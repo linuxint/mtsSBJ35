@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>jQuery UI Horizontal & Vertical Tabs 예제</title>
+    <!-- jQuery 및 jQuery UI 라이브러리를 포함합니다. -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+
+    <style>
+        /* 수직 탭 스타일 */
+        .ui-tabs-vertical {
+            width: 100%;
+        }
+        .ui-tabs-vertical .ui-tabs-nav {
+            padding: 10px 0;
+            float: left;
+            width: 20%;
+        }
+        .ui-tabs-vertical .ui-tabs-nav li {
+            clear: left;
+            width: 100%;
+            border-bottom: 1px solid #ccc;
+        }
+        .ui-tabs-vertical .ui-tabs-nav li a {
+            display: block;
+        }
+        .ui-tabs-vertical .ui-tabs-panel {
+            float: right;
+            width: 75%;
+            min-height: 150px;
+        }
+    </style>
+</head>
+<body>
+<h2>가로(수평) 탭</h2>
+<button onclick="addNewTab()">새 탭 추가</button>
+<div id="tabs-horizontal">
+    <ul>
+        <li><a href="#tab-1">탭 1</a></li>
+        <li><a href="#tab-2">탭 2</a></li>
+        <li><a href="#tab-3">탭 3</a></li>
+    </ul>
+    <div id="tab-1">
+        <h3>탭 1 컨텐츠</h3>
+        <p>이곳에 탭 1의 내용을 작성합니다.</p>
+    </div>
+    <div id="tab-2">
+        <h3>탭 2 컨텐츠</h3>
+        <p>이곳에 탭 2의 내용을 작성합니다.</p>
+    </div>
+    <div id="tab-3">
+        <h3>탭 3 컨텐츠</h3>
+        <p>이곳에 탭 3의 내용을 작성합니다.</p>
+    </div>
+</div>
+
+<h2>세로(수직) 탭</h2>
+<div id="tabs-vertical" class="ui-tabs-vertical ui-helper-clearfix">
+    <ul>
+        <li onclick="changeTab(0)"><a href="#tab-1-v">탭 1</a></li>
+        <li onclick="changeTab(1)"><a href="#tab-2-v">탭 2</a></li>
+        <li onclick="changeTab(2)"><a href="#tab-3-v">탭 3</a></li>
+    </ul>
+    <div id="tab-1-v">
+        <h3>탭 1 컨텐츠</h3>
+        <p>이곳에 탭 1의 내용을 작성합니다.</p>
+    </div>
+    <div id="tab-2-v">
+        <h3>탭 2 컨텐츠</h3>
+        <p>이곳에 탭 2의 내용을 작성합니다.</p>
+    </div>
+    <div id="tab-3-v">
+        <h3>탭 3 컨텐츠</h3>
+        <p>이곳에 탭 3의 내용을 작성합니다.</p>
+    </div>
+</div>
+
+<script>
+    // 가로(수평) 탭 초기화
+    $(function() {
+        $("#tabs-horizontal").tabs({
+            active: 1 // 탭 2를 처음으로 활성화
+        });
+    });
+
+    // 세로(수직) 탭 초기화
+    $(function() {
+        $("#tabs-vertical").tabs().addClass("ui-tabs-vertical ui-helper-clearfix");
+        $("#tabs-vertical li").removeClass("ui-corner-top").addClass("ui-corner-left");
+    });
+
+    function changeTab(index) {
+        $("#tabs-vertical").tabs("option", "active", index);
+    }
+    // 동적으로 탭 추가
+    function addNewTab() {
+        var newTabIndex = $("#tabs-horizontal ul li").length + 1;
+        var newTabContent = '<div id="tab-' + newTabIndex + '"><h3>탭 ' + newTabIndex + ' 컨텐츠</h3><p>이곳에 탭 ' + newTabIndex + '의 내용을 작성합니다.</p></div>';
+        var newTabLink = '<li><a href="#tab-' + newTabIndex + '">탭 ' + newTabIndex + '</a></li>';
+
+        $("#tabs-horizontal ul").append(newTabLink);
+        $("#tabs-horizontal").append(newTabContent);
+
+        $("#tabs-horizontal").tabs("refresh");
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="sign">
+
+    <!-- 결재 문서 작성 -->
+    <sql id="includeSignDoc">
+        INNER JOIN SGN_SIGN SS ON SS.DOCNO=SD.DOCNO AND SS.USERNO=${userno} AND SSTYPE!=0
+        <if test="searchExt1=='signed'">AND SS.SSRESULT!=0</if>        
+        <if test="searchExt1!='signed'">AND SS.SSRESULT=0 AND SS.SSSTEP=SD.DOCSTEP</if>        
+        WHERE SD.DELETEFLAG='N'
+        <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
+            <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
+                 ${item} LIKE '%' || #{searchKeyword} || '%'
+            </foreach>
+        </if>               
+    </sql>
+
+    <select id="selectSignDocCount" resultType="Integer" parameterType="com.devkbil.mtssbj.search.SearchVO">
+        SELECT COUNT(*)
+          FROM SGN_DOC SD
+         <include refid="includeSignDoc"/> 
+    </select> 
+    
+    <select id="selectSignDocList" resultType="com.devkbil.mtssbj.sign.SignDocVO" parameterType="com.devkbil.mtssbj.search.SearchVO">
+        SELECT * FROM (
+            SELECT ROW_NUMBER() OVER (ORDER BY SD.DOCNO DESC) AS RNUM
+                 , SD.DOCNO, DOCTITLE, SD.USERNO, USERNM, DOCSTEP, SD.DTNO, SDT.DTTITLE, DEPTNM
+                 , TO_CHAR(CHGDATE,'YYYY-MM-DD') CHGDATE, CODENM DOCSTATUS
+              FROM SGN_DOC SD
+             INNER JOIN COM_USER CU ON SD.USERNO=CU.USERNO
+             INNER JOIN SGN_DOCTYPE SDT ON SDT.DTNO=SD.DTNO
+             INNER JOIN COM_CODE CC ON CC.CODECD=SD.DOCSTATUS AND CLASSNO='2'
+             <include refid="includeSignDoc"/>
+        )
+        <if test="rowStart != null">
+            WHERE RNUM BETWEEN ${rowStart} AND ${rowStart-1}+${displayRowCount}
+            -- OFFSET ${rowStart-1} ROWS FETCH FIRST ${displayRowCount} ROWS ONLY -- oracle12c
+        </if>
+    </select> 
+        
+   <sql id="includeSignDocTobe">
+        WHERE SD.DELETEFLAG='N' AND SD.USERNO=${userno}
+        <if test="searchExt1!=''">
+            <if test="searchExt1==2">AND SD.DOCSTATUS IN (1,2)</if>
+            <if test="searchExt1!=2">AND SD.DOCSTATUS=${searchExt1}</if>
+        </if>        
+        
+        <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
+            <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
+                 ${item} LIKE '%'||#{searchKeyword}||'%'
+            </foreach>
+        </if>               
+    </sql>
+
+    <select id="selectSignDocTobeCount" resultType="Integer" parameterType="com.devkbil.mtssbj.search.SearchVO">
+        SELECT COUNT(*)
+          FROM SGN_DOC SD
+         <include refid="includeSignDocTobe"/>
+    </select> 
+    
+    <select id="selectSignDocTobeList" resultType="com.devkbil.mtssbj.sign.SignDocVO" parameterType="com.devkbil.mtssbj.search.SearchVO">
+        SELECT * FROM (
+            SELECT ROW_NUMBER() OVER (ORDER BY DOCNO DESC) AS RNUM
+                 , SD.DOCNO, DOCTITLE, SD.USERNO, USERNM, DOCSTEP, SD.DTNO, SDT.DTTITLE, DEPTNM
+                 , TO_CHAR(CHGDATE,'YYYY-MM-DD') CHGDATE, CODENM DOCSTATUS
+              FROM SGN_DOC SD
+             INNER JOIN COM_USER CU ON SD.USERNO=CU.USERNO
+             INNER JOIN SGN_DOCTYPE SDT ON SDT.DTNO=SD.DTNO
+             INNER JOIN COM_CODE CC ON CC.CODECD=SD.DOCSTATUS AND CLASSNO='2'
+             <include refid="includeSignDocTobe"/>
+        )
+        <if test="rowStart != null">
+            WHERE RNUM BETWEEN ${rowStart} AND ${rowStart-1}+${displayRowCount}
+            -- OFFSET ${rowStart-1} ROWS FETCH FIRST ${displayRowCount} ROWS ONLY -- oracle12c
+        </if>
+    </select> 
+            
+    <insert id="insertSignDoc" parameterType="com.devkbil.mtssbj.sign.SignDocVO">
+        <selectKey resultType="String" keyProperty="docno" order="BEFORE">
+            SELECT DOCNO_SEQ.NEXTVAL as docno FROM DUAL
+        </selectKey>
+        INSERT INTO SGN_DOC(DOCNO, DOCTITLE, USERNO, DOCCONTENTS, DOCSTATUS, DOCSTEP, DTNO, DEPTNM, DOCSIGNPATH, CHGDATE, REGDATE, DELETEFLAG)
+        VALUES (#{docno}, #{doctitle}, #{userno}, #{doccontents}, #{docstatus}, 1, #{dtno}, #{deptnm, jdbcType=VARCHAR}, #{docsignpath}, SYSDATE, SYSDATE, 'N')
+
+    </insert>
+
+    <update id="updateSignDoc" parameterType="com.devkbil.mtssbj.sign.SignDocVO">
+        UPDATE SGN_DOC
+           SET DOCTITLE=#{doctitle}, DOCCONTENTS=#{doccontents}, DOCSIGNPATH=#{docsignpath}
+             , CHGDATE=SYSDATE
+         WHERE DOCNO=#{docno} 
+    </update> 
+    
+    <delete id="deleteSign" parameterType="String">
+        DELETE 
+          FROM SGN_SIGN
+         WHERE DOCNO=#{docno} 
+    </delete>
+         
+    <insert id="insertSign" parameterType="com.devkbil.mtssbj.sign.SignVO" >
+        <selectKey resultType="String" keyProperty="ssno" order="BEFORE">
+            SELECT SSNO_SIGN_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO SGN_SIGN(SSNO, DOCNO, SSSTEP, SSTYPE, SSRESULT, RECEIVEDATE, SIGNDATE, USERNO, USERPOS)
+        VALUES ( #{ssno}, #{docno}, #{ssstep}, #{sstype}, #{ssresult}
+                , SYSDATE, ${signdate}, #{userno}, #{userpos} )
+    </insert>
+
+    <select id="selectSignDocOne" parameterType="com.devkbil.mtssbj.sign.SignDocVO" resultType="com.devkbil.mtssbj.sign.SignDocVO">
+        SELECT DOCNO, DOCTITLE, SD.USERNO, USERNM, DOCCONTENTS, DOCSTATUS, DOCSTEP, DTNO, DEPTNM
+             , TO_CHAR(CHGDATE, 'YYYY-MM-DD HH24:MI') as CHGDATE, DOCSIGNPATH
+          FROM SGN_DOC SD
+         INNER JOIN COM_USER CU ON SD.USERNO=CU.USERNO
+         WHERE SD.DELETEFLAG='N' AND DOCNO=#{docno}
+    </select> 
+    
+    <select id="selectCurrentSigner" parameterType="String" resultType="String">
+        SELECT SS.USERNO
+          FROM SGN_DOC SD
+         INNER JOIN SGN_SIGN SS ON SS.DOCNO=SD.DOCNO AND SS.SSSTEP=SD.DOCSTEP 
+        WHERE SD.DOCNO=#{docno} AND SD.DOCSTATUS IN (1,2)
+    </select>
+
+    <update id="deleteSignDoc" parameterType="com.devkbil.mtssbj.sign.SignDocVO">
+        UPDATE SGN_DOC
+           SET DELETEFLAG='Y'
+         WHERE DOCNO=#{docno} 
+    </update> 
+
+    <select id="selectSign" parameterType="String" resultType="com.devkbil.mtssbj.sign.SignVO">
+        SELECT SSNO, DOCNO, SSSTEP, SSTYPE, SSRESULT, SD.USERNO, USERNM, SD.USERPOS, SIGNDATE, SSCOMMENT
+          FROM SGN_SIGN SD
+         INNER JOIN COM_USER CU ON SD.USERNO=CU.USERNO
+         WHERE DOCNO=#{docno}
+         ORDER BY SSSTEP
+    </select>
+    
+    <select id="selectSignLast" parameterType="com.devkbil.mtssbj.sign.SignDocVO" resultType="com.devkbil.mtssbj.sign.SignVO">
+        <![CDATA[
+        SELECT SSNO, DOCNO, SSSTEP, SSTYPE, 0 as SSRESULT, SD.USERNO, USERNM, CD.CODENM as USERPOS
+          FROM SGN_SIGN SD
+         INNER JOIN COM_USER CU ON SD.USERNO=CU.USERNO
+         INNER JOIN COM_CODE CD ON CLASSNO='3' AND CD.CODECD=CU.USERPOS
+         WHERE DOCNO = (
+            SELECT DOCNO FROM (
+                SELECT ROW_NUMBER() OVER (ORDER BY DOCNO DESC) AS RNUM, DOCNO
+                  FROM SGN_DOC
+                 WHERE USERNO=#{userno} AND DTNO=#{dtno}
+            ) WHERE RNUM <= 1
+        )
+         ORDER BY SSSTEP
+        ]]>
+    </select>
+  
+    <!-- 결재 -->
+    <update id="updateSign" parameterType="com.devkbil.mtssbj.sign.SignVO" >
+        MERGE /*+ USE_HASH AB */
+         INTO SGN_SIGN SS
+        USING ( SELECT DOCNO, DOCSTEP FROM SGN_DOC SD) SD ON ( SD.DOCNO=SS.DOCNO AND SD.DOCSTEP=SS.SSSTEP )
+         WHEN MATCHED THEN
+        UPDATE SET SSRESULT=#{ssresult}
+            , SIGNDATE=SYSDATE
+            , SSCOMMENT=#{sscomment}
+    </update>
+
+    <select id="selectChkRemainSign" parameterType="com.devkbil.mtssbj.sign.SignVO" resultType="String">
+        <![CDATA[
+        SELECT SSSTEP
+          FROM (
+            SELECT ROWNUM RNUM, SSSTEP
+              FROM SGN_SIGN
+             WHERE DOCNO=#{docno} AND SSRESULT=0
+        ) WHERE RNUM <= 1
+        ]]>
+    </select>
+
+    <update id="updateSignDocStatus" parameterType="com.devkbil.mtssbj.sign.SignVO">
+        UPDATE SGN_DOC
+           SET DOCSTATUS = #{ssresult}
+            <if test="ssstep != null">
+                , DOCSTEP = DOCSTEP + 1
+            </if>
+         WHERE DOCNO=#{docno}
+    </update> 
+
+    <update id="updateSignDocCancel" parameterType="String">
+        UPDATE SGN_DOC
+           SET DOCSTATUS = 0
+         WHERE DOCNO=#{docno}
+    </update> 
+      
+</mapper> 
+

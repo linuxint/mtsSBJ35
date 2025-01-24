@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>log Viewer</title>
+    <style>
+        body {font-size:12px;}
+        table {
+            width: 100%;
+            border-top: 1px solid #444444;
+            border-collapse: collapse;
+        }
+        th, td {
+            border-bottom: 1px solid #444444;
+            padding: 3px;
+        }
+        tr:nth-child(even) {background: #CCC}
+        tr:nth-child(odd) {background: #FFF}
+    </style>
+</head>
+<body>
+<table>
+    <thead></thead>
+    <tbody>
+        <tr>
+            <th>No</th>
+            <th>logView</th>
+        </tr>
+        <tr th:each="logItem, idx : ${logView}">
+            <td th:text="${idx.index}"></td>
+            <td th:text="${logItem}"></td>
+        </tr>
+    </tbody>
+</table>
+</body>
+</html>

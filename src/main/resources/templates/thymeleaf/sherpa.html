@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<body>
+<script>
+  var url = "https://bacsherpa.blackyak.com/auth/forsherapa/";
+  var winPop = window.open(url, "bacsherpa", "left=10, top=10, width=1200, height=800");
+  setInterval(function() {
+    if (!winPop || (winPop && winPop.closed)) {
+      winPop = window.open(url, "bacsherpa", "left=10, top=10, width=1200, height=800");
+    } else {
+      winPop.location.href= url;
+    }
+    document.getElementById("result").innerText = Date();
+  },30000);
+</script>
+<div id="result"></div>
+</body>
+</html>

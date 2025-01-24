@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Tab Loading</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+<body>
+
+<div id="tabs">
+    <ul>
+        <li><a href="#tab-1">Tab 1</a></li>
+        <li><a href="#tab-2">Tab 2</a></li>
+        <!-- Add more tabs as needed -->
+    </ul>
+    <div id="tab-1">
+        <!-- Content of Tab 1 will be loaded dynamically -->
+    </div>
+    <div id="tab-2">
+        <!-- Content of Tab 2 will be loaded dynamically -->
+    </div>
+    <!-- Add more tab content divs as needed -->
+</div>
+
+<script>
+    $(document).ready(function() {
+        $("#tabs").tabs({
+            beforeLoad: function(event, ui) {
+                alert('a');
+                var tabContent = ui.panel;
+                var tabId = ui.tab.attr('href');
+
+                // Use AJAX to load content into tabs dynamically
+                $(tabContent).load('./index.html' + tabId, function(response, status, xhr) {
+                    if (status === "error") {
+                        console.log("Error loading content: " + xhr.statusText);
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

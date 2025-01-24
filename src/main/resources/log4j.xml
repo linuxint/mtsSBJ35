@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Properties>
+        <Property name="LOG_PATTERN">%-5level [${HOSTNAME}] [${PID:- }]  %d{yyyy-MM-dd HH:mm:ss.SSSZ}[%thread][%X{trxId}][%X{userName}] [%logger{0}:%line] - %msg%n</Property>
+        <Property name="LOG_DIR">@log.dir@/@app.name@</Property>
+        <Property name="APP_NAME">@app.name@</Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console">
+            <PatternLayout pattern="${LOG_PATTERN}" />
+        </Console>
+        <RollingFile name="rollingFileLogger"
+                     fileName="${LOG_DIR}/${APP_NAME}.log"
+                     filePattern="${LOG_DIR}/${APP_NAME}-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="${LOG_PATTERN}" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Logger name="com.devkbil" level="info">
+            <AppenderRef ref="rollingFileLogger" />
+        </Logger>
+        <Root level="info">
+            <AppenderRef ref="Console" />
+        </Root>
+    </Loggers>
+</Configuration>

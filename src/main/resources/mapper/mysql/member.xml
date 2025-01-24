@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="member">
+
+    <select id="selectSearchMemberCount" parameterType="com.devkbil.mtssbj.search.SearchVO" resultType="Integer" >
+        SELECT COUNT(*)
+          FROM COM_USER CU
+         WHERE CU.DELETEFLAG='N'
+           AND CU.USERNM LIKE CONCAT('%', #{searchKeyword},'%')
+    </select> 
+    
+    <select id="selectSearchMemberList" parameterType="com.devkbil.mtssbj.search.SearchVO" resultType="com.devkbil.mtssbj.member.UserVO" >
+        SELECT USERNO, USERID, USERNM, PHOTO, DEPTNM as DEPTNO
+          FROM COM_USER CU
+         INNER JOIN COM_DEPT CD ON CD.DEPTNO=CU.DEPTNO
+         WHERE CU.DELETEFLAG='N' AND CD.DELETEFLAG='N'
+           AND CU.USERNM LIKE CONCAT('%', #{searchKeyword},'%')
+         LIMIT ${rowStart-1}, 10
+    </select> 
+
+    <select id="selectMember4Login" parameterType="com.devkbil.mtssbj.member.UserVO" resultType="com.devkbil.mtssbj.member.UserVO" >
+        SELECT USERNO, USERID, USERNM, USERROLE
+          FROM COM_USER CU
+         WHERE CU.DELETEFLAG='N' 
+           AND CU.USERID = #{userid} AND USERPW=#{userpw}
+    </select> 
+    
+    <insert id="insertLogIn" parameterType="String">
+        INSERT INTO COM_LOGINOUT (USERNO, LTYPE, REGDATE)
+                           VALUES (#{userno}, 'I', NOW() );
+    </insert>
+
+    <insert id="insertLogOut" parameterType="String">
+        INSERT INTO COM_LOGINOUT (USERNO, LTYPE, REGDATE)
+                           VALUES (#{userno}, 'O', NOW() );
+    </insert>
+    
+</mapper>
+

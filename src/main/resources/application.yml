@@ -1,0 +1,132 @@
+#default 설정
+spring:
+  profiles:
+    active: local # 기본 환경을 local로
+    group:
+      local:
+        - common
+      dev:
+        - common
+      stag:
+        - common
+      prod:
+        - common
+---
+spring:
+  config:
+    activate:
+      on-profile: common # application-common.yml properties
+  pulsar:
+    client:
+      service-url: pulsar://localhost:6650
+    producer:
+      topic-name: logs
+--- #--------------------------------- local
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  #cache:
+  #  type: redis
+  #data:
+  #  redis:
+  #    host: localhost
+  #    port: 6379
+
+  datasource:
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    url: jdbc:p6spy:oracle:thin:@localhost:1521:XE
+    username: mts
+    password: mts
+    MaximumPoolSize: 10
+    MinimumIdle: 5
+    MaxLifetime: 1200000
+    ConnectionTimeout: 20000
+    IdleTimeout: 300000
+  sql:
+    #    init:
+    #      schema-locations:
+    #        - file:/database/Common/ddl/oracle/table.sql
+    #      data-locations:
+    #        - file:/database/Common/dml/oracle/tableData_oracle.sql
+    hikari:
+      pool-name: pool-oracle
+    jpa:
+      hibernate:
+        ddl-auto: none
+      output:
+        ansi:
+          enabled: always
+
+logging:
+  level:
+    org:
+      apache:
+        catalina: DEBUG
+        tomcat: DEBUG
+  file:
+    name: work/log/catalina.out
+    path: work/log/
+
+server:
+  port: 9090
+  #port: 8443
+  tomcat:
+    basedir: ./
+    accesslog:
+      enabled: true
+      directory: work/log/access
+  servlet:
+    jsp:
+      init-parameters:
+        mappedfile: false #자동 generated
+        trimWhitespace: true # 공백 제거
+
+#  jpa:
+#    hibernate:
+#      ddl-auto: create
+##      use-new-id-generator-mappings: false
+#      naming:
+#        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+#    generate-ddl: true
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true
+#      hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+--- #--------------------------------- dev
+spring:
+  config:
+    activate:
+      on-profile: dev
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+server:
+  port: 8081
+--- #--------------------------------- stag
+spring:
+  config:
+    activate:
+      on-profile: stag
+#  jpa:
+#    hibernate:
+#      ddl-auto: none
+server:
+  port: 8082
+--- #--------------------------------- prod
+spring:
+  config:
+    activate:
+      on-profile: prod
+#  jpa:
+#    hibernate:
+#      ddl-auto: none
+server:
+  port: 8083
+management:
+  health:
+    elasticsearch:
+      enabled: false
+

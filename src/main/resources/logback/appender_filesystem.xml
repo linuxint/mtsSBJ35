@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+    <!-- 파일 Appender 설정 -->
+    <appender name="FILE_SYSTEM_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 파일 경로 설정 -->
+        <file>${LOG_PATH}/${LOG_FILE_NAME_SYSTEM}.log</file>
+        <!-- 로그 패턴 설정 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <!-- 롤링 정책 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- gz, zip 등을 넣을 경우 자동 로그파일 압축 -->
+            <fileNamePattern>${LOG_PATH}/%d{yyyy-MM-dd}/${LOG_FILE_NAME_SYSTEM}_%i.log.gz</fileNamePattern>
+            <!-- 로그파일 최대 보관주기 -->
+            <maxHistory>30</maxHistory>
+            <maxFileSize>10MB</maxFileSize>
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.devkbil.mtssbj.common.masking.MaskingPatternLayout">
+                <maskPattern>\"userid\\{0,1}\"\s*:\s*\\{0,1}\"(.*?)\"</maskPattern>
+                <maskPattern>\"accountNum\\{0,1}\"\s*:\s*\\{0,1}\"(.*?)\"</maskPattern>
+                <maskPattern>\"phoneNum\\{0,1}\"\s*:\s*\\{0,1}\"(.*?)\"</maskPattern>
+                <maskPattern>\"TelNum\\{0,1}\"\s*:\s*\\{0,1}\"(.*?)\"</maskPattern>
+                <maskPattern>\"custBirth\\{0,1}\"\s*:\s*\\{0,1}\"(.*?)\"</maskPattern>
+                <maskPattern>\"custPNum\\{0,1}\"\s*:\s*\\{0,1}\"(.*?)\"</maskPattern>
+                <maskPattern>\"SSN\"\s*:\s*\"(.*?)\"</maskPattern> <!-- SSN JSON pattern -->
+                <maskPattern>\"address\"\s*:\s*\"(.*?)\"</maskPattern> <!-- Address JSON pattern -->
+                <maskPattern>(\d+\.\d+\.\d+\.\d+)</maskPattern> <!-- Ip address IPv4 pattern -->
+                <maskPattern>([\w.-]+@[\w.-]+\.\w+)</maskPattern> <!-- Email pattern -->
+                <pattern>%-5p [%d{ISO8601,UTC}] [%thread] %c: %m%n%rootException</pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+
+    <appender name="FILE_SYSTEM_ERROR_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>error</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_PATH}/${LOG_FILE_NAME_SYSTEM_ERROR}.log</file>
+        <!-- 로그 패턴 설정 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <!-- 롤링 정책 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- gz, zip 등을 넣을 경우 자동 로그파일 압축 -->
+            <fileNamePattern>${LOG_PATH}/%d{yyyy-MM-dd}/${LOG_FILE_NAME_SYSTEM_ERROR}_%i.log.gz</fileNamePattern>
+            <!-- 로그파일 최대 보관주기 -->
+            <maxHistory>30</maxHistory>
+            <maxFileSize>10MB</maxFileSize>
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.devkbil.mtssbj.common.masking.MaskingPatternLayout">
+                <maskPattern>\"userid\\{0,1}\"\s*:\s*\\{0,1}\"(.*?)\"</maskPattern>
+                <maskPattern>\"accountNum\\{0,1}\"\s*:\s*\\{0,1}\"(.*?)\"</maskPattern>
+                <maskPattern>\"phoneNum\\{0,1}\"\s*:\s*\\{0,1}\"(.*?)\"</maskPattern>
+                <maskPattern>\"TelNum\\{0,1}\"\s*:\s*\\{0,1}\"(.*?)\"</maskPattern>
+                <maskPattern>\"custBirth\\{0,1}\"\s*:\s*\\{0,1}\"(.*?)\"</maskPattern>
+                <maskPattern>\"custPNum\\{0,1}\"\s*:\s*\\{0,1}\"(.*?)\"</maskPattern>
+                <maskPattern>\"SSN\"\s*:\s*\"(.*?)\"</maskPattern> <!-- SSN JSON pattern -->
+                <maskPattern>\"address\"\s*:\s*\"(.*?)\"</maskPattern> <!-- Address JSON pattern -->
+                <maskPattern>(\d+\.\d+\.\d+\.\d+)</maskPattern> <!-- Ip address IPv4 pattern -->
+                <maskPattern>([\w.-]+@[\w.-]+\.\w+)</maskPattern> <!-- Email pattern -->
+                <pattern>%-5p [%d{ISO8601,UTC}] [%thread] %c: %m%n%rootException</pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+</included>

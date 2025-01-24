@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="project">
+
+    <sql id="includeProject">
+        WHERE PP.DELETEFLAG='N' 
+        <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
+            <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
+                 ${item} LIKE CONCAT('%', #{searchKeyword},'%' )
+            </foreach>
+        </if>               
+    </sql>
+
+    <select id="selectProjectCount" resultType="Integer" parameterType="com.devkbil.mtssbj.search.SearchVO">
+        SELECT COUNT(*)
+          FROM PRJ_PROJECT PP
+        INNER JOIN COM_USER CU ON PP.USERNO=CU.USERNO
+         <include refid="includeProject"/>
+    </select> 
+    
+    <select id="selectProjectList" resultType="com.devkbil.mtssbj.project.ProjectVO" parameterType="com.devkbil.mtssbj.search.SearchVO">
+        SELECT PRNO, PRTITLE, REGDATE, PRSTARTDATE, PRENDDATE
+             , PP.USERNO, USERNM, CODENM as PRSTATUS
+          FROM PRJ_PROJECT PP
+         INNER JOIN COM_USER CU ON PP.USERNO=CU.USERNO
+         INNER JOIN COM_CODE CC ON PP.PRSTATUS=CC.CODECD
+         <include refid="includeProject"/>
+           AND CC.CLASSNO=2
+         ORDER BY PRNO DESC 
+         <if test="rowStart != null">
+             LIMIT ${rowStart-1}, ${displayRowCount}
+         </if>
+    </select> 
+        
+    <insert id="insertProject" parameterType="com.devkbil.mtssbj.project.ProjectVO" >
+        INSERT INTO PRJ_PROJECT(PRTITLE, PRSTARTDATE, PRENDDATE, REGDATE, USERNO, PRSTATUS, DELETEFLAG)
+        VALUES (#{prtitle}, #{prstartdate}, #{prenddate}, now(), #{userno}, '0', 'N')
+    </insert>
+    
+    <update id="updateProject" parameterType="com.devkbil.mtssbj.project.ProjectVO">
+        UPDATE PRJ_PROJECT
+           SET PRTITLE=#{prtitle}
+             , PRSTATUS=#{prstatus}
+             , PRSTARTDATE=#{prstartdate} 
+             , PRENDDATE=#{prenddate}
+         WHERE DELETEFLAG='N'
+           AND PRNO=#{prno}
+    </update> 
+        
+    <select id="selectProjectOne" parameterType="String" resultType="com.devkbil.mtssbj.project.ProjectVO">
+        SELECT PRNO, PRTITLE, REGDATE, PRSTARTDATE, PRENDDATE
+             , PP.USERNO, USERNM, PRSTATUS
+          FROM PRJ_PROJECT PP
+         INNER JOIN COM_USER CU ON PP.USERNO=CU.USERNO
+         WHERE PP.DELETEFLAG='N'
+           AND PRNO=#{field1}
+    </select> 
+    
+    <select id="selectProjectAuthChk" parameterType="com.devkbil.mtssbj.project.ProjectVO" resultType="String">
+        SELECT PRNO
+          FROM PRJ_PROJECT
+         WHERE DELETEFLAG='N'
+           AND PRNO=#{prno} AND USERNO=#{userno}
+    </select> 
+
+    <delete id="deleteProjectOne" parameterType="String">
+        UPDATE PRJ_PROJECT
+           SET DELETEFLAG='Y'
+         WHERE PRNO=#{prno}
+    </delete> 
+    
+
+    <insert id="taskCopy_step1" parameterType="com.devkbil.mtssbj.common.ExtFieldVO">
+        INSERT INTO PRJ_TASK(PRNO, TSPARENT, TSTITLE, TSSTARTDATE, TSENDDATE, TSENDREAL, TSRATE, DELETEFLAG, OLDNO)
+            SELECT #{field2}, TSPARENT, TSTITLE, TSSTARTDATE, TSENDDATE, NULL, 0, 'N', TSNO
+            FROM PRJ_TASK
+            WHERE DELETEFLAG='N' AND PRNO=#{field1}
+        <selectKey keyProperty="field3" resultType="String" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+    
+    <update id="taskCopy_step2" parameterType="String">
+        UPDATE PRJ_TASK PT1
+         INNER JOIN PRJ_TASK PT2 ON PT2.PRNO=PT1.PRNO AND PT2.OLDNO=PT1.TSPARENT
+           SET PT1.TSPARENT=PT2.TSNO 
+         WHERE PT1.DELETEFLAG='N' AND PT1.PRNO=#{prno}
+           AND PT2.DELETEFLAG='N' AND PT2.PRNO=#{prno}
+    </update>    
+    
+</mapper>
+

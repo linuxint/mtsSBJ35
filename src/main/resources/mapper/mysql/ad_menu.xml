@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ad_menu">
+    <select id="selectMenu" resultType="com.devkbil.mtssbj.common.tree.TreeVO" >
+        SELECT MNU_NO as KEY, MNU_NM as TITLE, MNU_PARENT as PARENT
+          FROM COM_MENU
+         WHERE DELETEFLAG='N' 
+         ORDER BY MNU_NO
+    </select> 
+    
+    <insert id="insertMenu" parameterType="com.devkbil.mtssbj.admin.menu.MenuVO">
+        INSERT INTO COM_MENU(MNU_PARENT , MNU_TYPE , MNU_NM , MNU_DESC
+        , MNU_TARGET , MNU_FILENM , MNU_IMGPATH , MNU_CUSTOM , MNU_DESKTOP
+        , MNU_MOBILE , MNU_ORDER , MNU_CERT_TYPE , MNU_EXTN_CONN_YN , MNU_START_HOUR
+        , MNU_END_HOUR , REGUSERNO , CHGUSERNO , DELETEFLAG)
+        VALUES (#{mnuParent}, #{mnuType}, #{mnuNm}, #{mnuDesc}
+        , #{mnuTarget}, #{mnuFilenm}, #{mnuImgpath}, #{mnuCustom}, #{mnuDesktop}
+        , #{mnuMobile}, #{mnuOrder}, #{mnuCertType}, #{mnuExtnConnYn}, #{mnuStartHour}
+        , #{mnuEndHour}, #{reguserno}, #{chguserno}, 'N')
+        <selectKey keyProperty="mnuNo" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+    
+    <update id="updateMenu" parameterType="com.devkbil.mtssbj.admin.menu.MenuVO">
+        UPDATE COM_MENU
+        SET MNU_NM=#{mnuNm}
+          , MNU_PARENT=#{mnuParent}
+          , MNU_TYPE=#{mnuType}
+          , MNU_TARGET=#{mnuTarget}
+          , MNU_FILENM=#{mnuFilenm}
+          , MNU_IMGPATH=#{mnuImgpath}
+          , MNU_CUSTOM=#{mnuCustom}
+          , MNU_DESC=#{mnuDesc}
+          , MNU_ORDER=#{mnuOrder}
+          , MNU_DESKTOP=#{mnuDesktop}
+          , MNU_MOBILE=#{mnuMobile}
+          , MNU_EXTN_CONN_YN=#{mnuExtnConnYn}
+          , MNU_START_HOUR=#{mnuStartHour}
+          , MNU_END_HOUR=#{mnuEndHour}
+        WHERE MNU_NO=#{mnuNo}
+    </update> 
+        
+    <select id="selectMenuOne" parameterType="String" resultType="com.devkbil.mtssbj.admin.menu.MenuVO">
+        SELECT MNU_NO, MNU_NM
+          FROM COM_MENU
+         WHERE DELETEFLAG='N' AND MNU_NO=#{mnuNo}
+    </select> 
+
+    <delete id="deleteMenu" parameterType="String">
+        UPDATE COM_MENU
+           SET DELETEFLAG='Y'
+         WHERE MNU_NO=#{mnuNo}
+    </delete> 
+
+</mapper>
+

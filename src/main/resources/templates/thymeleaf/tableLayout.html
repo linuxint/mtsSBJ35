@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>log Viewer</title>
+    <style>
+        body {font-size:12px;}
+        table {
+            width: 100%;
+            border-top: 1px solid #444444;
+            border-collapse: collapse;
+        }
+        th, td {
+            border-bottom: 1px solid #444444;
+            padding: 3px;
+        }
+        .gray {background: #CCC}
+        .white {background: #FFF}
+        .yellow {background: #f1ebc2 }
+        .red {background: #f1c2c2}
+    </style>
+</head>
+<body>
+<table>
+    <thead></thead>
+    <tbody>
+        <tr>
+            <th>No</th>
+            <th>tableName</th>
+            <th>tableComments</th>
+            <th>columnName</th>
+            <th>columnComments</th>
+            <th>nullFlag</th>
+            <th>dataType</th>
+            <th>dataLength</th>
+            <th>pkFlag</th>
+            <th>fkFlag</th>
+        </tr>
+        <tr th:each="tableLayout, idx : ${listview}" th:class="${tableLayout.pkFlag}!=null ? 'yellow' : (${tableLayout.fkFlag}!=null ? 'gray' : 'white')">
+            <td th:text="${idx.index}"></td>
+            <td th:text="${tableLayout.tableName}"></td>
+            <td th:text="${tableLayout.tableComments}"></td>
+            <td th:text="${tableLayout.columnName}"></td>
+            <td th:text="${tableLayout.columnComments}"></td>
+            <td th:text="${tableLayout.nullFlag}"></td>
+            <td th:text="${tableLayout.dataType}"></td>
+            <td th:text="${tableLayout.dataLength}"></td>
+            <td th:text="${tableLayout.pkFlag}"></td>
+            <td th:text="${tableLayout.fkFlag}"></td>
+        </tr>
+    </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="crud">
+
+    <sql id="includeCrud">
+        WHERE TC.DELETEFLAG='N'
+        <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
+            <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
+                 ${item} LIKE CONCAT('%', #{searchKeyword},'%' )
+            </foreach>
+        </if>               
+    </sql>
+
+    <select id="selectCrudCount" resultType="Integer" parameterType="com.devkbil.mtssbj.search.SearchVO">
+        SELECT COUNT(1)
+          FROM TBL_CRUD TC
+         <include refid="includeCrud"/>
+    </select> 
+    
+    <select id="selectCrudList" resultType="com.devkbil.mtssbj.crud.CrudVO" parameterType="com.devkbil.mtssbj.search.SearchVO">
+        SELECT CRNO, CRTITLE, TC.USERNO, USERNM, CRMEMO, strftime('%Y-%m-%d', TC.REGDATE) as REGDATE
+          FROM TBL_CRUD TC
+         INNER JOIN COM_USER CU ON TC.USERNO=CU.USERNO
+         <include refid="includeCrud"/>
+         ORDER BY CRNO DESC
+         <if test="rowStart != null">
+             LIMIT 10 OFFSET ${rowStart-1}
+         </if>
+    </select> 
+        
+    <insert id="insertCrud" parameterType="com.devkbil.mtssbj.crud.CrudVO" >
+        INSERT INTO TBL_CRUD(CRTITLE, USERNO, CRMEMO, REGDATE, DELETEFLAG)
+        VALUES (#{crtitle}, #{userno}, #{crmemo}, datetime('now'), 'N')
+    </insert>
+    
+    <update id="updateCrud" parameterType="com.devkbil.mtssbj.crud.CrudVO">
+        UPDATE TBL_CRUD
+           SET CRTITLE=#{crtitle}, CRMEMO=#{crmemo}
+         WHERE CRNO=#{crno}
+    </update> 
+        
+    <select id="selectCrudOne" parameterType="com.devkbil.mtssbj.crud.CrudVO" resultType="com.devkbil.mtssbj.crud.CrudVO">
+        SELECT CRNO, CRTITLE, TC.USERNO, USERNM, CRMEMO, DATE_FORMAT(TC.REGDATE,'%Y-%m-%d') as REGDATE
+          FROM TBL_CRUD TC
+         INNER JOIN COM_USER CU ON TC.USERNO=CU.USERNO
+         WHERE DELETEFLAG='N' AND CRNO=#{crno}
+    </select> 
+    
+    <delete id="deleteCrud" parameterType="com.devkbil.mtssbj.crud.CrudVO">
+        UPDATE TBL_CRUD
+           SET DELETEFLAG='Y'
+         WHERE CRNO=#{crno} 
+    </delete> 
+
+    <delete id="deleteChk" parameterType="java.util.Map">
+        UPDATE TBL_CRUD
+           SET DELETEFLAG='Y'
+         WHERE CRNO IN
+            <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+    </delete>
+</mapper>
+

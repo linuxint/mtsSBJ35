@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>dependency View</title>
+    <style>
+        body {font-size:12px;}
+        table {
+            width: 100%;
+            border-top: 1px solid #444444;
+            border-collapse: collapse;
+        }
+        th, td {
+            border-bottom: 1px solid #444444;
+            padding: 3px;
+        }
+        .gray {background: #CCC}
+        .white {background: #FFF}
+        .yellow {background: #f1ebc2 }
+        .red {background: #f1c2c2}
+    </style>
+</head>
+<body>
+<table>
+    <thead></thead>
+    <tbody>
+        <tr>
+            <th>No</th>
+            <th>dependency View</th>
+        </tr>
+        <tr th:each="depItem, idx : ${listview}" >
+            <td th:text="${idx.index}"></td>
+            <td class="gray"   th:text="${depItem}" th:if="${#strings.contains(depItem,'->') == true} and ${#strings.contains(depItem,'(c)') == false}"></td>
+            <td class="yellow" th:text="${depItem}" th:if="${#strings.contains(depItem,'->') == false} and ${#strings.contains(depItem,'(c)') == true}"></td>
+            <td class="red"    th:text="${depItem}" th:if="${#strings.contains(depItem,'->') == true} and ${#strings.contains(depItem,'(c)') == true}"></td>
+            <td class="white"  th:text="${depItem}" th:if="${#strings.contains(depItem,'->') == false} and ${#strings.contains(depItem,'(c)') == false}"></td>
+        </tr>
+    </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,87 @@
+package com.devkbil.mtssbj.common.util;
+
+import com.devkbil.mtssbj.common.LocaleMessage;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.io.*;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+@Slf4j
+@Controller
+@RequiredArgsConstructor
+public class FileDownload {
+
+    LocaleMessage localeMessage;
+
+    /**
+     * 파일(첨부파일, 이미지등) 다운로드.
+     */
+    @GetMapping("fileDownload")
+    public void fileDownload(@RequestParam(value = "filename", required = false) String filename, @RequestParam(value = "downname", required = false) String downname, HttpServletRequest request, HttpServletResponse response) {
+        String path = System.getProperty("user.dir") + "/fileupload/";
+
+        if (!StringUtils.hasText(filename)) {
+            filename = downname;
+        }
+
+        try {
+            // 파일명 UTF-8로 인코딩
+            filename = URLEncoder.encode(filename, StandardCharsets.UTF_8);
+
+            String realPath = FileUtil.getRealPath(path, downname) + downname;
+
+            File file = new File(realPath);
+            if (!file.exists()) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found");
+                return;
+            }
+
+            // HTTP 응답 헤더 설정
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+            response.setContentLengthLong(file.length()); // 파일 크기 설정
+
+            // 파일 데이터를 버퍼링된 스트림으로 전송
+            try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+                 BufferedOutputStream bos = new BufferedOutputStream(response.getOutputStream())) {
+
+                byte[] buffer = new byte[8192]; // 8KB 버퍼
+                int bytesRead;
+                while ((bytesRead = bis.read(buffer)) != -1) {
+                    bos.write(buffer, 0, bytesRead);
+                }
+
+                bos.flush(); // 모든 데이터가 제대로 전송되도록 강제 flush
+            }
+        } catch (FileNotFoundException e) {
+            log.error("File not found error: {}", e.getMessage());
+            try {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found");
+            } catch (IOException ioException) {
+                log.error("Error sending 404 response: {}", ioException.getMessage());
+            }
+        } catch (IOException e) {
+            log.error("I/O error during file download: {}", e.getMessage());
+            try {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal server error");
+            } catch (IOException ioException) {
+                log.error("Error sending 500 response: {}", ioException.getMessage());
+            }
+        } catch (Exception e) {
+            log.error("Unexpected error: {}", e.getMessage());
+            try {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unexpected error");
+            } catch (IOException ioException) {
+                log.error("Error sending unexpected error response: {}", ioException.getMessage());
+            }
+        }
+    }
+
+}

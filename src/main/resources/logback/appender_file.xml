@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+    <!-- 화면출력용 전체로그 -->
+    <appender name="FILE_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 파일 경로 설정 -->
+        <file>${LOG_PATH}/${LOG_FILE_NAME}.log</file>
+        <!-- 로그 패턴 설정 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <!-- 롤링 정책 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- gz, zip 등을 넣을 경우 자동 로그파일 압축 -->
+            <fileNamePattern>${LOG_PATH}/%d{yyyy-MM-dd}/${LOG_FILE_NAME}_%i.log.gz</fileNamePattern>
+            <!-- 로그파일 최대 보관주기 -->
+            <maxHistory>30</maxHistory>
+            <maxFileSize>10MB</maxFileSize>
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- 파일 Appender 설정 -->
+    <appender name="FILE_SIFT_APPENDER" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <key>userip</key>
+            <defaultValue>server</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${userip}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <!-- 파일 경로 설정 -->
+                <file>${LOG_PATH}/${userip}/${LOG_FILE_NAME}.log</file>
+                <!-- 로그 패턴 설정 -->
+                <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                    <pattern>${LOG_PATTERN}</pattern>
+                </encoder>
+                <!-- 롤링 정책 -->
+                <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                    <!-- gz, zip 등을 넣을 경우 자동 로그파일 압축 -->
+                    <fileNamePattern>${LOG_PATH}/${userip}/%d{yyyy-MM-dd}/${LOG_FILE_NAME}_%i.log.gz</fileNamePattern>
+                    <!-- 로그파일 최대 보관주기 -->
+                    <maxHistory>30</maxHistory>
+                    <maxFileSize>10MB</maxFileSize>
+                    <totalSizeCap>20GB</totalSizeCap>
+                </rollingPolicy>
+            </appender>
+        </sift>
+    </appender>
+
+    <!-- 파일 Appender 설정 -->
+    <appender name="FILE_SIFT_ERROR_APPENDER" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <key>userip</key>
+            <defaultValue>server</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="ERROR-${userip}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                    <level>error</level>
+                    <onMatch>ACCEPT</onMatch>
+                    <onMismatch>DENY</onMismatch>
+                </filter>
+                <file>${LOG_PATH}/${userip}/${LOG_FILE_NAME_ERROR}.log</file>
+                <!-- 로그 패턴 설정 -->
+                <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                    <pattern>${LOG_PATTERN}</pattern>
+                </encoder>
+                <!-- 롤링 정책 -->
+                <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                    <!-- gz, zip 등을 넣을 경우 자동 로그파일 압축 -->
+                    <fileNamePattern>${LOG_PATH}/${userip}/%d{yyyy-MM-dd}/${LOG_FILE_NAME_ERROR}_%i.log.gz
+                    </fileNamePattern>
+                    <!-- 로그파일 최대 보관주기 -->
+                    <maxHistory>30</maxHistory>
+                    <maxFileSize>10MB</maxFileSize>
+                    <totalSizeCap>20GB</totalSizeCap>
+                </rollingPolicy>
+            </appender>
+        </sift>
+    </appender>
+
+</included>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="code">
+
+    <sql id="includeCode">
+        WHERE 1=1
+        <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
+            <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
+                 ${item} LIKE '%' || #{searchKeyword} || '%'
+            </foreach>
+        </if>               
+    </sql>
+
+    <select id="selectCodeCount" resultType="Integer" parameterType="com.devkbil.mtssbj.search.SearchVO">
+        SELECT COUNT(*)
+          FROM COM_CODE CC
+         <include refid="includeCode"/>
+    </select> 
+    
+    <select id="selectCodeList" resultType="com.devkbil.mtssbj.admin.code.CodeVO" parameterType="com.devkbil.mtssbj.search.SearchVO">
+        SELECT CLASSNO, CODECD, CODENM
+          FROM COM_CODE TB
+         <include refid="includeCode"/>
+         ORDER BY CLASSNO, CODECD 
+         <if test="rowStart != null">
+             LIMIT ${rowStart-1}, 10
+         </if>
+    </select> 
+        
+    <insert id="insertCode" parameterType="com.devkbil.mtssbj.admin.code.CodeVO" >
+        INSERT INTO COM_CODE(CLASSNO, CODECD, CODENM)
+        VALUES (#{classno}, #{codecd}, #{codenm})
+    </insert>
+    
+    <update id="updateCode" parameterType="com.devkbil.mtssbj.admin.code.CodeVO">
+        UPDATE COM_CODE
+           SET CODENM=#{codenm}
+         WHERE CLASSNO=#{classno} AND CODECD=#{codecd}
+    </update> 
+        
+    <select id="selectCodeOne" parameterType="com.devkbil.mtssbj.admin.code.CodeVO" resultType="com.devkbil.mtssbj.admin.code.CodeVO">
+        SELECT CLASSNO, CODECD, CODENM
+          FROM COM_CODE CC
+         WHERE CLASSNO=#{classno} AND CODECD=#{codecd}
+    </select> 
+    
+    <delete id="deleteCodeOne" parameterType="com.devkbil.mtssbj.admin.code.CodeVO">
+        DELETE FROM COM_CODE
+         WHERE CLASSNO=#{classno} AND CODECD=#{codecd}
+    </delete> 
+    
+</mapper>
+

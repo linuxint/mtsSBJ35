@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ad_user">
+    <select id="selectUserList" parameterType="String" resultType="com.devkbil.mtssbj.member.UserVO">
+        SELECT USERNO, USERID, USERNM, USERPW, PHOTO, DEPTNO, CODENM as USERROLE
+          FROM COM_USER CU
+         LEFT OUTER JOIN COM_CODE CC ON CC.CODECD=CU.USERROLE
+         WHERE CU.DELETEFLAG='N' AND CU.DEPTNO=#{deptno}
+
+           AND CC.CLASSNO = 1
+    </select> 
+    
+    <select id="selectUserListWithDept" parameterType="com.devkbil.mtssbj.search.SearchVO" resultType="com.devkbil.mtssbj.member.UserVO">
+        SELECT USERNO, USERID, USERNM, USERPW, PHOTO, CU.DEPTNO, DEPTNM, CC.CODENM as USERPOS
+          FROM COM_USER CU
+         LEFT OUTER JOIN COM_DEPT CD ON CD.DEPTNO=CU.DEPTNO
+         LEFT OUTER JOIN COM_CODE CC ON CC.CODECD=CU.USERPOS AND CC.CLASSNO='3'
+         WHERE CU.DELETEFLAG='N' AND CD.DELETEFLAG='N'
+           <if test="searchExt1!=null and searchExt1!=''">
+               AND CU.DEPTNO=#{searchExt1} 
+           </if>
+           <if test="searchKeyword!=null and searchKeyword!=''">
+               AND CU.USERNM LIKE '%' || #{searchKeyword} || '%'
+
+           </if>
+    </select>
+
+    
+    <select id="selectUserID" parameterType="String" resultType="String">
+        SELECT USERID
+          FROM COM_USER CU
+         WHERE CU.DELETEFLAG='N'
+           AND USERID=#{userid}        
+    </select> 
+   
+    <insert id="insertUser" parameterType="com.devkbil.mtssbj.member.UserVO" >
+        INSERT INTO COM_USER(USERID, USERNM, USERPW, USERROLE, PHOTO, DEPTNO, DELETEFLAG)
+        VALUES (#{userid}, #{usernm}, #{userpw}, #{userrole}, #{photo}, #{deptno}, 'N')
+        <selectKey keyProperty="userno" resultType="String" order="AFTER">
+            SELECT last_insert_rowid()
+        </selectKey>
+        </insert>
+    
+    <update id="updateUser" parameterType="com.devkbil.mtssbj.member.UserVO">
+        UPDATE COM_USER
+           SET USERNM=#{usernm}
+             , USERROLE = #{userrole}
+             <if test="photo != null and photo != ''">
+                 , PHOTO=#{photo}
+             </if>     
+         WHERE DELETEFLAG='N'
+           AND USERNO=#{userno} 
+    </update> 
+
+    <update id="updateUserByMe" parameterType="com.devkbil.mtssbj.member.UserVO">
+        UPDATE COM_USER
+           SET USERNM=#{usernm}
+             <if test="photo != null and photo != ''">
+                 , PHOTO=#{photo}
+             </if>     
+         WHERE DELETEFLAG='N'
+           AND USERNO=#{userno} 
+    </update> 
+        
+    <select id="selectUserOne" parameterType="String" resultType="com.devkbil.mtssbj.member.UserVO">
+        SELECT USERNO, USERID, USERNM, USERPW, USERROLE, PHOTO, DEPTNO
+          FROM COM_USER
+         WHERE DELETEFLAG = 'N'
+           AND USERNO = #{userno}
+    </select> 
+    
+    <delete id="deleteUser" parameterType="String">
+        UPDATE COM_USER
+           SET DELETEFLAG='Y'
+         WHERE USERNO=#{userno}
+    </delete> 
+    
+    <update id="updateUserPassword" parameterType="com.devkbil.mtssbj.member.UserVO">
+        UPDATE COM_USER
+           SET USERPW = #{userpw}
+         WHERE USERNO = #{userno}
+    </update> 
+        
+</mapper>
+

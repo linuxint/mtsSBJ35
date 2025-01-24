@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <title>간단한 지도 표시하기</title>
+</head>
+<body>
+<div id="map" style="width:100%;height:600px;">
+    <input type="text" name="addr" id="addr" value="인천광역시 부평구 부평문화로 216" placeholder="주소입력"/><input type="button" id="getGps" value="GPS보기"/><input type="text" name="gps" id="gps" value="" placeholder="GPS좌표"/>
+</div>
+<script>
+
+    const addrClick = () => {
+        const addr = document.getElementById("addr");
+        const retValue = getGeocode(addr.value)
+        console.log(retValue);
+    }
+
+    {
+        const button = document.getElementById("getGps");
+        button.addEventListener("click", addrClick);
+    }
+
+    async function getGeocode(address) {
+        const url = `/getGeocode?address=${encodeURIComponent(address)}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET'
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data && data.addresses && data.addresses.length > 0) {
+                const { x, y } = data.addresses[0];
+                alert(`Latitude: ${y}, Longitude: ${x}`);
+                return {x,y};
+            } else {
+                console.log('No results found');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+</script>
+</body>
+</html>

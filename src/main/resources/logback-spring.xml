@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 10초마다 파일 변화를 체크하여 갱신시킨다. -->
+<configuration scan="true" debug="true" scanPeriod="10 seconds">
+    <import class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"/>
+    <import class="ch.qos.logback.core.rolling.RollingFileAppender"/>
+    <import class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy"/>
+    <import class="ch.qos.logback.classic.sift.SiftingAppender"/>
+
+    <property resource ="application.properties"/>
+    <springProperty name="NAME" source="spring.application.name" />
+
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+
+    <!-- spring.profile에 따른 설정파일 분기 -->
+    <springProfile name = "local">
+        <property resource = "./logback/logback-local.properties"/>
+    </springProfile>
+
+    <springProfile name = "dev">
+        <property resource = "./logback/logback-dev.properties"/>
+    </springProfile>
+
+    <springProfile name = "stag">
+        <property resource = "./logback/logback-stag.properties"/>
+    </springProfile>
+
+    <springProfile name = "prod">
+        <property resource = "./logback/logback-prod.properties"/>
+    </springProfile>
+
+    <!-- 루트 로그 레벨 -->
+    <property name ="LOG_LEVEL" value = "${log.config.level}"/>
+
+    <!-- 로그 파일 경로 -->
+    <property name ="LOG_PATH" value = "${log.config.path:-./logs_local}"/>
+
+    <!-- 전체 로그 파일 명 -->
+    <property name ="LOG_FILE_NAME" value = "${log.config.filename}"/>
+    <property name ="LOG_FILE_NAME_ERROR" value = "${log.config.filename}_error"/>
+
+    <!-- 배치 로그 파일 명 -->
+    <property name ="LOG_FILE_NAME_BATCH" value = "${log.config.filename}_BATCH"/>
+    <property name ="LOG_FILE_NAME_BATCH_ERROR" value = "${log.config.filename}_BATCH_error"/>
+
+    <!-- 시스템 로그 파일 명 -->
+    <property name ="LOG_FILE_NAME_SYSTEM" value = "${log.config.filename}_SYSTEM"/>
+    <property name ="LOG_FILE_NAME_SYSTEM_ERROR" value = "${log.config.filename}_SYSTEM_error"/>
+
+    <!-- SQL 로그 파일 명 -->
+    <property name ="LOG_FILE_NAME_SQL" value = "${log.config.filename}_SQL"/>
+
+    <!-- 로그 파일 패턴 -->
+    <property name ="LOG_PATTERN" value = "%-5level [${HOSTNAME}] [${PID:- }]  %d{yyyy-MM-dd HH:mm:ss.SSSZ}[%thread][%X{trxId}][%X{userName}] [%logger{0}:%line] - %msg%n"/>
+    <property name ="LOG_PATTERN_CONSOLE" value = "%cyan(%date GMT) [%highlight(%-5level)] [%magenta(%thread)]
+        [%blue(%logger{36}.%M\(%line\))] %msg
+        %n"/>
+
+    <!-- appender별 분리 파일 include -->
+    <include resource="logback/appender_console.xml"/>
+    <include resource="logback/appender_file.xml"/>
+    <include resource="logback/appender_filesystem.xml"/>
+    <include resource="logback/appender_batch.xml"/>
+    <include resource="logback/appender_sql.xml"/>
+
+    <root level = "${LOG_LEVEL}">
+        <appender-ref ref="CONSOLE_APPENDER"/>
+        <appender-ref ref="FILE_APPENDER"/>
+        <appender-ref ref="FILE_SIFT_APPENDER"/>
+        <appender-ref ref="FILE_SIFT_ERROR_APPENDER"/>
+    </root>
+
+    <logger name="sqlLogger" level="DEBUG" additivity="false">
+        <appender-ref ref="SQL_APPENDER"/>
+        <appender-ref ref="SQL_SIFT_APPENDER"/>
+    </logger>
+    <logger name="p6spy" level="DEBUG" additivity="false">
+        <appender-ref ref="SQL_APPENDER"/>
+        <appender-ref ref="SQL_SIFT_APPENDER"/>
+    </logger>
+
+    <logger name="net.ttddyy.dsproxy.listener.logging" level = "DEBUG" additivity = "false">
+        <appender-ref ref="SQL_APPENDER"/>
+        <appender-ref ref="SQL_SIFT_APPENDER"/>
+    </logger>
+
+    <logger name="org.apache.ibatis" level = "DEBUG" additivity = "false">
+        <appender-ref ref="SQL_APPENDER"/>
+        <appender-ref ref="SQL_SIFT_APPENDER"/>
+        <appender-ref ref="CONSOLE_APPENDER"/>
+        <appender-ref ref="FILE_APPENDER"/>
+        <appender-ref ref="FILE_SIFT_APPENDER"/>
+        <appender-ref ref="FILE_SIFT_ERROR_APPENDER"/>
+    </logger>
+
+    <logger name="org.springframework.boot.autoconfigure.logging" level="info"/>
+
+    <logger name="BATCH" level="trace">
+        <appender-ref ref="FILE_BATCH_APPENDER"/>
+        <appender-ref ref="FILE_BATCH_ERROR_APPENDER"/>
+    </logger>
+
+    <logger name="SYSTEM" level="trace">
+        <appender-ref ref="FILE_SYSTEM_APPENDER"/>
+        <appender-ref ref="FILE_SYSTEM_ERROR_APPENDER"/>
+    </logger>
+</configuration>
