@@ -47,10 +47,29 @@
     </update> 
         
     <select id="selectMenuOne" parameterType="String" resultType="com.devkbil.mtssbj.admin.menu.MenuVO">
-        SELECT MNU_NO, MNU_NM
-          FROM COM_MENU
-         WHERE DELETEFLAG='N' AND MNU_NO=#{mnuNo}
-    </select> 
+        SELECT MNU_NO as mnuNo,
+               MNU_PARENT as mnuParent,
+               MNU_TYPE as mnuType,
+               MNU_NM as mnuNm,
+               MNU_DESC as mnuDesc,
+               MNU_TARGET as mnuTarget,
+               MNU_FILENM as mnuFilenm,
+               MNU_IMGPATH as mnuImgpath,
+               MNU_CUSTOM as mnuCustom,
+               MNU_DESKTOP as mnuDesktop,
+               MNU_MOBILE as mnuMobile,
+               MNU_ORDER as mnuOrder,
+               MNU_CERT_TYPE as mnuCertType,
+               MNU_EXTN_CONN_YN as mnuExtnConnYn,
+               MNU_START_HOUR as mnuStartHour,
+               MNU_END_HOUR as mnuEndHour,
+               REGUSERNO as reguserno,
+               CHGUSERNO as chguserno,
+               DELETEFLAG as deleteflag
+        FROM COM_MENU
+        WHERE DELETEFLAG = 'N'
+          AND MNU_NO = #{mnuNo}
+    </select>
 
     <delete id="deleteMenu" parameterType="String">
         UPDATE COM_MENU
