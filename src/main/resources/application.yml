@@ -44,14 +44,20 @@ spring:
     MaxLifetime: 1200000
     ConnectionTimeout: 20000
     IdleTimeout: 300000
+    hikari:
+      pool-name: pool-oracle
+      minimum-idle: 5
+      maximum-pool-size: 10
+      idle-timeout: 300000 # 최소 유휴 시간
+      max-lifetime: 1800000 # 최대 연결 유지 시간
+      connection-timeout: 20000 # 연결 대기 시간
   sql:
     #    init:
     #      schema-locations:
     #        - file:/database/Common/ddl/oracle/table.sql
     #      data-locations:
     #        - file:/database/Common/dml/oracle/tableData_oracle.sql
-    hikari:
-      pool-name: pool-oracle
+
     jpa:
       hibernate:
         ddl-auto: none
