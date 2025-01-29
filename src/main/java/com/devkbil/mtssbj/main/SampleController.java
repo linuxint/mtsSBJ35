@@ -16,8 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashMap;
 import java.util.List;
@@ -101,7 +101,7 @@ public class SampleController {
      */
     @Operation(summary = "목록 & 엑셀 샘플", description = "목록 표시와 엑셀 다운로드 기능을 테스트합니다.")
     @GetMapping("/sample4")
-    public String sample4(@RequestBody @Valid BoardSearchVO searchVO, ModelMap modelMap) {
+    public String sample4(@ModelAttribute @Valid BoardSearchVO searchVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -126,7 +126,7 @@ public class SampleController {
      */
     @Operation(summary = "엑셀 다운로드 샘플", description = "목록 데이터를 Excel로 다운로드합니다.")
     @PostMapping("/sample4Excel")
-    public void sample4Excel(HttpServletRequest request, HttpServletResponse response, @RequestBody @Valid BoardSearchVO searchVO) {
+    public void sample4Excel(HttpServletRequest request, HttpServletResponse response, @ModelAttribute @Valid BoardSearchVO searchVO) {
 
         // 엑셀 출력 헤더 정의
         String[] cellHeader = {

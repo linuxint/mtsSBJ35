@@ -36,7 +36,7 @@ public class DepartmentController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
             @ApiResponse(responseCode = "500", description = "서버에 오류가 발생하였습니다.")
     })
-    public DeptVO saveDepartment(@RequestBody @Valid DeptVO department) {
+    public DeptVO saveDepartment(@ModelAttribute @Valid DeptVO department) {
         return departmentService.saveDepartment(department);
     }
 
@@ -69,7 +69,7 @@ public class DepartmentController {
             @ApiResponse(responseCode = "404", description = "해당 ID의 부서를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "500", description = "서버에 오류가 발생하였습니다.")
     })
-    public DeptVO updateDepartment(@RequestBody DeptVO department, @PathVariable("id") Long departmentNo) {
+    public DeptVO updateDepartment(@ModelAttribute DeptVO department, @PathVariable("id") Long departmentNo) {
         return departmentService.updateDepartment(department, departmentNo);
     }
 

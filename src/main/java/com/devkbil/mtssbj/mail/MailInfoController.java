@@ -13,8 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class MailInfoController {
      */
     @Operation(summary = "메일 설정 리스트 조회", description = "사용자 메일 설정 리스트를 조회합니다.")
     @GetMapping("/mailInfoList")
-    public String mailInfoList(@RequestBody @Valid SearchVO searchVO, ModelMap modelMap) {
+    public String mailInfoList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -60,7 +60,7 @@ public class MailInfoController {
      */
     @Operation(summary = "메일 설정 작성/수정 폼 조회", description = "메일 설정을 작성하거나 수정하기 위한 폼을 제공합니다.")
     @GetMapping("/mailInfoForm")
-    public String mailInfoForm(@RequestBody @Valid MailInfoVO mailInfoInfo, ModelMap modelMap) {
+    public String mailInfoForm(@ModelAttribute @Valid MailInfoVO mailInfoInfo, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -86,7 +86,7 @@ public class MailInfoController {
      */
     @Operation(summary = "메일 설정 저장", description = "메일 서버 정보를 저장합니다.")
     @PostMapping("/mailInfoSave")
-    public String mailInfoSave(HttpServletRequest request, @RequestBody @Valid MailInfoVO mailInfoInfo, ModelMap modelMap) {
+    public String mailInfoSave(HttpServletRequest request, @ModelAttribute @Valid MailInfoVO mailInfoInfo, ModelMap modelMap) {
 
         HttpSession session = request.getSession();
 
@@ -124,7 +124,7 @@ public class MailInfoController {
      */
     @Operation(summary = "메일 설정 삭제", description = "선택한 메일 설정을 삭제합니다.")
     @PostMapping("/mailInfoDelete")
-    public String mailInfoDelete(@RequestBody @Valid MailInfoVO mailInfoVO) {
+    public String mailInfoDelete(@ModelAttribute @Valid MailInfoVO mailInfoVO) {
 
         mailService.deleteMailInfo(mailInfoVO);
 

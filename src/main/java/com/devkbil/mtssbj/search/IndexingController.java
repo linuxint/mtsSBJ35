@@ -12,6 +12,7 @@ import com.devkbil.mtssbj.config.EsConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -69,13 +70,23 @@ public class IndexingController {
 
     @Value("${batch.indexing.host}")
     private String indexingHost;
-    @Value("${elasticsearch.clustername}")
+
+    @Setter(onMethod_ = @Value("${elasticsearch.clustername}"))
     private String indexName;
-    private final String lastFile = System.getProperty("user.dir") + "/elasticsearch/" + indexName + ".last";
-    //final String LAST_FILE = localeMessage.getMessage("info.workspace") + "/elasticsearch/mts.last";
+
+    private String lastFile;
+
+    @Value("${elasticsearch.clustername}")
+    public void setIndexName(String indexName) {
+        this.indexName = indexName;
+        this.lastFile = System.getProperty("user.dir") + "/elasticsearch/" + indexName + ".last";
+    }
+
     @Value("${batch.indexing.file_ext}")
     private String fileExtention;
+
     private final Logger logBatch = LoggerFactory.getLogger("BATCH");
+
     private boolean isIndexing = false;
     private Properties lastFileProps = null;            // 마지막 색인값 보관
 
@@ -116,7 +127,6 @@ public class IndexingController {
         String filePath = System.getProperty("user.dir") + "/fileupload/"; //localeMessage.getMessage("info.filePath") + "/";  //  첨부 파일 경로
 
         // ---------------------------- elasticsearch connection --------------------------------
-        //RestHighLevelClient client = createConnection();
         RestHighLevelClient client = esConfig.client();
 
         // ---------------------------- 게시판 변경글 --------------------------------

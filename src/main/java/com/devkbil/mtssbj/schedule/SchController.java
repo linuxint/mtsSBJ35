@@ -15,8 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
@@ -43,7 +43,7 @@ public class SchController {
      * @param searchVO 검색 조건
      * @return 설정된 검색 조건
      */
-    private MonthVO setupDefaultDates(@RequestBody @Valid MonthVO searchVO) {
+    private MonthVO setupDefaultDates(@ModelAttribute @Valid MonthVO searchVO) {
 
         if (!StringUtils.hasText(searchVO.getYear())) {
             Date today = DateUtil.getToday();
@@ -71,7 +71,7 @@ public class SchController {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     @GetMapping("/schList")
-    public String schList(@RequestBody @Valid MonthVO searchVO, ModelMap modelMap) {
+    public String schList(@ModelAttribute @Valid MonthVO searchVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -98,7 +98,7 @@ public class SchController {
     @ApiResponse(responseCode = "200", description = "일정 입력/수정 화면을 반환했습니다.")
     @GetMapping("/schForm")
     public String schForm(@RequestParam(value = "cddate", required = false) String cddate
-            , @RequestBody @Valid SchVO schInfo, ModelMap modelMap) {
+            , @ModelAttribute @Valid SchVO schInfo, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -127,7 +127,7 @@ public class SchController {
     @Operation(summary = "일정 저장", description = "사용자의 일정 정보를 저장합니다.")
     @ApiResponse(responseCode = "200", description = "일정을 성공적으로 저장했습니다.")
     @PostMapping("/schSave")
-    public String schSave(@RequestBody @Valid SchVO schInfo) {
+    public String schSave(@ModelAttribute @Valid SchVO schInfo) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -150,7 +150,7 @@ public class SchController {
     @Operation(summary = "Ajax 일정 읽기", description = "특정 사용자의 일정을 Ajax로 조회합니다.")
     @ApiResponse(responseCode = "200", description = "일정을 성공적으로 조회했습니다(Ajax).")
     @PostMapping("/schRead4Ajax")
-    public String schRead4Ajax(@RequestBody @Valid SchVO schVO, @RequestParam(value = "cddate") String cddate, ModelMap modelMap) {
+    public String schRead4Ajax(@ModelAttribute @Valid SchVO schVO, @RequestParam(value = "cddate") String cddate, ModelMap modelMap) {
 
         SchVO schInfo = schService.selectSchOne4Read(schVO);
 
@@ -174,7 +174,7 @@ public class SchController {
      */
     @Operation(summary = "일정관리-일정읽기Request")
     @PostMapping("/schRead")
-    public String schRead(@RequestBody @Valid SchVO schVO, ModelMap modelMap) {
+    public String schRead(@ModelAttribute @Valid SchVO schVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -195,7 +195,7 @@ public class SchController {
     @Operation(summary = "일정 삭제", description = "특정 사용자의 일정을 삭제합니다.")
     @ApiResponse(responseCode = "200", description = "일정을 성공적으로 삭제했습니다.")
     @PostMapping("/schDelete")
-    public String schDelete(@RequestBody @Valid SchVO schVO) {
+    public String schDelete(@ModelAttribute @Valid SchVO schVO) {
 
         schService.deleteSch(schVO);
 
@@ -209,7 +209,7 @@ public class SchController {
      * @param schInfo 초기화할 일정 정보
      */
     private void initializeDefaultSchedule(@RequestParam(value = "cddate", required = false) String cddate
-            , @RequestBody @Valid SchVO schInfo) {
+            , @ModelAttribute @Valid SchVO schInfo) {
 
         schInfo.setSstype("1");
         schInfo.setSsisopen("Y");

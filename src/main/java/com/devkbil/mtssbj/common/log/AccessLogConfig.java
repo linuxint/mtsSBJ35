@@ -26,7 +26,7 @@ public class AccessLogConfig implements WebServerFactoryCustomizer {
 
         final AccessLogValve accessLogValve = new AccessLogValve();
         //accessLogValve.setDirectory();
-        //accessLogValve.setPattern("%{yyyy-MM-dd HH:mm:ss}t\t%s\t%r\t%{User-Agent}i\t%{Referer}i\t%a\t%b");
+        accessLogValve.setPattern("%{yyyy-MM-dd HH:mm:ss}t\t%s\t%r\t%{User-Agent}i\t%{Referer}i\t%a\t%b");
         //accessLogValve.setDirectory(".");
         //accessLogValve.setSuffix(".log");
         accessLogValve.setCondition("ignoreLogging");

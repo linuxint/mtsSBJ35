@@ -61,7 +61,7 @@ public class BoardController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public String boardList(@RequestParam(value = "globalKeyword", required = false) String globalKeyword
-            , @RequestBody @Valid BoardSearchVO searchVO, ModelMap modelMap) {
+            , @ModelAttribute @Valid BoardSearchVO searchVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -150,7 +150,7 @@ public class BoardController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public String boardSave(@RequestParam(value = "fileno", required = false) String[] fileno
-            , @RequestBody @Valid BoardVO boardInfo) {
+            , @ModelAttribute @Valid BoardVO boardInfo) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
         String userrole = authenticationService.getAuthenticatedUserrole();
@@ -328,7 +328,7 @@ public class BoardController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    public String boardReplySave(HttpServletResponse response, @RequestBody @Valid BoardReplyVO boardReplyInfo, ModelMap modelMap) {
+    public String boardReplySave(HttpServletResponse response, @ModelAttribute @Valid BoardReplyVO boardReplyInfo, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -363,7 +363,7 @@ public class BoardController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    public void boardReplyDelete(HttpServletResponse response, @RequestBody @Valid BoardReplyVO boardReplyInfo) {
+    public void boardReplyDelete(HttpServletResponse response, @ModelAttribute @Valid BoardReplyVO boardReplyInfo) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 

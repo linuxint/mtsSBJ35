@@ -17,8 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -146,7 +146,7 @@ public class TaskController {
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류")
     })
     @PostMapping("/taskSave")
-    public void taskSave(HttpServletResponse response, @RequestBody @Valid TaskVO taskInfo) {
+    public void taskSave(HttpServletResponse response, @ModelAttribute @Valid TaskVO taskInfo) {
 
         taskService.insertTask(taskInfo);
 

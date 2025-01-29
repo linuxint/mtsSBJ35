@@ -15,8 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -55,7 +55,7 @@ public class ChkController {
             }
     )
     @GetMapping("/chkList")
-    public String chkList(@RequestBody @Valid SearchVO searchVO, ModelMap modelMap) {
+    public String chkList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 

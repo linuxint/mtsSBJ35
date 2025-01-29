@@ -38,7 +38,7 @@ public class CodeController {
      */
     @RequestMapping("/adCodeList")
     @Operation(summary = "공통 코드 리스트", description = "모든 공통 코드의 리스트를 조회하고 화면에 렌더링합니다.")
-    public String codeList(@RequestBody @Valid SearchVO searchVO, ModelMap modelMap) {
+    public String codeList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
         searchVO.pageCalculate(codeService.selectCodeCount(searchVO)); // startRow, endRow 계산
         List<?> listview = codeService.selectCodeList(searchVO);
@@ -58,7 +58,7 @@ public class CodeController {
      */
     @GetMapping("/adCodeForm")
     @Operation(summary = "공통 코드 등록/수정 폼", description = "공통 코드 정보를 등록하거나 수정할 폼 화면을 반환합니다.")
-    public String codeForm(@RequestBody @Valid CodeVO codeInfo, ModelMap modelMap) {
+    public String codeForm(@ModelAttribute @Valid CodeVO codeInfo, ModelMap modelMap) {
         Optional.ofNullable(codeInfo.getClassno())
                 .map(classno -> codeService.selectCodeOne(codeInfo))
                 .ifPresent(selectedCodeInfo -> {
@@ -81,7 +81,7 @@ public class CodeController {
     @PostMapping("/adCodeSave")
     @Operation(summary = "공통 코드 저장/수정", description = "공통 코드를 저장하거나 업데이트합니다.")
     public String codeSave(@RequestParam(name = "codeFormType") String codeFormType,
-                           @RequestBody @Valid CodeVO codeInfo,
+                           @ModelAttribute @Valid CodeVO codeInfo,
                            ModelMap modelMap) {
         try {
             if (!"U".equals(codeFormType) &&
@@ -109,7 +109,7 @@ public class CodeController {
      */
     @GetMapping("/adCodeRead")
     @Operation(summary = "공통 코드 상세 조회", description = "지정된 공통 코드의 상세 정보를 반환합니다.")
-    public String codeRead(@RequestBody @Valid CodeVO codeVO, ModelMap modelMap) {
+    public String codeRead(@ModelAttribute @Valid CodeVO codeVO, ModelMap modelMap) {
         Optional.ofNullable(codeService.selectCodeOne(codeVO))
                 .ifPresent(codeInfo -> modelMap.addAttribute("codeInfo", codeInfo));
 
@@ -124,7 +124,7 @@ public class CodeController {
      */
     @PostMapping("/adCodeDelete")
     @Operation(summary = "공통 코드 삭제", description = "지정된 공통 코드를 삭제합니다.")
-    public String codeDelete(@RequestBody @Valid CodeVO codeVO) {
+    public String codeDelete(@ModelAttribute @Valid CodeVO codeVO) {
         codeService.deleteCodeOne(codeVO);
         return "redirect:/adCodeList";
     }
@@ -138,7 +138,7 @@ public class CodeController {
     @PostMapping("/codeList")
     @Operation(summary = "공통 코드 리스트 조회 (API)",
             description = "공통 코드 데이터를 JSON 형태로 반환합니다.")
-    public ResponseEntity<List<?>> codeList(@RequestBody @Valid SearchVO searchVO) {
+    public ResponseEntity<List<?>> codeList(@ModelAttribute @Valid SearchVO searchVO) {
         try {
             log.debug("코드 리스트를 조회합니다.");
             searchVO.pageCalculate(codeService.selectCodeCount(searchVO));

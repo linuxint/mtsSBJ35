@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,7 +24,7 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/login")
-    public String createAuthenticationToken(@RequestBody AuthRequest authRequest) throws Exception {
+    public String createAuthenticationToken(@ModelAttribute AuthRequest authRequest) throws Exception {
         // ... 기존 코드 ...
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());

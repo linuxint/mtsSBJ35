@@ -4,6 +4,8 @@ import com.devkbil.mtssbj.common.tree.TreeMaker;
 import com.devkbil.mtssbj.common.util.UtilEtc;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
+import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -33,11 +35,11 @@ public class BoardGroupController {
 
     private final BoardGroupService boardGroupService;
     private final EtcService etcService;
+    private final AuthenticationService authenticationService;
 
     /**
      * 모든 게시판 그룹의 리스트를 조회합니다.
      *
-     * @param userno   공통 속성을 modelMap에 설정하는 데 사용되는 사용자 식별자.
      * @param modelMap 구성된 트리 구조와 같은 속성을 저장할 ModelMap 객체.
      * @return 요청 처리 결과를 나타내는 문자열(이 구현에서는 빈 문자열을 반환).
      */
@@ -47,7 +49,11 @@ public class BoardGroupController {
             @ApiResponse(responseCode = "200", description = "요청 성공"),
             @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
-    public String boardGroupList(@RequestParam(value = "userno", required = false) String userno, ModelMap modelMap) {
+    public String boardGroupList(ModelMap modelMap) {
+
+        UserVO userVO = authenticationService.getAuthenticatedUser();
+
+        String userno = authenticationService.getAuthenticatedUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 
@@ -57,6 +63,7 @@ public class BoardGroupController {
         String treeStr = tm.makeTreeByHierarchy(listview);
 
         modelMap.addAttribute("treeStr", treeStr);
+        modelMap.addAttribute("userVO", userVO);
 
         return "";
         //return "admin/board/BoardGroupList";

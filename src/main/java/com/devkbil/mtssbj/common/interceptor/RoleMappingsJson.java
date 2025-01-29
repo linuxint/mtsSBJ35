@@ -23,7 +23,7 @@ public class RoleMappingsJson {
             {
                 "/adBoardGroupList": {
                     "ADMIN": {
-                        "successUrl": "admin/board/BoardGroupList",
+                        "successUrl": "thymeleaf/admin/board/BoardGroupList",
                         "errorUrl": "adminErrorPage"
                     },
                     "USER": {

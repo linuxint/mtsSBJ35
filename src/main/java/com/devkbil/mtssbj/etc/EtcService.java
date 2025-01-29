@@ -1,7 +1,6 @@
 package com.devkbil.mtssbj.etc;
 
 import com.devkbil.mtssbj.board.BoardSearchVO;
-import com.devkbil.mtssbj.member.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -30,18 +29,6 @@ public class EtcService {
     @Operation(summary = "공통 속성 설정", description = "Alert 카운트를 포함한 공통 속성을 설정합니다.")
     public void setCommonAttribute(String param, ModelMap modelMap) {
         Integer alertcount = sqlSession.selectOne("selectAlertCount", param);
-        modelMap.addAttribute("alertcount", alertcount);
-    }
-
-    /**
-     * 공통 속성을 설정합니다 (Alert 카운트를 포함).
-     *
-     * @param userVO   사용자 정보 파라미터
-     * @param modelMap 데이터 저장을 위한 모델맵 객체
-     */
-    @Operation(summary = "공통 속성 설정", description = "Alert 카운트를 포함한 공통 속성을 설정합니다.")
-    public void setCommonAttribute(UserVO userVO, ModelMap modelMap) {
-        Integer alertcount = sqlSession.selectOne("selectAlertCount", userVO.getUserno());
         modelMap.addAttribute("alertcount", alertcount);
     }
 

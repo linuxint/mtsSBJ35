@@ -19,8 +19,8 @@ import org.springframework.ui.ModelMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Optional;
@@ -121,7 +121,7 @@ public class LoginController {
      */
     @Operation(summary = "로그인 처리", description = "사용자가 입력한 정보로 인증하고 세션을 생성합니다.")
     @PostMapping("memberLoginChk")
-    public String memberLoginChk(HttpServletRequest request, HttpServletResponse response, @RequestBody @Valid UserVO loginInfo) {
+    public String memberLoginChk(HttpServletRequest request, HttpServletResponse response, @ModelAttribute @Valid UserVO loginInfo) {
 
         String userno = loginInfo.getUserno();
 

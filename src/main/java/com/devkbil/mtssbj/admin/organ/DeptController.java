@@ -14,8 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -67,7 +67,7 @@ public class DeptController {
      */
     @PostMapping("/adDeptSave")
     @Operation(summary = "부서 저장", description = "새로운 부서를 저장하거나 기존 부서를 업데이트합니다.")
-    public void saveDept(@RequestBody @Valid DeptVO deptInfo, HttpServletResponse response) {
+    public void saveDept(@ModelAttribute @Valid DeptVO deptInfo, HttpServletResponse response) {
         try {
             deptService.insertDept(deptInfo);
             UtilEtc.responseJsonValue(response, deptInfo);

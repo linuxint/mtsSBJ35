@@ -1,6 +1,5 @@
 package com.devkbil.mtssbj.project;
 
-import com.devkbil.mtssbj.common.util.DateUtil;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.AuthenticationService;
 import com.devkbil.mtssbj.search.SearchVO;
@@ -11,14 +10,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.util.StringUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -45,7 +43,7 @@ public class ProjectController {
      */
     @Operation(summary = "프로젝트 목록 조회", description = "검색 조건을 기반으로 프로젝트 목록을 조회합니다.")
     @GetMapping("/projectList")
-    public String projectList(@RequestBody @Valid SearchVO searchVO, ModelMap modelMap) {
+    public String projectList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -75,7 +73,7 @@ public class ProjectController {
             @ApiResponse(responseCode = "500", description = "서버 에러")
     })
     @PostMapping("/projectList4Ajax")
-    public String projectList4Ajax(@RequestBody @Valid SearchVO searchVO, ModelMap modelMap) {
+    public String projectList4Ajax(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
         searchVO.pageCalculate(projectService.selectProjectCount(searchVO)); // startRow, endRow
         List<?> listview = projectService.selectProjectList(searchVO);
@@ -127,7 +125,7 @@ public class ProjectController {
             @ApiResponse(responseCode = "500", description = "서버 에러")
     })
     @PostMapping("/projectSave")
-    public String projectSave(@RequestBody @Valid ProjectVO projectInfo, BindingResult result, ModelMap modelMap) {
+    public String projectSave(@ModelAttribute @Valid ProjectVO projectInfo, BindingResult result, ModelMap modelMap) {
 
         // 유효성 검사 오류가 있을 경우, 에러 정보를 모델에 추가하고 작성 폼 페이지로 다시 이동
         if (result.hasErrors()) {

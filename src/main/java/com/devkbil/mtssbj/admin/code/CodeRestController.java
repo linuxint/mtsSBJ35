@@ -9,8 +9,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,7 +42,7 @@ public class CodeRestController {
             @ApiResponse(responseCode = "400", description = "입력값이 올바르지 않음"),       // 잘못된 요청
             @ApiResponse(responseCode = "500", description = "서버 내부 오류 발생")        // 서버 오류
     })
-    public ResponseEntity<List<?>> getCodeList(@RequestBody @Valid SearchVO searchVO) {
+    public ResponseEntity<List<?>> getCodeList(@ModelAttribute @Valid SearchVO searchVO) {
         try {
             log.debug("코드 리스트 조회 요청: {}", searchVO);
 

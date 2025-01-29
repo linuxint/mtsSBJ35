@@ -29,7 +29,7 @@ public enum ErrorCode {
     // 잘못된 서버 요청
     BAD_REQUEST_ERROR(400, "G001", "Bad Request Exception"),
 
-    // @RequestBody 데이터 미 존재
+    // @ModelAttribute 데이터 미 존재
     REQUEST_BODY_MISSING_ERROR(400, "G002", "Required request body is missing"),
 
     // 유효하지 않은 타입
@@ -58,10 +58,10 @@ public enum ErrorCode {
     // NULL Point Exception 발생
     NULL_POINT_ERROR(404, "G010", "Null Point Exception"),
 
-    // @RequestBody 및 @RequestParam, @PathVariable 값이 유효하지 않음
+    // @ModelAttribute 및 @RequestParam, @PathVariable 값이 유효하지 않음
     NOT_VALID_ERROR(404, "G011", "handle Validation Exception"),
 
-    // @RequestBody 및 @RequestParam, @PathVariable 값이 유효하지 않음
+    // @ModelAttribute 및 @RequestParam, @PathVariable 값이 유효하지 않음
     NOT_VALID_HEADER_ERROR(404, "G012", "Header에 데이터가 존재하지 않는 경우 "),
 
     // 서버가 처리 할 방법을 모르는 경우 발생

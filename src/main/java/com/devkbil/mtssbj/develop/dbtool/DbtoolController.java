@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
@@ -43,7 +43,7 @@ public class DbtoolController {
             @RequestParam(value = "columnComments", required = false) String columnComments
             , @RequestParam(value = "columnName", required = false) String columnName
             , @RequestParam(value = "tableName", required = false) String tableName
-            , @RequestBody @Valid DbtoolVO dbtoolVO
+            , @ModelAttribute @Valid DbtoolVO dbtoolVO
             , ModelMap modelMap) throws IOException {
 
         DbtoolVO param = new DbtoolVO();

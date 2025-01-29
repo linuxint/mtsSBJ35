@@ -70,6 +70,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         TradingTimeInterceptor tradingTimeInterceptor = new TradingTimeInterceptor();
         registry.addInterceptor(tradingTimeInterceptor).addPathPatterns("/**").excludePathPatterns(ConfigConstant.allAllowList); // 모든 요청에 대해 근무시간 체크 실행
 
+        registry.addInterceptor(new ThemeInterceptor()).addPathPatterns("/**");
+
     }
     
     /*

@@ -15,8 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class SignDocController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
-    public String signDocTypeList(@RequestBody @Valid SearchVO searchVO, ModelMap modelMap) {
+    public String signDocTypeList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -78,7 +78,7 @@ public class SignDocController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
-    public String signDocTypeForm(@RequestBody @Valid SignDocTypeVO signInfo, ModelMap modelMap) {
+    public String signDocTypeForm(@ModelAttribute @Valid SignDocTypeVO signInfo, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -105,7 +105,7 @@ public class SignDocController {
             @ApiResponse(responseCode = "303", description = "저장 후 문서 유형 리스트로 리디렉션"),
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
-    public String signDocTypeSave(@RequestBody @Valid SignDocTypeVO signInfo) {
+    public String signDocTypeSave(@ModelAttribute @Valid SignDocTypeVO signInfo) {
         signDocService.insertSignDocType(signInfo);
         return "redirect:/adSignDocTypeList";
     }
@@ -123,7 +123,7 @@ public class SignDocController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
-    public String signDocTypeDelete(@RequestBody @Valid SignDocTypeVO signVO) {
+    public String signDocTypeDelete(@ModelAttribute @Valid SignDocTypeVO signVO) {
         signDocService.deleteSignDocType(signVO);
         return "redirect:/adSignDocTypeList";
     }

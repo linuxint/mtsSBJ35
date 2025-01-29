@@ -24,8 +24,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.IOException;
 
@@ -72,7 +72,7 @@ public class SearchController {
      */
     @PostMapping("/search4Ajax")
     @Operation(summary = "Ajax 기반 검색", description = "Elasticsearch를 통해 검색을 수행하고 JSON 형식으로 결과를 반환합니다.")
-    public void search4Ajax(HttpServletResponse response, @RequestBody @Valid FullTextSearchVO searchVO) {
+    public void search4Ajax(HttpServletResponse response, @ModelAttribute @Valid FullTextSearchVO searchVO) {
 
         EsConfig esConfig = new EsConfig();
         try (RestHighLevelClient client = esConfig.client()) {

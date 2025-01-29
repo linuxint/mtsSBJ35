@@ -25,7 +25,7 @@ public class AuthenticationService {
      *
      * @return 인증된 UserVO 객체 또는 인증 정보가 없거나 Principal이 UserVO가 아닌 경우 null
      */
-    private UserVO getAuthenticatedUser() {
+    public UserVO getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserVO) {
             return (UserVO) authentication.getPrincipal();

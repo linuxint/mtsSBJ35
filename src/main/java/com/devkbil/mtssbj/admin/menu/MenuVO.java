@@ -36,7 +36,6 @@ public class MenuVO {
     private String mnuType;
 
     @Schema(description = "메뉴명", example = "대시보드")
-    @NotBlank(message = "Menu name cannot be blank") // 유효성 검사: 공백 불가
     private String mnuNm;
 
     @Schema(description = "설명", example = "메뉴에 대한 설명")

@@ -19,8 +19,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -116,7 +116,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
             @ApiResponse(responseCode = "409", description = "아이디 중복 오류")
     })
-    public String saveUser(@RequestBody @Valid UserVO userInfo, ModelMap modelMap) {
+    public String saveUser(@ModelAttribute @Valid UserVO userInfo, ModelMap modelMap) {
         // 신규 사용자 ID 중복 검사
         if (!StringUtils.hasText(userInfo.getUserno())) {
             if (userService.selectUserID(userInfo.getUserid()) != null) {
@@ -161,7 +161,9 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "요청 성공, 사용자 데이터 반환"),
             @ApiResponse(responseCode = "404", description = "해당 사용자를 찾을 수 없음")
     })
-    public void userRead(@RequestParam(value = "userno") String userno, HttpServletResponse response) {
+    public void userRead(HttpServletResponse response) {
+
+        String userno = authenticationService.getAuthenticatedUserNo();
 
         // 사용자 정보 조회 후 JSON 형태로 반환
         UserVO userInfo = userService.selectUserOne(userno);
@@ -182,7 +184,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "사용자 삭제 완료"),
             @ApiResponse(responseCode = "404", description = "삭제 대상 사용자 없음")
     })
-    public String deleteUser(@RequestBody @Valid UserVO userInfo, ModelMap modelMap) {
+    public String deleteUser(@ModelAttribute @Valid UserVO userInfo, ModelMap modelMap) {
         userService.deleteUser(userInfo.getUserno());
         return commonUserList(modelMap, userInfo.getDeptno());
     }

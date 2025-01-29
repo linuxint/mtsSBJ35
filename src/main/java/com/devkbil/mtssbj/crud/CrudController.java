@@ -12,8 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -44,7 +44,7 @@ public class CrudController {
     @Operation(summary = "CRUD 리스트 조회", description = "CRUD 데이터를 조건에 따라 조회하여 리스트로 반환합니다.")
     @ApiResponse(responseCode = "200", description = "정상적으로 데이터를 반환합니다.")
     @GetMapping("/crudList")
-    public String crudList(@RequestBody @Valid SearchVO searchVO, ModelMap modelMap) {
+    public String crudList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -67,7 +67,7 @@ public class CrudController {
     @Operation(summary = "CRUD 입력/수정", description = "CRUD 데이터를 입력하거나 수정합니다.")
     @ApiResponse(responseCode = "200", description = "정상적으로 입력/수정 페이지를 반환합니다.")
     @GetMapping("/crudForm")
-    public String crudForm(@RequestBody @Valid CrudVO crudInfo, ModelMap modelMap) {
+    public String crudForm(@ModelAttribute @Valid CrudVO crudInfo, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -90,7 +90,7 @@ public class CrudController {
     @Operation(summary = "CRUD 저장", description = "CRUD 데이터를 저장(삽입/수정) 처리합니다.")
     @ApiResponse(responseCode = "302", description = "정상적으로 데이터를 저장하고 리스트 페이지로 리다이렉트합니다.")
     @PostMapping("/crudSave")
-    public String crudSave(@RequestBody @Valid CrudVO crudInfo) {
+    public String crudSave(@ModelAttribute @Valid CrudVO crudInfo) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -108,7 +108,7 @@ public class CrudController {
     @Operation(summary = "CRUD 상세 보기", description = "CRUD 데이터를 상세 조회하여 반환합니다.")
     @ApiResponse(responseCode = "200", description = "정상적으로 상세 페이지를 반환합니다.")
     @GetMapping("/crudRead")
-    public String crudRead(@RequestBody @Valid CrudVO crudVO, ModelMap modelMap) {
+    public String crudRead(@ModelAttribute @Valid CrudVO crudVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -133,7 +133,7 @@ public class CrudController {
     @Operation(summary = "CRUD 삭제", description = "CRUD 데이터를 삭제 처리합니다.")
     @ApiResponse(responseCode = "302", description = "정상적으로 데이터를 삭제하고 리스트 페이지로 리다이렉트합니다.")
     @GetMapping("/crudDelete")
-    public String crudDelete(@RequestBody @Valid CrudVO crudVO) {
+    public String crudDelete(@ModelAttribute @Valid CrudVO crudVO) {
 
         crudService.deleteCrud(crudVO);
 

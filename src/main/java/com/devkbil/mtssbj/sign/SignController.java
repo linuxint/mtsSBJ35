@@ -42,7 +42,7 @@ public class SignController {
      */
     @RequestMapping("/signListTobe")
     @Operation(summary = "결재 받을 문서 리스트 조회", description = "사용자가 결재받아야 하는 문서들의 리스트를 조회합니다.")
-    public String signListTobe(@RequestBody @Valid SearchVO searchVO, ModelMap modelMap) {
+    public String signListTobe(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -68,7 +68,7 @@ public class SignController {
      */
     @RequestMapping("/signListTo")
     @Operation(summary = "결재 할 문서 리스트 조회", description = "사용자가 결재를 진행해야 하는 문서들의 리스트를 조회합니다.")
-    public String signListTo(@RequestBody @Valid SearchVO searchVO, ModelMap modelMap) {
+    public String signListTo(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -97,7 +97,7 @@ public class SignController {
      */
     @GetMapping("/signDocTypeList")
     @Operation(summary = "기안 문서 타입 리스트 조회", description = "사용자가 선택할 수 있는 기안 문서 타입 리스트를 조회합니다.")
-    public String signDocTypeList(@RequestBody @Valid SearchVO searchVO, ModelMap modelMap) {
+    public String signDocTypeList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -119,7 +119,7 @@ public class SignController {
      */
     @GetMapping("/signDocForm")
     @Operation(summary = "결재 문서 작성/수정", description = "사용자가 결재 문서를 작성하거나 수정할 수 있는 화면을 반환합니다.")
-    public String signDocForm(@RequestBody @Valid SignDocVO signDocInfo, ModelMap modelMap) {
+    public String signDocForm(@ModelAttribute @Valid SignDocVO signDocInfo, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -159,7 +159,7 @@ public class SignController {
      */
     @PostMapping("/signDocSave")
     @Operation(summary = "결재 문서 저장", description = "작성하거나 수정된 결재 문서를 저장합니다.")
-    public String signDocSave(@RequestBody @Valid SignDocVO signDocInfo) {
+    public String signDocSave(@ModelAttribute @Valid SignDocVO signDocInfo) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -179,7 +179,7 @@ public class SignController {
      */
     @GetMapping("/signDocRead")
     @Operation(summary = "결재 문서 읽기", description = "결재 문서를 읽는 세부 화면을 반환합니다.")
-    public String signDocRead(@RequestBody @Valid SignDocVO signDocVO, ModelMap modelMap) {
+    public String signDocRead(@ModelAttribute @Valid SignDocVO signDocVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -205,7 +205,7 @@ public class SignController {
      */
     @GetMapping("/signDocDelete")
     @Operation(summary = "결재 문서 삭제", description = "특정 결재 문서를 삭제합니다.")
-    public String signDocDelete(@RequestBody @Valid SignDocVO signDocVO) {
+    public String signDocDelete(@ModelAttribute @Valid SignDocVO signDocVO) {
 
         signService.deleteSignDoc(signDocVO);
 
@@ -220,7 +220,7 @@ public class SignController {
      */
     @PostMapping("/signSave")
     @Operation(summary = "결재 진행", description = "사용자가 문서를 결재합니다.")
-    public String signSave(@RequestBody @Valid SignVO signInfo) {
+    public String signSave(@ModelAttribute @Valid SignVO signInfo) {
 
         signService.updateSign(signInfo);
 

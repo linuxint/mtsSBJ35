@@ -11,8 +11,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -83,7 +83,7 @@ public class PopUserController {
     @PostMapping("/popupUsersByDept")
     public String popupUsersByDept(
             @RequestParam(name = "deptno") String deptno
-            , @RequestBody @Valid SearchVO searchVO
+            , @ModelAttribute @Valid SearchVO searchVO
             , ModelMap modelMap
     ) {
         searchVO.setSearchExt1(deptno);

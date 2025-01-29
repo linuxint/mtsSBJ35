@@ -14,8 +14,8 @@ import org.springframework.ui.ModelMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -49,7 +49,7 @@ public class MemberController {
      * 사용자 저장.
      */
     @PostMapping("/userSave")
-    public String userSave(@RequestBody @Valid UserVO userInfo) {
+    public String userSave(@ModelAttribute @Valid UserVO userInfo) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -69,7 +69,7 @@ public class MemberController {
      * 비밀번호 변경.
      */
     @PostMapping("/changePWSave")
-    public void changePWSave(HttpServletResponse response, @RequestBody @Valid UserVO userInfo) {
+    public void changePWSave(HttpServletResponse response, @ModelAttribute @Valid UserVO userInfo) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -84,7 +84,7 @@ public class MemberController {
      * 직원조회.
      */
     @GetMapping("/searchMember")
-    public String searchMember(@RequestBody @Valid SearchVO searchVO, ModelMap modelMap) {
+    public String searchMember(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
         if (StringUtils.hasText(searchVO.getSearchKeyword())) {
 

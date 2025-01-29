@@ -15,8 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -106,7 +106,7 @@ public class TaskMineController {
     })
     @PostMapping("/taskMineSave")
     public String taskMineSave(@RequestParam(value = "fileno", required = false) String[] fileno
-            , @RequestBody @Valid TaskVO taskInfo) {
+            , @ModelAttribute @Valid TaskVO taskInfo) {
 
         // 요청 파일 데이터 처리
         FileUtil fs = new FileUtil();

@@ -13,8 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -38,7 +38,7 @@ public class MailController {
      */
     @Operation(summary = "수신 메일 리스트 조회", description = "사용자의 수신 메일 리스트를 조회합니다.")
     @GetMapping("/receiveMails")
-    public String receiveMails(@RequestBody @Valid SearchVO searchVO, ModelMap modelMap) {
+    public String receiveMails(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -71,7 +71,7 @@ public class MailController {
      */
     @Operation(summary = "발신 메일 리스트 조회", description = "사용자의 발신 메일 리스트를 조회합니다.")
     @GetMapping("/sendMails")
-    public String sendMails(@RequestBody @Valid SearchVO searchVO, ModelMap modelMap) {
+    public String sendMails(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -104,7 +104,7 @@ public class MailController {
      */
     @Operation(summary = "메일 작성 폼", description = "메일 작성 또는 수정 화면을 반환합니다.")
     @GetMapping("/mailForm")
-    public String mailForm(@RequestBody @Valid MailVO mailInfo, ModelMap modelMap) {
+    public String mailForm(@ModelAttribute @Valid MailVO mailInfo, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -137,7 +137,7 @@ public class MailController {
      */
     @Operation(summary = "메일 저장", description = "사용자가 작성한 메일 데이터를 저장합니다.")
     @PostMapping("/mailSave")
-    public String mailSave(@RequestBody @Valid MailVO mailInfo) {
+    public String mailSave(@ModelAttribute @Valid MailVO mailInfo) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -158,7 +158,7 @@ public class MailController {
      */
     @Operation(summary = "수신 메일 상세 조회", description = "특정 수신 메일의 상세 정보를 조회합니다.")
     @GetMapping("/receiveMailRead")
-    public String receiveMailRead(@RequestBody @Valid MailVO mailVO, ModelMap modelMap) {
+    public String receiveMailRead(@ModelAttribute @Valid MailVO mailVO, ModelMap modelMap) {
 
         mailRead(mailVO, modelMap);
 
@@ -174,7 +174,7 @@ public class MailController {
      */
     @Operation(summary = "발신 메일 상세 조회", description = "특정 발신 메일의 상세 정보를 조회합니다.")
     @GetMapping("/sendMailRead")
-    public String sendMailRead(@RequestBody @Valid MailVO mailVO, ModelMap modelMap) {
+    public String sendMailRead(@ModelAttribute @Valid MailVO mailVO, ModelMap modelMap) {
 
         mailRead(mailVO, modelMap);
 
@@ -187,7 +187,7 @@ public class MailController {
      * @param mailVO   메일 정보 객체
      * @param modelMap 뷰에 전달할 데이터
      */
-    private void mailRead(@RequestBody @Valid MailVO mailVO, ModelMap modelMap) {
+    private void mailRead(@ModelAttribute @Valid MailVO mailVO, ModelMap modelMap) {
 
         String userno = authenticationService.getAuthenticatedUserNo();
 
@@ -208,7 +208,7 @@ public class MailController {
      */
     @Operation(summary = "수신 메일 삭제", description = "단일 수신 메일을 삭제합니다.")
     @PostMapping("/receiveMailDelete")
-    public String receiveMailDelete(@RequestBody @Valid MailVO mailVO) {
+    public String receiveMailDelete(@ModelAttribute @Valid MailVO mailVO) {
 
         mailService.deleteMail(mailVO);
 
