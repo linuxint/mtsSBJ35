@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+    <div class="navbar-header">
+        <!-- 프로젝트 제목 -->
+        <a class="navbar-brand" th:href="@{/index}" th:text="#{common.projectTitle}"></a>
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+
+        <!-- 사용자 알림 및 프로필 -->
+        <ul class="nav navbar-top-links navbar-right">
+            <!-- 알림 (조건부 출력) -->
+            <li class="dropdown" th:if="${alertcount > 0}">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" onclick="showAlertList()">
+                    <i class="fa fa-bell fa-fw"></i> <i class="fa fa-caret-down"></i>
+                    <div class="msgAlert" th:text="${alertcount}"></div>
+                </a>
+                <script>
+                    function showAlertList() {
+                        $.ajax({
+                            url: "alertList4Ajax",
+                            dataType: "html",
+                            type: "post",
+                            success: function (result) {
+                                if (result !== "") {
+                                    $("#alertlist").html(result);
+                                }
+                            }
+                        });
+                    }
+                </script>
+                <ul id="alertlist" class="dropdown-menu dropdown-alerts"></ul>
+            </li>
+
+            <!-- 사용자 메뉴 -->
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-user">
+                    <li><a th:href="@{/memberForm}"><i class="fa fa-user fa-fw"></i> <span th:text="${userVO.usernm}"></span></a></li>
+                    <li><a th:href="@{/searchMember}"><i class="fa fa-users fa-fw"></i> <span th:text="#{menu.users}"></span></a></li>
+                    <li class="divider"></li>
+                    <li><a th:href="@{/memberLogout}"><i class="fa fa-sign-out fa-fw"></i> Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <div class="navbar-default sidebar" role="navigation">
+        <div class="sidebar-nav navbar-collapse">
+            <ul class="nav" id="side-menu">
+
+                <!-- 검색 -->
+                <li class="sidebar-search">
+                    <form id="searchForm" name="searchForm" method="post" th:action="@{/boardList}">
+                        <input type="hidden" name="searchType" value="brdtitle,brdmemo">
+                        <div class="input-group custom-search-form">
+                            <input class="form-control" type="text" name="globalKeyword" id="globalKeyword" placeholder="Search...">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" onclick="fn_search()">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </form>
+                    <script>
+                        function fn_search() {
+                            if ($("#globalKeyword").val() !== "") {
+                                $("#searchForm").submit();
+                            }
+                        }
+                    </script>
+                </li>
+
+                <!-- 일반 Links -->
+                <li>
+                    <a th:href="@{/boardList}"><i class="fa fa-files-o fa-fw"></i> <span th:text="#{board.boardName}"></span></a>
+                </li>
+                <li>
+                    <a th:href="@{/search}"><i class="fa fa-search fa-fw"></i> <span th:text="#{search.total}"></span></a>
+                </li>
+                <li>
+                    <a th:href="@{/projectList}"><i class="fa fa-tasks fa-fw"></i> <span th:text="#{project.title}"></span></a>
+                </li>
+
+                <!-- 전자 결재 -->
+                <li>
+                    <a href="#"><i class="fa fa-edit fa-fw"></i> <span th:text="#{electronic.payment}"></span> <span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li><a th:href="@{/signDocTypeList}" th:text="#{electronic.draft}"></a></li>
+                        <li><a th:href="@{/signListTobe}" th:text="#{electronic.approved}"></a></li>
+                        <li><a th:href="@{/signListTo}" th:text="#{electronic.paid}"></a></li>
+                    </ul>
+                </li>
+
+                <!-- 일정 -->
+                <li>
+                    <a th:href="@{/schList}"><i class="fa fa-calendar fa-fw"></i> <span th:text="#{schedule.management}"></span></a>
+                </li>
+
+                <!-- 메일 -->
+                <li>
+                    <a href="#"><i class="fa fa-envelope-o fa-fw"></i> <span th:text="#{mail.title}"></span> <span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li><a th:href="@{/mailForm}" th:text="#{mail.new}"></a></li>
+                        <li><a th:href="@{/receiveMails}" th:text="#{mail.receive}"></a></li>
+                        <li><a th:href="@{/sendMails}" th:text="#{mail.send}"></a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#"><i class="fa fa-music fa-fw"></i><span th:text="#{sample.title}"></span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li><a th:href="@{/sample1}" th:text="#{sample.1}"></a></li>
+                        <li><a th:href="@{/sample2}" th:text="#{sample.2}"></a></li>
+                        <li><a th:href="@{/sample3}" th:text="#{sample.3}"></a></li>
+                        <li><a th:href="@{/sample4}" th:text="#{sample.4}"></a></li>
+                        <li><a th:href="@{/sample5}" th:text="#{sample.5}"></a></li>
+                        <li><a th:href="@{/sample6}" th:text="#{sample.6}"></a></li>
+                    </ul>
+                </li>
+
+                <!-- 관리자 전용 -->
+                <li th:if="${userVO.userrole == 'ADMIN'}">
+                    <a href="#"><span th:text="#{menu.admin}"></span></a>
+                </li>
+                <li th:if="${userVO.userrole == 'ADMIN'}">
+                    <a th:href="@{/adBoardGroupList}"><i class="fa fa-files-o fa-fw"></i> <span th:text="#{menu.board}"></span></a>
+                </li>
+                <li th:if="${userVO.userrole == 'ADMIN'}">
+                    <a th:href="@{/adMenuList}"><i class="fa fa-files-o fa-fw"></i> <span th:text="#{menu.menu}"></span></a>
+                </li>
+                <li th:if="${userVO.userrole == 'ADMIN'}">
+                    <a href="#"><i class="fa fa-sitemap fa-fw"></i> <span th:text="#{menu.organ}"></span> <span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li><a th:href="@{/adDept}" th:text="#{menu.dept}"></a></li>
+                        <li><a th:href="@{/adUser}" th:text="#{menu.user}"></a></li>
+                    </ul>
+                </li>
+                <li th:if="${userVO.userrole == 'ADMIN'}">
+                    <a th:href="@{/adSignDocTypeList}"><i class="fa fa-edit fa-fw"></i> <span th:text="#{electronic.approval}"></span></a>
+                </li>
+                <li th:if="${userVO.userrole == 'ADMIN'}">
+                    <a th:href="@{/adCodeList}"><i class="fa fa-gear fa-fw"></i> <span th:text="#{menu.code}"></span></a>
+                </li>
+                <li th:if="${userVO.userrole == 'ADMIN'}">
+                    <a href="#"><i class="fa fa-sitemap fa-fw"></i> <span th:text="#{develop.title}"></span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li><a th:href="@{/dvLogView}" th:text="#{develop.title1}" target="_blank"></a></li>
+                        <li><a th:href="@{/apidoc/index.html}" th:text="#{develop.title2}" target="_blank"></a></li>
+                        <li><a th:href="@{/thymeleaftest}" th:text="#{develop.title3}" target="_blank"></a></li>
+                        <li><a th:href="@{/fileAllIndex}" th:text="#{develop.title4}"></a></li>
+                        <li><a th:href="@{/pdfdraw}" th:text="#{develop.title5}" target="_blank"></a></li>
+                        <li><a th:href="@{/dependencySearch}" th:text="#{develop.title6}" target="_blank"></a></li>
+                        <li><a th:href="@{/qrdraw}" th:text="#{develop.title7}" target="_blank"></a></li>
+                        <li><a th:href="@{/tableLayout}" th:text="#{develop.title8}" target="_blank"></a></li>
+                        <li><a th:href="@{/mapaddr}" th:text="#{develop.title9}" target="_blank"></a></li>
+                        <li><a th:href="@{/test/1}" th:text="#{develop.title10}" target="_blank"></a></li>
+                        <li><a th:href="@{/test/2}" th:text="#{develop.title10}" target="_blank"></a></li>
+                    </ul>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+</html>

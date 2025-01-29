@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{'thymeleaf/admin/inc/ad_header' :: header}"></div>
+<body>
+<div id="wrapper">
+    <!-- 네비게이션 부분 -->
+    <div th:replace="~{thymeleaf/common/navigation}"></div>
+
+    <div id="page-wrapper">
+        <!-- 페이지 타이틀 -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    <i class="fa fa-sitemap fa-fw"></i>
+                    <span th:text="#{menu.menu}"></span>
+                </h1>
+            </div>
+        </div>
+
+        <!-- 메뉴 트리 및 폼 -->
+        <div class="row">
+            <div class="panel panel-default col-lg-3">
+                <!-- 메뉴 트리 -->
+                <div style="max-height:400px; overflow:auto;">
+                    <div id="tree"></div>
+                </div>
+            </div>
+
+            <div class="panel panel-default col-lg-6">
+                <!-- 입력 폼 -->
+                <div class="panel-body">
+                    <div class="row form-group">
+                        <button class="btn btn-outline btn-primary" onclick="fn_subGroupNew()">
+                            <span th:text="#{menu.subappend}"></span>
+                        </button>
+                        <button class="btn btn-outline btn-primary" onclick="fn_groupNew()">
+                            <span th:text="#{menu.append}"></span>
+                        </button>
+                    </div>
+
+                    <!-- 메뉴 번호 -->
+                    <div class="row form-group">
+                        <label class="col-lg-3">메뉴No</label>
+                        <div class="col-lg-9">
+                            <input name="mnuNo" id="mnuNo" type="text" readonly="readonly" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- 상위메뉴 번호 -->
+                    <div class="row form-group">
+                        <label class="col-lg-3">상위메뉴No</label>
+                        <div class="col-lg-9">
+                            <input name="mnuParent" id="mnuParent" type="text" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- 메뉴 이름 -->
+                    <div class="row form-group">
+                        <label class="col-lg-3"><span th:text="#{common.menuName}"></span></label>
+                        <div class="col-lg-9">
+                            <input name="mnuNm" id="mnuNm" type="text" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- 메뉴 타입 -->
+                    <div class="row form-group">
+                        <label class="col-lg-3">메뉴타입</label>
+                        <div class="col-lg-9">
+                            <input name="mnuType" id="mnuType" type="text" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- 메뉴 링크 -->
+                    <div class="row form-group">
+                        <label class="col-lg-3">메뉴링크</label>
+                        <div class="col-lg-9">
+                            <input name="mnuTarget" id="mnuTarget" type="text" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- 더 다양한 필드들 -->
+                    <!-- 반복되는 요소는 그대로 진행 -->
+
+                    <!-- 저장 및 삭제 버튼 -->
+                    <div class="row form-group">
+                        <button class="btn btn-outline btn-primary" onclick="fn_groupSave()">
+                            <span th:text="#{common.btnSave}"></span>
+                        </button>
+                        <button class="btn btn-outline btn-danger" onclick="fn_groupDelete()">
+                            <span th:text="#{common.btnDelete}"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.page-wrapper -->
+</div>
+<div th:replace="~{'thymeleaf/admin/inc/ad_footer' :: footer}"></div>
+</body>
+</html>

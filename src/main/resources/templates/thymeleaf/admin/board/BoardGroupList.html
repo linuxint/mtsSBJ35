@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{'thymeleaf/admin/inc/ad_header' :: header}"></div>
+<script>
+    var selectedNode = null;
+
+    $(function () {
+        const treeData = JSON.parse("[[${treeStr}]]".replace(/&quot;/g, '"'));
+        $("#tree").dynatree({
+            children : treeData, // 트리에 적용
+            onActivate: TreenodeActivate
+        });
+        $("#tree").dynatree("getRoot").visit(function (node) {
+            node.expand(true);
+        });
+        fn_groupNew();
+    });
+
+    function TreenodeActivate(node) {
+        selectedNode = node;
+
+        if (selectedNode == null || selectedNode.data.key == 0) return;
+        $.ajax({
+            url: "adBoardGroupRead",
+            cache: false,
+            data: {bgno: selectedNode.data.key}
+        }).done(receiveData);
+    }
+
+    function receiveData(data) {
+        $("#bgno").val(data.bgno);
+        $("#bgname").val(data.bgname);
+        $('input:radio[name="bgused"][value="' + data.bgused + '"]').prop('checked', true);
+        $('input:radio[name="bgreadonly"][value="' + data.bgreadonly + '"]').prop('checked', true);
+        $('input:radio[name="bgreply"][value="' + data.bgreply + '"]').prop('checked', true);
+        $('input:radio[name="bgnotice"][value="' + data.bgnotice + '"]').prop('checked', true);
+    }
+
+    function fn_groupNew() {
+        $("#bgno").val("");
+        $("#bgname").val("");
+        $('input:radio[name="bgused"][value="Y"]').prop('checked', true);
+        $('input:radio[name="bgreadonly"][value="N"]').prop('checked', true);
+        $('input:radio[name="bgreply"][value="Y"]').prop('checked', true);
+        $('input:radio[name="bgnotice"][value="Y"]').prop('checked', true);
+    }
+
+    function fn_groupDelete(value) {
+        if (selectedNode == null) {
+            alert(/*[[#{msg.err.boardDelete}]]*/);
+            return;
+        }
+        if (selectedNode.childList) {
+            alert(/*[[#{msg.err.boardDelete4Child}]]*/);
+            return;
+        }
+
+        if (!confirm(/*[[#{ask.Delete}]]*/)) return;
+        $.ajax({
+            url: "adBoardGroupDelete",
+            cache: false,
+            data: {bgno: selectedNode.data.key}
+        }).done(function (response) {
+            receiveData4Delete(response);
+        });
+    }
+
+    function receiveData4Delete(response) {
+        if(response === "OK") {
+            alert(/*[[#{msg.boardDelete}]]*/);
+            selectedNode.remove();
+            selectedNode = null;
+            fn_groupNew();
+        }
+    }
+
+    function fn_groupSave() {
+        if ($("#bgname").val() == "") {
+            alert(/*[[#{msg.boardInputName}]]*/);
+            return;
+        }
+        var pid = null;
+        if (selectedNode != null) {
+            pid = selectedNode.data.key;
+        }
+
+        if (!confirm(/*[[#{ask.Save}]]*/)) {
+            return;
+        }
+
+        $.ajax({
+            url: "adBoardGroupSave",
+            cache: false,
+            type: "POST",
+            data: {
+                bgno: $("#bgno").val(), bgname: $("#bgname").val(), bgparent: pid,
+                bgused: $("input:radio[name=bgused]:checked").val(),
+                bgreadonly: $("input:radio[name=bgreadonly]:checked").val(),
+                bgreply: $("input:radio[name=bgreply]:checked").val(),
+                bgnotice: $("input:radio[name=bgnotice]:checked").val()
+            }
+        }).done(receiveData4Save);
+    }
+
+    function receiveData4Save(data) {
+        if (selectedNode !== null && selectedNode.data.key === data.bgno) {
+            selectedNode.data.title = data.bgname;
+            selectedNode.render();
+        } else {
+            addNode(data.bgno, data.bgname);
+        }
+
+        alert(/*[[#{msg.boardSave}]]*/);
+    }
+
+    function addNode(nodeNo, nodeTitle) {
+        var node = $("#tree").dynatree("getActiveNode");
+        if (!node) {
+            node = $("#tree").dynatree("getRoot");
+        }
+        var childNode = node.addChild({key: nodeNo, title: nodeTitle});
+        node.expand();
+        node.data.isFolder = true;
+        node.tree.redraw();
+    }
+</script>
+<body>
+<div id="wrapper">
+    <div th:replace="~{thymeleaf/common/navigation}"></div>
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header"><i class="fa fa-files-o fa-fw"></i> [[#{menu.board}]]</h1>
+            </div>
+        </div>
+        <!-- /.row -->
+        <div class="row">
+            <div class="panel panel-default col-lg-3">
+                <div style="max-height:400px; overflow:auto;">
+                    <div id="tree">
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default col-lg-6">
+                <div class="panel-body">
+                    <div class="row form-group">
+                        <button class="btn btn-outline btn-primary" onclick="fn_groupNew()">[[#{board.append}]]</button>
+                    </div>
+                    <input name="bgno" id="bgno" type="hidden" value="">
+                    <div class="row form-group">
+                        <label class="col-lg-3">[[#{board.groupname}]]</label>
+                        <div class="col-lg-9">
+                            <input name="bgname" id="bgname" type="text" maxlength="100" value="" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-lg-3">[[#{board.used}]]</label>
+                        <div class="col-lg-9 checkbox-inline">
+                            <label><input name="bgused" id="bgusedY" type="radio" th:checked="${bgused == 'Y'}" value="Y">[[#{board.usedY}]]</label>
+                            <label><input name="bgused" id="bgusedN" type="radio" th:checked="${bgused == 'N'}" value="N">[[#{board.usedN}]]</label>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-lg-3">[[#{board.readonly}]]</label>
+                        <div class="col-lg-9 checkbox-inline">
+                            <label><input name="bgreadonly" id="bgreadonlyY" type="radio" checked="checked" value="N">[[#{board.usedY}]]</label>
+                            <label><input name="bgreadonly" id="bgreadonlyN" type="radio" value="Y">[[#{board.usedN}]]</label>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-lg-3">[[#{common.btnReply}]]</label>
+                        <div class="col-lg-9 checkbox-inline">
+                            <label><input name="bgreply" id="bgreplyY" type="radio" checked="checked" value="Y">[[#{board.usedY}]]</label>
+                            <label><input name="bgreply" id="bgreplyN" type="radio" value="N">[[#{board.usedN}]]</label>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-lg-3">[[#{common.notice}]]</label>
+                        <div class="col-lg-9 checkbox-inline">
+                            <label><input name="bgnotice" id="bgnoticeY" type="radio" checked="checked" value="Y">[[#{board.usedY}]]</label>
+                            <label><input name="bgnotice" id="bgnoticeN" type="radio" value="N">[[#{board.usedN}]]</label>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <button class="btn btn-outline btn-primary" onclick="fn_groupSave()">[[#{common.btnSave}]]
+                        </button>
+                        <button class="btn btn-outline btn-primary" onclick="fn_groupDelete()">[[#{common.btnDelete}]]
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>ㅈ
+        <!-- /.row -->
+    </div>
+</div>
+<div th:replace="~{'thymeleaf/admin/inc/ad_footer' :: footer}"></div>
+</body>
+</html>

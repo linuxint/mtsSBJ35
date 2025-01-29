@@ -1,0 +1,35 @@
+<div th:if="${searchVO.totPage > 1}">
+    <div id="dataTables-example_paginate" class="dataTables_paginate paging_simple_numbers">
+        <ul class="pagination">
+            <li title="First"
+                class="paginate_button" th:classappend="${searchVO.page == 1} ? 'disabled' : ''"
+                th:onclick="${searchVO.page != 1} ? 'fnSubmitForm(1)' : null">
+                <a href="#"><i class="fa fa-angle-double-left fa-fw"></i></a>
+            </li>
+            <li title="Previous"
+                class="paginate_button" th:classappend="${searchVO.page == 1} ? 'disabled' : ''"
+                th:onclick="${searchVO.page != 1} ? 'fnSubmitForm(' + (searchVO.page - 1) + ')' : null">
+                <a href="#"><i class="fa fa-angle-left fa-fw"></i></a>
+            </li>
+
+            <ul th:each="i : ${#numbers.sequence(searchVO.pageStart, searchVO.pageEnd)}">
+                <li th:classappend="${i == searchVO.page} ? 'active' : ''"
+                    class="paginate_button"
+                    th:onclick="${i != searchVO.page} ? 'fnSubmitForm(' + i + ')' : null">
+                    <a href="#"><span th:text="${i}"></span></a>
+                </li>
+            </ul>
+
+            <li title="Next"
+                class="paginate_button" th:classappend="${searchVO.page == searchVO.totPage} ? 'disabled' : ''"
+                th:onclick="${searchVO.page != searchVO.totPage} ? 'fnSubmitForm(' + (searchVO.page + 1) + ')' : null">
+                <a href="#"><i class="fa fa-angle-right fa-fw"></i></a>
+            </li>
+            <li title="Last"
+                class="paginate_button" th:classappend="${searchVO.page == searchVO.totPage} ? 'disabled' : ''"
+                th:onclick="${searchVO.page != searchVO.totPage} ? 'fnSubmitForm(' + searchVO.totPage + ')' : null">
+                <a href="#"><i class="fa fa-angle-double-right fa-fw"></i></a>
+            </li>
+        </ul>
+    </div>
+</div>
