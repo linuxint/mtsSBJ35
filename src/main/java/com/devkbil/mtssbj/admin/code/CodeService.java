@@ -8,6 +8,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.InputStream;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import java.util.List;
 
 /**
@@ -22,6 +33,116 @@ public class CodeService {
     private final SqlSessionTemplate sqlSession;
 
     /**
+     * 엑셀 파일 처리 메서드
+     *
+     * @param inputStream 업로드된 엑셀 파일의 InputStream
+     * @return 처리 결과 메시지
+     */
+    public String processExcelFile(InputStream inputStream) {
+        try (Workbook workbook = new XSSFWorkbook(inputStream)) {
+            Sheet sheet = workbook.getSheetAt(0);
+
+            // 유효성 체크: 빈 시트나 헤더 미존재 시 오류 반환
+            if (sheet == null || sheet.getPhysicalNumberOfRows() <= 1) {
+                return "업로드된 엑셀 파일에 헤더 또는 데이터가 없습니다.";
+            }
+
+            // 1. 첫 번째 행을 헤더로 간주하고 유효성 확인
+            Row headerRow = sheet.getRow(0); // 첫 번째 행
+            if (!isValidHeaderRow(headerRow)) {
+                return "엑셀 파일의 헤더가 예상값(CLASSNO, CODECD, CODENM)과 일치하지 않습니다.";
+            }
+
+            // 2. 엑셀 데이터를 읽어 Java 객체로 변환 (헤더 제외)
+            List<CodeVO> excelData = new ArrayList<>();
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) { // 1부터 시작 (헤더 제외)
+                Row row = sheet.getRow(i);
+                if (row == null) continue;
+
+                CodeVO codeVO = new CodeVO();
+                codeVO.setClassno(getCellValue(row.getCell(0)));
+                codeVO.setCodecd(getCellValue(row.getCell(1)));
+                codeVO.setCodenm(getCellValue(row.getCell(2)));
+                excelData.add(codeVO);
+            }
+
+            // 3. 기존 데이터 조회
+            Map<String, CodeVO> existingData = new HashMap<>();
+            for (CodeVO code : selectCodeListAll()) {
+                String key = code.getClassno() + "-" + code.getCodecd();
+                existingData.put(key, code);
+            }
+
+            // 4. 데이터 비교 및 처리 (업데이트/삽입 구분)
+            for (CodeVO uploadedCode : excelData) {
+                String key = uploadedCode.getClassno() + "-" + uploadedCode.getCodecd();
+                if (existingData.containsKey(key)) {
+                    // 기존 데이터가 있으면 업데이트 처리
+                    insertCode("U", uploadedCode);
+                } else {
+                    // 기존 데이터가 없으면 삽입 처리
+                    insertCode("C", uploadedCode);
+                }
+            }
+
+            return "엑셀 데이터 처리가 성공적으로 완료되었습니다.";
+        } catch (Exception e) {
+            log.error("엑셀 파일 처리 중 오류 발생: {}", e.getMessage(), e);
+            throw new RuntimeException("엑셀 데이터 처리 중 오류 발생", e);
+        }
+    }
+
+    /**
+     * 헤더 행 유효성 검사
+     *
+     * @param headerRow 엑셀 헤더 행
+     * @return 헤더 유효 여부
+     */
+    public boolean isValidHeaderRow(Row headerRow) {
+        if (headerRow == null) {
+            return false;
+        }
+
+        String header1 = getCellValue(headerRow.getCell(0)).trim();
+        String header2 = getCellValue(headerRow.getCell(1)).trim();
+        String header3 = getCellValue(headerRow.getCell(2)).trim();
+
+        // 예상되는 헤더 값 (CLASSNO, CODECD, CODENM)
+        return "CLASSNO".equalsIgnoreCase(header1) &&
+                "CODECD".equalsIgnoreCase(header2) &&
+                "CODENM".equalsIgnoreCase(header3);
+    }
+
+    /**
+     * 셀 데이터 값을 String으로 추출
+     *
+     * @param cell 셀 객체
+     * @return 셀의 문자열 값
+     */
+    public String getCellValue(Cell cell) {
+        if (cell == null) {
+            return "";
+        }
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return cell.getDateCellValue().toString();
+                } else {
+                    return String.valueOf((int) cell.getNumericCellValue());
+                }
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                return cell.getCellFormula();
+            case BLANK:
+            default:
+                return "";
+        }
+    }
+
+    /**
      * 공통 코드 개수 조회
      * - 특정 검색 조건에 따라 코드의 총 개수를 반환합니다.
      *
@@ -30,6 +151,11 @@ public class CodeService {
      */
     public Integer selectCodeCount(SearchVO param) {
         return sqlSession.selectOne("selectCodeCount", param);
+    }
+
+    // 기존 데이터 조회
+    public List<CodeVO> selectCodeListAll() {
+        return sqlSession.selectList("selectCodeListAll");
     }
 
     /**

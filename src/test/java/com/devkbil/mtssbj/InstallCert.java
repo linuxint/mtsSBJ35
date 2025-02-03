@@ -1,15 +1,11 @@
 package com.devkbil.mtssbj;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.security.KeyStore;
-import java.security.MessageDigest;
+import javax.net.ssl.*;
+import java.io.*;
+import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.nio.file.Files;
 import java.util.Date;
 
 import javax.net.ssl.SSLContext;
@@ -51,6 +47,7 @@ public class InstallCert {
         KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
         ks.load(in, passphrase);
         in.close();
+
         SSLContext context = SSLContext.getInstance("TLS");
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(ks);
@@ -58,67 +55,86 @@ public class InstallCert {
         SavingTrustManager tm = new SavingTrustManager(defaultTrustManager);
         context.init(null, new TrustManager[] {tm}, null);
         SSLSocketFactory factory = context.getSocketFactory();
+
         System.out.println("Opening connection to " + host + ":" + port + "...");
         SSLSocket socket = (SSLSocket)factory.createSocket(host, port);
         socket.setSoTimeout(10000);
+
         try {
             System.out.println("Starting SSL handshake...");
             socket.startHandshake();
             socket.close();
-            System.out.println();
-            System.out.println("No errors, certificate is already trusted");
+            System.out.println("\nNo errors, certificate is already trusted.");
             return;
         } catch (SSLException e) {
-            System.out.println();
+            System.out.println("\nSSL handshake failed:");
             e.printStackTrace(System.out);
         }
+
         X509Certificate[] chain = tm.chain;
         if (chain == null) {
             System.out.println("Could not obtain server certificate chain");
             return;
         }
-        System.out.println();
-        System.out.println("Server sent " + chain.length + " certificate(s):");
-        System.out.println();
+
+        System.out.println("\nServer sent " + chain.length + " certificate(s):\n");
         MessageDigest sha1 = MessageDigest.getInstance("SHA1");
         MessageDigest md5 = MessageDigest.getInstance("MD5");
+
         for (int i = 0; i < chain.length; i++) {
             X509Certificate cert = chain[i];
-            System.out.println(" " + (i + 1) + " Subject " + cert.getSubjectDN());
-            System.out.println("   Issuer  " + cert.getIssuerDN());
+            System.out.println(" " + (i + 1) + " Subject: " + cert.getSubjectX500Principal());
+            System.out.println("   Issuer: " + cert.getIssuerX500Principal());
             sha1.update(cert.getEncoded());
-            System.out.println("   sha1    " + toHexString(sha1.digest()));
+            System.out.println("   SHA1: " + toHexString(sha1.digest()));
             md5.update(cert.getEncoded());
-            System.out.println("   md5     " + toHexString(md5.digest()));
+            System.out.println("   MD5: " + toHexString(md5.digest()));
             System.out.println();
 
             String alias = host + "-" + (i + 1);
             ks.setCertificateEntry(alias, cert);
-            OutputStream out = new FileOutputStream("jssecacerts");
-            ks.store(out, passphrase);
-            out.close();
-            System.out.println();
-            System.out.println(cert);
-            System.out.println();
-            System.out.println("Added certificate to keystore 'jssecacerts' using alias '" + alias + "'");
-            StringBuffer command = new StringBuffer();
-            command.append("keytool -exportcert -keystore ");
-            command.append(new File("jssecacerts").getAbsolutePath());
-            command.append(" -storepass changeit -file output.cert -alias ");
-            command.append(alias);
-            Runtime.getRuntime().exec(command.toString());
 
+            try (OutputStream out = new FileOutputStream("jssecacerts")) {
+                ks.store(out, passphrase);
+            }
+
+            System.out.println("\nAdded certificate to keystore 'jssecacerts' using alias '" + alias + "'");
+
+            // Keytool export command
+            ProcessBuilder exportCommand = new ProcessBuilder(
+                    "keytool", "-exportcert",
+                    "-keystore", new File("jssecacerts").getAbsolutePath(),
+                    "-storepass", "changeit",
+                    "-file", "output.cert",
+                    "-alias", alias
+            );
+            executeCommand(exportCommand);
+
+            // Keystore backup
             Files.copy(cacerts.toPath(), new File(cacerts.getAbsolutePath() + ".bak." + new Date().getTime()).toPath());
 
-            command = new StringBuffer();
-            command.append("keytool -importcert -noprompt -keystore ");
-            command.append(cacerts.getAbsolutePath());
-            command.append(" -storepass changeit -file output.cert -alias ");
-            command.append(alias);
-            System.out.println(command);
-            Runtime.getRuntime().exec(command.toString());
+            // Keytool import command
+            ProcessBuilder importCommand = new ProcessBuilder(
+                    "keytool", "-importcert", "-noprompt",
+                    "-keystore", cacerts.getAbsolutePath(),
+                    "-storepass", "changeit",
+                    "-file", "output.cert",
+                    "-alias", alias
+            );
+            System.out.println(String.join(" ", importCommand.command())); // For debugging
+            executeCommand(importCommand);
         }
+    }
 
+    private static void executeCommand(ProcessBuilder command) throws IOException, InterruptedException {
+        Process process = command.start();
+        process.waitFor();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        }
     }
 
     private static String toHexString(byte[] bytes) {

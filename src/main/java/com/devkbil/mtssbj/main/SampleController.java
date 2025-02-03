@@ -6,7 +6,7 @@ import com.devkbil.mtssbj.common.ExcelConstant;
 import com.devkbil.mtssbj.common.MakeExcel;
 import com.devkbil.mtssbj.common.util.DateUtil;
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +31,7 @@ public class SampleController {
     private final SampleService sampleService;
     private final EtcService etcService;
     private final BoardService boardService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 조직도/사용자 선택 샘플 페이지를 반환합니다.
@@ -43,7 +43,7 @@ public class SampleController {
     @GetMapping("/sample1")
     public String sample1(ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 
@@ -60,7 +60,7 @@ public class SampleController {
     @GetMapping("/sample2")
     public String sample2(ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
         // -----------------------------------------
@@ -81,7 +81,7 @@ public class SampleController {
     @GetMapping("/sample3")
     public String sample3(ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
         // -----------------------------------------
@@ -103,7 +103,7 @@ public class SampleController {
     @GetMapping("/sample4")
     public String sample4(@ModelAttribute @Valid BoardSearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
         // -----------------------------------------

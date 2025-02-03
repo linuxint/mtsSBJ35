@@ -1,4 +1,4 @@
-package com.devkbil.mtssbj.member;
+package com.devkbil.mtssbj.member.auth;
 
 import com.devkbil.mtssbj.common.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/login")
-    public String createAuthenticationToken(@ModelAttribute AuthRequest authRequest) throws Exception {
+    public String createAuthenticationToken(@ModelAttribute AuthRequest authRequest) {
         // ... 기존 코드 ...
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());

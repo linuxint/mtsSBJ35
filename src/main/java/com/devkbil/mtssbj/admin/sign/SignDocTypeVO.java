@@ -21,16 +21,13 @@ import lombok.Setter;
 public class SignDocTypeVO {
 
     @Schema(description = "문서 고유 번호") // Swagger API 설명
-    @NotBlank(message = "문서 번호는 필수 입력 값입니다.") // 유효성 검사: 공백 또는 null 불가
     private String dtno;
 
     @Schema(description = "문서 제목", maxLength = 100) // Swagger에 최대 길이 명시
-    @NotBlank(message = "문서 제목은 필수 입력 값입니다.") // 유효성 검사: 공백 또는 null 불가
     @Size(max = 100, message = "문서 제목은 최대 100자까지 입력 가능합니다.") // 최대 문자열 길이 제한
     private String dttitle;
 
     @Schema(description = "문서 내용") // Swagger API 설명
-    @NotBlank(message = "문서 내용은 필수 입력 값입니다.") // 유효성 검사: 공백 또는 null 불가
     private String dtcontents;
 
 }

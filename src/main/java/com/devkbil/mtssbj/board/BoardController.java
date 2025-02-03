@@ -9,7 +9,7 @@ import com.devkbil.mtssbj.common.util.FileVO;
 import com.devkbil.mtssbj.common.util.UtilEtc;
 import com.devkbil.mtssbj.config.security.Role;
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,7 +42,7 @@ public class BoardController {
     private final BoardService boardService;
     private final BoardGroupService boardGroupService;
     private final EtcService etcService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 게시판 리스트 조회 및 렌더링을 처리합니다.
@@ -63,7 +63,7 @@ public class BoardController {
     public String boardList(@RequestParam(value = "globalKeyword", required = false) String globalKeyword
             , @ModelAttribute @Valid BoardSearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         if (StringUtils.hasText(globalKeyword)) {
             searchVO.setSearchKeyword(globalKeyword);
@@ -112,7 +112,7 @@ public class BoardController {
             , @RequestParam(value = "brdno", required = false) String brdno
             , ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 
@@ -152,8 +152,8 @@ public class BoardController {
     public String boardSave(@RequestParam(value = "fileno", required = false) String[] fileno
             , @ModelAttribute @Valid BoardVO boardInfo) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
-        String userrole = authenticationService.getAuthenticatedUserrole();
+        String userno = authService.getAuthUserNo();
+        String userrole = authService.getAuthUserrole();
 
         boolean isAdmin = Role.ROLE_ADMIN == Role.getRoleByValue(userrole);
         boardInfo.setUserno(userno);
@@ -191,7 +191,7 @@ public class BoardController {
     public String boardRead(@RequestParam(value = "bgno", required = false) String bgno
             , @RequestParam(value = "brdno", required = false) String brdno, ModelMap modelMap) {// 세션에서 사용자 번호 가져오기
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 
@@ -232,7 +232,7 @@ public class BoardController {
     })
     public String boardDelete(@RequestParam(value = "brdno") String brdno, @RequestParam(value = "bgno") String bgno) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         BoardVO boardInfo = new BoardVO();        // 삭제 권한 확인
         boardInfo.setBrdno(brdno);
@@ -304,7 +304,7 @@ public class BoardController {
     })
     public void addBoardLike(@RequestParam(value = "brdno", required = false) String brdno, HttpServletResponse response) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         boardService.insertBoardLike(new ExtFieldVO(brdno, userno, null));
 
@@ -330,7 +330,7 @@ public class BoardController {
     })
     public String boardReplySave(HttpServletResponse response, @ModelAttribute @Valid BoardReplyVO boardReplyInfo, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         boardReplyInfo.setUserno(userno);
 
@@ -365,7 +365,7 @@ public class BoardController {
     })
     public void boardReplyDelete(HttpServletResponse response, @ModelAttribute @Valid BoardReplyVO boardReplyInfo) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         boardReplyInfo.setUserno(userno);
 

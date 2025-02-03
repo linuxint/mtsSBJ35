@@ -10,7 +10,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,16 +57,16 @@ public class GradleVersionExtractorTxt {
 
             // Print all updates at the end
             System.out.println("\nDependency Updates:");
-dependencyUpdates.entrySet().stream()
-        .sorted(Map.Entry.comparingByValue((update1, update2) -> {
-            if (update1.startsWith("Dependency without version")) {
-                return -1;
-            } else if (update2.startsWith("Dependency without version")) {
-                return 1;
-            }
-            return 0;
-        }))
-        .forEachOrdered(entry -> System.out.println(entry.getValue()));
+            dependencyUpdates.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue((update1, update2) -> {
+                        if (update1.startsWith("Dependency without version")) {
+                            return -1;
+                        } else if (update2.startsWith("Dependency without version")) {
+                            return 1;
+                        }
+                        return 0;
+                    }))
+                    .forEachOrdered(entry -> System.out.println(entry.getValue()));
 
         } catch (IOException e) {
             System.err.println("Error reading the gradle file: " + e.getMessage());
@@ -96,7 +99,10 @@ dependencyUpdates.entrySet().stream()
         try {
             String encodedGroupId = URLEncoder.encode(groupId, StandardCharsets.UTF_8.toString());
             String encodedArtifactId = URLEncoder.encode(artifactId, StandardCharsets.UTF_8.toString());
-            String urlString = String.format("https://search.maven.org/solrsearch/select?q=g:%s%%20AND%%20a:%s&rows=1&wt=json", encodedGroupId, encodedArtifactId);
+            String urlString = String.format(
+                    "https://search.maven.org/solrsearch/select?q=g:%s%%20AND%%20a:%s&rows=10&wt=json",
+                    encodedGroupId, encodedArtifactId
+            );
 
             URL url = (new URI(urlString)).toURL();
 
@@ -114,8 +120,14 @@ dependencyUpdates.entrySet().stream()
 
                     JSONObject jsonObject = new JSONObject(response.toString());
                     JSONArray docs = jsonObject.getJSONObject("response").getJSONArray("docs");
-                    if (docs.length() > 0) {
-                        return docs.getJSONObject(0).getString("latestVersion");
+
+                    // Iterate over results to find the first stable version
+                    for (int i = 0; i < docs.length(); i++) {
+                        String version = docs.getJSONObject(i).getString("latestVersion");
+                        // Filter out SNAPSHOT, alpha, beta, and other non-stable versions
+                        if (isStableVersion(version)) {
+                            return version;
+                        }
                     }
                 }
             } else {
@@ -149,4 +161,17 @@ dependencyUpdates.entrySet().stream()
         }
         return dependency;
     }
+
+    /**
+     * Check if a version is stable (i.e., not snapshot, alpha, beta, etc.)
+     */
+    private static boolean isStableVersion(String version) {
+        // Exclude versions with SNAPSHOT, alpha, beta, rc, milestone (e.g., M1, M2) in the name
+        return !version.contains("SNAPSHOT")
+                && !version.toLowerCase().contains("alpha")
+                && !version.toLowerCase().contains("beta")
+                && !version.toLowerCase().contains("rc")
+                && !version.matches(".*M[0-9]+.*"); // Matches milestone versions like M1, M2, etc.
+    }
+
 }

@@ -4,7 +4,7 @@ import com.devkbil.mtssbj.common.tree.TreeMaker;
 import com.devkbil.mtssbj.common.util.UtilEtc;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.member.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,7 +35,7 @@ public class BoardGroupController {
 
     private final BoardGroupService boardGroupService;
     private final EtcService etcService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 모든 게시판 그룹의 리스트를 조회합니다.
@@ -51,9 +51,7 @@ public class BoardGroupController {
     })
     public String boardGroupList(ModelMap modelMap) {
 
-        UserVO userVO = authenticationService.getAuthenticatedUser();
-
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 
@@ -63,8 +61,7 @@ public class BoardGroupController {
         String treeStr = tm.makeTreeByHierarchy(listview);
 
         modelMap.addAttribute("treeStr", treeStr);
-        modelMap.addAttribute("userVO", userVO);
-
+        log.debug("boardGroupList modelMap {}" , modelMap.toString());
         return "";
         //return "admin/board/BoardGroupList";
     }

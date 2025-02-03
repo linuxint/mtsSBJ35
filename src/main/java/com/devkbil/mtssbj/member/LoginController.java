@@ -2,6 +2,7 @@ package com.devkbil.mtssbj.member;
 
 import com.devkbil.mtssbj.common.LocaleMessage;
 import com.devkbil.mtssbj.config.ConfigConstant;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
@@ -33,7 +34,7 @@ public class LoginController {
 
     private final LocaleMessage localeMessage;
     private final MemberService memberService;
-    private final AuthenticationService authenticationService; // 인증 서비스
+    private final AuthService authService; // 인증 서비스
 
     /**
      * 쿠키 저장 메서드.
@@ -99,7 +100,7 @@ public class LoginController {
                               HttpServletRequest request,
                               ModelMap modelMap) {
 
-        if (!ObjectUtils.isEmpty(authenticationService.getAuthenticatedUserId())) {
+        if (!ObjectUtils.isEmpty(authService.enticatedUserId())) {
             return "redirect:/index";
         }
 
@@ -137,7 +138,7 @@ public class LoginController {
 //        request.getSession().setAttribute(userVO.getUserid(), listener);
 
         if ("Y".equalsIgnoreCase(loginInfo.getRemember())) {
-            saveCookie(response, "sid", loginInfo.getUserid(), MemberConstant.COOKIE_EXPIRE);
+            saveCookie(response, "sid", loginInfo.getUserid(), ConfigConstant.COOKIE_EXPIRE);
         } else {
             saveCookie(response, "sid", "", 0);
         }
@@ -163,7 +164,7 @@ public class LoginController {
     @GetMapping("memberLogout")
     public String memberLogout() {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         if (StringUtils.hasText(userno)) {
             memberService.insertLogOut(userno);

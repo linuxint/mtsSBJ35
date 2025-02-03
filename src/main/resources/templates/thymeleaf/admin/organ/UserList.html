@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<table class="table table-striped table-bordered table-hover">
+    <colgroup>
+        <col width='10%'/>
+        <col width='25%'/>
+        <col width='25%'/>
+        <col width='20%'/>
+        <col width='5%'/>
+    </colgroup>
+    <thead>
+    <tr>
+        <th>[[#{board.no}]]</th>
+        <th>[[#{common.id}]]</th>
+        <th>[[#{common.name}]]</th>
+        <th>[[#{common.role}]]</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user, status : ${listview}">
+        <td th:text="${status.index + 1}"></td>
+        <td>
+            <a href="javascript:fn_UserRead('[[${user.userno}]]')" th:text="${user.userid}"></a>
+        </td>
+        <td>
+            <a href="javascript:fn_UserRead('[[${user.userno}]]')" th:text="${user.usernm}"></a>
+        </td>
+        <td th:text="${user.userrole}"></td>
+        <td>
+            <a href="javascript:fn_UserDelete('[[${user.userno}]]')"><i class="fa fa-times fa-fw"></i></a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</html>

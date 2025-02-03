@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{'thymeleaf/admin/inc/ad_header' :: header}"></div>
+<script>
+    var selectedNode = null;
+
+    $(function () {
+        const treeData = JSON.parse("[[${treeStr}]]".replace(/&quot;/g, '"'));
+        $("#tree").dynatree({
+            children: treeData,
+            onActivate: TreenodeActivate
+        });
+        $("#tree").dynatree("getRoot").visit(function (node) {
+            node.expand(true);
+        });
+    });
+
+    function TreenodeActivate(node) {
+        selectedNode = node;
+
+        if (selectedNode == null || selectedNode.data.key == 0) return;
+
+        $.ajax({
+            url: "adUserList",
+            type: "post",
+            data: {deptno: selectedNode.data.key}
+        }).done(function (result) {
+            $("#userlist").html(result);
+        });
+    }
+
+    function fn_addUser() {
+        if (selectedNode == null || selectedNode.data.key == 0) {
+            alert(/*[[#{msg.err.selectDept}]]*/);
+            return;
+        }
+        $("#form1")[0].reset();
+        $("#userid").attr("readonly", false);
+        $("#pwDiv").show();
+        $("#myModal").modal("show");
+    }
+
+    function fn_addUserSave() {
+        const formData = new FormData($("#form1")[0]);
+        formData.append("deptno", selectedNode.data.key);
+
+        $.ajax({
+            url: "adUserSave",
+            contentType: false,
+            processData: false,
+            type: "post",
+            data: formData
+        }).done(function (result) {
+            $("#userlist").html(result);
+            alert(/*[[#{msg.boardSave}]]*/);
+        });
+
+        $("#myModal").modal("hide");
+    }
+
+    function fn_chkUserid() {
+        const userid = $("#userid").val();
+
+        $.ajax({
+            url: "chkUserid",
+            type: "post",
+            data: {userid: userid}
+        }).done(function (result) {
+            if (result) {
+                alert(/*[[#{msg.usedID}]]*/);
+            } else {
+                alert(/*[[#{msg.NoUsedID}]]*/);
+            }
+        });
+    }
+</script>
+<body>
+<div id="wrapper">
+    <div th:replace="~{thymeleaf/common/navigation}"></div>
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header"><i class="fa fa-user fa-fw"></i> [[#{menu.user}]]</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">[[#{common.deptList}]]</div>
+                    <div style="max-height:400px; overflow:auto;">
+                        <div id="tree"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        [[#{common.userList}]]
+                        <button class="btn btn-outline btn-primary pull-right" onclick="fn_addUser()">[[#{board.append}]]</button>
+                    </div>
+                    <div class="panel-body" id="userlist">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" id="closeX" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">[[#{menu.user}]]</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form1" name="form1">
+                    <input type="hidden" name="userno" id="userno">
+                    <div class="row form-group">
+                        <label class="col-lg-2">[[#{common.id}]]</label>
+                        <div class="col-lg-6">
+                            <input type="text" class="form-control" id="userid" name="userid" maxlength="20">
+                        </div>
+                        <button type="button" class="btn btn-default" onclick="fn_chkUserid()">[[#{common.idchk}]]</button>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-lg-2">[[#{common.name}]]</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="usernm" name="usernm" maxlength="20">
+                        </div>
+                    </div>
+                    <div class="row form-group" id="pwDiv">
+                        <label class="col-lg-2">[[#{common.password}]]</label>
+                        <div class="col-lg-4">
+                            <input type="password" class="form-control" id="userpw" name="userpw" maxlength="20">
+                        </div>
+                        <div class="col-lg-4">
+                            <input type="password" class="form-control" id="userpw2" name="userpw2" maxlength="20">
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-lg-2">[[#{common.role}]]</label>
+                        <div class="col-lg-6">
+                            <label><input name="userrole" type="radio" value="USER" checked>[[#{common.user}]]</label>
+                            <label><input name="userrole" type="radio" value="ADMIN">[[#{menu.admin}]]</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">[[#{common.btnClose}]]</button>
+                <button type="button" class="btn btn-primary" onclick="fn_addUserSave()">[[#{common.btnSave}]]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{'thymeleaf/admin/inc/ad_footer' :: footer}"></div>
+</body>
+</html>

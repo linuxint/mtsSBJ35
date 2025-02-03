@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Table Data Viewer</title>
+    <style>
+        /* Reset 기본 패딩 및 마진 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-size: 12px;
+            height: 100vh; /* 전체 화면 높이를 사용 */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-container {
+            flex: 1; /* 남은 영역을 모두 차지 */
+            overflow-y: auto; /* 스크롤 활성화 */
+            border: 1px solid #444444;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #444444; /* 셀 경계 스타일 */
+            padding: 5px;
+            text-align: center;
+        }
+
+        th {
+            position: sticky; /* 헤더 고정 */
+            top: 0;
+            background-color: #f2f2f2; /* 헤더 배경색 */
+            z-index: 2;
+        }
+
+        /* 데이터 색상 스타일 (선택 사항) */
+        .gray { background: #CCC; }
+        .white { background: #FFF; }
+        .yellow { background: #f1ebc2; }
+        .red { background: #f1c2c2; }
+
+        h1 {
+            margin: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<h1>Table Data: <span th:text="${tableName}">[No Data]</span></h1>
+
+<div th:if="${hasData}" class="table-container">
+    <table>
+        <thead>
+        <tr>
+            <th>No</th>
+            <!-- 컬럼 이름을 전송받은 순서(columnId 기반)대로 출력 -->
+            <th th:each="column : ${columns}" th:text="${column.columnName}"></th>
+        </tr>
+        <tr class="sticky2">
+            <th>한글 주석</th>
+            <th th:each="column : ${columns}" th:text="${column.columnComments}"></th> <!-- 한글 컬럼명 -->
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="row, idx : ${list}">
+            <td th:text="${idx.index + 1}"></td>
+            <!-- 데이터도 컬럼 순서(columnId)대로 출력 -->
+            <td th:each="column : ${columns}" th:text="${row[column.columnName]}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div th:if="${!hasData}" class="message">
+    데이터가 없습니다.
+</div>
+
+<a href="/tableLayout">Back to Tables</a>
+</body>
+</html>

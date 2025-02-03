@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{'thymeleaf/admin/inc/ad_header' :: header}"></div>
+<script>
+    var selectedNode = null;
+
+    $(function () {
+        const treeData = JSON.parse("[[${treeStr}]]".replace(/&quot;/g, '"'));
+        $("#tree").dynatree({
+            children: treeData,
+            onActivate: TreenodeActivate
+        });
+        $("#tree").dynatree("getRoot").visit(function (node) {
+            node.expand(true);
+        });
+        fn_groupNew();
+    });
+
+    function TreenodeActivate(node) {
+        selectedNode = node;
+
+        if (selectedNode == null || selectedNode.data.key == 0) return;
+
+        $.ajax({
+            url: "adDeptRead",
+            cache: false,
+            data: {deptno: selectedNode.data.key}
+        }).done(function (data) {
+            $("#deptno").val(data.deptno);
+            $("#deptnm").val(data.deptnm);
+        });
+    }
+
+    function fn_groupNew() {
+        $("#deptno").val("");
+        $("#deptnm").val("");
+    }
+
+    function fn_groupSave() {
+        const pid = selectedNode ? selectedNode.data.key : null;
+
+        $.ajax({
+            url: "adDeptSave",
+            cache: false,
+            type: "POST",
+            data: {deptno: $("#deptno").val(), deptnm: $("#deptnm").val(), parentno: pid}
+        }).done(function (data) {
+            if (selectedNode && selectedNode.data.key === data.deptno) {
+                selectedNode.data.title = data.deptnm;
+                selectedNode.render();
+            } else {
+                addNode(data.deptno, data.deptnm);
+            }
+            alert(/*[[#{msg.boardSave}]]*/);
+        });
+    }
+
+    function fn_groupDelete() {
+        if (!confirm(/*[[#{ask.Delete}]]*/)) return;
+
+        $.ajax({
+            url: "adDeptDelete",
+            cache: false,
+            data: {deptno: selectedNode.data.key}
+        }).done(function () {
+            alert(/*[[#{msg.boardDelete}]]*/);
+            selectedNode.remove();
+            selectedNode = null;
+            fn_groupNew();
+        });
+    }
+
+    function addNode(nodeNo, nodeTitle) {
+        let node = $("#tree").dynatree("getActiveNode") || $("#tree").dynatree("getRoot");
+        node.addChild({key: nodeNo, title: nodeTitle});
+        node.expand();
+        node.tree.redraw();
+    }
+</script>
+<body>
+<div id="wrapper">
+    <div th:replace="~{thymeleaf/common/navigation}"></div>
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header"><i class="fa fa-sitemap fa-fw"></i> [[#{menu.dept}]]</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="panel panel-default col-lg-3">
+                <div style="max-height:400px; overflow:auto;">
+                    <div id="tree"></div>
+                </div>
+            </div>
+            <div class="panel panel-default col-lg-6">
+                <div class="panel-body">
+                    <div class="row form-group">
+                        <button class="btn btn-outline btn-primary" onclick="fn_groupNew()">[[#{board.append}]]</button>
+                    </div>
+                    <form>
+                        <input name="deptno" id="deptno" type="hidden">
+                        <div class="row form-group">
+                            <label class="col-lg-3">[[#{common.deptName}]]</label>
+                            <div class="col-lg-9">
+                                <input name="deptnm" id="deptnm" style="width: 300px;" type="text" maxlength="100" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <button class="btn btn-outline btn-primary" onclick="fn_groupSave()">[[#{common.btnSave}]]</button>
+                            <button class="btn btn-outline btn-primary" onclick="fn_groupDelete()">[[#{common.btnDelete}]]</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{'thymeleaf/admin/inc/ad_footer' :: footer}"></div>
+</body>
+</html>

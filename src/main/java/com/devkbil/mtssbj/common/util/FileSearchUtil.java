@@ -72,45 +72,35 @@ public class FileSearchUtil extends SimpleFileVisitor<Path> {
             return new ArrayList<>();
         }
 
-        List<FileVO> filelist = new ArrayList<FileVO>();
-
+        List<FileVO> filelist = new ArrayList<>();
         Path path = Paths.get(dirPath);
-        DirectoryStream<Path> dir = null;
-        BasicFileAttributes attrs;
-        FileVO filedo;
-        FileChannel fileChannel;
-        try {
-            dir = Files.newDirectoryStream(path);
+
+        try (DirectoryStream<Path> dir = Files.newDirectoryStream(path)) {
             for (Path file : dir) {
-                attrs = Files.readAttributes(file, BasicFileAttributes.class);
+                BasicFileAttributes attrs = Files.readAttributes(file, BasicFileAttributes.class);
+
                 if (attrs.isDirectory()) {
-                    log.info("dir : {}", file);
-                    filelist = showFIlesInDir3(file.toString());
-                    //} else if(file.getFileName().endsWith(".txt")) {
-                    //    log.info("1");
-                } else {
-                    filedo = new FileVO();
-                    filedo.setFilename(file.getFileName().toString());
-                    filedo.setRealname(file.getFileName().toString());
+                    log.info("Directory found: {}", file.toAbsolutePath());
+                    filelist.addAll(showFIlesInDir3(file.toString())); // 재귀 호출로 하위 디렉토리 탐색
+                } else if (!file.getFileName().toString().startsWith(".") // 숨김 파일 제외
+                        && file.getFileName().toString().matches("^[0-9]+$")) { // 숫자 파일만
+                    log.info("File found: {}", file.toAbsolutePath());
 
-                    fileChannel = FileChannel.open(Paths.get(path + "/" + filedo.getRealname()));
-                    filedo.setFilesize(fileChannel.size() / 1024); // Kbyte
+                    FileVO fileVo = new FileVO();
+                    fileVo.setFilename(file.getFileName().toString());
+                    fileVo.setRealname(file.getFileName().toString());
 
-                    filedo.setUri(file.toUri().toString());
-                    filedo.setFilepath(file.getParent().toString());
-                    filelist.add(filedo);
+                    // 파일 크기 계산
+                    try (FileChannel channel = FileChannel.open(file)) {
+                        fileVo.setFilesize(channel.size() / 1024); // 파일 크기를 Kbyte 단위로 저장
+                    }
+                    fileVo.setUri(file.toUri().toString());
+                    fileVo.setFilepath(file.getParent().toString());
+                    filelist.add(fileVo);
                 }
             }
         } catch (IOException e) {
-            log.error(e.getMessage());
-        } finally {
-            try {
-                if (dir != null) {
-                    dir.close();
-                }
-            } catch (IOException e) {
-                log.error(e.getMessage());
-            }
+            log.error("Failed to read directory: {}", dirPath, e);
         }
         return filelist;
     }
@@ -139,6 +129,7 @@ public class FileSearchUtil extends SimpleFileVisitor<Path> {
     // 파일을 접근하는 중에 에러가 존재하면, 사용자에게 에러와 예외로 알려줌
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) {
+        log.error("Failed to access file: {} (Reason: {})", file.toAbsolutePath(), exc.getMessage());
         log.error(exc.getMessage());
         return CONTINUE;
     }

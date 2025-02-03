@@ -27,6 +27,7 @@ public class FileDownload {
     @GetMapping("fileDownload")
     public void fileDownload(@RequestParam(value = "filename", required = false) String filename, @RequestParam(value = "downname", required = false) String downname, HttpServletRequest request, HttpServletResponse response) {
         String path = System.getProperty("user.dir") + "/fileupload/";
+        log.info("Searching files in directory: {}", path); // filePath 확인
 
         if (!StringUtils.hasText(filename)) {
             filename = downname;

@@ -11,8 +11,8 @@ import java.io.*;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
@@ -71,7 +71,7 @@ public class FileUtil {
      */
     public static String getNewName() {
         SimpleDateFormat ft = new SimpleDateFormat("yyyyMMddhhmmssSSS");
-        return ft.format(new Date()) + (int) (Math.random() * 10);
+        return ft.format(new Date()) + (int)(Math.random() * 10);
     }
 
     public static String getFileExtension(String filename) {
@@ -487,7 +487,8 @@ public class FileUtil {
      * fromPath 하위의 모든 경로들을 basePath 를 기준으로한 상대경로로 가져온다.
      *
      * @param fromPath
-     * @param basePath return String[]
+     * @param basePath
+     * return String[]
      */
     public static String[] getAllSubRelDirs(String fromPath, String basePath) {
         String[] toPath = null;

@@ -3,7 +3,7 @@ package com.devkbil.mtssbj.main;
 import com.devkbil.mtssbj.common.ExtFieldVO;
 import com.devkbil.mtssbj.common.util.DateUtil;
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.project.ProjectService;
 import com.devkbil.mtssbj.schedule.DateVO;
 import com.devkbil.mtssbj.search.SearchVO;
@@ -24,7 +24,7 @@ import java.util.*;
 public class IndexService {
 
     private final SqlSessionTemplate sqlSession;
-    final AuthenticationService authenticationService;
+    final AuthService authService;
     private final EtcService etcService;
     private final ProjectService projectService;
 
@@ -40,12 +40,12 @@ public class IndexService {
             searchVO = new SearchVO();
         }
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);        // 공통 속성 설정
 
         Date today = DateUtil.getToday();
-        modelMap.putAll(calculateCalendarData(userno, today));// 캘린더 데이터 계산
+        modelMap.putAll(calculateCalendarData(today));// 캘린더 데이터 계산
 
         if (StringUtils.hasText(searchVO.getSearchKeyword())) {
             searchVO.setSearchType("prtitle"); // 검색어 처리 (Post 요청 시만 처리)
@@ -74,11 +74,13 @@ public class IndexService {
     /**
      * 캘린더 데이터를 계산하여 반환합니다.
      *
-     * @param userno    사용자 번호
      * @param targetDay 대상 날짜
      * @return 캘린더 데이터를 담은 Map
      */
-    public Map<String, Object> calculateCalendarData(String userno, Date targetDay) {
+    public Map<String, Object> calculateCalendarData(Date targetDay) {
+
+        String userno = authService.getAuthUserNo();
+
         List<DateVO> calenList = new ArrayList<>();
 
         Date today = DateUtil.getToday();

@@ -4,7 +4,7 @@ import com.devkbil.mtssbj.common.tree.TreeMaker;
 import com.devkbil.mtssbj.common.util.UtilEtc;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -33,7 +33,7 @@ public class MenuController {
 
     private final MenuService menuService;
     private final EtcService etcService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 메뉴 리스트를 조회하여 트리 형태로 렌더링합니다.
@@ -72,7 +72,7 @@ public class MenuController {
     public void menuSave(HttpServletResponse response, MenuVO menuInfo) {
         handleJsonResponse(response, () -> {
 
-            String userno = authenticationService.getAuthenticatedUserNo();
+            String userno = authService.getAuthUserNo();
 
             menuInfo.setReguserno(userno);
             menuService.insertMenu(menuInfo);
@@ -124,7 +124,7 @@ public class MenuController {
      */
     private void setCommonAttributes(ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 

@@ -1,12 +1,13 @@
 package com.devkbil.mtssbj;
 
 import com.devkbil.mtssbj.common.Listener.*;
+import com.devkbil.mtssbj.common.events.CustomApplicationEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -17,10 +18,29 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @EnableCaching
 public class MtssbjApplication implements CommandLineRunner {
 
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    // ApplicationEventPublisher 주입받기
+    public MtssbjApplication(ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
+
     public static void main(String[] args) {
-        //SpringApplication.run(MtssbjApplication.class, args);
+        // SpringApplication 인스턴스 생성 및 설정
         SpringApplication application = new SpringApplication(MtssbjApplication.class);
 
+        // BufferingApplicationStartup 설정 (2048 이벤트를 버퍼링)
+        application.setApplicationStartup(new BufferingApplicationStartup(2048));
+
+        // 애플리케이션 배너 설정
+        application.setBannerMode(Banner.Mode.CONSOLE);
+        // 로깅 이전에 설정을 분명히 함
+        application.setLogStartupInfo(true); // 기본 동작 허용
+
+        // WebApplicationType 설정 (Servlet 모드)
+        application.setWebApplicationType(WebApplicationType.SERVLET);
+
+        // 커스텀 ApplicationListeners 추가
         application.addListeners(
                 new ApplicationStartingEventListener(),
                 new ApplicationReadyEventListener(),
@@ -32,8 +52,6 @@ public class MtssbjApplication implements CommandLineRunner {
                 new ApplicationContextRefreshedEventListener()
         );
 
-        //application.setBannerMode(Banner.Mode.OFF); -- banner mode off
-        application.setWebApplicationType(WebApplicationType.SERVLET);
         //application.setWebApplicationType(WebApplicationType.REACTIVE);
 
         // custom banner of java
@@ -54,16 +72,25 @@ public class MtssbjApplication implements CommandLineRunner {
             }
         });
         */
+
+        // 애플리케이션 실행
         application.run(args);
+//        int exitCode = SpringApplication.exit(application.run(args));
+//        System.exit(exitCode);
     }
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("CourseTrackerApplication CommandLineRunner has executed");
+        log.info("Application started with CommandLineRunner");
+
+        // 사용자 정의 이벤트를 발행
+        CustomApplicationEvent customEvent = new CustomApplicationEvent(this, "Hello from CustomApplicationEvent");
+        applicationEventPublisher.publishEvent(customEvent);
+        log.info("Custom application event published");
     }
 
     @Bean
-    public CommandLineRunner commandLineRunner() {
+    public CommandLineRunner additionalCommandLineRunner() {
         return args -> {
             log.info("CommandLineRunner executed as a bean definition  with " + args.length + "arguments");
             for (int nLoop = 0; nLoop < args.length; nLoop++) {
@@ -72,4 +99,8 @@ public class MtssbjApplication implements CommandLineRunner {
         };
     }
 
+    @Bean
+    public ExitCodeGenerator exitCodeGenerator() {
+        return () -> 42; // 종료 코드 설정
+    }
 }

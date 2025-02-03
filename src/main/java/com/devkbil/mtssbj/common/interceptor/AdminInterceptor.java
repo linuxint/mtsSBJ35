@@ -1,7 +1,7 @@
 package com.devkbil.mtssbj.common.interceptor;
 
 import com.devkbil.mtssbj.config.security.Role;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -51,8 +51,8 @@ public class AdminInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object handler) {
 
-        AuthenticationService authenticationService = new AuthenticationService();
-        String userno = authenticationService.getAuthenticatedUserNo();
+        AuthService authService = new AuthService();
+        String userno = authService.getAuthUserNo();
 
         try {
             // 1. 세션 확인
@@ -63,7 +63,7 @@ public class AdminInterceptor implements HandlerInterceptor {
             }
 
             // 2. 관리자 권한 확인
-            String userrole = authenticationService.getAuthenticatedUserrole();
+            String userrole = authService.getAuthUserrole();
             if (Role.ROLE_ADMIN != Role.getRoleByValue(userrole)) {
                 log.warn("접근 권한 없음: 관리자 권한이 아님");
                 redirectToPage(res, NO_AUTH_PAGE); // 권한 없음 페이지로 이동

@@ -1,7 +1,7 @@
 package com.devkbil.mtssbj.mail;
 
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +27,7 @@ public class MailController {
 
     private final MailService mailService;
     private final EtcService etcService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 수신 메일 리스트 조회
@@ -40,7 +40,7 @@ public class MailController {
     @GetMapping("/receiveMails")
     public String receiveMails(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         List<?> mailInfoList = mailService.selectMailInfoList(userno);
         if (mailInfoList.isEmpty()) {
@@ -73,7 +73,7 @@ public class MailController {
     @GetMapping("/sendMails")
     public String sendMails(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         List<?> mailInfoList = mailService.selectMailInfoList(userno);
         if (mailInfoList.isEmpty()) {
@@ -84,7 +84,7 @@ public class MailController {
         Integer alertcount = etcService.selectAlertCount(userno);
         modelMap.addAttribute("alertcount", alertcount);
 
-        // 
+        //
         searchVO.setSearchExt1("S");
         searchVO.pageCalculate(mailService.selectReceiveMailCount(searchVO)); // startRow, endRow
         List<?> listview = mailService.selectReceiveMailList(searchVO);
@@ -106,7 +106,7 @@ public class MailController {
     @GetMapping("/mailForm")
     public String mailForm(@ModelAttribute @Valid MailVO mailInfo, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         List<?> mailInfoList = mailService.selectMailInfoList(userno);
         if (mailInfoList.isEmpty()) {
@@ -117,7 +117,7 @@ public class MailController {
         Integer alertcount = etcService.selectAlertCount(userno);
         modelMap.addAttribute("alertcount", alertcount);
 
-        // 
+        //
         modelMap.addAttribute("mailInfoList", mailInfoList);
 
         if (mailInfo.getEmno() != null) {
@@ -139,7 +139,7 @@ public class MailController {
     @PostMapping("/mailSave")
     public String mailSave(@ModelAttribute @Valid MailVO mailInfo) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         mailInfo.setUserno(userno);
         mailInfo.setEmtype("S");
@@ -189,12 +189,12 @@ public class MailController {
      */
     private void mailRead(@ModelAttribute @Valid MailVO mailVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         Integer alertcount = etcService.selectAlertCount(userno);
         modelMap.addAttribute("alertcount", alertcount);
 
-        // 
+        //
         MailVO mailInfo = mailService.selectReceiveMailOne(mailVO);
 
         modelMap.addAttribute("mailInfo", mailInfo);
@@ -248,7 +248,7 @@ public class MailController {
 
         session.setAttribute("mail", "ing"); // 작업 진행 상태 설정
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         Thread t = new Thread(new ImportMail(mailService, userno, session));
         t.start();

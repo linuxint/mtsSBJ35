@@ -1,7 +1,7 @@
 package com.devkbil.mtssbj.crud;
 
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,7 +33,7 @@ public class ChkController {
 
     private final CrudService crudService;
     private final EtcService etcService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 체크 리스트 조회
@@ -57,7 +57,7 @@ public class ChkController {
     @GetMapping("/chkList")
     public String chkList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         // 공통 속성 설정 (예: 사용자 정보)
         etcService.setCommonAttribute(userno, modelMap);

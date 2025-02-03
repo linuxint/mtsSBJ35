@@ -4,7 +4,7 @@ import com.devkbil.mtssbj.common.ExtFieldVO;
 import com.devkbil.mtssbj.common.util.FileUtil;
 import com.devkbil.mtssbj.common.util.FileVO;
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -33,7 +33,7 @@ public class TaskMineController {
     private final TaskService taskService;
     private final EtcService etcService;
     private final ProjectService projectService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 사용자의 작업 목록 조회.
@@ -50,7 +50,7 @@ public class TaskMineController {
     @GetMapping("/taskMine")
     public String taskMine(@RequestParam(value = "prno", required = false) String prno, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         ProjectVO projectInfo = projectService.selectProjectOne(prno);
         if (ObjectUtils.isEmpty(projectInfo)) {

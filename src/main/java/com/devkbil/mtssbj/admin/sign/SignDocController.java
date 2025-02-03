@@ -2,7 +2,7 @@ package com.devkbil.mtssbj.admin.sign;
 
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,7 +33,7 @@ public class SignDocController {
 
     private final SignDocService signDocService;
     private final EtcService etcService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 문서 유형 리스트를 조회합니다.
@@ -51,7 +51,7 @@ public class SignDocController {
     })
     public String signDocTypeList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);              // 공통 속성 설정
 
@@ -78,9 +78,9 @@ public class SignDocController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
-    public String signDocTypeForm(@ModelAttribute @Valid SignDocTypeVO signInfo, ModelMap modelMap) {
+    public String signDocTypeForm(@ModelAttribute SignDocTypeVO signInfo, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 

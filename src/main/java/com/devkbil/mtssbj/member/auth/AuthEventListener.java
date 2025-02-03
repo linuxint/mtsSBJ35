@@ -1,5 +1,6 @@
-package com.devkbil.mtssbj.member;
+package com.devkbil.mtssbj.member.auth;
 
+import com.devkbil.mtssbj.member.CustomSessionHandler;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
  * 사용자에 대해 활성 세션만 유효하도록 보장합니다.
  */
 @Component
-public class CustomAuthenticationSuccessListener implements ApplicationListener<AuthenticationSuccessEvent> {
+public class AuthEventListener implements ApplicationListener<AuthenticationSuccessEvent> {
 
     private final CustomSessionHandler customSessionHandler;
 
@@ -22,7 +23,7 @@ public class CustomAuthenticationSuccessListener implements ApplicationListener<
      *
      * @param customSessionHandler 사용자 세션 관리를 처리하는 핸들러 주입
      */
-    public CustomAuthenticationSuccessListener(CustomSessionHandler customSessionHandler) {
+    public AuthEventListener(CustomSessionHandler customSessionHandler) {
         this.customSessionHandler = customSessionHandler;
     }
 

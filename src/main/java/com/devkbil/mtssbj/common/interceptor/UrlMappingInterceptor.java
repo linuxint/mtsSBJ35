@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.common.interceptor;
 
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -75,9 +75,9 @@ public class UrlMappingInterceptor implements HandlerInterceptor {
         }
 
         // 인증된 사용자의 역할(Role)을 가져옴
-        AuthenticationService authenticationService = new AuthenticationService();
+        AuthService authService = new AuthService();
         String requestUrl = request.getRequestURI(); // 요청 URL
-        String userRole = authenticationService.getAuthenticatedUserrole();
+        String userRole = authService.getAuthUserrole();
 
         // 비로그인 상태는 "ANONYMOUS"로 설정
         if (ObjectUtils.isEmpty(userRole)) {

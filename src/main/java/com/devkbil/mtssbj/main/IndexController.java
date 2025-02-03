@@ -84,11 +84,9 @@ public class IndexController {
             @RequestParam(value = "date", required = false) String date
             , HttpServletRequest request, ModelMap modelMap) {
 
-        String userno = indexService.authenticationService.getAuthenticatedUserNo();
-
         Date today = DateUtil.stringToDate(date);
 
-        Map<String, Object> calendarData = indexService.calculateCalendarData(userno, today);
+        Map<String, Object> calendarData = indexService.calculateCalendarData(today);
 
         modelMap.addAllAttributes(calendarData);
 

@@ -2,43 +2,79 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>log Viewer</title>
+    <title>Log Viewer</title>
     <style>
-        body {font-size:12px;}
+        /* Reset 기본 패딩 및 마진 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-size: 12px;
+            height: 100vh; /* 화면 전체 높이를 사용 */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-container {
+            flex: 1; /* 남은 영역을 모두 차지 */
+            overflow-y: auto; /* 스크롤 활성화 */
+            border: 1px solid #444444;
+        }
+
         table {
             width: 100%;
-            border-top: 1px solid #444444;
             border-collapse: collapse;
+            height: 100%; /* 테이블이 컨테이너 높이에 맞게 확장 */
         }
+
         th, td {
-            border-bottom: 1px solid #444444;
-            padding: 3px;
+            border: 1px solid #444444; /* 테이블 경계 스타일 */
+            padding: 5px; /* 셀 여백 */
+            text-align: center;
         }
-        .gray {background: #CCC}
-        .white {background: #FFF}
-        .yellow {background: #f1ebc2 }
-        .red {background: #f1c2c2}
+
+        th {
+            position: sticky; /* `thead`를 고정 */
+            top: 0;
+            background-color: #f2f2f2; /* 헤더 배경색 */
+            z-index: 2;
+        }
+
+        /* 색상 스타일 */
+        .gray { background: #CCC; }
+        .white { background: #FFF; }
+        .yellow { background: #f1ebc2; }
+        .red { background: #f1c2c2; }
     </style>
 </head>
 <body>
-<table>
-    <thead></thead>
-    <tbody>
+<div class="table-container">
+    <table>
+        <thead>
         <tr>
             <th>No</th>
-            <th>tableName</th>
-            <th>tableComments</th>
-            <th>columnName</th>
-            <th>columnComments</th>
-            <th>nullFlag</th>
-            <th>dataType</th>
-            <th>dataLength</th>
-            <th>pkFlag</th>
-            <th>fkFlag</th>
+            <th>Table Name</th>
+            <th>Table Comments</th>
+            <th>Column Name</th>
+            <th>Column Comments</th>
+            <th>Null Flag</th>
+            <th>Data Type</th>
+            <th>Data Length</th>
+            <th>PK Flag</th>
+            <th>FK Flag</th>
         </tr>
+        </thead>
+        <tbody>
         <tr th:each="tableLayout, idx : ${listview}" th:class="${tableLayout.pkFlag}!=null ? 'yellow' : (${tableLayout.fkFlag}!=null ? 'gray' : 'white')">
             <td th:text="${idx.index}"></td>
-            <td th:text="${tableLayout.tableName}"></td>
+            <!-- 추가된 링크 -->
+            <td>
+                <a th:href="@{/table/view/{tableName}(tableName=${tableLayout.tableName})}"
+                   th:text="${tableLayout.tableName}"></a>
+            </td>
             <td th:text="${tableLayout.tableComments}"></td>
             <td th:text="${tableLayout.columnName}"></td>
             <td th:text="${tableLayout.columnComments}"></td>
@@ -48,7 +84,8 @@
             <td th:text="${tableLayout.pkFlag}"></td>
             <td th:text="${tableLayout.fkFlag}"></td>
         </tr>
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

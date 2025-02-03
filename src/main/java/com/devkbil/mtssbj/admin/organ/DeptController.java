@@ -4,7 +4,7 @@ import com.devkbil.mtssbj.common.tree.TreeMaker;
 import com.devkbil.mtssbj.common.util.UtilEtc;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,7 +34,7 @@ public class DeptController {
     private final DeptService deptService;
     private final EtcService etcService;
     private final TreeMaker treeMaker = new TreeMaker();  // TreeMaker 재사용
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 부서 트리 구조를 조회합니다.
@@ -46,7 +46,7 @@ public class DeptController {
     @Operation(summary = "부서 트리 조회", description = "부서의 계층 트리 구조를 반환합니다.")
     public String dept(ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         // 공통 속성 설정
         etcService.setCommonAttribute(userno, modelMap);

@@ -4,6 +4,7 @@ import com.devkbil.mtssbj.admin.organ.UserService;
 import com.devkbil.mtssbj.common.util.FileUtil;
 import com.devkbil.mtssbj.common.util.FileVO;
 import com.devkbil.mtssbj.common.util.UtilEtc;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -27,7 +28,7 @@ public class MemberController {
     private final UserService userService;
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 내정보.
@@ -35,7 +36,7 @@ public class MemberController {
     @GetMapping("/memberForm")
     public String memberForm(@RequestParam(value = "save", required = false) String save, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         UserVO userInfo = userService.selectUserOne(userno);
 
@@ -51,7 +52,7 @@ public class MemberController {
     @PostMapping("/userSave")
     public String userSave(@ModelAttribute @Valid UserVO userInfo) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         userInfo.setUserno(userno);
 
@@ -71,7 +72,7 @@ public class MemberController {
     @PostMapping("/changePWSave")
     public void changePWSave(HttpServletResponse response, @ModelAttribute @Valid UserVO userInfo) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         userInfo.setUserno(userno);
         userInfo.setUserpw(passwordEncoder.encode(userInfo.getUserpw()));

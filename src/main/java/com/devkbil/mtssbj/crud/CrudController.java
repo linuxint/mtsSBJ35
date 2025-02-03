@@ -1,7 +1,7 @@
 package com.devkbil.mtssbj.crud;
 
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,7 +29,7 @@ public class CrudController {
 
     private final CrudService crudService;
     private final EtcService etcService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * CRUD 리스트 페이지
@@ -46,7 +46,7 @@ public class CrudController {
     @GetMapping("/crudList")
     public String crudList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 
@@ -69,7 +69,7 @@ public class CrudController {
     @GetMapping("/crudForm")
     public String crudForm(@ModelAttribute @Valid CrudVO crudInfo, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 
@@ -92,7 +92,7 @@ public class CrudController {
     @PostMapping("/crudSave")
     public String crudSave(@ModelAttribute @Valid CrudVO crudInfo) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         crudInfo.setUserno(userno);
 
@@ -110,7 +110,7 @@ public class CrudController {
     @GetMapping("/crudRead")
     public String crudRead(@ModelAttribute @Valid CrudVO crudVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 

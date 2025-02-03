@@ -3,7 +3,7 @@ package com.devkbil.mtssbj.sign;
 import com.devkbil.mtssbj.admin.sign.SignDocService;
 import com.devkbil.mtssbj.admin.sign.SignDocTypeVO;
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,7 +31,7 @@ public class SignController {
     private final SignService signService;
     private final SignDocService signDocService;
     private final EtcService etcService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 결재 받을 문서 리스트를 조회합니다.
@@ -44,11 +44,11 @@ public class SignController {
     @Operation(summary = "결재 받을 문서 리스트 조회", description = "사용자가 결재받아야 하는 문서들의 리스트를 조회합니다.")
     public String signListTobe(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 
-        // 
+        //
         searchVO.setUserno(userno);
         searchVO.pageCalculate(signService.selectSignDocTobeCount(searchVO)); // startRow, endRow
         List<?> listview = signService.selectSignDocTobeList(searchVO);
@@ -70,7 +70,7 @@ public class SignController {
     @Operation(summary = "결재 할 문서 리스트 조회", description = "사용자가 결재를 진행해야 하는 문서들의 리스트를 조회합니다.")
     public String signListTo(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 
@@ -99,7 +99,7 @@ public class SignController {
     @Operation(summary = "기안 문서 타입 리스트 조회", description = "사용자가 선택할 수 있는 기안 문서 타입 리스트를 조회합니다.")
     public String signDocTypeList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 
@@ -121,7 +121,7 @@ public class SignController {
     @Operation(summary = "결재 문서 작성/수정", description = "사용자가 결재 문서를 작성하거나 수정할 수 있는 화면을 반환합니다.")
     public String signDocForm(@ModelAttribute @Valid SignDocVO signDocInfo, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 
@@ -161,7 +161,7 @@ public class SignController {
     @Operation(summary = "결재 문서 저장", description = "작성하거나 수정된 결재 문서를 저장합니다.")
     public String signDocSave(@ModelAttribute @Valid SignDocVO signDocInfo) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         signDocInfo.setUserno(userno);
 
@@ -181,7 +181,7 @@ public class SignController {
     @Operation(summary = "결재 문서 읽기", description = "결재 문서를 읽는 세부 화면을 반환합니다.")
     public String signDocRead(@ModelAttribute @Valid SignDocVO signDocVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 

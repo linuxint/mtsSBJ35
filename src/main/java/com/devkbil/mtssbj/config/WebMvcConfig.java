@@ -8,9 +8,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.CacheControl;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.validation.DefaultMessageCodesResolver;
 import org.springframework.validation.MessageCodesResolver;
+import org.springframework.validation.Validator;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.*;
+
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -73,11 +81,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(new ThemeInterceptor()).addPathPatterns("/**");
 
     }
-    
+
     /*
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        
+
         //전체 resource를 허용할 경우 registry.addMapping("/**")...
         registry.addMapping("/**")   //mapping할 resource를 지정합니다.
                 .allowedOrigins("http://localhost:18080");  //CORS를 허용할 origin을 지정합니다.
@@ -142,5 +150,75 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addFormatter(new LocalDateFormatter());
+    }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        WebMvcConfigurer.super.addArgumentResolvers(resolvers);
+    }
+
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        WebMvcConfigurer.super.configurePathMatch(configurer);
+    }
+
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        WebMvcConfigurer.super.configureContentNegotiation(configurer);
+    }
+
+    @Override
+    public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+        WebMvcConfigurer.super.configureAsyncSupport(configurer);
+    }
+
+    @Override
+    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+        WebMvcConfigurer.super.configureDefaultServletHandling(configurer);
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        WebMvcConfigurer.super.addCorsMappings(registry);
+    }
+
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry) {
+        WebMvcConfigurer.super.configureViewResolvers(registry);
+    }
+
+    @Override
+    public void addReturnValueHandlers(List<HandlerMethodReturnValueHandler> handlers) {
+        WebMvcConfigurer.super.addReturnValueHandlers(handlers);
+    }
+
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        WebMvcConfigurer.super.configureMessageConverters(converters);
+    }
+
+    @Override
+    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        WebMvcConfigurer.super.extendMessageConverters(converters);
+    }
+
+    @Override
+    public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+        WebMvcConfigurer.super.configureHandlerExceptionResolvers(resolvers);
+    }
+
+    @Override
+    public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+        WebMvcConfigurer.super.extendHandlerExceptionResolvers(resolvers);
+    }
+
+    @Override
+    public void addErrorResponseInterceptors(List<ErrorResponse.Interceptor> interceptors) {
+        WebMvcConfigurer.super.addErrorResponseInterceptors(interceptors);
+    }
+
+    @Override
+    public Validator getValidator() {
+        return WebMvcConfigurer.super.getValidator();
     }
 }

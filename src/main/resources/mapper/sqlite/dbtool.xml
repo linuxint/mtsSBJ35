@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dbtool">
+
+    <select id="selectTableData" parameterType="map" resultType="map">
+        SELECT
+        <foreach collection="columns" item="column" separator=",">
+            ${column}
+        </foreach>
+        FROM ${tableName}
+    </select>
+
+    <select id="checkExistingData" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM ${tableName}
+        WHERE
+        <foreach collection="keyColumns" item="keyColumn" separator=" AND ">
+            ${keyColumn} = #{keyValues[keyColumn]}
+        </foreach>
+    </select>
+
+    <update id="dynamicUpdate">
+        UPDATE ${tableName}
+        SET
+        <foreach collection="columns" item="column" separator=",">
+            ${column} = #{data[column]}
+        </foreach>
+        WHERE
+        <foreach collection="keyColumns" item="keyColumn" separator=" AND ">
+            ${keyColumn} = #{data[keyColumn]}
+        </foreach>
+    </update>
+
+    <insert id="dynamicInsert">
+        INSERT INTO ${tableName}
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <foreach collection="columns" item="column" separator=",">
+                ${column}
+            </foreach>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <foreach collection="columns" item="column" separator=",">
+                #{data[column]}
+            </foreach>
+        </trim>
+    </insert>
+
+    <select id="selectTableLayout" resultType="com.devkbil.mtssbj.develop.dbtool.DbtoolVO" parameterType="com.devkbil.mtssbj.develop.dbtool.DbtoolVO">
+        <![CDATA[
+        SELECT A1.TABLE_NAME AS tableName,
+                A1.TABLE_COMMENTS AS tableComments,
+                A1.COLUMN_COMMENTS AS columnComments,
+                A1.COLUMN_NAME AS columnName,
+                A1.COLUMN_ID as columnId,
+                MAX(CASE WHEN B1.CONSTRAINT_TYPE = 'PRIMARY KEY' THEN B1.CONSTRAINT_NAME ELSE NULL END) AS pkFlag, -- PK 플래그
+                MAX(CASE WHEN B1.CONSTRAINT_TYPE = 'FOREIGN KEY' THEN B1.CONSTRAINT_NAME || '->' || B1.R_CONSTRAINT_NAME || '.' || A1.COLUMN_NAME ELSE NULL END) AS fkFlag, -- FK 플래그
+                A1.NULL_FLAG AS nullFlag,
+                A1.DATA_TYPE AS dataType,
+                A1.DATA_LENGTH AS dataLength
+            FROM
+                (SELECT
+                     tbl_name AS TABLE_NAME,
+                     NULL AS TABLE_COMMENTS, -- SQLite는 테이블 주석 제공 X
+                     NULL AS COLUMN_COMMENTS, -- SQLite는 컬럼 주석 제공 X
+                     name AS COLUMN_NAME,
+                     CASE
+                          WHEN pk = 1 THEN 'PRIMARY KEY'
+                          WHEN "notnull" = 1 THEN 'NOT NULL'
+                          ELSE ''
+                     END AS NULL_FLAG,
+                     type AS DATA_TYPE,
+                     '' AS DATA_LENGTH,
+                     cid AS COLUMN_ID
+                 FROM pragma_table_info('#{tableName}')
+                ) A1
+                    LEFT JOIN
+                (SELECT m.name AS TABLE_NAME,
+                         p.origin AS CONSTRAINT_TYPE,
+                         p."table" AS R_CONSTRAINT_NAME,
+                         p."from" AS COLUMN_NAME,
+                         p."to" AS FK_COLUMN_NAME,
+                         NULL AS CONSTRAINT_NAME -- SQLite에서는 제약 조건 이름 지원 안 함
+                 FROM sqlite_master m
+                      LEFT JOIN pragma_foreign_key_list(m.name) p ON m.name = '#{tableName}'
+                 WHERE m.type='table' AND m.name = '#{tableName}'
+                ) B1 ON (A1.TABLE_NAME = B1.TABLE_NAME AND A1.COLUMN_NAME = B1.COLUMN_NAME)
+            WHERE 1=1
+        ]]>
+        <if test="columnComments!=null and columnComments!=''">
+            -- SQLite는 COLUMN_COMMENT 지원 안 함. 무시 처리.
+        </if>
+        <if test="columnName!=null and columnName!=''">
+            AND A1.COLUMN_NAME LIKE '%' || #{columnName} || '%'
+        </if>
+        <if test="tableName!=null and tableName!=''">
+            AND A1.TABLE_NAME = #{tableName}
+        </if>
+        GROUP BY
+        A1.TABLE_NAME, A1.TABLE_COMMENTS, A1.COLUMN_COMMENTS, A1.COLUMN_NAME, A1.NULL_FLAG, A1.DATA_TYPE, A1.DATA_LENGTH, A1.COLUMN_ID
+        ORDER BY A1.TABLE_NAME, A1.COLUMN_ID
+    </select>
+
+</mapper>

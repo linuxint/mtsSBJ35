@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.etc;
 
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import java.util.List;
 public class AlertMsgController {
 
     private final EtcService etcService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 현재 사용자의 전체 Alert 메시지 리스트를 반환합니다.
@@ -33,7 +33,7 @@ public class AlertMsgController {
     @GetMapping("/alertList")
     public String alertList(ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         List<?> listview = etcService.selectAlertList(userno);
 
@@ -52,7 +52,7 @@ public class AlertMsgController {
     @PostMapping("/alertList4Ajax")
     public String alertList4Ajax(ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         List<?> listview = etcService.selectAlertList4Ajax(userno);
 

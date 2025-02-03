@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{'thymeleaf/admin/inc/ad_header' :: header}"></div>
+<body>
+<div id="wrapper">
+
+    <!-- Navigation Include -->
+    <div th:replace="~{thymeleaf/common/navigation}"></div>
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header"><i class="fa fa-gear fa-fw"></i> <span th:text="#{common.codecd}"></span></h1>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="row">
+            <form id="form1" name="form1" role="form" action="@{/adCodeSave}" method="post" onsubmit="return fn_formSubmit()">
+                <input type="hidden" name="codeFormType" th:value="${codeFormType}">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row form-group">
+                            <label class="col-lg-2">
+                                <span th:text="#{common.classno}"></span>
+                            </label>
+                            <div class="col-lg-1">
+                                <input type="text" class="form-control" id="classno" name="classno" maxlength="10"
+                                       th:value="${codeInfo.classno}" th:attrappend="readonly=${readonly}">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-lg-2">
+                                <span th:text="#{common.codecd}"></span>
+                            </label>
+                            <div class="col-lg-1">
+                                <input type="text" class="form-control" id="codecd" name="codecd" maxlength="10"
+                                       th:value="${codeInfo.codecd}" th:attrappend="readonly=${readonly}">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-lg-2">
+                                <span th:text="#{common.codenm}"></span>
+                            </label>
+                            <div class="col-lg-5">
+                                <input type="text" class="form-control" id="codenm" name="codenm" maxlength="30"
+                                       th:value="${codeInfo.codenm}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-outline btn-primary">
+                    <span th:text="#{common.btnSave}"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Footer Include -->
+<div th:replace="~{'thymeleaf/admin/inc/ad_footer' :: footer}"></div>
+</body>
+</html>

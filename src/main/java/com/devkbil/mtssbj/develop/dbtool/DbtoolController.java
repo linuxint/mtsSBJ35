@@ -7,9 +7,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
@@ -26,6 +28,48 @@ import java.util.List;
 public class DbtoolController {
 
     private final DbtoolService dbtoolService;
+
+    @GetMapping("/table/view/{tableName}")
+    public String viewTableData(@PathVariable("tableName") String tableName, Model model) {
+        log.info("Request received for table: {}", tableName);
+
+        if (tableName == null || tableName.isBlank()) {
+            log.error("Invalid tableName provided.");
+            model.addAttribute("errorMessage", "Invalid or empty table name.");
+            return "error";
+        }
+
+        try {
+            // 1. 테이블 데이터 가져오기
+            List<?> tableData = dbtoolService.getTableData(tableName);
+
+            // 2. 테이블 레이아웃 정보 가져오기 (컬럼 순서 포함)
+            DbtoolVO param = new DbtoolVO();
+            param.setTableName(tableName);
+            List<DbtoolVO> dbColumns = dbtoolService.selectTabeLayout(param);
+
+            // 데이터가 없는 경우 처리
+            if (tableData == null || tableData.isEmpty()) {
+                log.warn("No data found for table: {}", tableName);
+                model.addAttribute("tableName", tableName);
+                model.addAttribute("message", "데이터가 없습니다.");
+                model.addAttribute("hasData", false);
+                model.addAttribute("columns", dbColumns); // 컬럼 정보를 전달
+                return "thymeleaf/tableData";
+            }
+
+            // 데이터가 있는 경우 처리
+            model.addAttribute("tableName", tableName);
+            model.addAttribute("list", tableData);
+            model.addAttribute("columns", dbColumns); // 컬럼 순서 포함
+            model.addAttribute("hasData", true);
+            return "thymeleaf/tableData";
+        } catch (Exception e) {
+            log.error("Error while retrieving data for table {}: {}", tableName, e.getMessage());
+            model.addAttribute("message", e.getMessage());
+            return "error";
+        }
+    }
 
     /**
      * 테이블 레이아웃 조회

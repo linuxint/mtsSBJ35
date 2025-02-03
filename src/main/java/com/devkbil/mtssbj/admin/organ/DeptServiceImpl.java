@@ -51,7 +51,7 @@ public class DeptServiceImpl implements DeptService {
         }
 
         // 부서 번호가 없으면 삽입, 있으면 업데이트
-        if (StringUtils.isEmpty(param.getDeptno())) {
+        if (!StringUtils.hasText(param.getDeptno())) {
             affectedRows = deptMapper.insertDept(param); // 신규 삽입
         } else {
             affectedRows = deptMapper.updateDept(param); // 기존 데이터 업데이트

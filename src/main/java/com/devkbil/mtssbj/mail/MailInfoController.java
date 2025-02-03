@@ -1,7 +1,7 @@
 package com.devkbil.mtssbj.mail;
 
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,7 +26,7 @@ public class MailInfoController {
 
     private final MailService mailService;
     private final EtcService etcService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 메일 설정 리스트 조회
@@ -39,7 +39,7 @@ public class MailInfoController {
     @GetMapping("/mailInfoList")
     public String mailInfoList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 
@@ -62,11 +62,11 @@ public class MailInfoController {
     @GetMapping("/mailInfoForm")
     public String mailInfoForm(@ModelAttribute @Valid MailInfoVO mailInfoInfo, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         etcService.setCommonAttribute(userno, modelMap);
 
-        // 
+        //
         if (mailInfoInfo.getEmino() != null) {
             mailInfoInfo = mailService.selectMailInfoOne(mailInfoInfo);
 
@@ -95,7 +95,7 @@ public class MailInfoController {
             return "common/message";
         }
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         mailInfoInfo.setUserno(userno);
 

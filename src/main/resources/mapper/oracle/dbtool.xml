@@ -5,12 +5,58 @@
 
 <mapper namespace="dbtool">
 
+    <select id="selectTableData" parameterType="map" resultType="map">
+        SELECT
+        <foreach collection="columns" item="column" separator=",">
+            ${column}
+        </foreach>
+        FROM ${tableName}
+    </select>
+
+    <select id="checkExistingData" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM ${tableName}
+        WHERE
+        <foreach collection="keyColumns" item="keyColumn" separator=" AND ">
+            ${keyColumn} = #{keyValues[keyColumn]}
+        </foreach>
+    </select>
+
+    <update id="dynamicUpdate">
+        UPDATE ${tableName}
+        <set>
+            <foreach collection="columns" item="column" separator=",">
+                ${column} = #{data[column]}
+            </foreach>
+        </set>
+        WHERE
+        <foreach collection="keyColumns" item="keyColumn" separator=" AND ">
+            ${keyColumn} = #{data[keyColumn]}
+        </foreach>
+    </update>
+
+    <insert id="dynamicInsert">
+        INSERT INTO ${tableName}
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <foreach collection="columns" item="column" separator=",">
+                ${column}
+            </foreach>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <foreach collection="columns" item="column" separator=",">
+                #{data[column]}
+            </foreach>
+        </trim>
+    </insert>
+
     <select id="selectTableLayout" resultType="com.devkbil.mtssbj.develop.dbtool.DbtoolVO" parameterType="com.devkbil.mtssbj.develop.dbtool.DbtoolVO">
         <![CDATA[
         SELECT A1.TABLE_NAME AS tableName,
                 A1.TABLE_COMMENTS AS tableComments,
                 A1.COLUMN_COMMENTS AS columnComments,
                 A1.COLUMN_NAME AS columnName,
+                A1.COLUMN_ID as columnId,
                 MAX(DECODE(B1.CONSTRAINT_TYPE, 'P', B1.CONSTRAINT_NAME)) AS pkFlag, -- PK 플래그
                 MAX(DECODE(B1.CONSTRAINT_TYPE, 'R', B1.CONSTRAINT_NAME||'->'||R_CONSTRAINT_NAME||'.'||A1.COLUMN_NAME)) AS fkFlag, -- FK 플래그
                 A1.NULL_FLAG AS nullFlag,
@@ -56,7 +102,7 @@
             AND A1.COLUMN_NAME LIKE '%'||#{columnName}||'%'
         </if>
         <if test="tableName!=null and tableName!=''">
-            AND A1.TABLE_NAME = '%'||#{tableName}||'%'
+            AND A1.TABLE_NAME = #{tableName}
         </if>
             GROUP BY
                 A1.TABLE_NAME, A1.TABLE_COMMENTS, A1.COLUMN_COMMENTS, A1.COLUMN_NAME, A1.NULL_FLAG, A1.DATA_TYPE, A1.DATA_LENGTH, A1.COLUMN_ID

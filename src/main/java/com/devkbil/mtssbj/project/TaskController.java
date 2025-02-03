@@ -3,7 +3,7 @@ package com.devkbil.mtssbj.project;
 import com.devkbil.mtssbj.common.ExtFieldVO;
 import com.devkbil.mtssbj.common.util.UtilEtc;
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -35,7 +35,7 @@ public class TaskController {
     private final ProjectService projectService;
     private final TaskService taskService;
     private final EtcService etcService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * Task의 기본 화면.
@@ -54,7 +54,7 @@ public class TaskController {
     @GetMapping("/task")
     public String task(@RequestParam(value = "prno", required = false) String prno, HttpServletRequest request, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         return task_do(userno, prno, modelMap);
     }
@@ -75,7 +75,7 @@ public class TaskController {
     @GetMapping("/taskCalendar")
     public String taskCalendar(@RequestParam(value = "prno", required = false) String prno, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         String ret = task_do(userno, prno, modelMap);
 
@@ -117,7 +117,7 @@ public class TaskController {
     @GetMapping("/taskWorker")
     public String taskWorker(@RequestParam(value = "prno", required = false) String prno, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         ProjectVO projectInfo = projectService.selectProjectOne(prno);
         if (ObjectUtils.isEmpty(projectInfo)) {

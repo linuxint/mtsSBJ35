@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.common.interceptor;
 
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.member.UserVO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -56,8 +56,8 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object handler) {
         logRequestInfo(req);
 
-        AuthenticationService authenticationService = new AuthenticationService();
-        Optional<UserVO> userVO = authenticationService.getAuthenticated();
+        AuthService authService = new AuthService();
+        Optional<UserVO> userVO = authService.getAuthOpt();
 
         if (userVO.isEmpty()) {
             log.warn("[LoginInterceptor] 로그인 세션이 존재하지 않음. 로그인 페이지로 이동");

@@ -4,6 +4,37 @@
         function fn_formSubmit() {
             document.form1.submit();
         }
+
+        function fn_uploadFile() {
+            // 파일 업로드를 위한 FormData 객체 준비
+            const formData = new FormData(document.getElementById('uploadForm'));
+
+            // 파일 입력 값 확인
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.value) {
+                alert("<s:message code='common.file.notselected'/>");
+                return;
+            }
+
+            // AJAX를 이용해 파일 업로드 실행
+            $.ajax({
+                url: '/api/v1/code/upload', // 파일 업로드 API 엔드포인트
+                type: 'POST',
+                data: formData,
+                processData: false, // FormData 사용 시 false로 설정
+                contentType: false, // FormData 사용 시 false로 설정
+                success: function (response) {
+                    alert(response); // 서버에서 반환된 메시지 출력
+                    $('#uploadModal').modal('hide'); // 모달 닫기
+                    location.reload(); // 페이지 새로고침
+                },
+                error: function (error) {
+                    console.error(error);
+                    alert("<s:message code='common.upload.error'/>");
+                }
+            });
+        }
+
     </script>
 
 </head>
@@ -25,8 +56,20 @@
         <!-- /.row -->
         <div class="row">
             <div class="col-lg-12">
+
                 <button type="button" class="btn btn-default pull-right" onclick="fn_moveToURL('adCodeForm')">
-                    <i class="fa fa-edit fa-fw"></i> <s:message code="common.codecd"/></button>
+                    <i class="fa fa-edit fa-fw"></i> <s:message code="common.codecd"/>
+                </button>
+
+                <!-- 새로운 엑셀 다운로드 버튼 -->
+                <button type="button" class="btn btn-default pull-right" onclick="fn_moveToURL('adCodeListExcel')">
+                    <i class="fa fa-download fa-fw"></i> <s:message code="common.excel.download"/>
+                </button>
+
+                <button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#uploadModal">
+                    <i class="fa fa-upload fa-fw"></i> <s:message code="common.excel.upload"/>
+                </button>
+
             </div>
         </div>
         <!-- /.row -->
@@ -86,6 +129,36 @@
     <!-- /#page-wrapper -->
 
 </div>
+
+<!-- 파일 업로드 레이어(모달) -->
+<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!-- 모달 헤더 -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel"><s:message code="common.excel.upload"/></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- 모달 바디 -->
+            <div class="modal-body">
+                <form id="uploadForm" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="fileInput"><s:message code="common.file.select"/></label>
+                        <input type="file" class="form-control" id="fileInput" name="file" />
+                    </div>
+                </form>
+            </div>
+            <!-- 모달 푸터 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"><s:message code="common.cancel"/></button>
+                <button type="button" class="btn btn-primary" onclick="fn_uploadFile()"><s:message code="common.upload"/></button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- /#wrapper -->
 </body>
 

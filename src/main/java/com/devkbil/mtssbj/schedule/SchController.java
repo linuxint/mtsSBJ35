@@ -2,7 +2,7 @@ package com.devkbil.mtssbj.schedule;
 
 import com.devkbil.mtssbj.common.util.DateUtil;
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,7 +35,7 @@ public class SchController {
 
     private final SchService schService;
     private final EtcService etcService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 기본 날짜를 설정합니다.
@@ -73,7 +73,7 @@ public class SchController {
     @GetMapping("/schList")
     public String schList(@ModelAttribute @Valid MonthVO searchVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         searchVO = setupDefaultDates(searchVO);
         Integer dayOfWeek = DateUtil.getDayOfWeek(DateUtil.str2Date(searchVO.getYear() + "-" + searchVO.getMonth() + "-01"));
@@ -100,7 +100,7 @@ public class SchController {
     public String schForm(@RequestParam(value = "cddate", required = false) String cddate
             , @ModelAttribute @Valid SchVO schInfo, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         // 일정 정보 조회 또는 기본 값 설정
         if (StringUtils.hasText(schInfo.getSsno())) {
@@ -129,7 +129,7 @@ public class SchController {
     @PostMapping("/schSave")
     public String schSave(@ModelAttribute @Valid SchVO schInfo) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         schInfo.setUserno(userno);
 
@@ -176,7 +176,7 @@ public class SchController {
     @PostMapping("/schRead")
     public String schRead(@ModelAttribute @Valid SchVO schVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         SchVO schInfo = schService.selectSchOne4Read(schVO);
 

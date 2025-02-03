@@ -7,12 +7,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +35,52 @@ import java.util.Optional;
 public class CodeController {
 
     private final CodeService codeService;
+
+    /**
+     * 공통 코드 리스트를 엑셀 파일로 다운로드
+     *
+     * @return 엑셀 파일 응답
+     */
+    @GetMapping("/adCodeListExcel")
+    public ResponseEntity<byte[]> codeListExcel() throws Exception {
+        // 1. 데이터 조회
+        List<?> codeList = codeService.selectCodeList(new SearchVO());
+
+        // 2. 엑셀 파일 생성
+        Workbook workbook = new SXSSFWorkbook();
+        Sheet sheet = workbook.createSheet("CodeList");
+
+        // 3. 헤더 작성
+        Row headerRow = sheet.createRow(0);
+        headerRow.createCell(0).setCellValue("CLASSNO");
+        headerRow.createCell(1).setCellValue("CODECD");
+        headerRow.createCell(2).setCellValue("CODENM");
+
+        // 4. 데이터 삽입
+        int rowNum = 1;
+        for (Object obj : codeList) {
+            CodeVO codeVO = (CodeVO) obj; // CodeVO로 캐스팅
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(codeVO.getClassno());
+            row.createCell(1).setCellValue(codeVO.getCodecd());
+            row.createCell(2).setCellValue(codeVO.getCodenm());
+        }
+
+        // 5. 워크북을 ByteArrayOutputStream으로 변환
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+
+        // 6. HTTP 응답으로 반환
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", "CodeList.xlsx");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(outputStream.toByteArray());
+    }
+
 
     /**
      * 공통 코드 리스트를 조회하고 화면에 렌더링합니다.
@@ -46,7 +99,7 @@ public class CodeController {
         modelMap.addAttribute("searchVO", searchVO);
         modelMap.addAttribute("listview", listview);
 
-        return "admin/code/CodeList";
+        return "thymeleaf/admin/code/CodeList";
     }
 
     /**
@@ -58,7 +111,7 @@ public class CodeController {
      */
     @GetMapping("/adCodeForm")
     @Operation(summary = "공통 코드 등록/수정 폼", description = "공통 코드 정보를 등록하거나 수정할 폼 화면을 반환합니다.")
-    public String codeForm(@ModelAttribute @Valid CodeVO codeInfo, ModelMap modelMap) {
+    public String codeForm(@ModelAttribute CodeVO codeInfo, ModelMap modelMap) {
         Optional.ofNullable(codeInfo.getClassno())
                 .map(classno -> codeService.selectCodeOne(codeInfo))
                 .ifPresent(selectedCodeInfo -> {
@@ -67,7 +120,7 @@ public class CodeController {
                     modelMap.addAttribute("readonly", "readonly");
                 });
 
-        return "admin/code/CodeForm";
+        return "thymeleaf/admin/code/CodeForm";
     }
 
     /**
@@ -109,11 +162,11 @@ public class CodeController {
      */
     @GetMapping("/adCodeRead")
     @Operation(summary = "공통 코드 상세 조회", description = "지정된 공통 코드의 상세 정보를 반환합니다.")
-    public String codeRead(@ModelAttribute @Valid CodeVO codeVO, ModelMap modelMap) {
+    public String codeRead(@ModelAttribute CodeVO codeVO, ModelMap modelMap) {
         Optional.ofNullable(codeService.selectCodeOne(codeVO))
                 .ifPresent(codeInfo -> modelMap.addAttribute("codeInfo", codeInfo));
 
-        return "admin/code/CodeRead";
+        return "thymeleaf/admin/code/CodeRead";
     }
 
     /**
@@ -122,9 +175,9 @@ public class CodeController {
      * @param codeVO 삭제할 공통 코드의 식별 정보를 포함한 객체
      * @return 공통 코드 리스트 화면으로 리다이렉트
      */
-    @PostMapping("/adCodeDelete")
+    @GetMapping("/adCodeDelete")
     @Operation(summary = "공통 코드 삭제", description = "지정된 공통 코드를 삭제합니다.")
-    public String codeDelete(@ModelAttribute @Valid CodeVO codeVO) {
+    public String codeDelete(@ModelAttribute CodeVO codeVO) {
         codeService.deleteCodeOne(codeVO);
         return "redirect:/adCodeList";
     }

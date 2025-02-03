@@ -1,4 +1,4 @@
-package com.devkbil.mtssbj.member;
+package com.devkbil.mtssbj.member.auth;
 
 import lombok.Getter;
 import lombok.Setter;

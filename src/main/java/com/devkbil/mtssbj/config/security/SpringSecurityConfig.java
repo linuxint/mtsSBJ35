@@ -44,8 +44,6 @@ import java.io.PrintWriter;
 @RequiredArgsConstructor
 public class SpringSecurityConfig {
 
-
-
     private final DataSource dataSource;
     private final CustomSessionExpiredStrategy customSessionExpiredStrategy;
     private final UserDetailsService userDetailsService;

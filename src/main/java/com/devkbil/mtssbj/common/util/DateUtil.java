@@ -478,7 +478,7 @@ public class DateUtil {
 
     public static String getDateFormat(String pOutformat, Date vDate) {
 
-        SimpleDateFormat pOutformatter = new SimpleDateFormat(pOutformat, java.util.Locale.KOREA);
+        SimpleDateFormat pOutformatter = new SimpleDateFormat(pOutformat, Locale.KOREA);
         String rDateString;
         try {
             rDateString = pOutformatter.format(vDate);
@@ -502,7 +502,7 @@ public class DateUtil {
 
     public static String getDateFormat(String pIndate, String pInformat, String pOutformat) {
 
-        SimpleDateFormat pInformatter = new SimpleDateFormat(pInformat, java.util.Locale.KOREA);
+        SimpleDateFormat pInformatter = new SimpleDateFormat(pInformat, Locale.KOREA);
         String rDateString;
 
         Date vIndate;
@@ -616,8 +616,8 @@ public class DateUtil {
 
     public static String getFormattedDateAdd(String pIndate, String pInformat, String pOutformat, int pDay, int pHour, int pMin) {
 
-        SimpleDateFormat pInformatter = new SimpleDateFormat(pInformat, java.util.Locale.KOREA);
-        SimpleDateFormat pOutformatter = new SimpleDateFormat(pOutformat, java.util.Locale.KOREA);
+        SimpleDateFormat pInformatter = new SimpleDateFormat(pInformat, Locale.KOREA);
+        SimpleDateFormat pOutformatter = new SimpleDateFormat(pOutformat, Locale.KOREA);
 
         String rDateString;
         Date vIndate;
@@ -652,8 +652,8 @@ public class DateUtil {
      */
     public static String getFormattedDateYearAdd(String pIndate, String pInformat, String pOutformat, int pYear) {
 
-        SimpleDateFormat pInformatter = new SimpleDateFormat(pInformat, java.util.Locale.KOREA);
-        SimpleDateFormat pOutformatter = new SimpleDateFormat(pOutformat, java.util.Locale.KOREA);
+        SimpleDateFormat pInformatter = new SimpleDateFormat(pInformat, Locale.KOREA);
+        SimpleDateFormat pOutformatter = new SimpleDateFormat(pOutformat, Locale.KOREA);
 
         Calendar cal = Calendar.getInstance(Locale.getDefault());
 
@@ -696,8 +696,8 @@ public class DateUtil {
 
     public static String getFormattedDateMonthAdd(String pIndate, String pInformat, String pOutformat, int pMonth) {
 
-        SimpleDateFormat pInformatter = new SimpleDateFormat(pInformat, java.util.Locale.KOREA);
-        SimpleDateFormat pOutformatter = new SimpleDateFormat(pOutformat, java.util.Locale.KOREA);
+        SimpleDateFormat pInformatter = new SimpleDateFormat(pInformat, Locale.KOREA);
+        SimpleDateFormat pOutformatter = new SimpleDateFormat(pOutformat, Locale.KOREA);
 
         Calendar cal = Calendar.getInstance(Locale.getDefault());
 
@@ -739,8 +739,8 @@ public class DateUtil {
 
     public static String getFormattedDateHourAdd(String pIndate, String pInformat, String pOutformat, int pHour) {
 
-        SimpleDateFormat pInformatter = new SimpleDateFormat(pInformat, java.util.Locale.KOREA);
-        SimpleDateFormat pOutformatter = new SimpleDateFormat(pOutformat, java.util.Locale.KOREA);
+        SimpleDateFormat pInformatter = new SimpleDateFormat(pInformat, Locale.KOREA);
+        SimpleDateFormat pOutformatter = new SimpleDateFormat(pOutformat, Locale.KOREA);
 
         Calendar cal = Calendar.getInstance(Locale.getDefault());
 
@@ -997,7 +997,7 @@ public class DateUtil {
 
     public static String getCurrentDate(String s) {
 
-        SimpleDateFormat simpledateformat = new SimpleDateFormat(s, java.util.Locale.KOREA);
+        SimpleDateFormat simpledateformat = new SimpleDateFormat(s, Locale.KOREA);
 
         return simpledateformat.format(new Date());
 
@@ -1015,8 +1015,8 @@ public class DateUtil {
 
     public static String getCurrentDate(String date, String format, String s) {
 
-        SimpleDateFormat simpledateformat = new SimpleDateFormat(s, java.util.Locale.KOREA);
-        SimpleDateFormat simpledateformat2 = new SimpleDateFormat(format, java.util.Locale.KOREA);
+        SimpleDateFormat simpledateformat = new SimpleDateFormat(s, Locale.KOREA);
+        SimpleDateFormat simpledateformat2 = new SimpleDateFormat(format, Locale.KOREA);
 
         try {
             return simpledateformat.format(simpledateformat2.parse(date));
@@ -1036,7 +1036,7 @@ public class DateUtil {
 
     public static String getCurrentDate(Date date, String s) {
 
-        SimpleDateFormat simpledateformat = new SimpleDateFormat(s, java.util.Locale.KOREA);
+        SimpleDateFormat simpledateformat = new SimpleDateFormat(s, Locale.KOREA);
 
         return simpledateformat.format(date);
 
@@ -1130,11 +1130,11 @@ public class DateUtil {
         String pInformat2 = argPinformat2;
 
         Date now = Calendar.getInstance().getTime();
-        SimpleDateFormat nowFormatter = new SimpleDateFormat(yyyyMMddHHmmss_bar, java.util.Locale.KOREA);
+        SimpleDateFormat nowFormatter = new SimpleDateFormat(yyyyMMddHHmmss_bar, Locale.KOREA);
         Calendar calendar1 = Calendar.getInstance();
         Calendar calendar2 = Calendar.getInstance();
-        SimpleDateFormat pInformatter1 = new SimpleDateFormat(pInformat1, java.util.Locale.KOREA);
-        SimpleDateFormat pInformatter2 = new SimpleDateFormat(pInformat2, java.util.Locale.KOREA);
+        SimpleDateFormat pInformatter1 = new SimpleDateFormat(pInformat1, Locale.KOREA);
+        SimpleDateFormat pInformatter2 = new SimpleDateFormat(pInformat2, Locale.KOREA);
         pIndate1 = "now".equals(pIndate1) ? nowFormatter.format(now) : pIndate1;
         pIndate2 = "now".equals(pIndate2) ? nowFormatter.format(now) : pIndate2;
         pInformat1 = "now".equals(pIndate1) ? yyyyMMddHHmmss_bar : pInformat1;

@@ -1,12 +1,13 @@
 package com.devkbil.mtssbj.common.util;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +18,9 @@ public class JwtUtil {
 
 //    private String SECRET_KEY = Base64.getEncoder().encodeToString("secret".getBytes());
 
-    private final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-
+    private final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(
+            Base64.getEncoder().encodeToString("N8smKe2pXyZCd3Rsv7nNni0gfZsl7J7MfinPxaO2Bgk=".getBytes()).getBytes()
+    );
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -53,12 +55,12 @@ public class JwtUtil {
 
     private String createToken(Map<String, Object> claims, String subject) { // claims 매개변수 추가
         return Jwts.builder()
-                .setClaims(claims) // claims 설정
-                .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-                .signWith(SECRET_KEY)
-                .compact();
+                .setClaims(claims)               // Claim 정보 지정
+                .setSubject(subject)             // 서브젝트 설정
+                .setIssuedAt(new Date(System.currentTimeMillis())) // 토큰 생성 시간
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 만료 시간
+                .signWith(SECRET_KEY)            // SECRET_KEY로 서명
+                .compact();                      // Token 문자열로 직렬화
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {

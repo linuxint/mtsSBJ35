@@ -1,7 +1,7 @@
 package com.devkbil.mtssbj.etc;
 
 import com.devkbil.mtssbj.board.BoardSearchVO;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import java.util.List;
 public class List4User {
 
     private final EtcService etcService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 사용자의 Alert 리스트를 페이징 처리하여 반환합니다.
@@ -34,7 +34,7 @@ public class List4User {
     @GetMapping("/list4User")
     public String list4User(BoardSearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         searchVO.setSearchExt1(userno);
 

@@ -19,15 +19,12 @@ import lombok.Setter;
 public class CodeVO {
 
     @Schema(description = "대분류", example = "CLASS01") // Swagger에 필드 설명과 예제 값 제공
-    @NotBlank(message = "대분류(classno)는 필수 값입니다.")
     private String classno;
 
     @Schema(description = "코드", example = "CODE001") // Swagger에 필드 설명과 예제 값 제공
-    @NotBlank(message = "코드(codecd)는 필수 값입니다.")
     private String codecd;
 
     @Schema(description = "코드명", example = "코드 이름 예시") // Swagger에 필드 설명과 예제 값 제공
-    @NotBlank(message = "코드명(codenm)은 필수 값입니다.")
     private String codenm;
 
 }

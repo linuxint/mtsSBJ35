@@ -1,12 +1,11 @@
 package com.devkbil.mtssbj.common.log;
 
 import com.devkbil.mtssbj.common.util.RequestUtil;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
@@ -40,11 +39,11 @@ import java.util.UUID;
 @Component
 public class MDCFilter extends OncePerRequestFilter {
 
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     // 생성자 주입 방식 사용
-    public MDCFilter(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
+    public MDCFilter(AuthService authService) {
+        this.authService = authService;
     }
 
     /**
@@ -100,10 +99,10 @@ public class MDCFilter extends OncePerRequestFilter {
     private String getUserPrincipal() {
 
         try {
-            String userId = authenticationService.getAuthenticated()
+            String userId = authService.getAuthOpt()
                                .map(auth -> auth.getUserid())
                                .orElse(""); // 사용자 ID 가져오기
-            String userName = authenticationService.getAuthenticated()
+            String userName = authService.getAuthOpt()
                                .map(auth -> auth.getUsernm())
                                .orElse(""); // 사용자 이름 가져오기
             return userId + "@" + userName; // ID와 이름을 연결하여 반환

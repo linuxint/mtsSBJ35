@@ -15,8 +15,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CustomSessionExpiredStrategy implements SessionInformationExpiredStrategy {
 
-
-
     @Override
     public void onExpiredSessionDetected(SessionInformationExpiredEvent event) throws IOException, ServletException {
         HttpServletRequest request = event.getRequest();

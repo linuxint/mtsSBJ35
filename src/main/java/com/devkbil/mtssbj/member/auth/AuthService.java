@@ -1,5 +1,6 @@
-package com.devkbil.mtssbj.member;
+package com.devkbil.mtssbj.member.auth;
 
+import com.devkbil.mtssbj.member.UserVO;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -11,9 +12,9 @@ import java.util.Optional;
  * Spring Security의 SecurityContext를 사용하여 인증된 사용자의 정보를 가져옵니다.
  */
 @Service
-public class AuthenticationService {
+public class AuthService {
 
-    private static final UserVO EMPTY_USER = new UserVO();
+    private static final UserVO USER_EMPTY = new UserVO();
 
     private Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
@@ -25,7 +26,7 @@ public class AuthenticationService {
      *
      * @return 인증된 UserVO 객체 또는 인증 정보가 없거나 Principal이 UserVO가 아닌 경우 null
      */
-    public UserVO getAuthenticatedUser() {
+    public UserVO getAuthUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserVO) {
             return (UserVO) authentication.getPrincipal();
@@ -39,8 +40,8 @@ public class AuthenticationService {
      *
      * @return 인증된 UserVO가 포함된 Optional 또는 인증된 사용자가 없을 경우 비어 있는 Optional
      */
-    public Optional<UserVO> getAuthenticated() {
-        return Optional.ofNullable(getAuthenticatedUser());
+    public Optional<UserVO> getAuthOpt() {
+        return Optional.ofNullable(getAuthUser());
     }
 
     /**
@@ -49,8 +50,8 @@ public class AuthenticationService {
      *
      * @return 인증된 사용자의 고유 번호 또는 인증된 사용자가 없을 경우 빈 문자열
      */
-    public String getAuthenticatedUserNo() {
-        UserVO userVO = getAuthenticatedUser();
+    public String getAuthUserNo() {
+        UserVO userVO = getAuthUser();
         return userVO != null ? userVO.getUserno() : "";
     }
 
@@ -60,8 +61,8 @@ public class AuthenticationService {
      *
      * @return 인증된 사용자 ID 또는 인증된 사용자가 없을 경우 빈 문자열
      */
-    public String getAuthenticatedUserId() {
-        return getAuthenticated().map(UserVO::getUserid).orElse("");
+    public String enticatedUserId() {
+        return getAuthOpt().map(UserVO::getUserid).orElse("");
     }
 
     /**
@@ -70,8 +71,8 @@ public class AuthenticationService {
      *
      * @return 인증된 사용자의 이름 또는 인증된 사용자가 없을 경우 빈 문자열
      */
-    public String getAuthenticatedUsernm() {
-        return getAuthenticated().map(UserVO::getUsernm).orElse("");
+    public String getAuthUsernm() {
+        return getAuthOpt().map(UserVO::getUsernm).orElse("");
     }
 
     /**
@@ -80,7 +81,7 @@ public class AuthenticationService {
      *
      * @return 현재 인증된 사용자의 역할 또는 인증된 사용자가 없을 경우 빈 문자열
      */
-    public String getAuthenticatedUserrole() {
-        return getAuthenticated().map(UserVO::getUserrole).orElse("");
+    public String getAuthUserrole() {
+        return getAuthOpt().map(UserVO::getUserrole).orElse("");
     }
 }

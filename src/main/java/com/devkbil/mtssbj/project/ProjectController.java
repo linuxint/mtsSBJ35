@@ -1,7 +1,7 @@
 package com.devkbil.mtssbj.project;
 
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.AuthenticationService;
+import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,7 +32,7 @@ public class ProjectController {
 
     private final ProjectService projectService;
     private final EtcService etcService;
-    private final AuthenticationService authenticationService;
+    private final AuthService authService;
 
     /**
      * 프로젝트 목록 조회.
@@ -45,7 +45,7 @@ public class ProjectController {
     @GetMapping("/projectList")
     public String projectList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         Integer alertcount = etcService.selectAlertCount(userno);
         modelMap.addAttribute("alertcount", alertcount);
@@ -99,7 +99,7 @@ public class ProjectController {
     @GetMapping("/projectForm")
     public String projectForm(@RequestParam(value = "prno", required = false) String prno, ModelMap modelMap) {
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         Integer alertcount = etcService.selectAlertCount(userno);
         modelMap.addAttribute("alertcount", alertcount);
@@ -133,7 +133,7 @@ public class ProjectController {
             return "project/ProjectForm"; // 혹은 에러 페이지
         }
 
-        String userno = authenticationService.getAuthenticatedUserNo(); // 현재 인증된 사용자의 번호를 가져옴
+        String userno = authService.getAuthUserNo(); // 현재 인증된 사용자의 번호를 가져옴
 
         projectInfo.setUserno(userno); // 프로젝트 정보에 사용자 번호를 설정
 
@@ -170,7 +170,7 @@ public class ProjectController {
             throw new IllegalArgumentException("프로젝트 번호가 잘못되었습니다.");
         }
 
-        String userno = authenticationService.getAuthenticatedUserNo();
+        String userno = authService.getAuthUserNo();
 
         ProjectVO projectInfo = new ProjectVO();        // check auth for delete
         projectInfo.setPrno(prno);
