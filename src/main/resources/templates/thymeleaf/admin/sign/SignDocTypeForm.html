@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{'thymeleaf/admin/inc/ad_header' :: header}"></div>
+
+<script>
+    window.onload = function () {
+        CKEDITOR.replace('dtcontents', {'filebrowserUploadUrl': 'upload4ckeditor'});
+    }
+
+    function fn_formSubmit() {
+        CKEDITOR.instances["dtcontents"].updateElement();
+
+        if (!chkInputValue("#dttitle", "문서양식명")) return false;
+
+        document.getElementById("form1").submit();
+    }
+</script>
+
+<body>
+<div id="wrapper">
+    <div th:replace="~{thymeleaf/common/navigation}"></div>
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header"><i class="fa fa-edit fa-fw"></i> [[#{menu.docTypeForm}]]</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <form id="form1" name="form1" role="form" th:action="@{/adSignDocTypeSave}" method="post">
+                <input type="hidden" name="dtno" th:value="${signInfo?.dtno}">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row form-group">
+                            <label class="col-lg-2">문서양식명</label>
+                            <div class="col-lg-8">
+                                <input type="text" class="form-control" id="dttitle" name="dttitle" maxlength="255"
+                                       th:value="${signInfo?.dttitle}">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-lg-2">문서양식내용</label>
+                            <div class="col-lg-8">
+                                <textarea class="form-control" id="dtcontents" name="dtcontents" th:text="${signInfo?.dtcontents}"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <button class="btn btn-outline btn-primary" onclick="fn_formSubmit();">[[#{common.btnSave}]]</button>
+            <div th:if="${signInfo?.dtno != null}">
+                <button class="btn btn-outline btn-primary"
+                        th:onclick="|fn_moveToURL('@{/adSignDocTypeDelete(dtno=${signInfo.dtno})}')|">
+                    [[#{common.btnDelete}]]
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{'thymeleaf/admin/inc/ad_footer' :: footer}"></div>
+</body>
+</html>

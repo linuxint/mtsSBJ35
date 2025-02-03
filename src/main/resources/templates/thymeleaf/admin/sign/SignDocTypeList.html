@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{'thymeleaf/admin/inc/ad_header' :: header}"></div>
+
+<script>
+    function fn_moveToForm() {
+        window.location = '/adSignDocTypeForm';
+    }
+</script>
+
+<body>
+<div id="wrapper">
+    <div th:replace="~{thymeleaf/common/navigation}"></div>
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header"><i class="fa fa-edit fa-fw"></i> [[#{menu.docTypeList}]]</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <button type="button" class="btn btn-default pull-right" onclick="fn_moveToForm()">
+                    <i class="fa fa-edit fa-fw"></i> 양식추가
+                </button>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="listHead">
+                    <div class="listHiddenField pull-left field60">[[#{board.no}]]</div>
+                    <div class="listTitle">[[#{document.typeName}]]</div>
+                </div>
+
+                <div th:if="${listview?.size() == 0}" class="listBody height200"></div>
+                <div th:each="listview, status : ${listview}" class="listBody">
+                    <!-- 행 번호 표시 -->
+                    <div class="listHiddenField pull-left field60 textCenter"
+                         th:text="${searchVO.totRow - ((searchVO.page - 1) * searchVO.displayRowCount + status.index)}">
+                    </div>
+
+                    <!-- 제목 링크 -->
+                    <div class="listTitle" th:title="${listview.dttitle}">
+                        <a th:if="${item.dtno != null}" th:href="@{/adSignDocTypeForm(dtno=${item.dtno})}"
+                           th:text="${item.dttitle}">
+                        </a>
+                    </div>
+                </div>
+
+                <br/>
+                <form role="form" id="form1" name="form1" method="post">
+                    <div th:replace="~{thymeleaf/common/pagingforSubmit :: paging}"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{'thymeleaf/admin/inc/ad_footer' :: footer}"></div>
+</body>
+</html>
