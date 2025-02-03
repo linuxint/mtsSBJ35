@@ -73,8 +73,22 @@
                 </div>
                 <button class="btn btn-outline btn-primary"><i class="fa fa-save fa-fw"></i><s:message code="common.btnSave"/></button>
                 <c:if test="${projectInfo.prno!=null}">
-                    <button type="button" class="btn btn-default" onclick="fn_moveToURL('projectDelete?prno=<c:out value="${projectInfo.prno}"/>')"><i class="fa fa-minus fa-fw"></i><s:message code="common.btnDelete"/></button>
+                    <button type="button" class="btn btn-default" onclick="fn_moveToURL('projectDelete?prno=<c:out value="${projectInfo.prno}"/>')">
+                        <i class="fa fa-minus fa-fw"></i><s:message code="common.btnDelete"/>
+                    </button>
                 </c:if>
+                <c:choose>
+                    <c:when test="${projectInfo.prno != null}">
+                        <button type="button" class="btn btn-default" onclick="fn_moveToURL('task?prno=<c:out value="${projectInfo.prno}"/>')">
+                            <i class="fa fa-arrow-left fa-fw"></i><s:message code="common.btnCancel"/>
+                        </button>
+                    </c:when>
+                    <c:otherwise>
+                        <button type="button" class="btn btn-default" onclick="fn_moveToURL('projectList')">
+                            <i class="fa fa-arrow-left fa-fw"></i><s:message code="common.btnCancel"/>
+                        </button>
+                    </c:otherwise>
+                </c:choose>
                 <input type="hidden" name="prno" value="<c:out value="${projectInfo.prno}"/>">
             </form>
 
