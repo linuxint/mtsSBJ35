@@ -1,5 +1,5 @@
-## SpringBoot 3.4 + MyBatis 3 + Oracle/MariaDB 기반 웹 프로젝트 템플릿 ##
-본 샘플은  SpringBoot 3.4 + MyBatis 3 + Oracle/MariaDB (Maven) 기반으로  제작한 웹 프로젝트 템플릿이다.
+## SpringBoot 3.5 + MyBatis 3 + Oracle/MariaDB 기반 웹 프로젝트 템플릿 ##
+본 샘플은  SpringBoot 3.5 + MyBatis 3 + Oracle/MariaDB (Maven) 기반으로  제작한 웹 프로젝트 템플릿이다.
 
 웹 개발시 많이 사용되는 다양한 기능들 미리 구현해 향후 소소한 제품으로 성장할 계획입니다.
 
@@ -47,19 +47,19 @@ groupware9 - 1)전자결제
 - FullCalendar v5
 
 ### 개발 환경 ###
-    Programming Language - Java 22
+    Programming Language - Java 23
     IDE - intelliJ
     DB - Oracle/MariaDB
-    Framework - MyBatis, SpringBoot 3.4
-    Build Tool - Maven
+    Framework - MyBatis, SpringBoot 3.5
+    Build Tool - gradle
 
 ### 설치 ###
 - OracleDB에 데이터 베이스(mts)를 생성(user_database_oracle.sql) 하고 tables_oracle.sql, tableData_oracle.sql를 실행하여 테이블과 데이터를 생성한다.
 - MariaDB에 데이터 베이스(mts)를 생성(user_database_myriadb.sql) 하고 tables_myriadb.sql, tableData_myriadb.sql를 실행하여 테이블과 데이터를 생성한다.
 - applicationContext.xml에 적절한 접속 정보를 입력한다.
 - 톰캣이나 Intellij/이클립스에서 mts를 실행
-- http://localhost:9090/mts/ 로 접속
-- ID/PW: admin/admin, user1/user1, user2/user2 ...
+- http://localhost:9090/ 로 접속
+- ID/PW: admin/1234, user1/1234, user2/1234 ...
   Oracle PW소스는 변경되지 않아 PW는 아이디로 입력된다.
 
 ### colima ###
