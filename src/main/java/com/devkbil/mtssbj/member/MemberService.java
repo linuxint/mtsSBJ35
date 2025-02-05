@@ -2,7 +2,6 @@ package com.devkbil.mtssbj.member;
 
 import com.devkbil.mtssbj.search.SearchVO;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +25,7 @@ public class MemberService {
      * @param param 검색 조건 객체
      * @return 검색된 회원 수
      */
-    public Integer selectSearchMemberCount(SearchVO param) {
+    public int selectSearchMemberCount(SearchVO param) {
         return sqlSession.selectOne("selectSearchMemberCount", param);
     }
 
@@ -47,7 +46,6 @@ public class MemberService {
      * @return 조회된 사용자 정보 VO
      * @throws Exception SQL 문제가 발생할 경우 예외 발생
      */
-    @SneakyThrows
     public UserVO selectMember4Login(UserVO param) {
         return sqlSession.selectOne("selectMember4Login", param);
     }
@@ -57,8 +55,8 @@ public class MemberService {
      *
      * @param param 사용자 ID 또는 정보
      */
-    public void insertLogIn(String param) {
-        sqlSession.insert("insertLogIn", param);
+    public int insertLogIn(String param) {
+        return sqlSession.insert("insertLogIn", param);
     }
 
     /**
@@ -66,8 +64,8 @@ public class MemberService {
      *
      * @param param 사용자 ID 또는 정보
      */
-    public void insertLogOut(String param) {
-        sqlSession.insert("insertLogOut", param);
+    public int insertLogOut(String param) {
+        return sqlSession.insert("insertLogOut", param);
     }
 
     /**

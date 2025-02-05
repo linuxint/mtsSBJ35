@@ -112,8 +112,8 @@ public class TaskService {
      *
      * @param param Task 번호
      */
-    public void deleteTaskOne(String param) {
-        sqlSession.delete("deleteTaskOne", param);
+    public int deleteTaskOne(String param) {
+        return sqlSession.delete("deleteTaskOne", param);
     }
 
     /**

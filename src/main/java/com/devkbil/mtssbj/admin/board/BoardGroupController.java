@@ -5,7 +5,6 @@ import com.devkbil.mtssbj.common.util.UtilEtc;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
-import com.devkbil.mtssbj.member.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -83,8 +82,10 @@ public class BoardGroupController {
     })
     public void boardGroupSave(HttpServletResponse response, BoardGroupVO bgInfo) {
 
-        boardGroupService.insertBoard(bgInfo);
-        UtilEtc.responseJsonValue(response, bgInfo);
+        int affectedRows = boardGroupService.insertBoard(bgInfo);
+
+        UtilEtc.responseJsonValue(response, affectedRows > 0 ? bgInfo : "Fail" );
+
     }
 
     /**
@@ -133,9 +134,9 @@ public class BoardGroupController {
             throw new IllegalArgumentException("bgno 값이 필요합니다.");
         }
 
-        int rowsAffected = boardGroupService.deleteBoardGroup(bgno);
+        int affectedRows = boardGroupService.deleteBoardGroup(bgno);
 
-        UtilEtc.responseJsonValue(response, rowsAffected > 0 ? "OK" : "Fail");
+        UtilEtc.responseJsonValue(response, affectedRows > 0 ? "OK" : "Fail");
 
     }
 

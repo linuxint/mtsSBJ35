@@ -40,7 +40,7 @@ public class BoardGroupService {
      * @throws IllegalArgumentException BoardGroupVO가 null일 경우 예외 발생
      */
     @Transactional
-    public void insertBoard(BoardGroupVO param) {
+    public int insertBoard(BoardGroupVO param) {
         if (ObjectUtils.isEmpty(param)) {
             throw new IllegalArgumentException("BoardGroupVO는 null일 수 없습니다.");
         }
@@ -50,10 +50,10 @@ public class BoardGroupService {
 
         if (!StringUtils.hasText(param.getBgno())) {
             // 신규 그룹 삽입
-            sqlSession.insert("insertBoardGroup", param);
+            return sqlSession.insert("insertBoardGroup", param);
         } else {
             // 기존 그룹 수정
-            sqlSession.update("updateBoardGroup", param);
+            return sqlSession.update("updateBoardGroup", param);
         }
     }
 
@@ -85,11 +85,11 @@ public class BoardGroupService {
     @Transactional
     public int deleteBoardGroup(String bgno) {
 
-        int rowsAffected = sqlSession.delete("deleteBoardGroup", bgno);
-        if (rowsAffected == 0) {
+        int affectedRows = sqlSession.delete("deleteBoardGroup", bgno);
+        if (affectedRows == 0) {
             throw new BoardGroupNotFoundException("bgno " + bgno + "에 해당하는 게시판 그룹 삭제 실패");
         }
-        return rowsAffected;
+        return affectedRows;
     }
 
     /**

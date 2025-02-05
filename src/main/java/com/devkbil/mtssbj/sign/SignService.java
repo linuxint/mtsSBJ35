@@ -23,7 +23,7 @@ public class SignService {
      * @param param 검색 조건 (SearchVO 객체)
      * @return 결재를 대기 중인 문서 수
      */
-    public Integer selectSignDocTobeCount(SearchVO param) {
+    public int selectSignDocTobeCount(SearchVO param) {
         return sqlSession.selectOne("selectSignDocTobeCount", param);
     }
 
@@ -43,7 +43,7 @@ public class SignService {
      * @param param 검색 조건 (SearchVO 객체)
      * @return 사용자에 의해 처리 중인 문서 수
      */
-    public Integer selectSignDocCount(SearchVO param) {
+    public int selectSignDocCount(SearchVO param) {
         return sqlSession.selectOne("selectSignDocCount", param);
     }
 
@@ -155,8 +155,8 @@ public class SignService {
      * @param param 삭제할 문서 정보 (SignDocVO 객체)
      */
     @Transactional(rollbackFor = Exception.class)
-    public void deleteSignDoc(SignDocVO param) {
-        sqlSession.delete("deleteSignDoc", param);
+    public int deleteSignDoc(SignDocVO param) {
+        return sqlSession.delete("deleteSignDoc", param);
     }
 
     /**
@@ -199,7 +199,7 @@ public class SignService {
      * @param param 문서 번호
      */
     @Transactional
-    public void updateSignDocCancel(String param) {
-        sqlSession.update("updateSignDocCancel", param);
+    public int updateSignDocCancel(String param) {
+        return sqlSession.update("updateSignDocCancel", param);
     }
 }

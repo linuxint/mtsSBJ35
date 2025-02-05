@@ -261,9 +261,8 @@ public class BoardService {
      * @param map 삭제 조건
      * @return boolean 삭제 성공 여부
      */
-    public boolean deleteBoardReplyAll(Map map) {
-        int rowsDeleted = sqlSession.delete("deleteBoardReplyAll", map);
-        return (rowsDeleted <= 0) ? false : true;
+    public int deleteBoardReplyAll(Map map) {
+        return sqlSession.delete("deleteBoardReplyAll", map);
     }
 
     /**

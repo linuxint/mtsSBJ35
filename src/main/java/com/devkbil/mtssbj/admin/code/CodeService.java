@@ -149,7 +149,7 @@ public class CodeService {
      * @param param 검색 조건 객체 (SearchVO)
      * @return Integer 공통 코드 개수
      */
-    public Integer selectCodeCount(SearchVO param) {
+    public int selectCodeCount(SearchVO param) {
         return sqlSession.selectOne("selectCodeCount", param);
     }
 
@@ -219,9 +219,7 @@ public class CodeService {
      * @throws IllegalArgumentException 삭제할 코드가 존재하지 않을 경우 발생
      */
     @Transactional
-    public void deleteCodeOne(CodeVO param) {
-        if (sqlSession.delete("deleteCodeOne", param) == 0) {
-            throw new IllegalArgumentException("삭제할 코드가 존재하지 않습니다.");
-        }
+    public int deleteCodeOne(CodeVO param) {
+        return sqlSession.delete("deleteCodeOne", param);
     }
 }

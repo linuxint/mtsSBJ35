@@ -165,9 +165,9 @@ public class TaskController {
     @PostMapping("/taskDelete")
     public void taskDelete(@RequestParam(value = "tsno", required = false) String tsno, HttpServletResponse response) {
 
-        taskService.deleteTaskOne(tsno);
+        int affectedRows = taskService.deleteTaskOne(tsno);
 
-        UtilEtc.responseJsonValue(response, "OK");
+        UtilEtc.responseJsonValue(response, affectedRows > 0 ? "OK" : "Fail");
     }
 
     /**

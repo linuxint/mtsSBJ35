@@ -3,7 +3,6 @@ package com.devkbil.mtssbj.admin.organ;
 import com.devkbil.mtssbj.member.UserVO;
 import com.devkbil.mtssbj.search.SearchVO;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -108,12 +107,10 @@ public class UserService {
     /**
      * 사용자 비밀번호 변경
      * - 사용자 비밀번호를 특정 조건에 따라 업데이트합니다.
-     * - `@SneakyThrows`를 사용하여 예외 처리를 간소화합니다.
      *
      * @param param 비밀번호 변경 정보를 담은 객체 (UserVO)
      * @return 처리된 결과 (변경된 행 수, int)
      */
-    @SneakyThrows
     public int updateUserPassword(UserVO param) {
         return sqlSession.delete("updateUserPassword", param);
     }

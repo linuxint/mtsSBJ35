@@ -48,12 +48,12 @@ public class ProjectService {
      *
      * @param param 저장할 프로젝트 데이터를 담은 객체
      */
-    public void insertProject(ProjectVO param) {
+    public int insertProject(ProjectVO param) {
 
         if (!StringUtils.hasText(param.getPrno())) { // 프로젝트 번호가 없으면 새 프로젝트로 간주
-            sqlSession.insert("insertProject", param);
+            return sqlSession.insert("insertProject", param);
         } else { // 프로젝트 번호가 있으면 업데이트
-            sqlSession.update("updateProject", param);
+            return sqlSession.update("updateProject", param);
         }
     }
 
@@ -96,8 +96,8 @@ public class ProjectService {
      *
      * @param param 삭제할 프로젝트 번호
      */
-    public void deleteProjectOne(String param) {
-        sqlSession.delete("deleteProjectOne", param);
+    public int deleteProjectOne(String param) {
+        return sqlSession.delete("deleteProjectOne", param);
     }
 
 }

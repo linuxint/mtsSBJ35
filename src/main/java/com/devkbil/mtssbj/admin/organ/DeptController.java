@@ -68,13 +68,11 @@ public class DeptController {
     @PostMapping("/adDeptSave")
     @Operation(summary = "부서 저장", description = "새로운 부서를 저장하거나 기존 부서를 업데이트합니다.")
     public void saveDept(@ModelAttribute @Valid DeptVO deptInfo, HttpServletResponse response) {
-        try {
-            deptService.insertDept(deptInfo);
-            UtilEtc.responseJsonValue(response, deptInfo);
-        } catch (Exception e) {
-            log.error("Error saving department: {}", deptInfo, e);
-            UtilEtc.responseJsonValue(response, "FAIL");
-        }
+
+        int affectedRows = deptService.insertDept(deptInfo);
+
+        UtilEtc.responseJsonValue(response, affectedRows > 0 ? deptInfo : "Fail");
+
     }
 
     /**
@@ -86,13 +84,11 @@ public class DeptController {
     @GetMapping("/adDeptRead")
     @Operation(summary = "부서 상세 조회", description = "지정된 부서 번호의 상세 정보를 조회합니다.")
     public void readDept(@RequestParam(value = "deptno") String deptno, HttpServletResponse response) {
-        try {
-            DeptVO deptInfo = deptService.selectDeptOne(deptno);
-            UtilEtc.responseJsonValue(response, deptInfo);
-        } catch (Exception e) {
-            log.error("Error reading department: {}", deptno, e);
-            UtilEtc.responseJsonValue(response, "FAIL");
-        }
+
+        DeptVO deptInfo = deptService.selectDeptOne(deptno);
+
+        UtilEtc.responseJsonValue(response, deptInfo!=null ? deptInfo : "Fail");
+
     }
 
     /**
@@ -104,12 +100,10 @@ public class DeptController {
     @GetMapping("/adDeptDelete")
     @Operation(summary = "부서 삭제", description = "지정된 부서 번호(deptno)에 해당하는 부서를 삭제합니다.")
     public void deleteDept(@RequestParam(value = "deptno") String deptno, HttpServletResponse response) {
-        try {
-            deptService.deleteDept(deptno);
-            UtilEtc.responseJsonValue(response, "OK");
-        } catch (Exception e) {
-            log.error("Error deleting department: {}", deptno, e);
-            UtilEtc.responseJsonValue(response, "FAIL");
-        }
+
+        int affectedRows = deptService.deleteDept(deptno);
+
+        UtilEtc.responseJsonValue(response, affectedRows > 0 ? "OK" : "Fail");
+
     }
 }

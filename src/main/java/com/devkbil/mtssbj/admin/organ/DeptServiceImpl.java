@@ -18,7 +18,6 @@ import java.util.List;
 public class DeptServiceImpl implements DeptService {
 
     private final DeptMapper deptMapper; // MyBatis Mapper 인터페이스
-    private int affectedRows; // 실행된 SQL의 반영된 행 수를 저장
 
     /**
      * 부서 리스트 조회
@@ -43,7 +42,7 @@ public class DeptServiceImpl implements DeptService {
     @Override
     @Transactional
     public int insertDept(DeptVO param) {
-        affectedRows = 0;
+        int affectedRows = 0;
 
         // 부모 번호가 빈 문자열이면 null로 처리
         if ("".equals(param.getParentno())) {
@@ -83,8 +82,7 @@ public class DeptServiceImpl implements DeptService {
     @Override
     @Transactional
     public int deleteDept(String deptno) {
-        affectedRows = deptMapper.deleteDept(deptno); // 논리 삭제 처리
-        return affectedRows;
+        return deptMapper.deleteDept(deptno); // 논리 삭제 처리
     }
 
 }

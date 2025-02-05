@@ -13,6 +13,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * HTML Escape 처리를 위한 사용자 정의 클래스.
+ */
 public class HtmlCharacterEscapes extends CharacterEscapes {
 
     private final int[] asciiEscapes;
@@ -32,7 +35,7 @@ public class HtmlCharacterEscapes extends CharacterEscapes {
         asciiEscapes['#'] = CharacterEscapes.ESCAPE_CUSTOM;
         asciiEscapes['\''] = CharacterEscapes.ESCAPE_CUSTOM;
 
-        //사용자 정의
+        // 사용자 정의 Escape 설정.
         Map<CharSequence, CharSequence> customMap = new HashMap<>();
         customMap.put("(", "&#40;");
         customMap.put("\'", "&apos;");

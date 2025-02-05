@@ -54,7 +54,7 @@ public class SchService {
      * @param param 검색 조건
      * @return 일정 개수
      */
-    public Integer selectSchCount(SearchVO param) {
+    public int selectSchCount(SearchVO param) {
         return sqlSession.selectOne("selectSchCount", param);
     }
 
@@ -235,7 +235,7 @@ public class SchService {
      *
      * @param param 일정 정보
      */
-    public void deleteSch(SchVO param) {
-        sqlSession.delete("deleteSch", param);
+    public int deleteSch(SchVO param) {
+        return sqlSession.delete("deleteSch", param);
     }
 }
