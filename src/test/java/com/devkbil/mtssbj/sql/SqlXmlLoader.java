@@ -9,6 +9,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class SqlXmlLoader {
@@ -28,7 +29,7 @@ public class SqlXmlLoader {
             for (Resource resource : resources) {
                 parseXml(resource);
             }
-            log.info("Loaded SQL Queries: {}", SQL_MAP.keySet());
+            log.debug("Loaded SQL Queries: {}", SQL_MAP.keySet());
         } catch (Exception e) {
             log.error("Error loading SQL XML files from {}", mapperLocations, e);
             throw new RuntimeException("Failed to load SQL XML files", e);
@@ -38,11 +39,16 @@ public class SqlXmlLoader {
     /**
      * SQL XML 파일 파싱 후 SQL ID 저장
      */
+    // SQL ID 저장 로직에 디버깅 추가
     private static void parseXml(Resource resource) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             var document = builder.parse(resource.getInputStream());
+
+            // namespace 정보 추출
+            String namespace = document.getDocumentElement().getAttribute("namespace");
+            log.debug("Parsed namespace: {}", namespace);
 
             var nodeList = document.getElementsByTagName("*");
             for (int i = 0; i < nodeList.getLength(); i++) {
@@ -50,7 +56,6 @@ public class SqlXmlLoader {
                 if (node.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
                     String tagName = node.getNodeName();
 
-                    // <select>, <insert>, <update>, <delete> 태그 처리
                     if (Set.of("select", "insert", "update", "delete").contains(tagName)) {
                         String id = node.getAttributes().getNamedItem("id").getNodeValue();
                         String parameterType = node.getAttributes().getNamedItem("parameterType") != null
@@ -61,7 +66,8 @@ public class SqlXmlLoader {
                                 ? node.getAttributes().getNamedItem("resultType").getNodeValue()
                                 : null;
 
-                        SQL_MAP.put(id, new QueryInfo(id, parameterType, resultType));
+                        SQL_MAP.put(namespace + "." + id, new QueryInfo(id, parameterType, resultType, namespace));
+                        log.debug("SQL ID 등록됨: {} (namespace: {})", id, namespace);
                     }
                 }
             }
@@ -71,31 +77,45 @@ public class SqlXmlLoader {
     }
 
     /**
-     * SQL ID 정보를 반환
-     */
-    public static QueryInfo getQueryInfo(String sqlId) {
-        return SQL_MAP.get(sqlId);
-    }
-
-    /**
-     * 전체 SQL ID 반환
+     * 전체 SQL ID 반환 (Namespace 포함)
      */
     public static Set<String> getAllSqlIds() {
         return SQL_MAP.keySet();
     }
 
     /**
-     * 쿼리 정보: SQL ID, 파라미터 타입, 결과 타입
+     * Namespace를 제외한 순수 SQL ID 반환
+     */
+    public static Set<String> getPureSqlIds() {
+        return SQL_MAP.keySet().stream()
+                      .map(id -> id.contains(".") ? id.substring(id.indexOf(".") + 1) : id) // Namespace 제거
+                      .collect(Collectors.toSet());
+    }
+
+    /**
+     * 전체 namespace 반환
+     */
+    public static Set<String> getNamespaces() {
+        return SQL_MAP.values().stream()
+                      .map(QueryInfo::getNamespace)
+                      .filter(namespace -> namespace != null && !namespace.isEmpty())
+                      .collect(Collectors.toSet());
+    }
+
+    /**
+     * 쿼리 정보: SQL ID, 파라미터 타입, 결과 타입, namespace
      */
     public static class QueryInfo {
         private final String id;
         private final String parameterType;
         private final String resultType;
+        private final String namespace;
 
-        public QueryInfo(String id, String parameterType, String resultType) {
+        public QueryInfo(String id, String parameterType, String resultType, String namespace) {
             this.id = id;
             this.parameterType = parameterType;
             this.resultType = resultType;
+            this.namespace = namespace;
         }
 
         public String getId() {
@@ -110,12 +130,17 @@ public class SqlXmlLoader {
             return resultType;
         }
 
+        public String getNamespace() {
+            return namespace;
+        }
+
         @Override
         public String toString() {
             return "QueryInfo{" +
                     "id='" + id + '\'' +
                     ", parameterType='" + parameterType + '\'' +
                     ", resultType='" + resultType + '\'' +
+                    ", namespace='" + namespace + '\'' +
                     '}';
         }
     }
