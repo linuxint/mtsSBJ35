@@ -4,60 +4,63 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GradleVersionMinorExtractorTxt {
+public class GradleVersionMinorExtractorFileWrite {
 
-    // Pattern to extract dependencies with valid versions
+    // 의존성 추출을 위한 패턴 정의
     private static final Pattern DEPENDENCY_PATTERN = Pattern.compile("['\"](\\S+:\\S+:\\S+)['\"]");
 
     public static void main(String[] args) {
-        String filePath = "build.gradle";
+        String filePath = "build.gradle"; // 수정 대상 파일 경로
         Map<String, String> dependencyUpdates = new LinkedHashMap<>();
 
         try {
+            // build.gradle 파일에서 의존성 추출
             List<String> dependencies = extractDependencies(filePath);
 
+            // 의존성별로 최신 버전 확인
             for (String dependency : dependencies) {
                 String currentVersion = getVersion(dependency);
                 if (currentVersion == null) {
-                    // Skip dependencies without explicit versions
+                    // 버전 정보가 없는 경우 스킵
                     continue;
                 }
 
                 String latestVersion = findLatestVersion(dependency);
                 if (latestVersion != null && isMinorUpdate(currentVersion, latestVersion)) {
-                    dependencyUpdates.put(
-                            dependency,
-                            "Current: " + dependency + " -> Latest Minor: " + replaceVersion(dependency, latestVersion)
-                    );
+                    // 업데이트 가능성이 있는 경우 기록
+                    dependencyUpdates.put(dependency, replaceVersion(dependency, latestVersion));
                 }
             }
 
-            // Print all updates at the end
-            System.out.println("\nDependency Updates:");
-            dependencyUpdates.forEach((key, value) -> System.out.println(value));
+            // build.gradle 파일 수정
+            if (!dependencyUpdates.isEmpty()) {
+                updateBuildGradleFile(filePath, dependencyUpdates);
+
+                System.out.println("\nDependency Updates Applied:");
+                dependencyUpdates.forEach((key, value) -> System.out.printf("Updated: %s -> %s%n", key, value));
+            } else {
+                System.out.println("\nNo minor updates found for dependencies.");
+            }
 
         } catch (IOException e) {
-            System.err.println("Error reading the Gradle file: " + e.getMessage());
+            System.err.println("Error processing the Gradle file: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
+    /**
+     * build.gradle 파일에서 의존성을 추출합니다.
+     */
     private static List<String> extractDependencies(String filePath) throws IOException {
         List<String> dependencies = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -67,14 +70,14 @@ public class GradleVersionMinorExtractorTxt {
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
 
-                // Handle block comments
+                // 블록 주석 처리
                 if (line.startsWith("/*")) inBlockComment = true;
                 if (line.endsWith("*/")) inBlockComment = false;
 
-                // Skip lines inside block comments or single-line comments
+                // 주석 제외
                 if (inBlockComment || line.startsWith("//")) continue;
 
-                // Extract valid dependencies
+                // 의존성 추출
                 Matcher matcher = DEPENDENCY_PATTERN.matcher(line);
                 if (matcher.find()) {
                     dependencies.add(matcher.group(1));
@@ -85,9 +88,12 @@ public class GradleVersionMinorExtractorTxt {
         return dependencies;
     }
 
+    /**
+     * Maven 레지스트리를 사용하여 최신 버전을 찾습니다.
+     */
     private static String findLatestVersion(String dependency) {
         String[] parts = dependency.split(":");
-        if (parts.length < 2) return null; // Invalid dependency format
+        if (parts.length < 2) return null; // 의존성 형식이 잘못된 경우
 
         String groupId = parts[0];
         String artifactId = parts[1];
@@ -100,8 +106,8 @@ public class GradleVersionMinorExtractorTxt {
                     encodedGroupId, encodedArtifactId
             );
 
-            URL url = createSafeURL(urlString); // 변경된 URL 생성 방식
-            if (url == null) return null; // URL이 유효하지 않을 경우 처리
+            URL url = createSafeURL(urlString);
+            if (url == null) return null;
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -132,10 +138,9 @@ public class GradleVersionMinorExtractorTxt {
         return null;
     }
 
-    // 추가된 안전한 URL 생성 메서드
+    // 안전한 URL 생성 메서드
     private static URL createSafeURL(String urlString) {
         try {
-            // URI를 먼저 사용하여 유효성 검사 및 URL 변환
             URI uri = URI.create(urlString);
             return uri.toURL();
         } catch (IllegalArgumentException | IOException e) {
@@ -145,35 +150,65 @@ public class GradleVersionMinorExtractorTxt {
         }
     }
 
+    // 의존성에서 현재 버전을 가져옵니다.
     private static String getVersion(String dependency) {
         String[] parts = dependency.split(":");
         return parts.length > 2 ? parts[2] : null;
     }
 
+    // 의존성의 새 버전으로 업데이트합니다.
     private static String replaceVersion(String dependency, String newVersion) {
         String[] parts = dependency.split(":");
         if (parts.length < 3) return dependency;
         return String.join(":", parts[0], parts[1], newVersion);
     }
 
+    // Minor 업데이트인지 확인합니다.
     private static boolean isMinorUpdate(String currentVersion, String latestVersion) {
         String[] currentParts = currentVersion.split("\\.");
         String[] latestParts = latestVersion.split("\\.");
 
-        if (currentParts.length < 2 || latestParts.length < 2) {
-            return false; // Invalid version format
+        if (currentParts.length < 2 || latestParts.length < 2) return false;
+
+        // Major version은 같아야 함
+        if (!currentParts[0].equals(latestParts[0])) return false;
+
+        // Minor version이 증가해야 함
+        return !currentParts[1].equals(latestParts[1]) &&
+                Integer.parseInt(latestParts[1]) > Integer.parseInt(currentParts[1]);
+    }
+
+    // build.gradle 파일을 업데이트합니다.
+    private static void updateBuildGradleFile(String filePath, Map<String, String> dependencyUpdates) throws IOException {
+        File inputFile = new File(filePath);
+        File tempFile = new File("build.gradle.tmp");
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String trimmedLine = line.trim();
+
+                // 업데이트할 의존성이 있는지 확인
+                for (Map.Entry<String, String> entry : dependencyUpdates.entrySet()) {
+                    String currentDependency = entry.getKey();
+                    String updatedDependency = entry.getValue();
+
+                    if (trimmedLine.contains(currentDependency)) {
+                        line = line.replace(currentDependency, updatedDependency);
+                        break;
+                    }
+                }
+
+                writer.write(line);
+                writer.newLine();
+            }
         }
 
-        // Major version must match
-        if (!currentParts[0].equals(latestParts[0])) {
-            return false;
+        // 원본 파일을 덮어씌움
+        if (!tempFile.renameTo(inputFile)) {
+            System.err.println("Failed to update the build.gradle file.");
         }
-
-        // Minor version must increase
-        if (!currentParts[1].equals(latestParts[1]) && Integer.parseInt(latestParts[1]) > Integer.parseInt(currentParts[1])) {
-            return true;
-        }
-
-        return false;
     }
 }
