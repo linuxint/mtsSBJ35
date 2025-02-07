@@ -19,13 +19,15 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
+import org.junit.jupiter.api.Test;
 
 import static com.devkbil.mtssbj.manager.SpringCalendarConstants.*;
 
 @Slf4j
 public class SpringCalendarExtractorTxt {
 
-    public static void main(String[] args) {
+    @Test
+    public void main() {
         try {
             // Step 1: URL에서 .ics 파일 다운로드
             InputStream inputStream = downloadICalFile(CALENDAR_URL);
