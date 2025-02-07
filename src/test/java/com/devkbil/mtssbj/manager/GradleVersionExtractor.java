@@ -14,53 +14,36 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class GradleVersionExtractor {
 
-    private static final Pattern DEPENDENCY_PATTERN = Pattern.compile("['\"]([^'\"]+:[^'\"]+:[^'\"]+)['\"]");
+    private static final Pattern DEPENDENCY_PATTERN = Pattern.compile("['\"]([^'\"]+:[^'\"]+(:[^'\"]+)?)['\"]");
 
     @Test
     public void main() {
         String filePath = "build.gradle";
-
-        try {
-            List<String> dependenciesWithVersions = extractDependenciesWithVersions(filePath);
-            List<String> updatedDependencies = new ArrayList<>();
-
-            for (String dependency : dependenciesWithVersions) {
-                String latestVersion = findLatestVersion(dependency);
-                if (latestVersion != null && !latestVersion.equals(getVersion(dependency))) {
-                    String updatedDependency = replaceVersion(dependency, latestVersion);
-                    updatedDependencies.add(updatedDependency);
-                } else {
-                    updatedDependencies.add(dependency);
-                }
-            }
-
-            List<String> updatedContent = updateDependenciesInFile(filePath, updatedDependencies);
-            //writeUpdatedFile(filePath, updatedContent);
-
-            // 모든 내용을 콘솔에 출력
-            updatedContent.forEach(System.out::println);
-
-        } catch (IOException e) {
-            System.err.println("Error reading the gradle file: " + e.getMessage());
-            e.printStackTrace();
-        }
+        List<String> dependencies = extractDependenciesWithVersions(filePath);
+        dependencies.parallelStream()
+                    .map(dependency -> {
+                        String latest = findLatestVersion(dependency);
+                        return (latest != null && !latest.equals(getVersion(dependency)))
+                               ? replaceVersion(dependency, latest)
+                               : dependency;
+                    })
+                    .forEach(System.out::println); // 최종 결과 출력
     }
 
-    private static List<String> extractDependenciesWithVersions(String filePath) throws IOException {
-        List<String> dependenciesWithVersions = new ArrayList<>();
+    private List<String> extractDependenciesWithVersions(String filePath) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                Matcher matcher = DEPENDENCY_PATTERN.matcher(line);
-                if (matcher.find()) {
-                    dependenciesWithVersions.add(matcher.group(1));
-                }
-            }
+            return reader.lines()
+                         .map(line -> DEPENDENCY_PATTERN.matcher(line))
+                         .filter(Matcher::find)
+                         .map(m -> m.group(1))
+                         .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return dependenciesWithVersions;
     }
 
     private static String findLatestVersion(String dependency) {

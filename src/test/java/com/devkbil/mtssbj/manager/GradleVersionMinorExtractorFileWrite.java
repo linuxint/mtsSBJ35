@@ -11,14 +11,23 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class GradleVersionMinorExtractorFileWrite {
 
-    // 의존성 추출을 위한 패턴 정의
+    // 의존성 추출을 위한 패턴 정의 (정규식 캐싱)
     private static final Pattern DEPENDENCY_PATTERN = Pattern.compile("['\"](\\S+:\\S+:\\S+)['\"]");
+
+    // 병렬 처리용 스레드 풀
+    private static final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
 
     @Test
     public void main() {
@@ -26,25 +35,28 @@ public class GradleVersionMinorExtractorFileWrite {
         Map<String, String> dependencyUpdates = new LinkedHashMap<>();
 
         try {
-            // build.gradle 파일에서 의존성 추출
+            // 1. build.gradle 파일에서 의존성 추출
             List<String> dependencies = extractDependencies(filePath);
 
-            // 의존성별로 최신 버전 확인
-            for (String dependency : dependencies) {
-                String currentVersion = getVersion(dependency);
-                if (currentVersion == null) {
-                    // 버전 정보가 없는 경우 스킵
-                    continue;
-                }
+            // 2. 최신 버전 병렬 확인
+            List<CompletableFuture<Void>> futures = dependencies.stream().map(dependency ->
+                CompletableFuture.runAsync(() -> {
+                    String currentVersion = getVersion(dependency);
+                    if (currentVersion == null) return;
 
-                String latestVersion = findLatestVersion(dependency);
-                if (latestVersion != null && isMinorUpdate(currentVersion, latestVersion)) {
-                    // 업데이트 가능성이 있는 경우 기록
-                    dependencyUpdates.put(dependency, replaceVersion(dependency, latestVersion));
-                }
-            }
+                    String latestVersion = findLatestVersion(dependency);
+                    if (latestVersion != null && isMinorUpdate(currentVersion, latestVersion)) {
+                        synchronized (dependencyUpdates) { // 멀티스레드 환경에서 공유 Map 보호
+                            dependencyUpdates.put(dependency, replaceVersion(dependency, latestVersion));
+                        }
+                    }
+                }, executor)
+            ).collect(Collectors.toList());
 
-            // build.gradle 파일 수정
+            // 모든 작업 완료 대기
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+            // 3. build.gradle 파일 수정
             if (!dependencyUpdates.isEmpty()) {
                 updateBuildGradleFile(filePath, dependencyUpdates);
 
@@ -57,80 +69,52 @@ public class GradleVersionMinorExtractorFileWrite {
         } catch (IOException e) {
             System.err.println("Error processing the Gradle file: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            executor.shutdown(); // 스레드풀 종료
         }
     }
 
-    /**
-     * build.gradle 파일에서 의존성을 추출합니다.
-     */
+    /** ⬇️ 최적화된 의존성 추출 */
     private static List<String> extractDependencies(String filePath) throws IOException {
-        List<String> dependencies = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            boolean inBlockComment = false;
-
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-
-                // 블록 주석 처리
-                if (line.startsWith("/*")) inBlockComment = true;
-                if (line.endsWith("*/")) inBlockComment = false;
-
-                // 주석 제외
-                if (inBlockComment || line.startsWith("//")) continue;
-
-                // 의존성 추출
-                Matcher matcher = DEPENDENCY_PATTERN.matcher(line);
-                if (matcher.find()) {
-                    dependencies.add(matcher.group(1));
-                }
-            }
+            return reader.lines()
+                .map(String::trim)
+                .filter(line -> !line.startsWith("//")) // 주석 제거
+                .filter(line -> !line.startsWith("/*") && !line.startsWith("*/")) // 블록 주석
+                .map(line -> DEPENDENCY_PATTERN.matcher(line))
+                .filter(Matcher::find)
+                .map(matcher -> matcher.group(1))
+                .collect(Collectors.toList());
         }
-
-        return dependencies;
     }
 
-    /**
-     * Maven 레지스트리를 사용하여 최신 버전을 찾습니다.
-     */
+    /** ⬇️ 병렬 처리 지원 (HTTP 요청) */
     private static String findLatestVersion(String dependency) {
         String[] parts = dependency.split(":");
-        if (parts.length < 2) return null; // 의존성 형식이 잘못된 경우
+        if (parts.length < 2) return null;
 
         String groupId = parts[0];
         String artifactId = parts[1];
 
         try {
-            String encodedGroupId = URLEncoder.encode(groupId, StandardCharsets.UTF_8.toString());
-            String encodedArtifactId = URLEncoder.encode(artifactId, StandardCharsets.UTF_8.toString());
             String urlString = String.format(
-                    "https://search.maven.org/solrsearch/select?q=g:%s%%20AND%%20a:%s&rows=1&wt=json",
-                    encodedGroupId, encodedArtifactId
+                "https://search.maven.org/solrsearch/select?q=g:%s%%20AND%%20a:%s&rows=1&wt=json",
+                URLEncoder.encode(groupId, StandardCharsets.UTF_8),
+                URLEncoder.encode(artifactId, StandardCharsets.UTF_8)
             );
 
-            URL url = createSafeURL(urlString);
-            if (url == null) return null;
-
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URL(urlString).openConnection();
             connection.setRequestMethod("GET");
 
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                    StringBuilder response = new StringBuilder();
-                    String inputLine;
-                    while ((inputLine = in.readLine()) != null) {
-                        response.append(inputLine);
-                    }
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                String jsonResponse = new BufferedReader(new InputStreamReader(connection.getInputStream()))
+                    .lines().collect(Collectors.joining());
 
-                    JSONObject jsonObject = new JSONObject(response.toString());
-                    JSONArray docs = jsonObject.getJSONObject("response").optJSONArray("docs");
-                    if (docs != null && docs.length() > 0) {
-                        return docs.getJSONObject(0).getString("latestVersion");
-                    }
+                JSONObject jsonObject = new JSONObject(jsonResponse);
+                JSONArray docs = jsonObject.getJSONObject("response").optJSONArray("docs");
+                if (docs != null && docs.length() > 0) {
+                    return docs.getJSONObject(0).getString("latestVersion");
                 }
-            } else {
-                System.err.println("Server returned non-OK status: " + responseCode);
             }
         } catch (IOException | JSONException e) {
             System.err.println("Error occurred while fetching the latest version: " + e.getMessage());
@@ -138,6 +122,25 @@ public class GradleVersionMinorExtractorFileWrite {
         }
 
         return null;
+    }
+
+    /** ⬇️ 빌드 파일 업데이트 최적화 (읽기/쓰기 최소화) */
+    private static void updateBuildGradleFile(String filePath, Map<String, String> dependencyUpdates) throws IOException {
+        List<String> lines = Files.readAllLines(Path.of(filePath), StandardCharsets.UTF_8);
+        List<String> updatedLines = new ArrayList<>();
+
+        for (String line : lines) {
+            String updatedLine = line;
+            for (Map.Entry<String, String> entry : dependencyUpdates.entrySet()) {
+                if (line.contains(entry.getKey())) {
+                    updatedLine = line.replace(entry.getKey(), entry.getValue());
+                    break;
+                }
+            }
+            updatedLines.add(updatedLine);
+        }
+
+        Files.write(Path.of(filePath), updatedLines, StandardCharsets.UTF_8);
     }
 
     // 안전한 URL 생성 메서드
@@ -180,37 +183,4 @@ public class GradleVersionMinorExtractorFileWrite {
                 Integer.parseInt(latestParts[1]) > Integer.parseInt(currentParts[1]);
     }
 
-    // build.gradle 파일을 업데이트합니다.
-    private static void updateBuildGradleFile(String filePath, Map<String, String> dependencyUpdates) throws IOException {
-        File inputFile = new File(filePath);
-        File tempFile = new File("build.gradle.tmp");
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String trimmedLine = line.trim();
-
-                // 업데이트할 의존성이 있는지 확인
-                for (Map.Entry<String, String> entry : dependencyUpdates.entrySet()) {
-                    String currentDependency = entry.getKey();
-                    String updatedDependency = entry.getValue();
-
-                    if (trimmedLine.contains(currentDependency)) {
-                        line = line.replace(currentDependency, updatedDependency);
-                        break;
-                    }
-                }
-
-                writer.write(line);
-                writer.newLine();
-            }
-        }
-
-        // 원본 파일을 덮어씌움
-        if (!tempFile.renameTo(inputFile)) {
-            System.err.println("Failed to update the build.gradle file.");
-        }
-    }
 }
