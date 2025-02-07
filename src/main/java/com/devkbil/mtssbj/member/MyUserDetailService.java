@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * 사용자 인증을 위한 `UserDetailsService` 구현 클래스.
@@ -27,8 +27,8 @@ public class MyUserDetailService implements UserDetailsService {
     @Override
     public UserVO loadUserByUsername(String insertedUserId) throws UsernameNotFoundException {
         // 사용자 정보를 데이터베이스에서 조회
-        Optional<UserVO> findOne = memberService.findOne(insertedUserId);
-        UserVO userVO = findOne.orElseThrow(() -> new UsernameNotFoundException(insertedUserId));
+        UserVO userVO = Objects.requireNonNull(memberService.findOne(insertedUserId),
+                () -> { throw new UsernameNotFoundException("User not found with ID: " + insertedUserId); });
 
 //        return User.builder()
 //                .username(userVO.getUserid())

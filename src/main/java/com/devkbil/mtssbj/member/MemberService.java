@@ -6,7 +6,6 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 사용자 관리와 관련된 서비스 클래스.
@@ -74,7 +73,7 @@ public class MemberService {
      * @param userId 사용자 ID
      * @return Optional 형태의 사용자 VO 객체
      */
-    public Optional<UserVO> findOne(String userId) {
+    public UserVO findOne(String userId) {
         return repository.findByUserid(userId);
     }
 }

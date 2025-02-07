@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Optional;
+import java.util.Objects;
 
 @Tag(name = "LoginController", description = "회원 로그인 및 로그아웃 처리 컨트롤러")
 @Controller
@@ -126,8 +126,8 @@ public class LoginController {
 
         String userno = loginInfo.getUserno();
 
-        Optional<UserVO> findOne = memberService.findOne(userno);
-        UserVO userVO = findOne.orElseThrow(() -> new UsernameNotFoundException(userno));
+        UserVO userVO = Objects.requireNonNull(memberService.findOne(userno),
+                () -> { throw new UsernameNotFoundException("User not found with ID: " + userno); });
 
         // 로그인 로직 수행
         memberService.insertLogIn(userVO.getUserno());
