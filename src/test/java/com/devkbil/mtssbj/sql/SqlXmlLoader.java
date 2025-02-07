@@ -14,96 +14,91 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SqlXmlLoader {
 
-    // SQL ID 캐싱: SQL ID -> INPUT, OUTPUT 정보 저장
-    private static final Map<String, QueryInfo> SQL_MAP = new HashMap<>();
+    private static final Map<String, QueryInfo> SQL_MAP = new HashMap<>(); // SQL ID를 저장하는 맵
 
-    /**
-     * SQL XML 파일에서 Query ID 로드
-     * @param mapperLocations MyBatis 매퍼 경로 (예: "classpath:mapper/oracle/*.xml")
-     */
+    private static final ThreadLocal<DocumentBuilder> DOCUMENT_BUILDER = ThreadLocal.withInitial(() -> {
+        // 다중 스레드 환경에서도 XML 파서를 안전하게 사용할 수 있도록 ThreadLocal로 관리
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            return factory.newDocumentBuilder();
+        } catch (Exception e) {
+            throw new IllegalStateException("DocumentBuilder 생성 중 오류 발생", e);
+        }
+    });
+
     public static void loadSqlQueries(String mapperLocations) {
         try {
+            // XML 리소스 로드
             PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-            Resource[] resources = resolver.getResources(mapperLocations);
+            Resource[] resources = resolver.getResources(mapperLocations); // 경로에서 리소스 가져오기
 
-            for (Resource resource : resources) {
-                parseXml(resource);
-            }
-            log.debug("Loaded SQL Queries: {}", SQL_MAP.keySet());
+            Arrays.stream(resources).parallel().forEach(SqlXmlLoader::parseXml); // 모든 XML 파일을 병렬 처리
+            log.debug("총 SQL Queries 로드: {}", SQL_MAP.size()); // 로드된 SQL 전체 수 출력
         } catch (Exception e) {
             log.error("SQL XML 파일 로딩 중 오류 발생: {}", mapperLocations, e);
-            throw new RuntimeException("SQL XML 파일 로드 실패", e);
+            throw new RuntimeException("SQL XML 파일 로드 실패", e); // 실패 시 예외 발생
         }
     }
 
-    /**
-     * SQL XML 파일 파싱 후 SQL ID 저장
-     */
-    // SQL ID 저장 로직에 디버깅 추가
     private static void parseXml(Resource resource) {
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(resource.getInputStream());
+            // XML 파일 파싱
+            DocumentBuilder builder = DOCUMENT_BUILDER.get(); // ThreadLocal에서 DocumentBuilder 가져오기
+            Document document = builder.parse(resource.getInputStream()); // XML 문서 파싱
 
-            // namespace 정보 추출
-            String namespace = document.getDocumentElement().getAttribute("namespace");
-            log.debug("Parsed namespace: {}", namespace);
+            String namespace = document.getDocumentElement().getAttribute("namespace"); // Namespace 추출
+            NodeList nodeList = document.getElementsByTagName("*"); // 모든 노드 가져옴
 
-            NodeList nodeList = document.getElementsByTagName("*");
             for (int i = 0; i < nodeList.getLength(); i++) {
                 var node = nodeList.item(i);
                 if (node.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
                     String tagName = node.getNodeName();
-
                     if (Set.of("select", "insert", "update", "delete").contains(tagName)) {
-                        String id = node.getAttributes().getNamedItem("id").getNodeValue();
-                        String parameterType = Optional.ofNullable(node.getAttributes().getNamedItem("parameterType"))
-                                .map(attr -> attr.getNodeValue()).orElse(null);
-                        String resultType = Optional.ofNullable(node.getAttributes().getNamedItem("resultType"))
-                                .map(attr -> attr.getNodeValue()).orElse(null);
-
-                        SQL_MAP.put(namespace + "." + id, new QueryInfo(id, parameterType, resultType, namespace));
-                        log.debug("SQL 등록됨: {} (namespace: {})", id, namespace);
+                        addSqlIdToMap(namespace, node); // 유효한 SQL 태그 처리
                     }
                 }
             }
         } catch (Exception e) {
-            log.error("XML 파일 파싱 실패: {}", resource.getFilename(), e);
+            log.error("XML 파일 파싱 실패: {}", resource.getFilename(), e); // 실패 시 오류 로그 기록
         }
     }
 
-    /**
-     * 전체 SQL ID 반환 (Namespace 포함)
-     */
-    public static Set<String> getAllSqlIds() {
-        return SQL_MAP.keySet();
+    private static void addSqlIdToMap(String namespace, org.w3c.dom.Node node) {
+        try {
+            // SQL ID와 관련된 속성을 맵에 저장
+            String id = node.getAttributes().getNamedItem("id").getNodeValue(); // SQL ID 추출
+            String parameterType = Optional.ofNullable(node.getAttributes().getNamedItem("parameterType"))
+                                            .map(attr -> attr.getNodeValue()).orElse(null); // Parameter 타입 추출
+            String resultType = Optional.ofNullable(node.getAttributes().getNamedItem("resultType"))
+                                        .map(attr -> attr.getNodeValue()).orElse(null); // Result 타입 추출
+            SQL_MAP.put(namespace + "." + id, new QueryInfo(id, parameterType, resultType, namespace)); // SQL 맵에 저장
+            log.debug("SQL 등록됨: {} (namespace: {})", id, namespace); // 디버그 로그
+        } catch (Exception e) {
+            log.error("SQL ID 등록 중 오류 발생. namespace: {}, node: {}", namespace, node, e); // 실패 시 오류 처리
+        }
     }
 
-    /**
-     * Namespace를 제외한 순수 SQL ID 반환
-     */
+    public static Set<String> getAllSqlIds() {
+        return SQL_MAP.keySet(); // Namespace 포함 SQL ID 반환
+    }
+
     public static Set<String> getPureSqlIds() {
+        // Namespace를 제외한 SQL ID만 추출하여 반환
         return SQL_MAP.keySet().stream().map(id -> id.contains(".") ? id.split("\\.")[1] : id)
                       .collect(Collectors.toSet());
     }
 
-    /**
-     * 전체 namespace 반환
-     */
     public static Set<String> getNamespaces() {
+        // 모든 Namespace 반환
         return SQL_MAP.values().stream().map(QueryInfo::getNamespace)
                       .filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
-    /**
-     * 쿼리 정보: SQL ID, 파라미터 타입, 결과 타입, namespace
-     */
     public static class QueryInfo {
-        private final String id;
-        private final String parameterType;
-        private final String resultType;
-        private final String namespace;
+        private final String id; // SQL ID
+        private final String parameterType; // Parameter 타입
+        private final String resultType; // 결과 타입
+        private final String namespace; // Namespace
 
         public QueryInfo(String id, String parameterType, String resultType, String namespace) {
             this.id = id;
@@ -113,17 +108,7 @@ public class SqlXmlLoader {
         }
 
         public String getNamespace() {
-            return namespace;
-        }
-
-        @Override
-        public String toString() {
-            return "QueryInfo{" +
-                    "id='" + id + '\'' +
-                    ", parameterType='" + parameterType + '\'' +
-                    ", resultType='" + resultType + '\'' +
-                    ", namespace='" + namespace + '\'' +
-                    '}';
+            return namespace; // Namespace 반환
         }
     }
 }
