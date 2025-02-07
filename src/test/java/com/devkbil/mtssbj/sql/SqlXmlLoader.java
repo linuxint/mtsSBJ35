@@ -3,12 +3,12 @@ package com.devkbil.mtssbj.sql;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,8 +31,8 @@ public class SqlXmlLoader {
             }
             log.debug("Loaded SQL Queries: {}", SQL_MAP.keySet());
         } catch (Exception e) {
-            log.error("Error loading SQL XML files from {}", mapperLocations, e);
-            throw new RuntimeException("Failed to load SQL XML files", e);
+            log.error("SQL XML 파일 로딩 중 오류 발생: {}", mapperLocations, e);
+            throw new RuntimeException("SQL XML 파일 로드 실패", e);
         }
     }
 
@@ -44,13 +44,13 @@ public class SqlXmlLoader {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            var document = builder.parse(resource.getInputStream());
+            Document document = builder.parse(resource.getInputStream());
 
             // namespace 정보 추출
             String namespace = document.getDocumentElement().getAttribute("namespace");
             log.debug("Parsed namespace: {}", namespace);
 
-            var nodeList = document.getElementsByTagName("*");
+            NodeList nodeList = document.getElementsByTagName("*");
             for (int i = 0; i < nodeList.getLength(); i++) {
                 var node = nodeList.item(i);
                 if (node.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
@@ -58,21 +58,18 @@ public class SqlXmlLoader {
 
                     if (Set.of("select", "insert", "update", "delete").contains(tagName)) {
                         String id = node.getAttributes().getNamedItem("id").getNodeValue();
-                        String parameterType = node.getAttributes().getNamedItem("parameterType") != null
-                                ? node.getAttributes().getNamedItem("parameterType").getNodeValue()
-                                : null;
-
-                        String resultType = node.getAttributes().getNamedItem("resultType") != null
-                                ? node.getAttributes().getNamedItem("resultType").getNodeValue()
-                                : null;
+                        String parameterType = Optional.ofNullable(node.getAttributes().getNamedItem("parameterType"))
+                                .map(attr -> attr.getNodeValue()).orElse(null);
+                        String resultType = Optional.ofNullable(node.getAttributes().getNamedItem("resultType"))
+                                .map(attr -> attr.getNodeValue()).orElse(null);
 
                         SQL_MAP.put(namespace + "." + id, new QueryInfo(id, parameterType, resultType, namespace));
-                        log.debug("SQL ID 등록됨: {} (namespace: {})", id, namespace);
+                        log.debug("SQL 등록됨: {} (namespace: {})", id, namespace);
                     }
                 }
             }
         } catch (Exception e) {
-            log.error("Error parsing SQL XML file: {}", resource.getFilename(), e);
+            log.error("XML 파일 파싱 실패: {}", resource.getFilename(), e);
         }
     }
 
@@ -87,8 +84,7 @@ public class SqlXmlLoader {
      * Namespace를 제외한 순수 SQL ID 반환
      */
     public static Set<String> getPureSqlIds() {
-        return SQL_MAP.keySet().stream()
-                      .map(id -> id.contains(".") ? id.substring(id.indexOf(".") + 1) : id) // Namespace 제거
+        return SQL_MAP.keySet().stream().map(id -> id.contains(".") ? id.split("\\.")[1] : id)
                       .collect(Collectors.toSet());
     }
 
@@ -96,10 +92,8 @@ public class SqlXmlLoader {
      * 전체 namespace 반환
      */
     public static Set<String> getNamespaces() {
-        return SQL_MAP.values().stream()
-                      .map(QueryInfo::getNamespace)
-                      .filter(namespace -> namespace != null && !namespace.isEmpty())
-                      .collect(Collectors.toSet());
+        return SQL_MAP.values().stream().map(QueryInfo::getNamespace)
+                      .filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     /**
@@ -116,18 +110,6 @@ public class SqlXmlLoader {
             this.parameterType = parameterType;
             this.resultType = resultType;
             this.namespace = namespace;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getParameterType() {
-            return parameterType;
-        }
-
-        public String getResultType() {
-            return resultType;
         }
 
         public String getNamespace() {

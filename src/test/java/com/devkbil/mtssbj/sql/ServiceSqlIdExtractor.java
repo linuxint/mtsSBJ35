@@ -29,7 +29,7 @@ public class ServiceSqlIdExtractor {
         try {
             Files.walk(Paths.get(servicePath))
                     .filter(Files::isRegularFile)
-                    .filter(path -> path.toString().endsWith("Service.java")) // 파일명 규칙 적용
+                    .filter(path -> path.toString().endsWith("Service.java"))
                     .forEach(path -> {
                         try {
                             String content = Files.readString(path);
@@ -38,19 +38,16 @@ public class ServiceSqlIdExtractor {
                             if (isServiceClass(content)) {
                                 Matcher matcher = SQL_ID_PATTERN.matcher(content);
                                 while (matcher.find()) {
-                                    String sqlId = matcher.group(2);
-                                    sqlIds.add(sqlId);
-                                    // log.info("Found SQL ID: {} in {}", sqlId, path);
+                                    sqlIds.add(matcher.group(2));
                                 }
                             }
                         } catch (IOException e) {
-                            log.error("Error reading file: {}", path, e);
+                            log.error("파일 읽기 실패: {}", path, e);
                         }
                     });
         } catch (IOException e) {
-            log.error("Error walking path: {}", servicePath, e);
+            log.error("서비스 경로 처리 실패: {}", servicePath, e);
         }
-
         return sqlIds;
     }
 
