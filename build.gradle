@@ -39,18 +39,18 @@ dependencyManagement {
     imports {
         mavenBom('org.springframework.boot:spring-boot-dependencies:3.5.0-M1') {
 //            bomProperty 'spring-framework.version', '7.0.0-M1'
-//            bomProperty 'spring-security.version', '6.5.0-M1'
-//            bomProperty 'spring-integration.version', '6.5.0-M1'
-//            bomProperty 'spring-hateoas.version', '3.0.0-M1'
-//            bomProperty 'spring-retry.version', '2.0.11'
+            bomProperty 'spring-security.version', '6.5.0-M1'
+            bomProperty 'spring-integration.version', '6.5.0-M1'
+            bomProperty 'spring-hateoas.version', '3.0.0-M1'
+            bomProperty 'spring-retry.version', '2.0.11'
         }
 //        mavenBom 'org.springframework:spring-framework-bom:7.0.0-M1'
 //        mavenBom 'org.springframework.data:spring-data-bom:2025.1.0-M1'
-//        mavenBom 'org.springframework.integration:spring-integration-bom:6.5.0-M1'
-//        mavenBom 'org.springframework.ai:spring-ai-bom:1.0.0-M5'
-//        mavenBom 'com.fasterxml.jackson:jackson-bom:2.18.2'
-//        mavenBom 'io.micrometer:micrometer-bom:1.15.0-M1'
-//        mavenBom 'org.springframework.modulith:spring-modulith-bom:1.4.0-M1'
+        mavenBom 'org.springframework.integration:spring-integration-bom:6.5.0-M1'
+        mavenBom 'org.springframework.ai:spring-ai-bom:1.0.0-M5'
+        mavenBom 'com.fasterxml.jackson:jackson-bom:2.18.2'
+        mavenBom 'io.micrometer:micrometer-bom:1.15.0-M1'
+        mavenBom 'org.springframework.modulith:spring-modulith-bom:1.4.0-M1'
     }
 }
 
@@ -77,7 +77,7 @@ springBoot {
     buildInfo()
 }
 
-configurations.all {
+configurations.configureEach {
     exclude group: 'com.itextpdf', module: 'itextpdf'
 }
 
@@ -177,6 +177,8 @@ dependencies {
     implementation 'io.micrometer:micrometer-jakarta9'                      // Micrometer Jakarta 지원
     implementation 'io.micrometer:micrometer-observation'                   // 관측 시스템
     implementation 'io.micrometer:micrometer-commons'
+    implementation 'io.micrometer:micrometer-tracing:latest.integration'
+
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.10.0' // SQL 쿼리 로깅
     implementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:1.10.0' // DB 커넥션 상태 추적
     implementation 'com.github.gavlyukovskiy:flexy-pool-spring-boot-starter:1.10.0' // 커넥션 풀 동적 크기 제어 및 메트릭 모니터링
@@ -255,7 +257,7 @@ dependencies {
 //    implementation 'org.hibernate.orm:hibernate-jcache:7.0.0.Beta3'
 
     implementation 'jakarta.validation:jakarta.validation-api:3.1.0'
-//    implementation 'jakarta.persistence:jakarta.persistence-api:3.2.0'
+    implementation 'jakarta.persistence:jakarta.persistence-api:3.2.0'
 
     implementation 'org.springframework.boot:spring-boot-starter-cache'
 //    implementation 'com.github.ben-manes.caffeine:caffeine'
@@ -269,7 +271,7 @@ dependencies {
     // ======================
     // 15. 통신 인터페이스
     // ======================
-    //implementation 'com.bucket4j:bucket4j-oracle:8.14.0'
+//    implementation 'com.bucket4j:bucket4j-oracle:8.14.0'
     implementation 'com.bucket4j:bucket4j_jdk17-oracle:8.14.0'
 //    implementation 'io.github.bucket4j:bucket4j-spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-json'
@@ -286,26 +288,15 @@ dependencies {
     // jood.sql-dialect: ORACLE // application.properties || application.yml
     // 세선 DB
 
-
     // 미정렬
     //implementation 'org.springframework.ai:spring-ai-bedrock-converse-spring-boot-starter'
+
+    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.0.RC2'
 
     implementation 'org.eclipse.jgit:org.eclipse.jgit:7.1.0.202411261347-r'
 
 
     implementation fileTree(dir: 'lib', include: ['*.jar'])
-}
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-
-            from(components.java)
-        }
-    }
-}
-tasks.withType(JavaExec).configureEach {
-    systemProperty 'file.encoding', 'UTF-8'
 }
 
 tasks.withType(Checkstyle).configureEach { task ->
@@ -315,11 +306,11 @@ tasks.withType(Checkstyle).configureEach { task ->
     }
 }
 
-tasks.named('test') {
+tasks.named('test').configure {
     useJUnitPlatform()
 }
 
-tasks.named('clean') {
+tasks.named('clean').configure {
     delete(layout.projectDirectory.dir('logs_local'))
     delete(layout.projectDirectory.dir('logs_dev'))
     delete(layout.projectDirectory.dir('logs_stag'))
@@ -351,5 +342,9 @@ allprojects {
         configureEach {
             systemProperty 'file.encoding', 'UTF-8'
         }
+    }
+
+    tasks.withType(JavaExec).configureEach {
+        systemProperty 'file.encoding', 'UTF-8'
     }
 }
