@@ -3,6 +3,7 @@ package com.devkbil.mtssbj.manager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -20,9 +21,10 @@ import java.util.regex.Pattern;
 public class GradleVersionExtractorTxt {
 
     // Updated Pattern: Includes dependencies with or without versions
-    private static final Pattern DEPENDENCY_PATTERN = Pattern.compile("['\"](\\S+:\\S+)(:\\S+)?['\"]");
+    private final Pattern DEPENDENCY_PATTERN = Pattern.compile("['\"](\\S+:\\S+)(:\\S+)?['\"]");
 
-    public static void main(String[] args) {
+    @Test
+    public void main() {
         String filePath = "build.gradle";
 
         // Map to store dependency updates
@@ -74,7 +76,7 @@ public class GradleVersionExtractorTxt {
         }
     }
 
-    private static List<String> extractDependencies(String filePath) throws IOException {
+    private List<String> extractDependencies(String filePath) throws IOException {
         List<String> dependencies = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;

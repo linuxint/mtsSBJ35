@@ -3,6 +3,7 @@ package com.devkbil.mtssbj.manager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -19,7 +20,8 @@ public class GradleVersionMinorExtractorFileWrite {
     // 의존성 추출을 위한 패턴 정의
     private static final Pattern DEPENDENCY_PATTERN = Pattern.compile("['\"](\\S+:\\S+:\\S+)['\"]");
 
-    public static void main(String[] args) {
+    @Test
+    public void main() {
         String filePath = "build.gradle"; // 수정 대상 파일 경로
         Map<String, String> dependencyUpdates = new LinkedHashMap<>();
 

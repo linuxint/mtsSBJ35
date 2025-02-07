@@ -27,4 +27,17 @@ public class SpringCalendarConstants {
 
     // Line separator
     public static final String LINE_SEPARATOR = "-".repeat(140); // 뷰 정리
+
+    public static final char topLeft = '\u250C';    // ┌
+    public static final char topRight = '\u2510';   // ┐
+    public static final char bottomLeft = '\u2514'; // └
+    public static final char bottomRight = '\u2518';// ┘
+    public static final char horizontal = '\u2500'; // ─
+    public static final char vertical = '\u2502';   // │
+    public static final char middleTop = '\u252C';  // ┬
+    public static final char middleBottom = '\u2534';// ┴
+    public static final char middleLeft = '\u251C';  // ├
+    public static final char middleRight = '\u2524'; // ┤
+    public static final char center = '\u253C';      // ┼
+
 }
