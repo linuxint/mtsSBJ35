@@ -11,7 +11,8 @@ spring:
         - common
       prod:
         - common
----
+
+--- #--------------------------------- common
 spring:
   config:
     activate:
@@ -21,6 +22,7 @@ spring:
       service-url: pulsar://localhost:6650
     producer:
       topic-name: logs
+
 --- #--------------------------------- local
 spring:
   config:
@@ -35,35 +37,31 @@ spring:
   #    port: 6379
 
   datasource:
-    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
-    url: jdbc:p6spy:oracle:thin:@localhost:1521:XE
-    username: mts
-    password: mts
-    MaximumPoolSize: 10
-    MinimumIdle: 5
-    MaxLifetime: 1200000
-    ConnectionTimeout: 20000
-    IdleTimeout: 300000
+#    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+#    url: jdbc:p6spy:oracle:thin:@localhost:1521:XE
+#    username: mts
+#    password: mts
     hikari:
       pool-name: pool-oracle
       minimum-idle: 5
       maximum-pool-size: 10
       idle-timeout: 300000 # 최소 유휴 시간
-      max-lifetime: 1800000 # 최대 연결 유지 시간
+      max-lifetime: 1200000 # 최대 연결 유지 시간
       connection-timeout: 20000 # 연결 대기 시간
+      driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+      jdbc-url: jdbc:p6spy:oracle:thin:@localhost:1521:XE
+      username: mts
+      password: mts
   sql:
     #    init:
     #      schema-locations:
     #        - file:/database/Common/ddl/oracle/table.sql
     #      data-locations:
     #        - file:/database/Common/dml/oracle/tableData_oracle.sql
-
+  data:
     jpa:
       hibernate:
         ddl-auto: none
-      output:
-        ansi:
-          enabled: always
 
 logging:
   level:
@@ -101,34 +99,42 @@ server:
 #      hibernate:
 #        format_sql: true
 #      hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+
 --- #--------------------------------- dev
 spring:
   config:
     activate:
       on-profile: dev
-#  jpa:
-#    hibernate:
-#      ddl-auto: update
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
 server:
   port: 8081
+
 --- #--------------------------------- stag
 spring:
   config:
     activate:
       on-profile: stag
-#  jpa:
-#    hibernate:
-#      ddl-auto: none
+  jpa:
+    hibernate:
+      ddl-auto: none
 server:
   port: 8082
+
 --- #--------------------------------- prod
 spring:
   config:
     activate:
       on-profile: prod
-#  jpa:
-#    hibernate:
-#      ddl-auto: none
+  jpa:
+    hibernate:
+      ddl-auto: none
 server:
   port: 8083
 management:
