@@ -44,12 +44,14 @@
             <form id="form1" name="form1" role="form" action="projectSave" method="post" onsubmit="return fn_formSubmit();">
                 <div class="panel panel-default">
                     <div class="panel-body">
+
                         <div class="row form-group">
                             <label class="col-lg-2"><s:message code="project.name"/></label>
                             <div class="col-lg-9">
                                 <input type="text" class="form-control" id="prtitle" name="prtitle" size="70" maxlength="100" value="<c:out value="${projectInfo.prtitle}"/>">
                             </div>
                         </div>
+
                         <div class="row form-group">
                             <label class="col-lg-2"><s:message code="project.term"/></label>
                             <div class="col-lg-2">

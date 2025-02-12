@@ -2,111 +2,289 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <html xmlns:th="http://www.thymeleaf.org">
 <div th:replace="~{'thymeleaf/admin/inc/ad_header' :: header}"></div>
+<script>
+    function fn_searchUser(){
+        $.ajax({
+            url: "popupUser",
+            type: "post"
+        }).success(function(result){
+                $("#popupUser").html(result);
+            }
+        );
+        $("#popupUser").modal("show");
+    }
+
+    function deptTreeInUserActivate(node) {
+        if (node==null || node.data.key==0) return;
+
+        $.ajax({
+            url: "popupUsersByDept",
+            type:"post",
+            data: { deptno : node.data.key }
+        }).success(function(result){
+                $("#userlist").html(result);
+            }
+        );
+    }
+    function fn_selectUser(userno, usernm) {
+        $("#userno").val(userno);
+        $("#usernm").val(usernm);
+        $("#popupUser").modal("hide");
+
+    }
+</script>
+
+
+
+
+
+<style>
+    .ip-input-group {
+        display: flex;
+        gap: 5px; /* 입력 필드와 '.' 간격 */
+    }
+    .input-ip {
+        width: 100px; /* 각 입력 필드 크기 고정 */
+    }
+    .ip-input-group span {
+        align-self: center; /* 텍스트 정렬 */
+    }
+    .form-control {
+        display: inline-block;
+        vertical-align: middle;
+    }
+</style>
+<script>
+    /**
+     * IP 주소 각 값을 유효성 검증 (0~255 사이 숫자)
+     */
+    function validateIPPart(input) {
+        if (input.value > 255) {
+            input.value = 255; // 최대값 초과 시 강제 설정
+        } else if (input.value < 0 || input.value === "") {
+            input.value = 0;  // 최소값 미만 시 기본값 설정
+        }
+        updateIP(); // 업데이트
+    }
+
+    /**
+     * IP 값 조합 후 hidden 필드에 설정
+     */
+    function updateIP() {
+        const ip1 = document.getElementById('ip1').value || 0;
+        const ip2 = document.getElementById('ip2').value || 0;
+        const ip3 = document.getElementById('ip3').value || 0;
+        const ip4 = document.getElementById('ip4').value || 0;
+
+        // IP 구성
+        const fullIP = `${ip1}.${ip2}.${ip3}.${ip4}`;
+        document.getElementById('hwIp').value = fullIP;
+    }
+    /**
+     * 도메인 선택 시 동작: "직접입력" 선택 시 입력창 표시
+     */
+    function toggleCustomDomain(select) {
+        const customDomainInput = document.getElementById('customDomain');
+        const selectedValue = select.value;
+
+        // "직접입력"을 선택했을 경우
+        if (selectedValue === 'custom') {
+            customDomainInput.style.display = 'inline-block'; // 입력창 보이기
+            customDomainInput.focus(); // 포커스 설정
+        } else {
+            customDomainInput.style.display = 'none'; // 입력창 숨김
+            customDomainInput.value = ''; // 입력값 초기화
+        }
+
+        updateEmail(); // 이메일 업데이트
+    }
+
+    /**
+     * 이메일 ID 및 도메인 결합 후 Hidden 필드에 저장
+     */
+    function updateEmail() {
+        const emailId = document.getElementById('emailId').value.trim(); // 이메일 아이디
+        const emailDomainSelect = document.getElementById('emailDomainSelect');
+        const selectedDomain = emailDomainSelect.value; // 선택된 도메인
+        const customDomainInput = document.getElementById('customDomain').value.trim(); // 직접 입력 도메인
+
+        // 도메인 결정 (직접입력 시 customDomain 사용)
+        const domain = selectedDomain === 'custom' ? customDomainInput : selectedDomain;
+
+        // 이메일 조합 및 Hidden 필드에 저장
+        const emailInput = emailId && domain ? `${emailId}@${domain}` : '';
+        document.getElementById('adminEmail').value = emailInput;
+    }
+</script>
+
 <body>
 <div id="wrapper">
-    <div th:replace="~{thymeleaf/common/navigation}"></div>
-    <div id="page-wrapper">
-        <div class="container mt-4">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header text-center" th:text="${hwVO.hwId != null} ? '하드웨어 수정' : '하드웨어 등록'"></h1>
-                </div>
-            </div>
 
+    <div th:replace="~{thymeleaf/common/navigation}"></div>
+
+    <div id="page-wrapper">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header"><i class="fa fa-files-o fa-fw"></i> 서버 하드웨어</h1>
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+        <div class="row">
             <!-- Form -->
             <form id="hwForm" name="hwForm" action="@{/adServerHWSave}" method="post" class="form-horizontal">
-                <input type="hidden" name="hwId" th:value="${hwVO.hwId}">
+                <div class="panel panel-default">
+                    <div class="panel-body">
 
-                <!-- 하드웨어명 -->
-                <div class="row mb-3">
-                    <label for="hwName" class="col-lg-2 col-form-label">하드웨어명</label>
-                    <div class="col-lg-9">
-                        <input type="text" class="form-control" id="hwName" name="hwName" th:value="${hwVO.hwName}" maxlength="200" required>
+                        <!-- 하드웨어명 -->
+                        <div class="row form-group">
+                            <label for="hwName" class="col-lg-2 col-form-label">하드웨어명</label>
+                            <div class="col-lg-9">
+                                <input type="text" class="form-control" id="hwName" name="hwName" th:value="${hwVO.hwName}" maxlength="200" required>
+                            </div>
+                        </div>
+
+                        <!-- IP 주소 -->
+                        <div class="row form-group">
+                            <label for="ip1" class="col-lg-2 col-form-label">IP 주소</label>
+                            <div class="col-lg-9 d-flex align-items-center ip-input-group">
+                                <!-- 1번째 입력 필드 -->
+                                <input type="number" class="form-control input-ip" id="ip1" min="0" max="255" value="0" style="text-align: center;" oninput="validateIPPart(this)" required>
+                                <span class="mx-1">.</span>
+                                <!-- 2번째 입력 필드 -->
+                                <input type="number" class="form-control input-ip" id="ip2" min="0" max="255" value="0" style="text-align: center;" oninput="validateIPPart(this)" required>
+                                <span class="mx-1">.</span>
+                                <!-- 3번째 입력 필드 -->
+                                <input type="number" class="form-control input-ip" id="ip3" min="0" max="255" value="0" style="text-align: center;" oninput="validateIPPart(this)" required>
+                                <span class="mx-1">.</span>
+                                <!-- 4번째 입력 필드 -->
+                                <input type="number" class="form-control input-ip" id="ip4" min="0" max="255" value="0" style="text-align: center;" oninput="validateIPPart(this)" required>
+                                <small class="form-text text-muted ml-3">IP 주소는 0~255 범위의 숫자로 입력하거나 변경하세요.</small>
+
+                                <!-- Hidden input for 최종 IP 저장 -->
+                                <input type="hidden" id="hwIp" name="hwIp" th:value="${hwVO.hwIp}">
+                            </div>
+                        </div>
+
+                        <!-- 관리자 번호 -->
+                        <div class="row form-group">
+                            <label for="adminUserNo" class="col-lg-2 col-form-label">관리자 번호</label>
+                            <div class="col-lg-2 d-flex align-items-center ip-input-group">
+
+                                <input type="hidden" name="adminUserNo" id="adminUserNo" required>
+                                <input class="form-control" type="text" name="usernm" id="usernm" readonly="readonly">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" onclick="fn_searchUser()">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                                <div id="popupUser" class="modal fade" tabindex="-1" role="dialog"
+                                     aria-labelledby="myModalLabel" aria-hidden="true">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 관리자 이메일 -->
+                        <div class="row form-group">
+                            <label for="emailId" class="col-lg-2 col-form-label">관리자 이메일</label>
+                            <div class="col-lg-9 d-flex align-items-center">
+                                <!-- 이메일 아이디 입력 -->
+                                <input type="text" class="form-control" id="emailId" placeholder="아이디 입력" oninput="updateEmail()" required style="width: 20%;">
+
+                                <!-- @ 문구 -->
+                                <span class="mx-1">@</span>
+
+                                <!-- 도메인 선택 -->
+                                <select class="form-control" id="emailDomainSelect" onchange="toggleCustomDomain(this)" style="width: auto;">
+                                    <option value="naver.com">naver.com</option>
+                                    <option value="gmail.com">gmail.com</option>
+                                    <option value="custom">직접입력</option>
+                                </select>
+
+                                <!-- 커스텀 도메인 입력 (초기에는 숨김 처리) -->
+                                <input type="text" class="form-control ml-2" id="customDomain" placeholder="도메인 입력" oninput="updateEmail()" style="display: none; width: 20%;">
+
+                                <!-- Hidden input for 최종 이메일 -->
+                                <input type="hidden" id="adminEmail" name="adminEmail" th:value="${hwVO.adminEmail}">
+                                <small class="form-text text-muted ml-3">예: example@naver.com 또는 직접 도메인 입력</small>
+                            </div>
+                        </div>
+
+                        <!-- OS 정보 -->
+                        <div class="row form-group">
+                            <label for="osInfo" class="col-lg-2 col-form-label">OS 정보</label>
+                            <div class="col-lg-9">
+                                <input type="text" class="form-control" id="osInfo" name="osInfo" th:value="${hwVO.osInfo}" maxlength="200">
+                            </div>
+                        </div>
+
+                        <!-- CPU 정보 -->
+                        <div class="row form-group">
+                            <label for="cpuInfo" class="col-lg-2 col-form-label">CPU 정보</label>
+                            <div class="col-lg-9">
+                                <input type="text" class="form-control" id="cpuInfo" name="cpuInfo" th:value="${hwVO.cpuInfo}" maxlength="200">
+                            </div>
+                        </div>
+
+                        <!-- 메모리 정보 -->
+                        <div class="row form-group">
+                            <label for="memoryInfo" class="col-lg-2 col-form-label">메모리 정보</label>
+                            <div class="col-lg-9">
+                                <input type="text" class="form-control" id="memoryInfo" name="memoryInfo" th:value="${hwVO.memoryInfo}" maxlength="200">
+                            </div>
+                        </div>
+
+                        <!-- 디스크 정보 -->
+                        <div class="row form-group">
+                            <label for="diskInfo" class="col-lg-2 col-form-label">디스크 정보</label>
+                            <div class="col-lg-9">
+                                <input type="text" class="form-control" id="diskInfo" name="diskInfo" th:value="${hwVO.diskInfo}" maxlength="200">
+                            </div>
+                        </div>
+
+                        <!-- 기타 정보 -->
+                        <div class="row form-group">
+                            <label for="etcInfo" class="col-lg-2 col-form-label">기타 정보</label>
+                            <div class="col-lg-9">
+                                <textarea class="form-control" id="etcInfo" name="etcInfo" rows="3" maxlength="4000" th:text="${hwVO.etcInfo}"></textarea>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label for="bgusedN" class="col-lg-2 col-form-label">사용여부</label>
+                            <div class="col-lg-9">
+                                <label><input name="bgused" id="bgusedY" type="radio" th:checked="${hwVO.actYn == 'Y'}" value="Y">[[#{board.usedY}]]</label>
+                                <label><input name="bgused" id="bgusedN" type="radio" th:checked="${hwVO.actYn == 'N' || hwVO.actYn == null || hwVO.actYn == ''}" value="N">[[#{board.usedN}]]</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <!-- IP 주소 -->
-                <div class="row mb-3">
-                    <label for="hwIp" class="col-lg-2 col-form-label">IP 주소</label>
-                    <div class="col-lg-9">
-                        <input type="text" class="form-control" id="hwIp" name="hwIp" th:value="${hwVO.hwIp}" maxlength="20" required>
-                    </div>
-                </div>
-
-                <!-- 관리자 번호 -->
-                <div class="row mb-3">
-                    <label for="adminUserNo" class="col-lg-2 col-form-label">관리자 번호</label>
-                    <div class="col-lg-9">
-                        <input type="number" class="form-control" id="adminUserNo" name="adminUserNo" th:value="${hwVO.adminUserNo}" max="9999999999" required>
-                    </div>
-                </div>
-
-                <!-- 관리자 이메일 -->
-                <div class="row mb-3">
-                    <label for="adminEmail" class="col-lg-2 col-form-label">관리자 이메일</label>
-                    <div class="col-lg-9">
-                        <input type="email" class="form-control" id="adminEmail" name="adminEmail" th:value="${hwVO.adminEmail}" maxlength="100">
-                    </div>
-                </div>
-
-                <!-- OS 정보 -->
-                <div class="row mb-3">
-                    <label for="osInfo" class="col-lg-2 col-form-label">OS 정보</label>
-                    <div class="col-lg-9">
-                        <input type="text" class="form-control" id="osInfo" name="osInfo" th:value="${hwVO.osInfo}" maxlength="200">
-                    </div>
-                </div>
-
-                <!-- CPU 정보 -->
-                <div class="row mb-3">
-                    <label for="cpuInfo" class="col-lg-2 col-form-label">CPU 정보</label>
-                    <div class="col-lg-9">
-                        <input type="text" class="form-control" id="cpuInfo" name="cpuInfo" th:value="${hwVO.cpuInfo}" maxlength="200">
-                    </div>
-                </div>
-
-                <!-- 메모리 정보 -->
-                <div class="row mb-3">
-                    <label for="memoryInfo" class="col-lg-2 col-form-label">메모리 정보</label>
-                    <div class="col-lg-9">
-                        <input type="text" class="form-control" id="memoryInfo" name="memoryInfo" th:value="${hwVO.memoryInfo}" maxlength="200">
-                    </div>
-                </div>
-
-                <!-- 디스크 정보 -->
-                <div class="row mb-3">
-                    <label for="diskInfo" class="col-lg-2 col-form-label">디스크 정보</label>
-                    <div class="col-lg-9">
-                        <input type="text" class="form-control" id="diskInfo" name="diskInfo" th:value="${hwVO.diskInfo}" maxlength="200">
-                    </div>
-                </div>
-
-                <!-- 기타 정보 -->
-                <div class="row mb-3">
-                    <label for="etcInfo" class="col-lg-2 col-form-label">기타 정보</label>
-                    <div class="col-lg-9">
-                        <textarea class="form-control" id="etcInfo" name="etcInfo" rows="3" maxlength="4000" th:text="${hwVO.etcInfo}"></textarea>
-                    </div>
-                </div>
-
-                <!-- 활성 여부 -->
-                <div class="row mb-3">
-                    <label for="actYn" class="col-lg-2 col-form-label">활성 여부</label>
-                    <div class="col-lg-9">
-                        <select id="actYn" name="actYn" class="form-control">
-                            <option value="Y" th:selected="${hwVO.actYn == 'Y'}">활성</option>
-                            <option value="N" th:selected="${hwVO.actYn == 'N'}">비활성</option>
-                        </select>
-                    </div>
-                </div>
-
                 <!-- 등록/수정 버튼 -->
-                <div class="row">
-                    <div class="col-lg-9 offset-lg-2">
-                        <button type="submit" class="btn btn-success me-2">저장</button>
-                        <button type="button" class="btn btn-secondary" th:onclick="|window.location.href='@{/adServerHWList}'|">취소</button>
-                    </div>
-                </div>
+                <button class="btn btn-outline btn-primary">
+                    <i class="fa fa-save fa-fw"></i>
+                    <span th:text="#{common.btnSave}"></span>
+                </button>
+                <!-- 프로젝트 번호가 null이 아닐 경우 삭제 버튼 표시 -->
+                <button type="button" class="btn btn-default"
+                        th:if="${hwVO.hwId != null}"
+                        th:onclick="|fn_moveToURL('projectDelete?prno=${projectInfo.prno}')|">
+                    <i class="fa fa-minus fa-fw"></i>
+                    <span th:text="#{common.btnDelete}"></span>
+                </button>
+                <!-- 프로젝트 번호가 null인지 여부에 따라 적절한 버튼 표시 -->
+                <!-- 프로젝트 번호가 있을 경우 -->
+                <button type="button" class="btn btn-default"
+                        th:if="${hwVO.hwId != null}"
+                        th:onclick="|fn_moveToURL('task?prno=${projectInfo.prno}')|">
+                    <i class="fa fa-arrow-left fa-fw"></i>
+                    <span th:text="#{common.btnCancel}"></span>
+                </button>
+                <!-- 프로젝트 번호가 없을 경우 -->
+                <button type="button" class="btn btn-default"
+                        th:unless="${hwVO.hwId != null}"
+                        th:onclick="|fn_moveToURL('adServerHWList')|">
+                    <i class="fa fa-arrow-left fa-fw"></i>
+                    <span th:text="#{common.btnCancel}"></span>
+                </button>
+                <input type="hidden" name="hwId" th:value="${hwVO.hwId}">
             </form>
         </div>
     </div>

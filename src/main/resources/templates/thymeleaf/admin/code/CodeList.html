@@ -50,7 +50,8 @@
 
                 <!-- Search Form -->
                 <form role="form" id="form1" name="form1" method="post">
-                    <div th:replace="common/pagingforSubmit :: paging"></div>
+                    <div th:include="thymeleaf/admin/common/pagingforSubmit"></div>
+
                     <div class="form-group">
                         <div class="checkbox col-lg-3 pull-left">
                             <label class="pull-right">

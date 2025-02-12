@@ -9,49 +9,55 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">서버 하드웨어 목록</h1>
+                <h1 class="page-header"><i class="fa fa-files-o fa-fw"></i> 서버 하드웨어</h1>
             </div>
+            <!-- /.col-lg-12 -->
         </div>
-
         <!-- Add Button -->
         <div class="row">
             <div class="col-lg-12">
-                <button type="button" class="btn btn-default pull-right"
-                        th:onclick="|window.location.href='@{/adServerHWForm}'|">
-                    등록하기
-                </button>
+                <button type="button" class="btn btn-default pull-right" onclick="fn_moveToURL('adServerHWForm')">
+                    <i class="fa fa-edit fa-fw"></i> 하드웨어 등록</button>
             </div>
         </div>
 
-        <!-- List Table -->
-        <table class="table table-bordered">
-            <thead>
-            <tr>
-                <th>HW ID</th>
-                <th>하드웨어명</th>
-                <th>IP 주소</th>
-                <th>관리자 이메일</th>
-                <th>활성 여부</th>
-                <th>등록일</th>
-                <th>액션</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="item : ${hwList}">
-                <td th:text="${item.hwId}"></td>
-                <td th:text="${item.hwName}"></td>
-                <td th:text="${item.hwIp}"></td>
-                <td th:text="${item.adminEmail}"></td>
-                <td th:text="${item.actYn}"></td>
-                <td th:text="${item.regDate}"></td>
-                <td>
-                    <button class="btn btn-primary" th:onclick="|window.location.href='@{/adServerHWRead(hwId=${item.hwId})}'|">상세</button>
-                    <button class="btn btn-danger" th:onclick="|window.location.href='@{/adServerHWDelete(hwId=${item.hwId})}'|">삭제</button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <!-- Styled Table using ProjectList.jsp structure -->
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="listHead">
+                    <div class="listHiddenField pull-left field50">HW ID</div>
+                    <div class="listHiddenField pull-right field100 text-center">IP 주소</div>
+                    <div class="listHiddenField pull-right field100">관리자 이메일</div>
+                    <div class="listHiddenField pull-right field100 text-center">활성 여부</div>
+                    <div class="listHiddenField pull-right field100 text-center">등록일</div>
+                    <div class="listTitle">하드웨어명</div>
+                </div>
+                <div th:each="item : ${hwList}">
+                    <div class="listBody">
+                        <div class="listHiddenField pull-left field50" th:text="${item.hwId}"></div>
+                        <div class="listHiddenField pull-right field100 text-center" th:text="${item.hwIp}"></div>
+                        <div class="listHiddenField pull-right field100" th:text="${item.adminEmail}"></div>
+                        <div class="listHiddenField pull-right field100 text-center" th:text="${item.actYn}"
+                             th:classappend="${item.actYn == 'Y'} ? 'text-success' : 'text-danger'"></div>
+                        <div class="listHiddenField pull-right field100 text-center" th:text="${item.regDate}"></div>
+                        <div class="listTitle" th:text="${item.hwName}">
+                            <a th:href="@{/adServerHWRead(hwId=${item.hwId})}" title="상세 보기">
+                                <i class="fa fa-eye fa-fw"></i> 상세 보기
+                            </a>
+                        </div>
+                        <div class="showField text-muted small">
+                            IP: <span th:text="${item.hwIp}"></span> | 등록일: <span th:text="${item.regDate}"></span>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- 데이터가 없을 경우 메시지 출력 -->
+                <div th:if="${hwList == null or hwList.isEmpty()}">
+                    <div class="listBody height200"></div>
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>
 

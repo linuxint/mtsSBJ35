@@ -65,10 +65,11 @@ public class ProjectService {
      */
     public ProjectVO selectProjectOne(String param) {
 
-        ProjectVO projectVO = sqlSession.selectOne("selectProjectOne", param);
+        ProjectVO projectVO;
 
-        // 조회된 프로젝트가 없으면 초기화
-        if (projectVO == null) {
+        if(StringUtils.hasText(param)) {
+            projectVO = sqlSession.selectOne("selectProjectOne", param);
+        } else {
             log.warn("프로젝트 번호 [{}]에 대한 조회 결과가 없습니다. 기본값을 초기화합니다.", param);
             String today = LocalDate.now().toString(); // 현재 날짜
             projectVO = new ProjectVO();
