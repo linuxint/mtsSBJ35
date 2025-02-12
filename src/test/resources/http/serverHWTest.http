@@ -1,0 +1,72 @@
+### Form Login - Login Request (Get JSESSIONID)
+POST http://localhost:9090/memberLoginChk
+Content-Type: application/x-www-form-urlencoded
+
+userid=admin&userpw=1234
+
+> {%
+    // 단순히 응답이 잘 처리되었는지 확인
+    console.log("Response status: " + response.status);
+    // 응답 본문이 필요하지 않다면 아래와 같이 처리하지 않음
+%}
+
+### Server Hardware
+GET http://localhost:9090/adServerHWList
+
+###
+GET http://localhost:9090/adServerHWRead?hwId=1
+
+###
+POST http://127.0.0.1:9090/adServerHWSave
+
+###
+GET http://127.0.0.1:9090/adServerHWDelete?hwId=1
+
+### Server Software
+GET http://127.0.0.1:9090/adServerSWList
+
+###
+POST http://127.0.0.1:9090/adServerSWSave
+
+###
+GET http://127.0.0.1:9090/adServerSWRead?swId=1
+
+###
+GET http://127.0.0.1:9090/adServerSWDelete?swId=1
+
+### Server Service
+GET http://127.0.0.1:9090/adServerSvcList
+
+###
+POST http://127.0.0.1:9090/adServerSvcSave
+
+###
+GET http://127.0.0.1:9090/adServerSvcRead?svcId=1
+
+###
+GET http://127.0.0.1:9090/adServerSvcDelete?svcId=1
+
+### Server Connection
+GET http://127.0.0.1:9090/adServerConnList
+
+###
+POST http://127.0.0.1:9090/adServerConnSave
+
+###
+GET http://127.0.0.1:9090/adServerConnRead?connId=1
+
+###
+GET http://127.0.0.1:9090/adServerConnDelete?connId=1
+
+### Server Connection Etc
+GET http://127.0.0.1:9090/adServerEtcList
+
+###
+POST http://127.0.0.1:9090/adServerEtcSave
+
+###
+GET http://127.0.0.1:9090/adServerEtcRead?etcId=1
+
+###
+GET http://127.0.0.1:9090/adServerEtcDelete?etcId=1
+

@@ -52,8 +52,6 @@ public class MtssbjApplication implements CommandLineRunner {
                 new ApplicationContextRefreshedEventListener()
         );
 
-        //application.setWebApplicationType(WebApplicationType.REACTIVE);
-
         // custom banner of java
         /*
         application.setBanner(new Banner() {

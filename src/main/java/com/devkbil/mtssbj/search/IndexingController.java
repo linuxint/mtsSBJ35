@@ -12,7 +12,6 @@ import com.devkbil.mtssbj.config.EsConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -71,7 +70,7 @@ public class IndexingController {
     @Value("${batch.indexing.host}")
     private String indexingHost;
 
-    @Setter(onMethod_ = @Value("${elasticsearch.clustername}"))
+    @Value("${elasticsearch.clustername}")
     private String indexName;
 
     private String lastFile;

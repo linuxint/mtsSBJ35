@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ad_srv_conn">
+
+    <sql id="includeServerCommon">
+        WHERE SVC_CONN.DELETEFLAG='N'
+        <if test="connId!=null and connId!=''">
+            AND SVC_CONN.CONN_ID=#{connId}
+        </if>
+        <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
+            <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
+                ${item} LIKE '%'||#{searchKeyword}||'%'
+            </foreach>
+        </if>
+    </sql>
+
+    <!-- 목록 조회 -->
+    <select id="selectSrvConnList" resultType="com.devkbil.mtssbj.admin.server.ConnVO"
+            parameterType="com.devkbil.mtssbj.search.ServerSearchVO">
+        SELECT * FROM (
+            SELECT ROW_NUMBER() OVER (ORDER BY SVC_CONN.CONN_ID DESC) AS RNUM
+                   , SVC_CONN.CONN_ID    AS connId
+                   , SVC_CONN.SVC_ID     AS svcId
+                   , SVC.SW_ID           AS swId
+                   , SVC.HW_ID           AS hwId
+                   , HW.HW_NAME          AS hwName
+                   , SW.SW_NAME          AS swName
+                   , SVC.SVC_NAME        AS svcName
+                   , SVC_CONN.CONN_NAME  AS connName
+                   , SVC_CONN.USER_NAME  AS userName
+                   , SVC_CONN.USER_PW    AS userPw
+                   , SVC_CONN.ACT_YN     AS actYn
+                   , SVC_CONN.DELETEFLAG AS deleteFlag
+                   , SVC_CONN.REGDATE    AS regDate
+                   , SVC_CONN.REGUSERNO  AS regUserNo
+                   , SVC_CONN.CHGDATE    AS chgDate
+                   , SVC_CONN.CHGUSERNO  AS chgUserNo
+              FROM TBL_SRV_CONN SVC_CONN
+         LEFT JOIN TBL_SRV_SVC SVC ON SVC_CONN.SVC_ID = SVC.SVC_ID
+         LEFT JOIN TBL_SRV_HW HW ON SVC.HW_ID = HW.HW_ID
+         LEFT JOIN TBL_SRV_SW SW ON SVC.SW_ID = SW.SW_ID
+        <include refid="includeServerCommon"/>
+        )
+        <if test="rowStart != null">
+        WHERE RNUM BETWEEN ${rowStart} AND ${rowStart-1}+${displayRowCount}
+        </if>
+    </select>
+
+    <!-- 상세 조회 -->
+    <select id="selectSrvConnOne" parameterType="String" resultType="com.devkbil.mtssbj.admin.server.ConnVO">
+        SELECT SVC_CONN.CONN_ID      AS connId
+               , SVC.SVC_ID          AS svcId
+               , SVC.SW_ID           AS swId
+               , SVC.HW_ID           AS hwId
+               , HW.HW_NAME          AS hwName
+               , SW.SW_NAME          AS swName
+               , SVC.SVC_NAME        AS svcName
+               , SVC_CONN.CONN_NAME  AS connName
+               , SVC_CONN.USER_NAME  AS userName
+               , SVC_CONN.USER_PW    AS userPw
+               , SVC_CONN.ACT_YN     AS actYn
+               , SVC_CONN.DELETEFLAG AS deleteFlag
+               , SVC_CONN.REGDATE    AS regDate
+               , SVC_CONN.REGUSERNO  AS regUserNo
+               , SVC_CONN.CHGDATE    AS chgDate
+               , SVC_CONN.CHGUSERNO  AS chgUserNo
+          FROM TBL_SRV_CONN SVC_CONN
+     LEFT JOIN TBL_SRV_SVC SVC ON SVC_CONN.SVC_ID = SVC.SVC_ID
+     LEFT JOIN TBL_SRV_HW HW ON SVC.HW_ID = HW.HW_ID
+     LEFT JOIN TBL_SRV_SW SW ON SVC.SW_ID = SW.SW_ID
+         WHERE SVC_CONN.DELETEFLAG = 'N'
+           AND SVC_CONN.CONN_ID = #{connId}
+    </select>
+
+    <!-- 등록 -->
+    <insert id="insertSrvConn" parameterType="com.devkbil.mtssbj.admin.server.ConnVO">
+        <selectKey resultType="String" keyProperty="connId" order="BEFORE">
+            SELECT CONN_ID_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_SRV_CONN ( CONN_ID, SVC_ID, CONN_NAME, USER_NAME, USER_PW, ACT_YN, DELETEFLAG, REGDATE, REGUSERNO, CHGDATE, CHGUSERNO )
+        VALUES ( #{connId}, #{svcId},#{connName}, #{userName}, #{userPw}, #{actYn}, 'N', CURRENT_TIMESTAMP, #{regUserno}, CURRENT_TIMESTAMP, #{chgUserno} )
+    </insert>
+
+    <!-- 수정 -->
+    <update id="updateSrvConn" parameterType="com.devkbil.mtssbj.admin.server.ConnVO">
+        UPDATE TBL_SRV_CONN
+           SET SVC_ID      = #{svcId}
+               , CONN_NAME = #{connName}
+               , USER_NAME = #{userName}
+               , USER_PW   = #{userPw}
+               , ACT_YN    = #{actYn}
+               , CHGDATE   = CURRENT_TIMESTAMP
+               , CHGUSERNO = #{chgUserno}
+         WHERE CONN_ID = #{connId}
+           AND DELETEFLAG = 'N'
+    </update>
+
+    <!-- 삭제 (논리 삭제) -->
+    <delete id="deleteSrvConn" parameterType="String">
+        UPDATE TBL_SRV_CONN
+           SET DELETEFLAG  = 'Y'
+               , CHGDATE   = CURRENT_TIMESTAMP
+               , CHGUSERNO = #{chgUserno}
+         WHERE CONN_ID = #{connId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Header Include -->
+<div th:replace="~{'thymeleaf/admin/inc/ad_header' :: header}"></div>
+<body>
+<div id="wrapper">
+    <div th:replace="~{thymeleaf/common/navigation}"></div>
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">서버 하드웨어 목록</h1>
+            </div>
+        </div>
+
+        <!-- Add Button -->
+        <div class="row">
+            <div class="col-lg-12">
+                <button type="button" class="btn btn-default pull-right"
+                        th:onclick="|window.location.href='@{/adServerHWForm}'|">
+                    등록하기
+                </button>
+            </div>
+        </div>
+
+        <!-- List Table -->
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>HW ID</th>
+                <th>하드웨어명</th>
+                <th>IP 주소</th>
+                <th>관리자 이메일</th>
+                <th>활성 여부</th>
+                <th>등록일</th>
+                <th>액션</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${hwList}">
+                <td th:text="${item.hwId}"></td>
+                <td th:text="${item.hwName}"></td>
+                <td th:text="${item.hwIp}"></td>
+                <td th:text="${item.adminEmail}"></td>
+                <td th:text="${item.actYn}"></td>
+                <td th:text="${item.regDate}"></td>
+                <td>
+                    <button class="btn btn-primary" th:onclick="|window.location.href='@{/adServerHWRead(hwId=${item.hwId})}'|">상세</button>
+                    <button class="btn btn-danger" th:onclick="|window.location.href='@{/adServerHWDelete(hwId=${item.hwId})}'|">삭제</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<!-- Footer Include -->
+<div th:replace="~{'thymeleaf/admin/inc/ad_footer' :: footer}"></div>
+</body>
+</html>

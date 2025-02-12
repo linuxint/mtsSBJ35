@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{'thymeleaf/admin/inc/ad_header' :: header}"></div>
+<body>
+<div id="wrapper">
+    <div th:replace="~{thymeleaf/common/navigation}"></div>
+    <div id="page-wrapper">
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header text-center" th:text="${hwVO.hwId != null} ? '하드웨어 수정' : '하드웨어 등록'"></h1>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form id="hwForm" name="hwForm" action="@{/adServerHWSave}" method="post" class="form-horizontal">
+                <input type="hidden" name="hwId" th:value="${hwVO.hwId}">
+
+                <!-- 하드웨어명 -->
+                <div class="row mb-3">
+                    <label for="hwName" class="col-lg-2 col-form-label">하드웨어명</label>
+                    <div class="col-lg-9">
+                        <input type="text" class="form-control" id="hwName" name="hwName" th:value="${hwVO.hwName}" maxlength="200" required>
+                    </div>
+                </div>
+
+                <!-- IP 주소 -->
+                <div class="row mb-3">
+                    <label for="hwIp" class="col-lg-2 col-form-label">IP 주소</label>
+                    <div class="col-lg-9">
+                        <input type="text" class="form-control" id="hwIp" name="hwIp" th:value="${hwVO.hwIp}" maxlength="20" required>
+                    </div>
+                </div>
+
+                <!-- 관리자 번호 -->
+                <div class="row mb-3">
+                    <label for="adminUserNo" class="col-lg-2 col-form-label">관리자 번호</label>
+                    <div class="col-lg-9">
+                        <input type="number" class="form-control" id="adminUserNo" name="adminUserNo" th:value="${hwVO.adminUserNo}" max="9999999999" required>
+                    </div>
+                </div>
+
+                <!-- 관리자 이메일 -->
+                <div class="row mb-3">
+                    <label for="adminEmail" class="col-lg-2 col-form-label">관리자 이메일</label>
+                    <div class="col-lg-9">
+                        <input type="email" class="form-control" id="adminEmail" name="adminEmail" th:value="${hwVO.adminEmail}" maxlength="100">
+                    </div>
+                </div>
+
+                <!-- OS 정보 -->
+                <div class="row mb-3">
+                    <label for="osInfo" class="col-lg-2 col-form-label">OS 정보</label>
+                    <div class="col-lg-9">
+                        <input type="text" class="form-control" id="osInfo" name="osInfo" th:value="${hwVO.osInfo}" maxlength="200">
+                    </div>
+                </div>
+
+                <!-- CPU 정보 -->
+                <div class="row mb-3">
+                    <label for="cpuInfo" class="col-lg-2 col-form-label">CPU 정보</label>
+                    <div class="col-lg-9">
+                        <input type="text" class="form-control" id="cpuInfo" name="cpuInfo" th:value="${hwVO.cpuInfo}" maxlength="200">
+                    </div>
+                </div>
+
+                <!-- 메모리 정보 -->
+                <div class="row mb-3">
+                    <label for="memoryInfo" class="col-lg-2 col-form-label">메모리 정보</label>
+                    <div class="col-lg-9">
+                        <input type="text" class="form-control" id="memoryInfo" name="memoryInfo" th:value="${hwVO.memoryInfo}" maxlength="200">
+                    </div>
+                </div>
+
+                <!-- 디스크 정보 -->
+                <div class="row mb-3">
+                    <label for="diskInfo" class="col-lg-2 col-form-label">디스크 정보</label>
+                    <div class="col-lg-9">
+                        <input type="text" class="form-control" id="diskInfo" name="diskInfo" th:value="${hwVO.diskInfo}" maxlength="200">
+                    </div>
+                </div>
+
+                <!-- 기타 정보 -->
+                <div class="row mb-3">
+                    <label for="etcInfo" class="col-lg-2 col-form-label">기타 정보</label>
+                    <div class="col-lg-9">
+                        <textarea class="form-control" id="etcInfo" name="etcInfo" rows="3" maxlength="4000" th:text="${hwVO.etcInfo}"></textarea>
+                    </div>
+                </div>
+
+                <!-- 활성 여부 -->
+                <div class="row mb-3">
+                    <label for="actYn" class="col-lg-2 col-form-label">활성 여부</label>
+                    <div class="col-lg-9">
+                        <select id="actYn" name="actYn" class="form-control">
+                            <option value="Y" th:selected="${hwVO.actYn == 'Y'}">활성</option>
+                            <option value="N" th:selected="${hwVO.actYn == 'N'}">비활성</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 등록/수정 버튼 -->
+                <div class="row">
+                    <div class="col-lg-9 offset-lg-2">
+                        <button type="submit" class="btn btn-success me-2">저장</button>
+                        <button type="button" class="btn btn-secondary" th:onclick="|window.location.href='@{/adServerHWList}'|">취소</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<!-- Footer Include -->
+<div th:replace="~{'thymeleaf/admin/inc/ad_footer' :: footer}"></div>
+</body>
+</html>
