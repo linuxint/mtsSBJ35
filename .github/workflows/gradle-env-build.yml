@@ -5,17 +5,17 @@ on:
     branches:
       - main    # Main branch 업데이트 시 실행
       - local
-      - dev     # Dev branch 업데이트 시 실행
-      - stag    # Stag branch 업데이트 시 실행
-      - prod
+      #- dev     # Dev branch 업데이트 시 실행
+      #- stag    # Stag branch 업데이트 시 실행
+      #- prod
       - feature/* # 모든 feature 브랜치 실행
   pull_request:
     branches:
       - main    # Main branch 실행
       - local
-      - dev     # Dev branch 실행
-      - stag    # Stag branch 실행
-      - prod
+      #- dev     # Dev branch 실행
+      #- stag    # Stag branch 실행
+      #- prod
 
 jobs:
   build:
@@ -24,7 +24,7 @@ jobs:
 
     strategy:
       matrix:
-        env: [local, dev, stag, prod] # 테스트 대상 환경 정의
+        env: [local] # 테스트 대상 환경 정의 , dev, stag, prod
 
     steps:
       # 1. Checkout Source Code
