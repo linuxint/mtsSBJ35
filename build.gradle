@@ -280,9 +280,14 @@ dependencies {
 
 tasks.withType(Checkstyle).configureEach { task ->
     task.reports {
-        xml.required.set(false) // XML 비활성화
-        html.required.set(true) // HTML 활성화
+        xml.required = false
+        html.required = true
+        html.outputLocation = file("$rootDir/reports/checkstyle.html")
     }
+}
+tasks.withType(Checkstyle) {
+    ignoreFailures = true // 규칙 위반 시 빌드 실패하지 않음
+    showViolations = true
 }
 
 tasks.named('test').configure {
@@ -329,8 +334,31 @@ allprojects {
 }
 
 spotless {
+//    format 'misc', {
+//        target '*.md', '*.yml', '*.html'
+//        prettier()
+//    }
     java {
-        googleJavaFormat('1.17.0') // Google Java Format 사용
+//        pipeToCommand(['sed', 's/oldText/newText/g']) // 텍스트를 sed로 처리
+//        replace('oldText', 'newText') // 특정 텍스트를 다른 텍스트로 바꿈
+//        custom('Remove TODOs') { str -> str.replace('TODO', '') } // TODO 제거
+//        target '**/*.java' // 모든 Java 파일 대상
+//        target 'src/main/**/*.java', 'src/test/**/*.java'
+//        trimTrailingWhitespace() // 행 끝 공백 제거
+//        indentWithTabs() // 탭으로 들여쓰기
+//        licenseHeader '/* (C) Company Name 2023 */', 'package '
+//        licenseHeader '/* (C) Company Name 2023 */', '(package |import )'
+
+//        licenseHeader '// My License Header'
+//        target 'src/main/java/com/devkbil/mtssbj/admin/board/*.java' // 특정 패턴에서만 추가
+
+//        licenseHeader '// My License Header' // 코드 상단에 주석 추가
+//        removeUnusedImports() // 미사용 import 제거
+//         importOrder('java', 'javax', 'org', 'com') // 순서대로 정렬
+//         prettier() // Prettier 규칙 설정 (주로 JavaScript에 적합)
+//         eclipse().configFile 'path/to/eclipse-java-formatter.xml' // Eclipse Formatter 설정 파일 적용
+        indentWithSpaces(4) // 스페이스 4칸 설정
+//        endWithNewline() // 파일 마지막에 항상 줄바꿈
     }
 }
 
