@@ -1,7 +1,9 @@
 package com.devkbil.mtssbj.config;
 
 import com.devkbil.mtssbj.MtssbjApplication;
+
 import jakarta.persistence.EntityManagerFactory;
+
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

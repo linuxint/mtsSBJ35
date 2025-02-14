@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -24,15 +25,15 @@ import org.springframework.context.annotation.Bean;
 public class Es8Config {
 
     @Value("${elasticsearch.host}")
-    String ELASTIC_HOST = "localhost";
+    private String elasticHost = "localhost";
     @Value("${elasticsearch.port}")
-    int ELASTIC_PORT = 9200;
+    private int elasticPort = 9200;
     @Value("${elasticsearch.scheme}")
-    String ELASTIC_SCHEME = "http";
+    private String elasticScheme = "http";
     @Value("${elasticsearch.credentials.id}")
-    String ELASTIC_CREDENTILS_ID = "elastic";
+    private String elasticCredentilsId = "elastic";
     @Value("${elasticsearch.credentials.passwd}")
-    String ELASTIC_CREDENTILS_PASSWD = "manager";
+    private String elasticCredentilsPasswd = "manager";
 
     /**
      * Elasticsearch Connection client
@@ -43,8 +44,8 @@ public class Es8Config {
     public ElasticsearchClient client() {
 
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(ELASTIC_CREDENTILS_ID, ELASTIC_CREDENTILS_PASSWD));
-        RestClient restClient = RestClient.builder(new HttpHost(ELASTIC_HOST, ELASTIC_PORT, ELASTIC_SCHEME))
+        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(elasticCredentilsId, elasticCredentilsPasswd));
+        RestClient restClient = RestClient.builder(new HttpHost(elasticHost, elasticPort, elasticScheme))
                 .setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
                     @Override
                     public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {

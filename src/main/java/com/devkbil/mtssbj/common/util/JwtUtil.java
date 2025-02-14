@@ -3,22 +3,25 @@ package com.devkbil.mtssbj.common.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+
 @Component
 public class JwtUtil {
 
 //    private String SECRET_KEY = Base64.getEncoder().encodeToString("secret".getBytes());
 
-    private final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(
+    private final SecretKey secretKey = Keys.hmacShaKeyFor(
             Base64.getEncoder().encodeToString("N8smKe2pXyZCd3Rsv7nNni0gfZsl7J7MfinPxaO2Bgk=".getBytes()).getBytes()
     );
 
@@ -37,7 +40,7 @@ public class JwtUtil {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
+            .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -59,7 +62,7 @@ public class JwtUtil {
                 .setSubject(subject)             // 서브젝트 설정
                 .setIssuedAt(new Date(System.currentTimeMillis())) // 토큰 생성 시간
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 만료 시간
-                .signWith(SECRET_KEY)            // SECRET_KEY로 서명
+            .signWith(secretKey)            // SECRET_KEY로 서명
                 .compact();                      // Token 문자열로 직렬화
     }
 

@@ -1,9 +1,12 @@
 package com.devkbil.mtssbj.common.interceptor;
 
 import com.devkbil.mtssbj.member.auth.AuthService;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -46,7 +49,7 @@ public class UrlMappingInterceptor implements HandlerInterceptor {
      * 생성자: 외부 JSON 데이터를 활용하여 URL-역할(Role) 매핑 정보를 초기화합니다.
      */
     public UrlMappingInterceptor() {
-        RoleMappingLoader loader = new RoleMappingLoader();// JSON 데이터를 로드하여 초기화
+        RoleMappingLoader loader = new RoleMappingLoader(); // JSON 데이터를 로드하여 초기화
         this.urlRoleMappings = loader.loadMappingsFromString(RoleMappingsJson.ROLE_MAPPINGS_JSON);
     }
 

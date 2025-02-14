@@ -3,10 +3,12 @@ package com.devkbil.mtssbj.common.util;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
+
 import org.apache.commons.codec.binary.Base32;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -61,8 +63,10 @@ public class OtpUtil {
             byte[] decodedKey = codec.decode(otpkey);
             int window = 3;
             for (int i = -window; i <= window; ++i) {
-                long hash = verify_code(decodedKey, wave + i);
-                if (hash == otpnum) result = true;
+                long hash = verifyCode(decodedKey, wave + i);
+                if (hash == otpnum) {
+                    result = true;
+                }
             }
         } catch (InvalidKeyException | NoSuchAlgorithmException e) {
             ; //log.error(e.getMessage());
@@ -70,30 +74,30 @@ public class OtpUtil {
         return result;
     }
 
-    private static int verify_code(byte[] key, long t) throws NoSuchAlgorithmException, InvalidKeyException {
+    private static int verifyCode(byte[] key, long timestamp) throws NoSuchAlgorithmException, InvalidKeyException {
         byte[] data = new byte[8];
-        long value = t;
-        for (int i = 8; i-- > 0; value >>>= 8) {
-            data[i] = (byte) value;
+        long tempValue = timestamp;
+        for (int i = 8; i-- > 0; tempValue >>>= 8) {
+            data[i] = (byte) tempValue;
         }
 
-        SecretKeySpec signKey = new SecretKeySpec(key, "HmacSHA1");
-        Mac mac = Mac.getInstance("HmacSHA1");
-        mac.init(signKey);
-        byte[] hash = mac.doFinal(data);
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key, "HmacSHA1");
+        Mac macInstance = Mac.getInstance("HmacSHA1");
+        macInstance.init(secretKeySpec);
+        byte[] hashedData = macInstance.doFinal(data);
 
-        int offset = hash[20 - 1] & 0xF;
+        int offset = hashedData[20 - 1] & 0xF;
 
-        long truncatedHash = 0;
+        long truncatedResult = 0;
         for (int i = 0; i < 4; ++i) {
-            truncatedHash <<= 8;
-            truncatedHash |= (hash[offset + i] & 0xFF);
+            truncatedResult <<= 8;
+            truncatedResult |= (hashedData[offset + i] & 0xFF);
         }
 
-        truncatedHash &= 0x7FFFFFFF;
-        truncatedHash %= 1000000;
+        truncatedResult &= 0x7FFFFFFF;
+        truncatedResult %= 1000000;
 
-        return (int) truncatedHash;
+        return (int) truncatedResult;
     }
 
     public static String generateOtp2() {
@@ -103,8 +107,8 @@ public class OtpUtil {
         // 실제론 생성한 key를 DB에 저장해놔야 나중에 OTP를 검증할 수 있음
         String key = googleAuthenticatorKey.getKey();
 
-        String QRUrl = GoogleAuthenticatorQRGenerator.getOtpAuthURL("adduci", "userId", googleAuthenticatorKey);
+        String qrUrl = GoogleAuthenticatorQRGenerator.getOtpAuthURL("adduci", "userId", googleAuthenticatorKey);
 
-        return QRUrl;
+        return qrUrl;
     }
 }

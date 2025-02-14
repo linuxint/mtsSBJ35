@@ -1,13 +1,13 @@
 package com.devkbil.mtssbj.pdf;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.io.RandomAccessReadBufferedFile;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class PdfFIleMergeTest {
     public static void main(String[] args) throws IOException {

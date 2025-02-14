@@ -1,17 +1,7 @@
 package com.devkbil.mtssbj;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.TimeZone;
-
 import lombok.extern.slf4j.Slf4j;
+
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
@@ -27,6 +17,17 @@ import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.util.RandomUidGenerator;
 import net.fortuna.ical4j.util.UidGenerator;
 import net.fortuna.ical4j.validate.ValidationException;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.TimeZone;
 
 @Slf4j
 public class iCalExample {

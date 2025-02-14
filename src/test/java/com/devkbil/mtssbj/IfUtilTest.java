@@ -1,8 +1,8 @@
 package com.devkbil.mtssbj;
 
-import java.util.Arrays;
-
 import com.devkbil.mtssbj.common.util.IfUtil;
+
+import java.util.Arrays;
 
 public class IfUtilTest {
     public static void main(String[] args) {

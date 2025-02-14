@@ -1,8 +1,8 @@
 package com.devkbil.mtssbj.datetime;
 
-import java.util.Date;
-
 import com.devkbil.mtssbj.common.util.FormatUtil;
+
+import java.util.Date;
 
 public class FormatUtilTest {
 

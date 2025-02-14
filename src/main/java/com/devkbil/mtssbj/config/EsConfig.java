@@ -26,15 +26,15 @@ import java.io.IOException;
 public class EsConfig {
 
     @Value("${elasticsearch.host}")
-    String ELASTIC_HOST = "localhost";
+    String elasticHost = "localhost";
     @Value("${elasticsearch.port}")
-    int ELASTIC_PORT = 9200;
+    int elasticPort = 9200;
     @Value("${elasticsearch.scheme}")
-    String ELASTIC_SCHEME = "http";
+    String elasticScheme = "http";
     @Value("${elasticsearch.credentials.id}")
-    String ELASTIC_CREDENTILS_ID = "elastic";
+    String elasticCredentilsId = "elastic";
     @Value("${elasticsearch.credentials.passwd}")
-    String ELASTIC_CREDENTILS_PASSWD = "manager";
+    String elasticCredentilsPasswd = "manager";
 
     /**
      * Elasticsearch Connection client
@@ -54,11 +54,11 @@ public class EsConfig {
          */
         final CredentialsProvider credentialProvider = new BasicCredentialsProvider();
         credentialProvider.setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(ELASTIC_CREDENTILS_ID, ELASTIC_CREDENTILS_PASSWD));
+            new UsernamePasswordCredentials(elasticCredentilsId, elasticCredentilsPasswd));
 
         return new RestHighLevelClient(
                 RestClient.builder(
-                        new HttpHost(ELASTIC_HOST, ELASTIC_PORT, ELASTIC_SCHEME)
+                    new HttpHost(elasticHost, elasticPort, elasticScheme)
                 ).setHttpClientConfigCallback(
                         httpAsyncClientBuilder -> {
                             HttpAsyncClientBuilder httpAsyncClientBuilder1 = httpAsyncClientBuilder.setDefaultCredentialsProvider(

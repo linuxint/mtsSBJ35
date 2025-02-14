@@ -3,8 +3,6 @@ package com.devkbil.mtssbj.common.util;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Calendar;
-
 @Getter
 @Setter
 public class TimeUtil {
@@ -27,10 +25,11 @@ public class TimeUtil {
     }
 
     public String formatTime(long lTime) {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(lTime);
-        return String.format("%02d:%02d:%02d.%03d", c.get(Calendar.HOUR), c.get(Calendar.MINUTE),
-                c.get(Calendar.SECOND), c.get(Calendar.MILLISECOND));
+        return String.format("%02d:%02d:%02d.%03d",
+            (lTime / (1000 * 60 * 60)) % 24,
+            (lTime / (1000 * 60)) % 60,
+            (lTime / 1000) % 60,
+            lTime % 1000);
     }
 
     /**

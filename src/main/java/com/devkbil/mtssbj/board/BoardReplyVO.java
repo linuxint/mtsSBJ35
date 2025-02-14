@@ -1,9 +1,12 @@
 package com.devkbil.mtssbj.board;
 
 import com.devkbil.mtssbj.common.util.UtilEtc;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +19,7 @@ import lombok.Setter;
 @Schema(description = "게시글 댓글 : Board Reply") // Swagger API의 데이터 모델 설명
 @XmlRootElement(name = "boardreplyvo")
 @XmlType(propOrder = {"brdno", "reno", "rewriter", "rememo", "regdate", "reparent", "redepth", "reorder", "userno",
-        "usernm", "photo"}) // XML 정렬 순서
+    "usernm", "photo"}) // XML 정렬 순서
 @Getter
 @Setter
 public class BoardReplyVO {

@@ -9,9 +9,12 @@ import com.devkbil.mtssbj.common.util.FileUtil;
 import com.devkbil.mtssbj.common.util.FileVO;
 import com.devkbil.mtssbj.common.util.HostUtil;
 import com.devkbil.mtssbj.config.EsConfig;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import lombok.RequiredArgsConstructor;
+
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -35,7 +38,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -340,12 +347,13 @@ public class IndexingController {
         } catch (Exception e) {
             logBatch.error(e.getMessage());
         } finally {
-            if (stream != null)
+            if (stream != null) {
                 try {
                     stream.close();
                 } catch (IOException e) {
                     logBatch.error("Error closing stream");
                 }
+            }
         }
         return text;
     }

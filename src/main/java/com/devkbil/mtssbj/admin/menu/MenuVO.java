@@ -1,9 +1,10 @@
 package com.devkbil.mtssbj.admin.menu;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
+
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,13 +16,8 @@ import lombok.Setter;
  */
 @Schema(description = "메뉴 데이터 모델 : MenuVO") // Swagger에서 모델 설명 정의
 @XmlRootElement(name = "MenuVO") // XML 루트 태그 이름 설정
-@XmlType(propOrder = {
-        "mnuNo", "mnuNm", "mnuParent", "mnuType", "mnuDesc",
-        "mnuTarget", "mnuFilenm", "mnuImgpath", "mnuCustom",
-        "mnuDesktop", "mnuMobile", "mnuOrder", "mnuCertType",
-        "mnuExtnConnYn", "mnuStartHour", "mnuEndHour",
-        "regdate", "reguserno", "chgdate", "chguserno", "deleteflag"
-}) // XML 및 Swagger에서 필드 출력 순서 정의
+@XmlType(propOrder = {"mnuNo", "mnuNm", "mnuParent", "mnuType", "mnuDesc", "mnuTarget", "mnuFilenm", "mnuImgpath", "mnuCustom", "mnuDesktop", "mnuMobile", "mnuOrder", "mnuCertType", "mnuExtnConnYn", "mnuStartHour", "mnuEndHour", "regdate", "reguserno", "chgdate", "chguserno", "deleteflag"})
+// XML 및 Swagger에서 필드 출력 순서 정의
 @Getter
 @Setter
 public class MenuVO {

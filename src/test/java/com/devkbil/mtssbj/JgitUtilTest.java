@@ -1,10 +1,10 @@
 package com.devkbil.mtssbj;
 
-import java.io.File;
+import com.devkbil.mtssbj.common.util.JgitUtil;
 
 import org.eclipse.jgit.api.Git;
 
-import com.devkbil.mtssbj.common.util.JgitUtil;
+import java.io.File;
 
 public class JgitUtilTest {
     public static void main(String[] args) throws Exception {

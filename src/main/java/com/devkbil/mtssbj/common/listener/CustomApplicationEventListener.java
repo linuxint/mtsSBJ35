@@ -1,7 +1,9 @@
-package com.devkbil.mtssbj.common.Listener;
+package com.devkbil.mtssbj.common.listener;
 
 import com.devkbil.mtssbj.common.events.CustomApplicationEvent;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 

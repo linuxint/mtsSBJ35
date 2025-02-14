@@ -4,8 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,9 +36,9 @@ public class DbtoolRestController {
             description = "엑셀 파일을 업로드해 동적으로 지정된 테이블에 데이터를 삽입 또는 업데이트합니다."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "엑셀 데이터 업로드 성공"),
-            @ApiResponse(responseCode = "400", description = "유효하지 않은 테이블 또는 컬럼 정보"),
-            @ApiResponse(responseCode = "500", description = "엑셀 데이터 처리 중 오류 발생")
+        @ApiResponse(responseCode = "200", description = "엑셀 데이터 업로드 성공"),
+        @ApiResponse(responseCode = "400", description = "유효하지 않은 테이블 또는 컬럼 정보"),
+        @ApiResponse(responseCode = "500", description = "엑셀 데이터 처리 중 오류 발생")
     })
     public ResponseEntity<String> uploadExcelFileDynamic(@RequestParam("file") MultipartFile file) {
         try (InputStream is = new BufferedInputStream(file.getInputStream())) {

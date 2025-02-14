@@ -1,10 +1,12 @@
 package com.devkbil.mtssbj.mail;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+
 import lombok.Getter;
 import lombok.Setter;
 

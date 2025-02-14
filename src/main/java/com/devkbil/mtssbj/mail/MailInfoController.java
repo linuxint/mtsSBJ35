@@ -3,13 +3,17 @@ package com.devkbil.mtssbj.mail;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -110,8 +114,8 @@ public class MailInfoController {
 
         mailService.insertMailInfo(mailInfoInfo);
 
-        Thread t = new Thread(new ImportMail(mailService, userno, session));
-        t.start();
+        Thread thread = new Thread(new ImportMail(mailService, userno, session));
+        thread.start();
 
         return "redirect:/mailInfoList";
     }

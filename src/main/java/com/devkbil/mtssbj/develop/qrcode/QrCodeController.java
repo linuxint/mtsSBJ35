@@ -1,14 +1,19 @@
 package com.devkbil.mtssbj.develop.qrcode;
 
+
 import com.devkbil.mtssbj.common.util.PdfUtil;
 import com.google.zxing.WriterException;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -19,7 +24,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Rectangle;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -112,17 +118,17 @@ public class QrCodeController {
             //drawText("21:13:33 -5", fontGulim,QrConstant.SEQNO_FONT_SIZE,QrConstant.QRCODE_STARTX + 80,QrConstant.QRCODE_STARTY-15, contentStream);
             //cnfdrawText("21:13:33 -6", fontGulim,QrConstant.SEQNO_FONT_SIZE,QrConstant.QRCODE_STARTX + 80,QrConstant.QRCODE_STARTY-15, contentStream);
 
-            getQrBox(pdImage, document, contentStream, QrConstant.QRCODE_STARTX, QrConstant.QRCODE_STARTY);//0
+            getQrBox(pdImage, document, contentStream, QrConstant.QRCODE_STARTX, QrConstant.QRCODE_STARTY); //0
 
-            getQrBox(pdImage, document, contentStream, QrConstant.QRCODE_STARTX, QrConstant.QRCODE_STARTY + QrConstant.QRCODE_YGAP + QrConstant.QRCODE_HEIGHT);//2
+            getQrBox(pdImage, document, contentStream, QrConstant.QRCODE_STARTX, QrConstant.QRCODE_STARTY + QrConstant.QRCODE_YGAP + QrConstant.QRCODE_HEIGHT); //2
 
-            getQrBox(pdImage, document, contentStream, QrConstant.QRCODE_STARTX, QrConstant.QRCODE_STARTY + (QrConstant.QRCODE_YGAP + QrConstant.QRCODE_HEIGHT) * 2);//4
+            getQrBox(pdImage, document, contentStream, QrConstant.QRCODE_STARTX, QrConstant.QRCODE_STARTY + (QrConstant.QRCODE_YGAP + QrConstant.QRCODE_HEIGHT) * 2); //4
 
-            getQrBox(pdImage, document, contentStream, QrConstant.QRCODE_STARTX + QrConstant.QRCODE_WIDTH + QrConstant.QRCODE_XGAP, QrConstant.QRCODE_STARTY);//1
+            getQrBox(pdImage, document, contentStream, QrConstant.QRCODE_STARTX + QrConstant.QRCODE_WIDTH + QrConstant.QRCODE_XGAP, QrConstant.QRCODE_STARTY); //1
 
-            getQrBox(pdImage, document, contentStream, QrConstant.QRCODE_STARTX + QrConstant.QRCODE_WIDTH + QrConstant.QRCODE_XGAP, QrConstant.QRCODE_STARTY + QrConstant.QRCODE_YGAP + QrConstant.QRCODE_HEIGHT);//3
+            getQrBox(pdImage, document, contentStream, QrConstant.QRCODE_STARTX + QrConstant.QRCODE_WIDTH + QrConstant.QRCODE_XGAP, QrConstant.QRCODE_STARTY + QrConstant.QRCODE_YGAP + QrConstant.QRCODE_HEIGHT); //3
 
-            getQrBox(pdImage, document, contentStream, QrConstant.QRCODE_STARTX + QrConstant.QRCODE_WIDTH + QrConstant.QRCODE_XGAP, QrConstant.QRCODE_STARTY + (QrConstant.QRCODE_YGAP + QrConstant.QRCODE_HEIGHT) * 2);//5
+            getQrBox(pdImage, document, contentStream, QrConstant.QRCODE_STARTX + QrConstant.QRCODE_WIDTH + QrConstant.QRCODE_XGAP, QrConstant.QRCODE_STARTY + (QrConstant.QRCODE_YGAP + QrConstant.QRCODE_HEIGHT) * 2); //5
 
             contentStream.close();
 

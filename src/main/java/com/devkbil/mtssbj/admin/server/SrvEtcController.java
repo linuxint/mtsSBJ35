@@ -5,13 +5,17 @@ import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.ServerSearchVO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
@@ -45,8 +49,8 @@ public class SrvEtcController {
     @GetMapping("/adServerEtcList")
     @Operation(summary = "기타 정보 목록 조회", description = "모든 서비스 기타 정보의 목록을 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공"),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public String serverEtcList(ModelMap modelMap) {
 
@@ -74,9 +78,9 @@ public class SrvEtcController {
     @PostMapping("/adServerEtcSave")
     @Operation(summary = "기타 정보 저장", description = "새로운 정보를 저장하거나 기존 정보를 업데이트합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "저장 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "저장 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public void serverEtcSave(HttpServletResponse response, SrvEtcVO serviceSrvEtcVO) {
         int affectedRows = !StringUtils.hasText(serviceSrvEtcVO.getEtcId())
@@ -95,9 +99,9 @@ public class SrvEtcController {
     @GetMapping("/adServerEtcRead")
     @Operation(summary = "기타 정보 조회", description = "특정 기타 정보의 상세 정보를 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "요청 데이터 없음"),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "조회 성공"),
+        @ApiResponse(responseCode = "404", description = "요청 데이터 없음"),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public void serverEtcRead(@RequestParam(value = "etcId") String etcId, HttpServletResponse response) {
         if (!StringUtils.hasText(etcId)) {
@@ -117,9 +121,9 @@ public class SrvEtcController {
     @GetMapping("/adServerEtcDelete")
     @Operation(summary = "기타 정보 삭제", description = "특정 기타 정보를 삭제합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "삭제 대상 정보 없음"),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "삭제 성공"),
+        @ApiResponse(responseCode = "404", description = "삭제 대상 정보 없음"),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public void serverEtcDelete(@RequestParam(value = "etcId") String etcId, HttpServletResponse response) {
         if (!StringUtils.hasText(etcId)) {

@@ -6,6 +6,7 @@ import org.apache.http.ssl.SSLContexts;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
 import java.io.ByteArrayInputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -20,20 +21,22 @@ import java.security.cert.X509Certificate;
  */
 public class SSLUtils {
 
-    private static final TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType) {
-        }
+    private static final TrustManager[] trustAllCerts = new TrustManager[] {
+        new X509TrustManager() {
+            @Override
+            public void checkClientTrusted(X509Certificate[] chain, String authType) {
+            }
 
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType) {
-        }
+            @Override
+            public void checkServerTrusted(X509Certificate[] chain, String authType) {
+            }
 
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return null;
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
         }
-    }};
+    };
 
     /**
      * Create a SSL Context from a Certificate

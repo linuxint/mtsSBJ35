@@ -1,12 +1,24 @@
 package com.devkbil.mtssbj.mail;
 
-import jakarta.mail.*;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
@@ -18,11 +30,11 @@ import java.util.Properties;
 @Slf4j
 public class SendMail {
 
-    private final String SMTP_HOST;
-    private final String SMTP_PORT;        // "465";
-    private final String SMTP_ACCOUNT;
-    private final String SMTP_PASSWD;
-    private final String SMTP_USERNM;
+    private final String smtpHost;
+    private final String smtpPort;        // "465";
+    private final String smtpAccount;
+    private final String smtpPasswd;
+    private final String smtpUsernm;
     private String smtpssl = "true";  // SSL 활성화 여부
 
     /**
@@ -35,11 +47,11 @@ public class SendMail {
      * @param pw     SMTP 계정 비밀번호
      */
     public SendMail(String host, String port, String user, String usernm, String pw) {
-        this.SMTP_HOST = host;
-        this.SMTP_PORT = port;
-        this.SMTP_ACCOUNT = user;
-        this.SMTP_USERNM = usernm;
-        this.SMTP_PASSWD = pw;
+        this.smtpHost = host;
+        this.smtpPort = port;
+        this.smtpAccount = user;
+        this.smtpUsernm = usernm;
+        this.smtpPasswd = pw;
         if (!"465".equals(port)) {  // 465 포트가 아니면 SSL 비활성화
             smtpssl = "false";
         }
@@ -72,14 +84,14 @@ public class SendMail {
                      String contents) throws MessagingException {
         // SMTP 서버 속성 설정
         Properties props = new Properties();
-        props.put("mail.smtp.host", SMTP_HOST);  // SMTP 서버
+        props.put("mail.smtp.host", smtpHost);  // SMTP 서버
         props.put("mail.smtp.auth", "true");    // 인증 활성화
         props.put("mail.debug", "true");        // 디버깅 활성화
         props.put("mail.smtp.starttls.enable", "true"); // TLS 활성화
         props.put("mail.smtp.EnableSSL.enable", "true"); // SSL 활성화
-        props.put("mail.smtp.port", SMTP_PORT); // SMTP 포트
+        props.put("mail.smtp.port", smtpPort); // SMTP 포트
 
-        props.put("mail.smtp.socketFactory.port", SMTP_PORT);
+        props.put("mail.smtp.socketFactory.port", smtpPort);
         if ("true".equals(smtpssl)) {
             props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         }
@@ -89,7 +101,7 @@ public class SendMail {
         Session session = Session.getDefaultInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(SMTP_ACCOUNT, SMTP_PASSWD);
+                return new PasswordAuthentication(smtpAccount, smtpPasswd);
             }
         });
 
@@ -98,7 +110,7 @@ public class SendMail {
         try {
             // 메시지 구성
             MimeMessage msg = new MimeMessage(session);
-            InternetAddress addressFrom = new InternetAddress(SMTP_ACCOUNT, SMTP_USERNM, "UTF-8");
+            InternetAddress addressFrom = new InternetAddress(smtpAccount, smtpUsernm, "UTF-8");
             msg.setFrom(addressFrom); // 발신자 설정
             msg.setRecipients(Message.RecipientType.TO, mail2Addr(recipients)); // 수신자 설정
 

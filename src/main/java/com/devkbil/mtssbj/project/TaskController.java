@@ -4,15 +4,19 @@ import com.devkbil.mtssbj.common.ExtFieldVO;
 import com.devkbil.mtssbj.common.util.UtilEtc;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.ObjectUtils;
@@ -48,8 +52,8 @@ public class TaskController {
      */
     @Operation(summary = "작업 중심 화면", description = "프로젝트의 작업 중심 목록 화면을 반환합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "정상 호출"),
-            @ApiResponse(responseCode = "403", description = "권한 없음")
+        @ApiResponse(responseCode = "200", description = "정상 호출"),
+        @ApiResponse(responseCode = "403", description = "권한 없음")
     })
     @GetMapping("/task")
     public String task(@RequestParam(value = "prno", required = false) String prno, HttpServletRequest request, ModelMap modelMap) {
@@ -69,8 +73,8 @@ public class TaskController {
      */
     @Operation(summary = "일정 중심 화면", description = "프로젝트의 작업을 일정(calendar) 중심으로 반환합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "정상 호출"),
-            @ApiResponse(responseCode = "403", description = "권한 없음")
+        @ApiResponse(responseCode = "200", description = "정상 호출"),
+        @ApiResponse(responseCode = "403", description = "권한 없음")
     })
     @GetMapping("/taskCalendar")
     public String taskCalendar(@RequestParam(value = "prno", required = false) String prno, ModelMap modelMap) {
@@ -111,8 +115,8 @@ public class TaskController {
      */
     @Operation(summary = "작업자 중심 화면", description = "작업자를 기준으로 작업 데이터를 반환합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "정상 호출"),
-            @ApiResponse(responseCode = "403", description = "권한 없음")
+        @ApiResponse(responseCode = "200", description = "정상 호출"),
+        @ApiResponse(responseCode = "403", description = "권한 없음")
     })
     @GetMapping("/taskWorker")
     public String taskWorker(@RequestParam(value = "prno", required = false) String prno, ModelMap modelMap) {
@@ -142,8 +146,8 @@ public class TaskController {
      */
     @Operation(summary = "작업 저장", description = "작업 데이터를 저장하거나 수정합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "작업 저장 성공"),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 오류")
+        @ApiResponse(responseCode = "200", description = "작업 저장 성공"),
+        @ApiResponse(responseCode = "400", description = "입력 데이터 오류")
     })
     @PostMapping("/taskSave")
     public void taskSave(HttpServletResponse response, @ModelAttribute @Valid TaskVO taskInfo) {
@@ -159,8 +163,8 @@ public class TaskController {
      */
     @Operation(summary = "작업 삭제", description = "작업 번호(tsno)에 해당하는 작업 데이터를 삭제합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "작업 삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "작업을 찾을 수 없음")
+        @ApiResponse(responseCode = "200", description = "작업 삭제 성공"),
+        @ApiResponse(responseCode = "404", description = "작업을 찾을 수 없음")
     })
     @PostMapping("/taskDelete")
     public void taskDelete(@RequestParam(value = "tsno", required = false) String tsno, HttpServletResponse response) {
@@ -175,8 +179,8 @@ public class TaskController {
      */
     @Operation(summary = "일정 팝업", description = "일정을 클릭했을 때 세부 정보를 반환하는 팝업 화면입니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "정상 처리"),
-            @ApiResponse(responseCode = "404", description = "일정을 찾을 수 없음")
+        @ApiResponse(responseCode = "200", description = "정상 처리"),
+        @ApiResponse(responseCode = "404", description = "일정을 찾을 수 없음")
     })
     @PostMapping("/taskCalenPopup")
     public String taskCalenPopup(@RequestParam(value = "tsno", required = false) String tsno, ModelMap modelMap) {
@@ -194,8 +198,8 @@ public class TaskController {
      */
     @Operation(summary = "작업 복사", description = "특정 작업(Task)을 다른 프로젝트로 복사합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "작업 복사 성공"),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 오류")
+        @ApiResponse(responseCode = "200", description = "작업 복사 성공"),
+        @ApiResponse(responseCode = "400", description = "입력 데이터 오류")
     })
     @GetMapping("/taskCopy")
     public String taskCopy(@RequestParam(value = "prno", required = false) String prno, @RequestParam(value = "srcno", required = false) String srcno) {

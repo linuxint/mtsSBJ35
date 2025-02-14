@@ -74,34 +74,34 @@ public class NewStringUtil {
         return sb.toString();
     }
 
-    public static String replace(String source, String pattern, String replace) {
-        if (isEmpty(source)) {
+    public static String replace(String sourceText, String searchPattern, String replacementText) {
+        if (isEmpty(sourceText)) {
             return "";
         }
-        if (replace == null) {
-            replace = "";
+        if (replacementText == null) {
+            replacementText = "";
         }
 
-        int i = 0;
-        int j = 0;
-        int k = pattern.length();
+        int currentIndex = 0;
+        int foundIndex = 0;
+        int patternLength = searchPattern.length();
 
-        StringBuilder buf = new StringBuilder();
-        String result = source;
-        while ((j = source.indexOf(pattern, i)) >= 0) {
-            if (buf == null) {
-                buf = new StringBuilder(source.length() * 2);
+        StringBuilder resultBuffer = new StringBuilder();
+        String resultString = sourceText;
+        while ((foundIndex = sourceText.indexOf(searchPattern, currentIndex)) >= 0) {
+            if (resultBuffer == null) {
+                resultBuffer = new StringBuilder(sourceText.length() * 2);
             }
-            buf.append(source, i, j);
-            buf.append(replace);
+            resultBuffer.append(sourceText, currentIndex, foundIndex);
+            resultBuffer.append(replacementText);
 
-            i = j + k;
+            currentIndex = foundIndex + patternLength;
         }
 
-        if (i != 0) {
-            buf.append(source.substring(i));
-            result = buf.toString();
+        if (currentIndex != 0) {
+            resultBuffer.append(sourceText.substring(currentIndex));
+            resultString = resultBuffer.toString();
         }
-        return result;
+        return resultString;
     }
 }

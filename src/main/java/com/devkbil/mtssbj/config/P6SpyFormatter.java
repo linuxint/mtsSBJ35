@@ -2,6 +2,7 @@ package com.devkbil.mtssbj.config;
 
 import com.p6spy.engine.logging.Category;
 import com.p6spy.engine.spy.appender.MessageFormattingStrategy;
+
 import org.hibernate.engine.jdbc.internal.FormatStyle;
 
 import java.util.Locale;

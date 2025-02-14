@@ -1,9 +1,9 @@
 package com.devkbil.mtssbj;
 
+import com.devkbil.mtssbj.common.util.SecurityUtil;
+
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-
-import com.devkbil.mtssbj.common.util.SecurityUtil;
 
 public class SecurityUtilTest {
 

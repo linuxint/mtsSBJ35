@@ -59,7 +59,7 @@ public class MaskingAspect {
                         if (fieldValue instanceof String && field.isAnnotationPresent(Mask.class)) {
                             Mask mask = field.getAnnotation(Mask.class); // Mask 어노테이션을 가져옴
                             MaskingType maskingType = mask.type(); // 해당 어노테이션이 보유한 Enum 타입을 가져옴
-                            String maskedValue = MaskingUtil.MaskingOf(maskingType, (String) fieldValue); // 마스킹 적용
+                            String maskedValue = MaskingUtil.maskingOf(maskingType, (String) fieldValue); // 마스킹 적용
                             field.set(responseDto, maskedValue);
                         } else {
                             field.set(responseDto, fieldValue);

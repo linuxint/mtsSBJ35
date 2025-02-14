@@ -8,6 +8,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
 import javax.imageio.ImageIO;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -44,11 +45,11 @@ public class QRCodeGenerator {
         // 입력 받은 문자열 데이터를 기준으로 QR 코드 비트 매트릭스(BitMatrix) 생성
         // BitMatrix는 QR 코드의 흑백 픽셀 데이터를 저장하는 데 사용됩니다.
         BitMatrix bitMatrix = qrCodeWriter.encode(
-                qrString
-                , BarcodeFormat.QR_CODE
-                , QrConstant.QRCODE_HINT_WIDTH
-                , QrConstant.QRCODE_HINT_HEIGHT
-                , hintMap
+            qrString,
+            BarcodeFormat.QR_CODE,
+            QrConstant.QRCODE_HINT_WIDTH,
+            QrConstant.QRCODE_HINT_HEIGHT,
+            hintMap
         );
 
         // BitMatrix를 BufferedImage로 변환 (QR 코드 이미지를 흑백 픽셀로 시각화)

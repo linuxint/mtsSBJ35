@@ -1,13 +1,6 @@
 package com.devkbil.mtssbj;
 
 import javax.net.ssl.*;
-import java.io.*;
-import java.security.*;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.nio.file.Files;
-import java.util.Date;
-
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSocket;
@@ -15,6 +8,13 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Date;
 
 /**
  * Class used to add the server's certificate to the KeyStore with your trusted

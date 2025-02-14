@@ -1,8 +1,10 @@
 package com.devkbil.mtssbj.admin.board;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,10 +15,7 @@ import lombok.Setter;
  */
 @Schema(description = "게시판 그룹 관리 객체 : BoardGroupVO")
 @XmlRootElement(name = "BoardGroupVO")
-@XmlType(propOrder = {
-        "bgno", "bgname", "bglevel", "bgparent", "deleteflag",
-        "bgused", "bgreply", "bgreadonly", "regdate", "chgdate", "bgnotice"
-})
+@XmlType(propOrder = {"bgno", "bgname", "bglevel", "bgparent", "deleteflag", "bgused", "bgreply", "bgreadonly", "regdate", "chgdate", "bgnotice"})
 @Getter
 @Setter
 public class BoardGroupVO {

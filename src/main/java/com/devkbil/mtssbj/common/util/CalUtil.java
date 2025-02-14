@@ -5,51 +5,51 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 
 public class CalUtil {
-    public static String divideS(Object a, Object b, int scale) {
-        return newBigDecimal(a).divide(newBigDecimal(b), scale, RoundingMode.HALF_UP).toPlainString();
+    public static String divideS(Object numerator, Object denominator, int scale) {
+        return newBigDecimal(numerator).divide(newBigDecimal(denominator), scale, RoundingMode.HALF_UP).toPlainString();
     }
 
-    public static Double divideD(Object a, Object b, int scale) {
-        return newBigDecimal(a).divide(newBigDecimal(b), scale, RoundingMode.HALF_UP).doubleValue();
+    public static Double divideD(Object numerator, Object denominator, int scale) {
+        return newBigDecimal(numerator).divide(newBigDecimal(denominator), scale, RoundingMode.HALF_UP).doubleValue();
     }
 
-    public static Long divideL(Object a, Object b) {
-        return newBigDecimal(a).divide(newBigDecimal(b), 0, RoundingMode.HALF_UP).longValue();
+    public static Long divideL(Object numerator, Object denominator) {
+        return newBigDecimal(numerator).divide(newBigDecimal(denominator), 0, RoundingMode.HALF_UP).longValue();
     }
 
-    public static Integer divideI(Object a, Object b) {
-        return newBigDecimal(a).divide(newBigDecimal(b), 0, RoundingMode.HALF_UP).intValue();
+    public static Integer divideI(Object numerator, Object denominator) {
+        return newBigDecimal(numerator).divide(newBigDecimal(denominator), 0, RoundingMode.HALF_UP).intValue();
     }
 
-    public static Integer divideIF(Object a, Object b) {
-        return newBigDecimal(a).divide(newBigDecimal(b), 0, RoundingMode.FLOOR).intValue();
+    public static Integer divideIF(Object numerator, Object denominator) {
+        return newBigDecimal(numerator).divide(newBigDecimal(denominator), 0, RoundingMode.FLOOR).intValue();
     }
 
-    public static Double subtractDR(Object a, Object b, int scale) {
-        return newBigDecimal(a).subtract(newBigDecimal(b), new MathContext(scale, RoundingMode.HALF_UP)).doubleValue();
+    public static Double subtractDR(Object numerator, Object denominator, int scale) {
+        return newBigDecimal(numerator).subtract(newBigDecimal(denominator), new MathContext(scale, RoundingMode.HALF_UP)).doubleValue();
     }
 
-    public static int multiplyI(Object a, Object b) {
-        return newBigDecimal(a).multiply(newBigDecimal(b)).intValue();
+    public static int multiplyI(Object numerator, Object denominator) {
+        return newBigDecimal(numerator).multiply(newBigDecimal(denominator)).intValue();
     }
 
-    public static BigDecimal newBigDecimal(Object a) {
-        if (a instanceof String) {
-            return new BigDecimal((String) a);
+    public static BigDecimal newBigDecimal(Object numerator) {
+        if (numerator instanceof String) {
+            return new BigDecimal((String) numerator);
         }
-        if (a instanceof Long) {
-            return new BigDecimal((Long) a);
+        if (numerator instanceof Long) {
+            return new BigDecimal((Long) numerator);
         }
-        if (a instanceof Integer) {
-            return new BigDecimal((Integer) a);
+        if (numerator instanceof Integer) {
+            return new BigDecimal((Integer) numerator);
         }
-        if (a instanceof Float) {
-            return BigDecimal.valueOf((Float) a);
+        if (numerator instanceof Float) {
+            return BigDecimal.valueOf((Float) numerator);
         }
-        if (a instanceof Double) {
-            return BigDecimal.valueOf((Double) a);
+        if (numerator instanceof Double) {
+            return BigDecimal.valueOf((Double) numerator);
         }
-        throw new RuntimeException(a.getClass().getName() + " is not supported.");
+        throw new RuntimeException(numerator.getClass().getName() + " is not supported.");
     }
 
     /**

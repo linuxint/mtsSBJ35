@@ -1,7 +1,9 @@
 package com.devkbil.mtssbj;
 
-import com.devkbil.mtssbj.common.util.TimeUtil;
 import jodd.util.StringUtil;
+
+import com.devkbil.mtssbj.common.util.TimeUtil;
+
 import org.springframework.util.StringUtils;
 
 public class StringIsEmptyTest {

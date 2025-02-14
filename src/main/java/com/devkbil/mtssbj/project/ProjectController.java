@@ -3,13 +3,17 @@ package com.devkbil.mtssbj.project;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
@@ -68,9 +72,9 @@ public class ProjectController {
      */
     @Operation(summary = "프로젝트 목록 Ajax 조회", description = "Ajax 방식으로 프로젝트 정보를 제공합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ajax 기반 프로젝트 목록 반환",
-                    content = @Content(mediaType = "text/html")),
-            @ApiResponse(responseCode = "500", description = "서버 에러")
+        @ApiResponse(responseCode = "200", description = "Ajax 기반 프로젝트 목록 반환",
+            content = @Content(mediaType = "text/html")),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
     })
     @PostMapping("/projectList4Ajax")
     public String projectList4Ajax(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
@@ -92,9 +96,9 @@ public class ProjectController {
      */
     @Operation(summary = "프로젝트 작성 폼 조회", description = "신규 또는 수정 중인 프로젝트 정보를 표시하는 양식 페이지를 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "프로젝트 작성 페이지 반환",
-                    content = @Content(mediaType = "text/html")),
-            @ApiResponse(responseCode = "500", description = "서버 에러")
+        @ApiResponse(responseCode = "200", description = "프로젝트 작성 페이지 반환",
+            content = @Content(mediaType = "text/html")),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
     })
     @GetMapping("/projectForm")
     public String projectForm(@RequestParam(value = "prno", required = false) String prno, ModelMap modelMap) {
@@ -119,10 +123,10 @@ public class ProjectController {
      */
     @Operation(summary = "프로젝트 저장", description = "신규 또는 수정된 프로젝트 정보를 저장합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "302", description = "저장 후 프로젝트 목록 페이지로 리다이렉트",
-                    content = @Content(mediaType = "text/html")),
-            @ApiResponse(responseCode = "403", description = "권한 없음"),
-            @ApiResponse(responseCode = "500", description = "서버 에러")
+        @ApiResponse(responseCode = "302", description = "저장 후 프로젝트 목록 페이지로 리다이렉트",
+            content = @Content(mediaType = "text/html")),
+        @ApiResponse(responseCode = "403", description = "권한 없음"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
     })
     @PostMapping("/projectSave")
     public String projectSave(@ModelAttribute @Valid ProjectVO projectInfo, BindingResult result, ModelMap modelMap) {
@@ -157,10 +161,10 @@ public class ProjectController {
      */
     @Operation(summary = "프로젝트 삭제", description = "지정된 프로젝트를 삭제합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "302", description = "삭제 후 프로젝트 목록 페이지로 리다이렉트",
-                    content = @Content(mediaType = "text/html")),
-            @ApiResponse(responseCode = "403", description = "권한 없음"),
-            @ApiResponse(responseCode = "500", description = "서버 에러")
+        @ApiResponse(responseCode = "302", description = "삭제 후 프로젝트 목록 페이지로 리다이렉트",
+            content = @Content(mediaType = "text/html")),
+        @ApiResponse(responseCode = "403", description = "권한 없음"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
     })
     @PostMapping("/projectDelete")
     public String projectDelete(@RequestParam(value = "prno", required = false) String prno) {

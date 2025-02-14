@@ -19,10 +19,8 @@ package com.devkbil.mtssbj.elastic;
  * under the License.
  */
 
-import static org.junit.Assume.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.IOException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -77,8 +75,10 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.utility.DockerImageName;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+
+import static org.junit.Assume.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class EsClientTest {
 

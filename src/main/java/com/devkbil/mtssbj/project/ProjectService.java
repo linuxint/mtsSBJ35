@@ -1,8 +1,10 @@
 package com.devkbil.mtssbj.project;
 
 import com.devkbil.mtssbj.search.SearchVO;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -67,7 +69,7 @@ public class ProjectService {
 
         ProjectVO projectVO;
 
-        if(StringUtils.hasText(param)) {
+        if (StringUtils.hasText(param)) {
             projectVO = sqlSession.selectOne("selectProjectOne", param);
         } else {
             log.warn("프로젝트 번호 [{}]에 대한 조회 결과가 없습니다. 기본값을 초기화합니다.", param);

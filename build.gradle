@@ -339,6 +339,32 @@ spotless {
 //        prettier()
 //    }
     java {
+        importOrder(
+                "ch",    // 그룹 1
+                "",       // 그룹 간 빈 줄
+                "co",    // 그룹 1
+                "",       // 그룹 간 빈 줄
+                "com",    // 그룹 1
+                "",       // 그룹 간 빈 줄
+                "io",     // 그룹 2
+                "",       // 그룹 간 빈 줄
+                "jakarta", // 그룹 3
+                "",       // 그룹 간 빈 줄
+                "lombok", // 그룹 4
+                "",       // 그룹 간 빈 줄
+                "net", // 그룹 4
+                "",       // 그룹 간 빈 줄
+                "org",    // 그룹 5
+                "",       // 그룹 간 빈 줄
+                "javax",   // 그룹 6 (표준 Java API)
+                "",       // 그룹 간 빈 줄
+                "java",   // 그룹 6 (표준 Java API)
+                "",       // 그룹 간 빈 줄
+                "\\#static"  // 그룹 7 (STATIC import 마지막)
+        )
+        removeUnusedImports() // 불필요한 Import 자동 제거
+//        prettier() // 코드 정렬 (선택 사항)
+
 //        pipeToCommand(['sed', 's/oldText/newText/g']) // 텍스트를 sed로 처리
 //        replace('oldText', 'newText') // 특정 텍스트를 다른 텍스트로 바꿈
 //        custom('Remove TODOs') { str -> str.replace('TODO', '') } // TODO 제거

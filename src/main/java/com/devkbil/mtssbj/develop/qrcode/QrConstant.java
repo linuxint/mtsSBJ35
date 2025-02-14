@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.develop.qrcode;
 
-import java.awt.*;
+import java.awt.Color;
 
 /**
  * QR 코드 및 PDF 생성에 필요한 상수 정의 클래스

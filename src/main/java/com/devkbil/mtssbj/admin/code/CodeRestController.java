@@ -1,15 +1,23 @@
 package com.devkbil.mtssbj.admin.code;
 
 import com.devkbil.mtssbj.search.SearchVO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedInputStream;
@@ -31,13 +39,13 @@ public class CodeRestController {
 
     @PostMapping("/upload")
     @Operation(
-            summary = "엑셀 파일 업로드",
-            description = "엑셀 파일을 업로드하여 공통 코드 데이터를 처리합니다."
+        summary = "엑셀 파일 업로드",
+        description = "엑셀 파일을 업로드하여 공통 코드 데이터를 처리합니다."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "엑셀 데이터 업로드 성공"),
-            @ApiResponse(responseCode = "400", description = "엑셀 파일에 헤더 또는 데이터가 없습니다."),
-            @ApiResponse(responseCode = "500", description = "엑셀 데이터 처리 중 서버 오류 발생")
+        @ApiResponse(responseCode = "200", description = "엑셀 데이터 업로드 성공"),
+        @ApiResponse(responseCode = "400", description = "엑셀 파일에 헤더 또는 데이터가 없습니다."),
+        @ApiResponse(responseCode = "500", description = "엑셀 데이터 처리 중 서버 오류 발생")
     })
     public ResponseEntity<String> uploadExcelFile(@RequestParam("file") MultipartFile file) {
         try (InputStream is = new BufferedInputStream(file.getInputStream())) {
@@ -60,9 +68,9 @@ public class CodeRestController {
     @PostMapping("/list")
     @Operation(summary = "공통 코드 목록 조회", description = "검색 조건을 이용하여 공통 코드 리스트를 조회합니다.") // API 메서드의 동작 설명
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "공통 코드 목록 조회 성공"), // 성공 응답
-            @ApiResponse(responseCode = "400", description = "입력값이 올바르지 않음"),       // 잘못된 요청
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류 발생")        // 서버 오류
+        @ApiResponse(responseCode = "200", description = "공통 코드 목록 조회 성공"), // 성공 응답
+        @ApiResponse(responseCode = "400", description = "입력값이 올바르지 않음"),       // 잘못된 요청
+        @ApiResponse(responseCode = "500", description = "서버 내부 오류 발생")        // 서버 오류
     })
     public ResponseEntity<List<?>> getCodeList(@ModelAttribute @Valid SearchVO searchVO) {
         try {

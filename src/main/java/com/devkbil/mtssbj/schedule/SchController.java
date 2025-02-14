@@ -3,14 +3,18 @@ package com.devkbil.mtssbj.schedule;
 import com.devkbil.mtssbj.common.util.DateUtil;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
@@ -67,8 +71,8 @@ public class SchController {
      */
     @Operation(summary = "일정 목록 조회", description = "특정 달(month)의 일정 목록을 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공적으로 일정 목록을 조회했습니다.", headers = @Header(name = AUTHORIZATION, description = "Access Token")),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+        @ApiResponse(responseCode = "200", description = "성공적으로 일정 목록을 조회했습니다.", headers = @Header(name = AUTHORIZATION, description = "Access Token")),
+        @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     @GetMapping("/schList")
     public String schList(@ModelAttribute @Valid MonthVO searchVO, ModelMap modelMap) {
@@ -97,8 +101,8 @@ public class SchController {
     @Operation(summary = "일정 입력/수정 화면 조회", description = "특정 일정 정보를 입력하거나 수정합니다.")
     @ApiResponse(responseCode = "200", description = "일정 입력/수정 화면을 반환했습니다.")
     @GetMapping("/schForm")
-    public String schForm(@RequestParam(value = "cddate", required = false) String cddate
-            , @ModelAttribute @Valid SchVO schInfo, ModelMap modelMap) {
+    public String schForm(@RequestParam(value = "cddate", required = false) String cddate,
+                          @ModelAttribute @Valid SchVO schInfo, ModelMap modelMap) {
 
         String userno = authService.getAuthUserNo();
 
@@ -208,8 +212,8 @@ public class SchController {
      *
      * @param schInfo 초기화할 일정 정보
      */
-    private void initializeDefaultSchedule(@RequestParam(value = "cddate", required = false) String cddate
-            , @ModelAttribute @Valid SchVO schInfo) {
+    private void initializeDefaultSchedule(@RequestParam(value = "cddate", required = false) String cddate,
+                                           @ModelAttribute @Valid SchVO schInfo) {
 
         schInfo.setSstype("1");
         schInfo.setSsisopen("Y");

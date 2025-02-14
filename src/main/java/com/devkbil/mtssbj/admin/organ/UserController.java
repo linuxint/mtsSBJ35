@@ -4,16 +4,20 @@ import com.devkbil.mtssbj.common.tree.TreeMaker;
 import com.devkbil.mtssbj.common.util.UtilEtc;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.member.UserVO;
+import com.devkbil.mtssbj.member.auth.AuthService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -79,8 +83,8 @@ public class UserController {
     @PostMapping("/adUserList")
     @Operation(summary = "부서별 사용자 리스트 조회", description = "특정 부서에 속한 사용자들의 리스트를 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공, 사용자 리스트 반환"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터")
+        @ApiResponse(responseCode = "200", description = "요청 성공, 사용자 리스트 반환"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터")
     })
     public String userList(@RequestParam(value = "deptno", required = false) String deptno, ModelMap modelMap) {
         return commonUserList(modelMap, deptno);
@@ -112,9 +116,9 @@ public class UserController {
     @PostMapping("/adUserSave")
     @Operation(summary = "사용자 저장", description = "사용자 정보를 신규 저장하거나 업데이트합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 저장 완료"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
-            @ApiResponse(responseCode = "409", description = "아이디 중복 오류")
+        @ApiResponse(responseCode = "200", description = "사용자 저장 완료"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+        @ApiResponse(responseCode = "409", description = "아이디 중복 오류")
     })
     public String saveUser(@ModelAttribute @Valid UserVO userInfo, ModelMap modelMap) {
         // 신규 사용자 ID 중복 검사
@@ -142,8 +146,8 @@ public class UserController {
     @PostMapping("/chkUserid")
     @Operation(summary = "중복된 사용자 ID 확인", description = "특정 사용자 ID가 중복되었는지 확인합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "중복되지 않은 ID 사용 가능"),
-            @ApiResponse(responseCode = "409", description = "중복된 사용자 ID")
+        @ApiResponse(responseCode = "200", description = "중복되지 않은 ID 사용 가능"),
+        @ApiResponse(responseCode = "409", description = "중복된 사용자 ID")
     })
     public void chkUserid(@RequestParam(value = "userid") String userid, HttpServletResponse response) {
         String existingUserID = userService.selectUserID(userid);
@@ -158,8 +162,8 @@ public class UserController {
     @PostMapping(value = "/adUserRead")
     @Operation(summary = "사용자 상세 조회", description = "특정 사용자 번호(userno)에 해당하는 사용자 데이터를 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공, 사용자 데이터 반환"),
-            @ApiResponse(responseCode = "404", description = "해당 사용자를 찾을 수 없음")
+        @ApiResponse(responseCode = "200", description = "요청 성공, 사용자 데이터 반환"),
+        @ApiResponse(responseCode = "404", description = "해당 사용자를 찾을 수 없음")
     })
     public void userRead(HttpServletResponse response) {
 
@@ -181,8 +185,8 @@ public class UserController {
     @PostMapping("/adUserDelete")
     @Operation(summary = "사용자 삭제", description = "특정 사용자 번호(userno)에 해당하는 사용자를 삭제합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 삭제 완료"),
-            @ApiResponse(responseCode = "404", description = "삭제 대상 사용자 없음")
+        @ApiResponse(responseCode = "200", description = "사용자 삭제 완료"),
+        @ApiResponse(responseCode = "404", description = "삭제 대상 사용자 없음")
     })
     public String deleteUser(@ModelAttribute @Valid UserVO userInfo, ModelMap modelMap) {
         userService.deleteUser(userInfo.getUserno());

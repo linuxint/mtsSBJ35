@@ -27,8 +27,7 @@ public enum MDCKey {
     CORRELATION_ID("X-Correlation-Id"), // 상관 관계 ID (헤더에서 제공됨)
     USER_NAME("userName"), // 사용자 이름 (로그인을 통해 획득)
     USER_ID("userid"), // 사용자 ID (로그인 고유 ID)
-    USER_NM("usernm"), // 사용자 이름 (대체 표현)
-    ;
+    USER_NM("usernm"); // 사용자 이름 (대체 표현)
 
     private final String key; // MDC 매핑 키를 위한 속성 (최종 문자열 값)
 

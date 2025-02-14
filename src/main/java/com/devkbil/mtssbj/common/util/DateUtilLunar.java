@@ -1,6 +1,7 @@
 package com.devkbil.mtssbj.common.util;
 
 import com.ibm.icu.util.ChineseCalendar;
+
 import org.springframework.util.StringUtils;
 
 import java.util.Calendar;
@@ -49,9 +50,9 @@ public class DateUtilLunar {
         String retMonth = (pad2Str + month).substring(month.length());
         String retDay = (pad2Str + day).substring(day.length());
 
-        String SDay = retYear + retMonth + retDay;
+        String sDay = retYear + retMonth + retDay;
 
-        hm.put("day", SDay);
+        hm.put("day", sDay);
         hm.put("leap", leap);
 
         return hm;
@@ -114,36 +115,39 @@ public class DateUtilLunar {
 
         if (str.length() == 8) {
             yyyy = str.substring(0, 4);
-            if (yyyy.equals("0000"))
+            if (yyyy.equals("0000")) {
                 return "";
+            }
 
             mm = str.substring(4, 6);
-            if (mm.equals("00"))
+            if (mm.equals("00")) {
                 return yyyy;
-
+            }
             dd = str.substring(6, 8);
-            if (dd.equals("00"))
+            if (dd.equals("00")) {
                 return yyyy + ch + mm;
-
+            }
             return yyyy + ch + mm + ch + dd;
         } else if (str.length() == 6) {
             yyyy = str.substring(0, 4);
-            if (yyyy.equals("0000"))
+            if (yyyy.equals("0000")) {
                 return "";
-
+            }
             mm = str.substring(4, 6);
-            if (mm.equals("00"))
+            if (mm.equals("00")) {
                 return yyyy;
-
+            }
             return yyyy + ch + mm;
         } else if (str.length() == 4) {
             yyyy = str.substring(0, 4);
-            if (yyyy.equals("0000"))
+            if (yyyy.equals("0000")) {
                 return "";
-            else
+            } else {
                 return yyyy;
-        } else
+            }
+        } else {
             return "";
+        }
     }
 
     /**
@@ -153,15 +157,15 @@ public class DateUtilLunar {
      * @return 변환문자열
      */
     public static String validChkDate(String dateStr) {
-        String _dateStr = dateStr;
+        String retValue = dateStr;
 
         if (dateStr == null || !(dateStr.trim().length() == 8 || dateStr.trim().length() == 10)) {
             throw new IllegalArgumentException("Invalid date format: " + dateStr);
         }
         if (dateStr.length() == 10) {
-            _dateStr = dateStr.replace("-", "");
+            retValue = dateStr.replace("-", "");
         }
-        return _dateStr;
+        return retValue;
     }
 
 

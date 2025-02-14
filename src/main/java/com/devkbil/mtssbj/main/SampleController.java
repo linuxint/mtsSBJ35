@@ -7,12 +7,16 @@ import com.devkbil.mtssbj.common.MakeExcel;
 import com.devkbil.mtssbj.common.util.DateUtil;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -129,10 +133,9 @@ public class SampleController {
     public void sample4Excel(HttpServletRequest request, HttpServletResponse response, @ModelAttribute @Valid BoardSearchVO searchVO) {
 
         // 엑셀 출력 헤더 정의
-        String[] cellHeader = {
-                "No", "그룹no", "그룹명", "글No", "글제목", "작성자명", "내용", "작성일"
-                , "작성시간", "조회수", "삭제여부", "파일수", "댓글수", "사용자번호"
-                , "사용자명", "공지여부", "좋아요"
+        String[] cellHeader = {"No", "그룹no", "그룹명", "글No", "글제목", "작성자명", "내용", "작성일",
+            "작성시간", "조회수", "삭제여부", "파일수", "댓글수", "사용자번호",
+            "사용자명", "공지여부", "좋아요"
         };
 
         // 게시판은 페이징 처리를 하지만 엑셀은 모든 데이터를 다운로드

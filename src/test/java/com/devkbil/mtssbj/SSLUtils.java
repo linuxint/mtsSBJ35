@@ -25,6 +25,7 @@ import org.apache.http.ssl.SSLContexts;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
 import java.io.ByteArrayInputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStore;

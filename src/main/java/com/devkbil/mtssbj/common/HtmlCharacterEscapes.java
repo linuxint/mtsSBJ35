@@ -4,6 +4,7 @@ package com.devkbil.mtssbj.common;
 import com.fasterxml.jackson.core.SerializableString;
 import com.fasterxml.jackson.core.io.CharacterEscapes;
 import com.fasterxml.jackson.core.io.SerializedString;
+
 import org.apache.commons.text.translate.AggregateTranslator;
 import org.apache.commons.text.translate.CharSequenceTranslator;
 import org.apache.commons.text.translate.EntityArrays;
@@ -42,14 +43,14 @@ public class HtmlCharacterEscapes extends CharacterEscapes {
         //customMap.put("(", "&#40;");
         //customMap.put(")", "&#41;");
         //customMap.put("#", "&#35;");
-        Map<CharSequence, CharSequence> CUSTOM_ESCAPE = Collections.unmodifiableMap(customMap);
+        Map<CharSequence, CharSequence> customeEscape = Collections.unmodifiableMap(customMap);
 
         // XSS 방지 처리 특수 문자 인코딩 값 지정
         translator = new AggregateTranslator(
                 new LookupTranslator(EntityArrays.BASIC_ESCAPE),  // <, >, &, " 는 여기에 포함됨
                 new LookupTranslator(EntityArrays.ISO8859_1_ESCAPE),
                 new LookupTranslator(EntityArrays.HTML40_EXTENDED_ESCAPE),
-                new LookupTranslator(CUSTOM_ESCAPE)
+            new LookupTranslator(customeEscape)
         );
     }
 

@@ -38,21 +38,19 @@ public class SecurityUtil {
         return strbuf.toString();
     }
 
-    public static byte[] hexToByteArray(String s) {
-        byte[] retValue = null;
-        if (s != null && s.length() != 0) {
-            retValue = new byte[s.length() / 2];
-            for (int i = 0; i < retValue.length; i++) {
-                retValue[i] = (byte) Integer.parseInt(s.substring(2 * i, 2 * i + 2), 16);
+    public static byte[] hexToByteArray(String hexString) {
+        byte[] byteArray = null;
+        if (hexString != null && hexString.length() != 0) {
+            byteArray = new byte[hexString.length() / 2];
+            for (int i = 0; i < byteArray.length; i++) {
+                byteArray[i] = (byte) Integer.parseInt(hexString.substring(2 * i, 2 * i + 2), 16);
             }
         }
-        return retValue;
+        return byteArray;
     }
 
     public static String getRandomAlphaNumeric(int len) {
-        char[] charSet = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-                'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
-                'v', 'w', 'x', 'y', 'z'};
+        char[] charSet = "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
 
         int idx = 0;
         StringBuffer sb = new StringBuffer();

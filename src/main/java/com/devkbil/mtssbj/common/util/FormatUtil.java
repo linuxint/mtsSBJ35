@@ -18,23 +18,23 @@ public class FormatUtil {
         return getNumber(obj, 0);
     }
 
-    public static String getNumber(Object obj, int point) {
-        if (obj == null) {
+    public static String getNumber(Object input, int decimalPlaces) {
+        if (input == null) {
             return "0";
         }
         try {
-            String strVal = String.valueOf(obj);
-            String[] n = strVal.split("\\.");
-            if (n.length < 2 || point == 0) {
-                return String.format("%,d", Long.parseLong(n[0]));
+            String strValue = String.valueOf(input);
+            String[] parts = strValue.split("\\.");
+            if (parts.length < 2 || decimalPlaces == 0) {
+                return String.format("%,d", Long.parseLong(parts[0]));
             } else {
-                return String.format("%,d", Long.parseLong(n[0])) + "." + n[1].substring(0,
-                        Math.min(point, n[1].length())).replaceAll("0+$", "");
+                return String.format("%,d", Long.parseLong(parts[0])) + "." + parts[1].substring(0,
+                    Math.min(decimalPlaces, parts[1].length())).replaceAll("0+$", "");
             }
         } catch (NumberFormatException e) {
-            return String.valueOf(obj);
+            return String.valueOf(input);
         } catch (Exception e) {
-            return String.valueOf(obj);
+            return String.valueOf(input);
         }
     }
 
@@ -238,9 +238,11 @@ public class FormatUtil {
         source = getMobile(source);
         if (source.length() != 12 && source.length() != 13) {
             return getSecurity(source);
-        } else if (source.length() == 12) {// 010-123-4567
+        } else if (source.length() == 12) {
+            // 010-123-4567
             return source.substring(0, 4) + multiMark(3) + "-" + source.substring(source.length() - 4);
-        } else {// 010-1234-5678
+        } else {
+            // 010-1234-5678
             return source.substring(0, 4) + multiMark(4) + "-" + source.substring(source.length() - 4);
         }
     }
@@ -318,16 +320,16 @@ public class FormatUtil {
         return oneDecimal.format(result) + suffix;
     }
 
-    public static String lpad(Object src, String t, int length) {
+    public static String lpad(Object src, String padChar, int targetLength) {
         if (src == null) {
             return null;
         }
-        String strSrc = String.valueOf(src).trim();
-        String result = strSrc;
-        for (int i = 0; i < length - strSrc.length(); i++) {
-            result = t + result;
+        String sourceStr = String.valueOf(src).trim();
+        StringBuilder result = new StringBuilder(sourceStr);
+        while (result.length() < targetLength) {
+            result.insert(0, padChar);
         }
-        return result;
+        return result.toString();
     }
 
     /**
@@ -357,23 +359,23 @@ public class FormatUtil {
         return source.matches("^(\\d\\d\\d?)-?(\\d\\d\\d\\d?)-?(\\d\\d\\d\\d)$");
     }
 
-    public static String concat(String a, String b) {
-        return a + b;
+    public static String concat(String str1, String str2) {
+        return str1 + str2;
     }
 
-    public static String getFilename(String a) {
-        if (a == null) {
+    public static String getFilename(String filepath) {
+        if (filepath == null) {
             return "";
         }
-        int c = a.lastIndexOf(File.pathSeparator);
-        if (c >= 0) {
-            a = a.substring(c + 1);
+        int lastSeparatorIndex = filepath.lastIndexOf(File.pathSeparator);
+        if (lastSeparatorIndex >= 0) {
+            filepath = filepath.substring(lastSeparatorIndex + 1);
         }
-        int d = a.lastIndexOf(".");
-        if (d >= 0) {
-            a = a.substring(0, d);
+        int lastDotIndex = filepath.lastIndexOf(".");
+        if (lastDotIndex >= 0) {
+            filepath = filepath.substring(0, lastDotIndex);
         }
-        return a;
+        return filepath;
     }
 
     public static String getDayName(Object date) {

@@ -32,12 +32,14 @@ import co.elastic.clients.transport.endpoints.BinaryResponse;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import co.elastic.clients.util.BinaryData;
 import co.elastic.clients.util.ContentType;
+
 import com.devkbil.mtssbj.GeoPoint;
 import com.devkbil.mtssbj.Person;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;

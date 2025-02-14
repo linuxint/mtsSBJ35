@@ -1,8 +1,10 @@
 package com.devkbil.mtssbj.schedule;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,11 +14,7 @@ import lombok.Setter;
  */
 @Schema(description = "일정 : SchVO")
 @XmlRootElement(name = "SchVO")
-@XmlType(propOrder = {
-        "ssno", "sstitle", "sstype", "ssstartdate", "ssstarthour", "ssstartminute", "ssenddate",
-        "ssendhour", "ssendminute", "ssrepeattype", "ssrepeattypenm", "ssrepeatoption", "ssrepeatend",
-        "sscontents", "ssisopen", "userno", "usernm"
-})
+@XmlType(propOrder = {"ssno", "sstitle", "sstype", "ssstartdate", "ssstarthour", "ssstartminute", "ssenddate", "ssendhour", "ssendminute", "ssrepeattype", "ssrepeattypenm", "ssrepeatoption", "ssrepeatend", "sscontents", "ssisopen", "userno", "usernm"})
 @Getter
 @Setter
 public class SchVO {

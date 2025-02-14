@@ -4,13 +4,17 @@ import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
@@ -45,9 +49,9 @@ public class SignDocController {
     @GetMapping("/adSignDocTypeList")
     @Operation(summary = "문서 유형 리스트 조회", description = "관리자가 문서 유형 리스트를 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "문서 유형 리스트 반환"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
-            @ApiResponse(responseCode = "500", description = "서버 오류 발생")
+        @ApiResponse(responseCode = "200", description = "문서 유형 리스트 반환"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
+        @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     public String signDocTypeList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
@@ -74,9 +78,9 @@ public class SignDocController {
     @GetMapping("/adSignDocTypeForm")
     @Operation(summary = "문서 유형 폼 조회", description = "특정 문서 유형 정보를 조회하거나, 신규 문서 유형을 위한 폼을 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "문서 유형 폼 반환"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
-            @ApiResponse(responseCode = "500", description = "서버 오류 발생")
+        @ApiResponse(responseCode = "200", description = "문서 유형 폼 반환"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
+        @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     public String signDocTypeForm(@ModelAttribute SignDocTypeVO signInfo, ModelMap modelMap) {
 
@@ -102,8 +106,8 @@ public class SignDocController {
     @PostMapping("/adSignDocTypeSave")
     @Operation(summary = "문서 유형 저장", description = "문서 유형 정보를 저장하거나 업데이트합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "303", description = "저장 후 문서 유형 리스트로 리디렉션"),
-            @ApiResponse(responseCode = "500", description = "서버 오류 발생")
+        @ApiResponse(responseCode = "303", description = "저장 후 문서 유형 리스트로 리디렉션"),
+        @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     public String signDocTypeSave(@ModelAttribute @Valid SignDocTypeVO signInfo) {
         signDocService.insertSignDocType(signInfo);
@@ -119,9 +123,9 @@ public class SignDocController {
     @GetMapping("/adSignDocTypeDelete")
     @Operation(summary = "문서 유형 삭제", description = "특정 문서 유형 정보를 삭제합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "303", description = "삭제 후 문서 유형 리스트로 리디렉션"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
-            @ApiResponse(responseCode = "500", description = "서버 오류 발생")
+        @ApiResponse(responseCode = "303", description = "삭제 후 문서 유형 리스트로 리디렉션"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+        @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     public String signDocTypeDelete(@ModelAttribute @Valid SignDocTypeVO signVO) {
         signDocService.deleteSignDocType(signVO);

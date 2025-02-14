@@ -1,8 +1,10 @@
 package com.devkbil.mtssbj.admin.server;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,8 +12,7 @@ import lombok.Setter;
 @Setter
 @Schema(description = "서버 하드웨어 VO")
 @XmlRootElement(name = "HWVO")
-@XmlType(propOrder = {"hwId", "hwName", "hwIp", "adminUserNo", "adminEmail", "osInfo",
-        "cpuInfo", "memoryInfo", "diskInfo", "etcInfo", "actYn", "deleteFlag", "regDate", "chgDate"})
+@XmlType(propOrder = {"hwId", "hwName", "hwIp", "adminUserNo", "adminEmail", "osInfo", "cpuInfo", "memoryInfo", "diskInfo", "etcInfo", "actYn", "deleteFlag", "regDate", "chgDate"})
 public class HWVO {
     @Schema(description = "하드웨어 ID", example = "1")
     private String hwId;

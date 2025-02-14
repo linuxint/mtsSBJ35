@@ -5,12 +5,16 @@ import com.devkbil.mtssbj.common.util.UtilEtc;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -87,8 +91,7 @@ public class DeptController {
 
         DeptVO deptInfo = deptService.selectDeptOne(deptno);
 
-        UtilEtc.responseJsonValue(response, deptInfo!=null ? deptInfo : "Fail");
-
+        UtilEtc.responseJsonValue(response, deptInfo != null ? deptInfo : "Fail");
     }
 
     /**

@@ -5,13 +5,17 @@ import com.devkbil.mtssbj.common.util.UtilEtc;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,8 +48,8 @@ public class MenuController {
     @GetMapping("/adMenuList")
     @Operation(summary = "메뉴 리스트 조회", description = "모든 메뉴 항목의 리스트를 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "메뉴 리스트 리턴 성공"),
-            @ApiResponse(responseCode = "500", description = "서버 에러: 메뉴 리스트를 반환하는 동안 문제가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "메뉴 리스트 리턴 성공"),
+        @ApiResponse(responseCode = "500", description = "서버 에러: 메뉴 리스트를 반환하는 동안 문제가 발생했습니다.")
     })
     public String menuList(ModelMap modelMap) {
         setCommonAttributes(modelMap);
@@ -65,9 +69,9 @@ public class MenuController {
     @PostMapping("/adMenuSave")
     @Operation(summary = "메뉴 저장", description = "새로운 메뉴 정보를 저장하거나 기존 메뉴를 업데이트합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "메뉴 저장 성공"),
-            @ApiResponse(responseCode = "400", description = "클라이언트 요청 오류: 유효하지 않은 데이터"),
-            @ApiResponse(responseCode = "500", description = "서버 에러: 메뉴 저장 처리 중 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "메뉴 저장 성공"),
+        @ApiResponse(responseCode = "400", description = "클라이언트 요청 오류: 유효하지 않은 데이터"),
+        @ApiResponse(responseCode = "500", description = "서버 에러: 메뉴 저장 처리 중 오류가 발생했습니다.")
     })
     public void menuSave(HttpServletResponse response, MenuVO menuInfo) {
         handleJsonResponse(response, () -> {
@@ -89,9 +93,9 @@ public class MenuController {
     @GetMapping("/adMenuRead")
     @Operation(summary = "단일 메뉴 조회", description = "메뉴 번호(mnuNo)에 해당하는 메뉴 정보를 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "메뉴 데이터 리턴 성공"),
-            @ApiResponse(responseCode = "404", description = "해당 메뉴를 찾을 수 없습니다."),
-            @ApiResponse(responseCode = "500", description = "서버 에러: 메뉴 정보를 불러오는 동안 문제가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "메뉴 데이터 리턴 성공"),
+        @ApiResponse(responseCode = "404", description = "해당 메뉴를 찾을 수 없습니다."),
+        @ApiResponse(responseCode = "500", description = "서버 에러: 메뉴 정보를 불러오는 동안 문제가 발생했습니다.")
     })
     public void menuRead(@RequestParam(value = "mnuNo") String mnuNo, HttpServletResponse response) {
         handleJsonResponse(response, () -> menuService.selectMenuOne(mnuNo));
@@ -106,9 +110,9 @@ public class MenuController {
     @PostMapping("/adMenuDelete")
     @Operation(summary = "메뉴 삭제", description = "메뉴 번호(mnuNo)에 해당하는 메뉴 항목을 삭제합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "메뉴 삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "삭제할 메뉴를 찾을 수 없습니다."),
-            @ApiResponse(responseCode = "500", description = "서버 에러: 메뉴 삭제 처리 중 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "메뉴 삭제 성공"),
+        @ApiResponse(responseCode = "404", description = "삭제할 메뉴를 찾을 수 없습니다."),
+        @ApiResponse(responseCode = "500", description = "서버 에러: 메뉴 삭제 처리 중 오류가 발생했습니다.")
     })
     public void menuDelete(@RequestParam(value = "mnuNo") String mnuNo, HttpServletResponse response) {
         handleJsonResponse(response, () -> {

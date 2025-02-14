@@ -4,11 +4,15 @@ import com.devkbil.mtssbj.admin.organ.DeptService;
 import com.devkbil.mtssbj.admin.organ.UserService;
 import com.devkbil.mtssbj.common.tree.TreeMaker;
 import com.devkbil.mtssbj.search.SearchVO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -82,9 +86,9 @@ public class PopUserController {
     @Operation(summary = "선택된 부서의 사용자 리스트", description = "부서 ID로 해당 부서의 사용자 리스트를 반환합니다.")
     @PostMapping("/popupUsersByDept")
     public String popupUsersByDept(
-            @RequestParam(name = "deptno") String deptno
-            , @ModelAttribute @Valid SearchVO searchVO
-            , ModelMap modelMap
+        @RequestParam(name = "deptno") String deptno,
+        @ModelAttribute @Valid SearchVO searchVO,
+        ModelMap modelMap
     ) {
         searchVO.setSearchExt1(deptno);
 
@@ -137,10 +141,10 @@ public class PopUserController {
     @Operation(summary = "사용자들 리스트", description = "사용자들의 정보를 부서별로 조회 후 반환합니다.")
     @PostMapping("/popupUsers4Users")
     public String popupUsers4Users(
-            @RequestParam(name = "deptno") String deptno
-            , HttpServletRequest request
-            , SearchVO searchVO
-            , ModelMap modelMap) {
+        @RequestParam(name = "deptno") String deptno,
+        HttpServletRequest request,
+        SearchVO searchVO,
+        ModelMap modelMap) {
 
         popupUsersByDept(deptno, searchVO, modelMap);
 

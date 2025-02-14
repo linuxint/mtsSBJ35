@@ -2,13 +2,22 @@ package com.devkbil.mtssbj.common;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jxls.builder.JxlsOutputFile;
 import org.jxls.transform.poi.JxlsPoiTemplateFillerBuilder;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -63,10 +72,10 @@ public class MakeExcel {
                 JxlsOutputFile jxlsOutputFile = new JxlsOutputFile(tempFile);
                 // 1. Jxls 3.0 API를 사용하여 템플릿 처리 및 데이터 바인딩
                 JxlsPoiTemplateFillerBuilder
-                        .newInstance()
-                        .withTemplate(templateInputStream) // 템플릿 파일
-                        .build()
-                        .fill(beans, jxlsOutputFile); // 데이터와 매핑 후 출력 파일에 작성
+                    .newInstance()
+                    .withTemplate(templateInputStream) // 템플릿 파일
+                    .build()
+                    .fill(beans, jxlsOutputFile); // 데이터와 매핑 후 출력 파일에 작성
 
                 // 2. Apache POI를 사용해서 쉬트 이름 변경
                 try (FileInputStream fis = new FileInputStream(tempFile);
@@ -114,6 +123,6 @@ public class MakeExcel {
     private void responseExcel(HttpServletResponse response, String filename) throws UnsupportedEncodingException {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition",
-                "attachment; filename=\"" + URLEncoder.encode(filename, StandardCharsets.UTF_8) + ".xlsx\"");
+            "attachment; filename=\"" + URLEncoder.encode(filename, StandardCharsets.UTF_8) + ".xlsx\"");
     }
 }

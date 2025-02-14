@@ -1,10 +1,13 @@
 package com.devkbil.mtssbj.board;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+
 import lombok.Getter;
 import lombok.Setter;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -18,11 +21,7 @@ import java.util.List;
  */
 @Schema(description = "게시글 정보 : Board")
 @XmlRootElement(name = "BoardVO")
-@XmlType(propOrder = {
-        "bgno", "bgname", "brdno", "brdtitle", "brdwriter", "brdmemo", "regdate", "regtime",
-        "brdhit", "deleteflag", "filecnt", "replycnt", "userno", "usernm", "brdnotice",
-        "brdlike", "brdlikechk", "extfield1", "etc1", "etc2", "etc3", "etc4", "etc5", "uploadfile"
-})
+@XmlType(propOrder = {"bgno", "bgname", "brdno", "brdtitle", "brdwriter", "brdmemo", "regdate", "regtime", "brdhit", "deleteflag", "filecnt", "replycnt", "userno", "usernm", "brdnotice", "brdlike", "brdlikechk", "extfield1", "etc1", "etc2", "etc3", "etc4", "etc5", "uploadfile"})
 @Getter
 @Setter
 public class BoardVO {

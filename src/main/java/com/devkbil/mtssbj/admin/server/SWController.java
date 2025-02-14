@@ -5,13 +5,17 @@ import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.ServerSearchVO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
@@ -45,8 +49,8 @@ public class SWController {
     @GetMapping("/adServerSWList")
     @Operation(summary = "서버 소프트웨어 리스트 조회", description = "모든 서버 소프트웨어의 목록을 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공"),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public String serverSWList(ModelMap modelMap) {
 
@@ -75,9 +79,9 @@ public class SWController {
     @PostMapping("/adServerSWSave")
     @Operation(summary = "서버 소프트웨어 저장", description = "새로운 서버 소프트웨어를 저장하거나 기존 데이터를 업데이트합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public void serverSWSave(HttpServletResponse response, SWVO swVO) {
 
@@ -98,9 +102,9 @@ public class SWController {
     @GetMapping("/adServerSWRead")
     @Operation(summary = "서버 소프트웨어 상세 조회", description = "서버 소프트웨어 ID(swId)에 해당하는 정보를 읽어옵니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공"),
-            @ApiResponse(responseCode = "404", description = "소프트웨어를 찾을 수 없습니다."),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "404", description = "소프트웨어를 찾을 수 없습니다."),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public void serverSWRead(@RequestParam(value = "swId") String swId, HttpServletResponse response) {
 
@@ -122,9 +126,9 @@ public class SWController {
     @GetMapping("/adServerSWDelete")
     @Operation(summary = "서버 소프트웨어 삭제", description = "서버 소프트웨어 ID(swId)에 해당하는 정보를 삭제합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공"),
-            @ApiResponse(responseCode = "404", description = "소프트웨어를 찾을 수 없습니다."),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "404", description = "소프트웨어를 찾을 수 없습니다."),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public void serverSWDelete(@RequestParam(value = "swId") String swId, HttpServletResponse response) {
 

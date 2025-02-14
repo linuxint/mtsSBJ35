@@ -5,13 +5,17 @@ import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.ServerSearchVO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
@@ -45,8 +49,8 @@ public class ConnController {
     @GetMapping("/adServerConnList")
     @Operation(summary = "서비스 접속 정보 목록 조회", description = "모든 서비스 접속 정보를 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공"),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public String serverConnList(ModelMap modelMap) {
 
@@ -77,9 +81,9 @@ public class ConnController {
     @PostMapping("/adServerConnSave")
     @Operation(summary = "서비스 접속 정보 저장", description = "새로운 서비스를 저장하거나 기존 서비스 데이터를 업데이트합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public void serverConnSave(HttpServletResponse response, ConnVO serviceConnVO) {
 
@@ -100,9 +104,9 @@ public class ConnController {
     @GetMapping("/adServerConnRead")
     @Operation(summary = "서비스 접속 정보 조회", description = "특정 서비스 접속 정보의 상세 정보를 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공"),
-            @ApiResponse(responseCode = "404", description = "서비스 접속 정보를 찾을 수 없습니다."),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "404", description = "서비스 접속 정보를 찾을 수 없습니다."),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public void serverConnRead(@RequestParam(value = "connId") String connId, HttpServletResponse response) {
 
@@ -127,9 +131,9 @@ public class ConnController {
     @GetMapping("/adServerConnDelete")
     @Operation(summary = "서비스 접속 정보 삭제", description = "특정 서비스 접속 정보를 삭제합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공"),
-            @ApiResponse(responseCode = "404", description = "서비스 접속 정보를 찾을 수 없습니다."),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "404", description = "서비스 접속 정보를 찾을 수 없습니다."),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public void serverConnDelete(@RequestParam(value = "connId") String connId, HttpServletResponse response) {
 

@@ -11,19 +11,27 @@ import com.devkbil.mtssbj.config.security.Role;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.util.List;
@@ -56,12 +64,13 @@ public class BoardController {
     @RequestMapping("/boardList")
     @Operation(summary = "게시판 리스트 조회", description = "게시판 리스트와 관련 데이터를 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시판 리스트 반환 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
+        @ApiResponse(responseCode = "200", description = "게시판 리스트 반환 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
+        @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    public String boardList(@RequestParam(value = "globalKeyword", required = false) String globalKeyword
-            , @ModelAttribute @Valid BoardSearchVO searchVO, ModelMap modelMap) {
+    public String boardList(@RequestParam(value = "globalKeyword", required = false) String globalKeyword,
+                            @ModelAttribute @Valid BoardSearchVO searchVO,
+                            ModelMap modelMap) {
 
         String userno = authService.getAuthUserNo();
 
@@ -104,13 +113,13 @@ public class BoardController {
     @GetMapping("/boardForm")
     @Operation(summary = "게시물 작성 폼 조회", description = "게시물 작성 화면을 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시물 작성 폼 반환 성공"),
-            @ApiResponse(responseCode = "404", description = "게시판 그룹 정보 없음"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
+        @ApiResponse(responseCode = "200", description = "게시물 작성 폼 반환 성공"),
+        @ApiResponse(responseCode = "404", description = "게시판 그룹 정보 없음"),
+        @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    public String boardForm(@RequestParam(value = "bgno", required = false) String bgno
-            , @RequestParam(value = "brdno", required = false) String brdno
-            , ModelMap modelMap) {
+    public String boardForm(@RequestParam(value = "bgno", required = false) String bgno,
+                            @RequestParam(value = "brdno", required = false) String brdno,
+                            ModelMap modelMap) {
 
         String userno = authService.getAuthUserNo();
 
@@ -145,12 +154,12 @@ public class BoardController {
     @PostMapping("/boardSave")
     @Operation(summary = "게시물 저장", description = "새로운 게시물을 저장하거나 기존 게시물을 업데이트합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "303", description = "게시물 저장 후 리디렉션"),
-            @ApiResponse(responseCode = "403", description = "권한 없음"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
+        @ApiResponse(responseCode = "303", description = "게시물 저장 후 리디렉션"),
+        @ApiResponse(responseCode = "403", description = "권한 없음"),
+        @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    public String boardSave(@RequestParam(value = "fileno", required = false) String[] fileno
-            , @ModelAttribute @Valid BoardVO boardInfo) {
+    public String boardSave(@RequestParam(value = "fileno", required = false) String[] fileno,
+                            @ModelAttribute @Valid BoardVO boardInfo) {
 
         String userno = authService.getAuthUserNo();
         String userrole = authService.getAuthUserrole();
@@ -184,12 +193,12 @@ public class BoardController {
     @GetMapping("/boardRead")
     @Operation(summary = "게시물 읽기", description = "특정 게시물의 상세 내역을 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시물 상세 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "게시물 정보 없음"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
+        @ApiResponse(responseCode = "200", description = "게시물 상세 조회 성공"),
+        @ApiResponse(responseCode = "404", description = "게시물 정보 없음"),
+        @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    public String boardRead(@RequestParam(value = "bgno", required = false) String bgno
-            , @RequestParam(value = "brdno", required = false) String brdno, ModelMap modelMap) {// 세션에서 사용자 번호 가져오기
+    public String boardRead(@RequestParam(value = "bgno", required = false) String bgno,
+                            @RequestParam(value = "brdno", required = false) String brdno, ModelMap modelMap) {
 
         String userno = authService.getAuthUserNo();
 
@@ -226,9 +235,9 @@ public class BoardController {
     @GetMapping("/boardDelete")
     @Operation(summary = "게시글 삭제", description = "게시글 삭제 반환.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시판 삭제 반환 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
+        @ApiResponse(responseCode = "200", description = "게시판 삭제 반환 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
+        @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public String boardDelete(@RequestParam(value = "brdno") String brdno, @RequestParam(value = "bgno") String bgno) {
 
@@ -262,9 +271,9 @@ public class BoardController {
     @PostMapping("/boardListByAjax")
     @Operation(summary = "게시판 그룹 트리", description = "게시판 그룹 트리 반환.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시판 그룹 트리 반환 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
+        @ApiResponse(responseCode = "200", description = "게시판 그룹 트리 반환 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
+        @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public void boardListByAjax(HttpServletResponse response) {
         List<?> listview = boardGroupService.selectBoardGroupList();
@@ -298,9 +307,9 @@ public class BoardController {
     @PostMapping("/addBoardLike")
     @Operation(summary = "게시글 좋아요 저장", description = "게시글 좋아요 저장 반환.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글 좋아요 저장 반환 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
+        @ApiResponse(responseCode = "200", description = "게시글 좋아요 저장 반환 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
+        @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public void addBoardLike(@RequestParam(value = "brdno", required = false) String brdno, HttpServletResponse response) {
 
@@ -324,9 +333,9 @@ public class BoardController {
     @PostMapping("/boardReplySave")
     @Operation(summary = "게시글 댓글 저장", description = "게시글 댓글 저장 반환.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글 댓글 저장 반환 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
+        @ApiResponse(responseCode = "200", description = "게시글 댓글 저장 반환 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
+        @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public String boardReplySave(HttpServletResponse response, @ModelAttribute @Valid BoardReplyVO boardReplyInfo, ModelMap modelMap) {
 
@@ -359,9 +368,9 @@ public class BoardController {
     @PostMapping("/boardReplyDelete")
     @Operation(summary = "게시글 댓글 삭제", description = "게시글 댓글 삭제 반환.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글 댓글 삭제 반환 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
+        @ApiResponse(responseCode = "200", description = "게시글 댓글 삭제 반환 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
+        @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public void boardReplyDelete(HttpServletResponse response, @ModelAttribute @Valid BoardReplyVO boardReplyInfo) {
 

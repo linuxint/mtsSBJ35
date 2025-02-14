@@ -1,10 +1,10 @@
 package com.devkbil.mtssbj.pdf;
 
-import static com.devkbil.mtssbj.common.util.PdfUtil.*;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static com.devkbil.mtssbj.common.util.PdfUtil.*;
 
 public class PdfToImageTest {
 

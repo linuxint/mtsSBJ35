@@ -1,5 +1,15 @@
 package com.devkbil.mtssbj.manager;
 
+import lombok.extern.slf4j.Slf4j;
+
+import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.Property;
+
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -12,14 +22,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
-
-import lombok.extern.slf4j.Slf4j;
-import net.fortuna.ical4j.data.CalendarBuilder;
-import net.fortuna.ical4j.data.ParserException;
-import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.Property;
-import org.junit.jupiter.api.Test;
 
 import static com.devkbil.mtssbj.manager.SpringCalendarConstants.*;
 

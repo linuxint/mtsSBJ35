@@ -5,13 +5,17 @@ import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.ServerSearchVO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
@@ -19,7 +23,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -46,8 +49,8 @@ public class HWController {
     @GetMapping("/adServerHWList")
     @Operation(summary = "서버 하드웨어 리스트 조회", description = "모든 서버 하드웨어의 목록을 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공"),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public String serverHWList(ModelMap modelMap) {
 
@@ -95,9 +98,9 @@ public class HWController {
     @PostMapping("/adServerHWSave")
     @Operation(summary = "서버 하드웨어 저장", description = "새로운 서버 하드웨어를 저장하거나 기존 데이터를 업데이트합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public void serverHWSave(HttpServletResponse response, HWVO hwInfo) {
 
@@ -117,9 +120,9 @@ public class HWController {
     @GetMapping("/adServerHWRead")
     @Operation(summary = "서버 하드웨어 상세 조회", description = "서버 하드웨어 ID(hwId)에 해당하는 정보를 읽어옵니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공"),
-            @ApiResponse(responseCode = "404", description = "서버 하드웨어를 찾을 수 없습니다."),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "404", description = "서버 하드웨어를 찾을 수 없습니다."),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public void serverHWRead(@RequestParam(value = "hwId") String hwId, HttpServletResponse response) {
 
@@ -141,9 +144,9 @@ public class HWController {
     @GetMapping("/adServerHWDelete")
     @Operation(summary = "서버 하드웨어 삭제", description = "서버 하드웨어 ID(hwId)에 해당하는 정보를 삭제합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공"),
-            @ApiResponse(responseCode = "404", description = "서버 하드웨어를 찾을 수 없습니다."),
-            @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
+        @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "404", description = "서버 하드웨어를 찾을 수 없습니다."),
+        @ApiResponse(responseCode = "500", description = "서버에 오류가 발생했습니다.")
     })
     public void serverHWDelete(@RequestParam(value = "hwId") String hwId, HttpServletResponse response) {
 

@@ -2,11 +2,15 @@ package com.devkbil.mtssbj.admin.code;
 
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.search.SearchVO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -17,7 +21,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
@@ -77,8 +85,8 @@ public class CodeController {
         headers.setContentDispositionFormData("attachment", "CodeList.xlsx");
 
         return ResponseEntity.ok()
-                .headers(headers)
-                .body(outputStream.toByteArray());
+            .headers(headers)
+            .body(outputStream.toByteArray());
     }
 
 
@@ -113,12 +121,12 @@ public class CodeController {
     @Operation(summary = "공통 코드 등록/수정 폼", description = "공통 코드 정보를 등록하거나 수정할 폼 화면을 반환합니다.")
     public String codeForm(@ModelAttribute CodeVO codeInfo, ModelMap modelMap) {
         Optional.ofNullable(codeInfo.getClassno())
-                .map(classno -> codeService.selectCodeOne(codeInfo))
-                .ifPresent(selectedCodeInfo -> {
-                    modelMap.addAttribute("codeInfo", selectedCodeInfo);
-                    modelMap.addAttribute("codeFormType", "U");
-                    modelMap.addAttribute("readonly", "readonly");
-                });
+            .map(classno -> codeService.selectCodeOne(codeInfo))
+            .ifPresent(selectedCodeInfo -> {
+                modelMap.addAttribute("codeInfo", selectedCodeInfo);
+                modelMap.addAttribute("codeFormType", "U");
+                modelMap.addAttribute("readonly", "readonly");
+            });
 
         return "thymeleaf/admin/code/CodeForm";
     }
@@ -137,8 +145,7 @@ public class CodeController {
                            @ModelAttribute @Valid CodeVO codeInfo,
                            ModelMap modelMap) {
         try {
-            if (!"U".equals(codeFormType) &&
-                    Optional.ofNullable(codeService.selectCodeOne(codeInfo)).isPresent()) {
+            if (!"U".equals(codeFormType) && Optional.ofNullable(codeService.selectCodeOne(codeInfo)).isPresent()) {
                 modelMap.addAttribute("msg", "이미 사용 중인 코드입니다.");
                 return "common/message";
             }
@@ -164,7 +171,7 @@ public class CodeController {
     @Operation(summary = "공통 코드 상세 조회", description = "지정된 공통 코드의 상세 정보를 반환합니다.")
     public String codeRead(@ModelAttribute CodeVO codeVO, ModelMap modelMap) {
         Optional.ofNullable(codeService.selectCodeOne(codeVO))
-                .ifPresent(codeInfo -> modelMap.addAttribute("codeInfo", codeInfo));
+            .ifPresent(codeInfo -> modelMap.addAttribute("codeInfo", codeInfo));
 
         return "thymeleaf/admin/code/CodeRead";
     }
@@ -190,7 +197,7 @@ public class CodeController {
      */
     @PostMapping("/codeList")
     @Operation(summary = "공통 코드 리스트 조회 (API)",
-            description = "공통 코드 데이터를 JSON 형태로 반환합니다.")
+        description = "공통 코드 데이터를 JSON 형태로 반환합니다.")
     public ResponseEntity<List<?>> codeList(@ModelAttribute @Valid SearchVO searchVO) {
         try {
             log.debug("코드 리스트를 조회합니다.");

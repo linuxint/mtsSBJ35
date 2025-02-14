@@ -5,12 +5,16 @@ import com.devkbil.mtssbj.common.util.FileUtil;
 import com.devkbil.mtssbj.common.util.FileVO;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.ObjectUtils;
@@ -43,9 +47,9 @@ public class TaskMineController {
      */
     @Operation(summary = "사용자의 작업 목록 조회", description = "사용자가 담당한 작업 목록을 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "작업 목록 페이지 반환"),
-            @ApiResponse(responseCode = "403", description = "사용 권한 없음"),
-            @ApiResponse(responseCode = "500", description = "서버 에러")
+        @ApiResponse(responseCode = "200", description = "작업 목록 페이지 반환"),
+        @ApiResponse(responseCode = "403", description = "사용 권한 없음"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
     })
     @GetMapping("/taskMine")
     public String taskMine(@RequestParam(value = "prno", required = false) String prno, ModelMap modelMap) {
@@ -77,9 +81,9 @@ public class TaskMineController {
      */
     @Operation(summary = "작업 세부 정보 조회", description = "특정 작업의 세부 정보를 조회하고 수정 가능한 폼을 제공합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "작업 수정 폼 페이지 반환"),
-            @ApiResponse(responseCode = "404", description = "작업 정보를 찾을 수 없음"),
-            @ApiResponse(responseCode = "500", description = "서버 에러")
+        @ApiResponse(responseCode = "200", description = "작업 수정 폼 페이지 반환"),
+        @ApiResponse(responseCode = "404", description = "작업 정보를 찾을 수 없음"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
     })
     @GetMapping("/taskMineForm")
     public String taskMineForm(@RequestParam(value = "tsno") String tsno, ModelMap modelMap) {
@@ -101,12 +105,12 @@ public class TaskMineController {
      */
     @Operation(summary = "작업 저장", description = "사용자가 수정하거나 새로 생성한 작업 데이터를 저장합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "302", description = "저장 작업 완료 후 목록 페이지로 리다이렉트"),
-            @ApiResponse(responseCode = "500", description = "서버 에러")
+        @ApiResponse(responseCode = "302", description = "저장 작업 완료 후 목록 페이지로 리다이렉트"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
     })
     @PostMapping("/taskMineSave")
-    public String taskMineSave(@RequestParam(value = "fileno", required = false) String[] fileno
-            , @ModelAttribute @Valid TaskVO taskInfo) {
+    public String taskMineSave(@RequestParam(value = "fileno", required = false) String[] fileno,
+                               @ModelAttribute @Valid TaskVO taskInfo) {
 
         // 요청 파일 데이터 처리
         FileUtil fs = new FileUtil();

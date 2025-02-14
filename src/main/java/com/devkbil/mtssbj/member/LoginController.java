@@ -3,15 +3,19 @@ package com.devkbil.mtssbj.member;
 import com.devkbil.mtssbj.common.LocaleMessage;
 import com.devkbil.mtssbj.config.ConfigConstant;
 import com.devkbil.mtssbj.member.auth.AuthService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
@@ -126,8 +130,9 @@ public class LoginController {
 
         String userno = loginInfo.getUserno();
 
-        UserVO userVO = Objects.requireNonNull(memberService.findOne(userno),
-                () -> { throw new UsernameNotFoundException("User not found with ID: " + userno); });
+        UserVO userVO = Objects.requireNonNull(memberService.findOne(userno), () -> {
+            throw new UsernameNotFoundException("User not found with ID: " + userno);
+        });
 
         // 로그인 로직 수행
         memberService.insertLogIn(userVO.getUserno());

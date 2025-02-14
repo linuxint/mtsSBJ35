@@ -80,9 +80,7 @@ public enum ErrorCode {
     // Transaction Delete Error
     DELETE_ERROR(200, "9999", "Delete Transaction Error Exception"),
 
-    BUSINESS_EXCEPTION_ERROR(200, "B999", "Business Exception Error"),
-
-    ; // End
+    BUSINESS_EXCEPTION_ERROR(200, "B999", "Business Exception Error");
 
     /**
      * ******************************* Error Code Constructor ***************************************

@@ -2,9 +2,12 @@ package com.devkbil.mtssbj.common.interceptor;
 
 import com.devkbil.mtssbj.config.security.Role;
 import com.devkbil.mtssbj.member.auth.AuthService;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -27,16 +30,16 @@ import java.util.List;
 public class AdminInterceptor implements HandlerInterceptor {
 
     // 관리자 접근이 필요한 URL 패턴
-    private static final String LOGIN_PAGE = "memberLogin"; // 로그인 페이지 URL
-    private static final String NO_AUTH_PAGE = "noAuthMessage"; // 권한 없음 페이지 URL
+    private final String loginPage = "memberLogin"; // 로그인 페이지 URL
+    private final String noAuthPage = "noAuthMessage"; // 권한 없음 페이지 URL
 
-    private final List<String> ADMIN_ESSENTIAL = Collections.singletonList("/ad**"); // 관리자 필수 URL 목록
+    private final List<String> adminEssential = Collections.singletonList("/ad**"); // 관리자 필수 URL 목록
 
     /**
      * @return 관리자 접근이 필요한 URL 패턴 리스트를 반환합니다.
      */
     public List<String> getAdminEssential() {
-        return ADMIN_ESSENTIAL;
+        return adminEssential;
     }
 
     /**
@@ -58,7 +61,7 @@ public class AdminInterceptor implements HandlerInterceptor {
             // 1. 세션 확인
             if (!StringUtils.hasText(userno)) {
                 log.warn("접근 권한 없음: 유저 세션 없음");
-                redirectToPage(res, LOGIN_PAGE); // 로그인 페이지로 이동
+                redirectToPage(res, loginPage); // 로그인 페이지로 이동
                 return false;
             }
 
@@ -66,7 +69,7 @@ public class AdminInterceptor implements HandlerInterceptor {
             String userrole = authService.getAuthUserrole();
             if (Role.ROLE_ADMIN != Role.getRoleByValue(userrole)) {
                 log.warn("접근 권한 없음: 관리자 권한이 아님");
-                redirectToPage(res, NO_AUTH_PAGE); // 권한 없음 페이지로 이동
+                redirectToPage(res, noAuthPage); // 권한 없음 페이지로 이동
                 return false;
             }
 

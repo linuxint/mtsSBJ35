@@ -31,16 +31,16 @@ public class ConfigConstant {
     public static final String PARAMETER_LOGIN_PWD = "userpw";
 
     public static final String[] allAllowList = {
-            "/api/v1/auth/**"
-            , "/css/**"
-            , "/js/**"
-            , "/images/**"
-            , "/favicon.ico"
-            , "/application/**"
-            , "/memberLogout"
-            , "/memberLogin"
-            , "/login-process"
-            , "/memberLoginChk"
-            , "/error/**"
+        "/api/v1/auth/**",
+        "/css/**",
+        "/js/**",
+        "/images/**",
+        "/favicon.ico",
+        "/application/**",
+        "/memberLogout",
+        "/memberLogin",
+        "/login-process",
+        "/memberLoginChk",
+        "/error/**"
     };
 }

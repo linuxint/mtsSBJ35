@@ -5,13 +5,17 @@ import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.ServerSearchVO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
@@ -45,8 +49,8 @@ public class SvcController {
     @GetMapping("/adServerSvcList")
     @Operation(summary = "서비스 목록 조회", description = "모든 서비스의 목록을 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청 성공"),
-            @ApiResponse(responseCode = "500", description = "서버 에러 발생")
+        @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "500", description = "서버 에러 발생")
     })
     public String serverSvcList(ModelMap modelMap) {
 
@@ -74,9 +78,9 @@ public class SvcController {
     @PostMapping("/adServerSvcSave")
     @Operation(summary = "서비스 저장", description = "서비스 데이터를 저장하거나 업데이트합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "저장 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
-            @ApiResponse(responseCode = "500", description = "서버 에러 발생")
+        @ApiResponse(responseCode = "200", description = "저장 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+        @ApiResponse(responseCode = "500", description = "서버 에러 발생")
     })
     public void serverSvcSave(HttpServletResponse response, SvcVO svcVO) {
         int affectedRows = !StringUtils.hasText(svcVO.getSvcId())
@@ -95,9 +99,9 @@ public class SvcController {
     @GetMapping("/adServerSvcRead")
     @Operation(summary = "서비스 조회", description = "특정 서비스 정보를 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "찾을 수 없는 데이터"),
-            @ApiResponse(responseCode = "500", description = "서버 에러 발생")
+        @ApiResponse(responseCode = "200", description = "조회 성공"),
+        @ApiResponse(responseCode = "404", description = "찾을 수 없는 데이터"),
+        @ApiResponse(responseCode = "500", description = "서버 에러 발생")
     })
     public void serverSvcRead(@RequestParam(value = "svcId") String svcId, HttpServletResponse response) {
         if (!StringUtils.hasText(svcId)) {
@@ -117,9 +121,9 @@ public class SvcController {
     @GetMapping("/adServerSvcDelete")
     @Operation(summary = "서비스 삭제", description = "특정 서비스 정보를 삭제합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "삭제 대상이 없음"),
-            @ApiResponse(responseCode = "500", description = "서버 에러 발생")
+        @ApiResponse(responseCode = "200", description = "삭제 성공"),
+        @ApiResponse(responseCode = "404", description = "삭제 대상이 없음"),
+        @ApiResponse(responseCode = "500", description = "서버 에러 발생")
     })
     public void serverSvcDelete(@RequestParam(value = "svcId") String svcId, HttpServletResponse response) {
         if (!StringUtils.hasText(svcId)) {

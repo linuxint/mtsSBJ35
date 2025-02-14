@@ -7,13 +7,19 @@ import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.project.ProjectService;
 import com.devkbil.mtssbj.schedule.DateVO;
 import com.devkbil.mtssbj.search.SearchVO;
+
 import lombok.RequiredArgsConstructor;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 메인 페이지와 관련된 서비스 클래스.
@@ -45,13 +51,13 @@ public class IndexService {
         etcService.setCommonAttribute(userno, modelMap);        // 공통 속성 설정
 
         Date today = DateUtil.getToday();
-        modelMap.putAll(calculateCalendarData(today));// 캘린더 데이터 계산
+        modelMap.putAll(calculateCalendarData(today)); // 캘린더 데이터 계산
 
         if (StringUtils.hasText(searchVO.getSearchKeyword())) {
             searchVO.setSearchType("prtitle"); // 검색어 처리 (Post 요청 시만 처리)
         }
 
-        searchVO.setDisplayRowCount(12);// 페이징 처리
+        searchVO.setDisplayRowCount(12); // 페이징 처리
         searchVO.pageCalculate(projectService.selectProjectCount(searchVO));
 
         // 데이터 조회 처리

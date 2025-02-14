@@ -1,6 +1,7 @@
 package com.devkbil.mtssbj.member;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
@@ -27,8 +28,9 @@ public class MyUserDetailService implements UserDetailsService {
     @Override
     public UserVO loadUserByUsername(String insertedUserId) throws UsernameNotFoundException {
         // 사용자 정보를 데이터베이스에서 조회
-        UserVO userVO = Objects.requireNonNull(memberService.findOne(insertedUserId),
-                () -> { throw new UsernameNotFoundException("User not found with ID: " + insertedUserId); });
+        UserVO userVO = Objects.requireNonNull(memberService.findOne(insertedUserId), () -> {
+            throw new UsernameNotFoundException("User not found with ID: " + insertedUserId);
+        });
 
 //        return User.builder()
 //                .username(userVO.getUserid())

@@ -2,11 +2,15 @@ package com.devkbil.mtssbj.search;
 
 import com.devkbil.mtssbj.common.util.DateUtil;
 import com.devkbil.mtssbj.config.EsConfig;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -47,7 +51,7 @@ public class SearchController {
     static final String[] INCLUDE_FIELDS = {"brdno", "userno", "regdate", "regtime", "brdtitle", "brdwriter", "brdmemo", "brdhit"};
 
     @Value("${elasticsearch.clustername}")
-    private String INDEX_NAME = ""; // Elasticsearch 색인 이름
+    private String indexName = ""; // Elasticsearch 색인 이름
 
     /**
      * 검색 페이지를 반환합니다.
@@ -83,7 +87,7 @@ public class SearchController {
                 return;
             }
 
-            if ("".equals(searchVO.getSearchKeyword()) || !"".equals(INDEX_NAME)) {
+            if ("".equals(searchVO.getSearchKeyword()) || !"".equals(indexName)) {
                 return;
             }
 
@@ -103,7 +107,7 @@ public class SearchController {
             searchSourceBuilder.aggregation(aggregation);
 
             // 검색 요청 생성
-            SearchRequest searchRequest = new SearchRequest(INDEX_NAME).source(searchSourceBuilder);
+            SearchRequest searchRequest = new SearchRequest(indexName).source(searchSourceBuilder);
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
 
             // 검색 결과를 JSON으로 반환

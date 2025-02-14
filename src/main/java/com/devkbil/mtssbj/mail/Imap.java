@@ -3,17 +3,38 @@ package com.devkbil.mtssbj.mail;
 import com.devkbil.mtssbj.common.util.DateUtil;
 import com.devkbil.mtssbj.common.util.FileUtil;
 import com.devkbil.mtssbj.common.util.FileVO;
-import jakarta.mail.*;
+
+import jakarta.mail.Address;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.Part;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Store;
 import jakarta.mail.internet.MimeUtility;
 import jakarta.mail.search.AndTerm;
 import jakarta.mail.search.ComparisonTerm;
 import jakarta.mail.search.ReceivedDateTerm;
 import jakarta.mail.search.SearchTerm;
+
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 import java.util.stream.IntStream;
+
 
 /**
  * Imap 클래스는 IMAP 이메일 서버에 연결하고, 이메일 메시지를 관리하며,

@@ -3,9 +3,12 @@ package com.devkbil.mtssbj.develop.dbtool;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -84,11 +87,11 @@ public class DbtoolController {
     @ApiResponse(responseCode = "200", description = "레코드가 정상적으로 조회되었습니다.")
     @GetMapping("/tableLayout")
     public String tableLayout(
-            @RequestParam(value = "columnComments", required = false) String columnComments
-            , @RequestParam(value = "columnName", required = false) String columnName
-            , @RequestParam(value = "tableName", required = false) String tableName
-            , @ModelAttribute @Valid DbtoolVO dbtoolVO
-            , ModelMap modelMap) throws IOException {
+        @RequestParam(value = "columnComments", required = false) String columnComments,
+        @RequestParam(value = "columnName", required = false) String columnName,
+        @RequestParam(value = "tableName", required = false) String tableName,
+        @ModelAttribute @Valid DbtoolVO dbtoolVO,
+        ModelMap modelMap) throws IOException {
 
         DbtoolVO param = new DbtoolVO();
 

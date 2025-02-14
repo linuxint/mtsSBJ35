@@ -3,14 +3,18 @@ package com.devkbil.mtssbj.crud;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.ObjectUtils;
@@ -44,15 +48,12 @@ public class ChkController {
      * @return JSP 페이지 경로 : "crud/ChkList"
      */
     @Operation(
-            summary = "체크 리스트 조회",
-            description = "CRUD 데이터 리스트를 반환합니다. 페이징 관련 계산과 리스트 데이터를 제공하며, 사용자 세션 정보를 처리합니다.",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "정상적으로 리스트 페이지 반환",
-                            content = @Content(schema = @Schema(implementation = String.class))
-                    )
-            }
+        summary = "체크 리스트 조회",
+        description = "CRUD 데이터 리스트를 반환합니다. 페이징 관련 계산과 리스트 데이터를 제공하며, 사용자 세션 정보를 처리합니다.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "정상적으로 리스트 페이지 반환",
+                content = @Content(schema = @Schema(implementation = String.class)))
+        }
     )
     @GetMapping("/chkList")
     public String chkList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
@@ -82,12 +83,12 @@ public class ChkController {
      * @return "redirect:/chkList" 삭제 후 리스트 페이지로 리다이렉션
      */
     @Operation(
-            summary = "선택된 행 삭제",
-            description = "사용자가 선택한 행을 삭제한 후, 리스트 페이지로 리다이렉션합니다.",
-            responses = {
-                    @ApiResponse(responseCode = "302", description = "체크 리스트 페이지로 리다이렉션"),
-                    @ApiResponse(responseCode = "400", description = "삭제할 데이터가 없거나 유효하지 않은 경우 예외 발생")
-            }
+        summary = "선택된 행 삭제",
+        description = "사용자가 선택한 행을 삭제한 후, 리스트 페이지로 리다이렉션합니다.",
+        responses = {
+            @ApiResponse(responseCode = "302", description = "체크 리스트 페이지로 리다이렉션"),
+            @ApiResponse(responseCode = "400", description = "삭제할 데이터가 없거나 유효하지 않은 경우 예외 발생")
+        }
     )
     @PostMapping("/chkDelete")
     public String chkDelete(@RequestParam(value = "checkRow", required = false) String[] checkRow) {

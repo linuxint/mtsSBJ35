@@ -1,30 +1,50 @@
 package com.devkbil.mtssbj.common.util;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 @Slf4j
 public class FileUtil {
-    static final Integer IMG_WIDTH = 100;
-    static final Integer IMG_HEIGHT = 100;
-    public static int nSUCCESS = 1;
+    static final Integer imgWidth = 100;
+    static final Integer imgHeight = 100;
+    public static int nSuccess = 1;
     public static int nException = 0;
-    public static int nFAILER = -1;
-    static int BUFFER_SIZE = 1024; /** fileCopy BUFFER_SIZE **/
+    public static int nFailer = -1;
+    static int bufferSize = 1024; /** fileCopy BUFFER_SIZE **/
 
     /**
      * 실제 파일 저장.
@@ -48,9 +68,9 @@ public class FileUtil {
     }
 
     private static BufferedImage resizeImage(BufferedImage srcImage, int type) {
-        BufferedImage resizedImage = new BufferedImage(IMG_WIDTH, IMG_HEIGHT, type);
+        BufferedImage resizedImage = new BufferedImage(imgWidth, imgHeight, type);
         Graphics2D g2 = resizedImage.createGraphics();
-        g2.drawImage(srcImage, 0, 0, IMG_WIDTH, IMG_HEIGHT, null);
+        g2.drawImage(srcImage, 0, 0, imgWidth, imgHeight, null);
         g2.dispose();
 
         return resizedImage;
@@ -112,7 +132,7 @@ public class FileUtil {
         int nRtn;
 
         if (!StringUtils.hasText(srcFilePath)) {
-            return nFAILER;
+            return nFailer;
         }
 
         //  파일명변경: ".bak" 추가
@@ -120,9 +140,9 @@ public class FileUtil {
         File destFile = new File(destFilePath);
 
         if (!srcFile.renameTo(destFile)) {
-            return nFAILER;
+            return nFailer;
         } else {
-            return nSUCCESS;
+            return nSuccess;
         }
 
     }
@@ -182,7 +202,7 @@ public class FileUtil {
      * @return true/false
      */
     public static int bufferFileCopy(String source, String target) {
-        int retValue = nSUCCESS;
+        int retValue = nSuccess;
         File sourceFile = new File(source);
 
         FileInputStream inputStream = null;
@@ -191,7 +211,7 @@ public class FileUtil {
         BufferedOutputStream bout = null;
 
         int bytesRead;
-        byte[] buffer = new byte[BUFFER_SIZE];
+        byte[] buffer = new byte[bufferSize];
 
         try {
             inputStream = new FileInputStream(sourceFile);
@@ -200,7 +220,7 @@ public class FileUtil {
             bin = new BufferedInputStream(inputStream);
             bout = new BufferedOutputStream(outputStream);
 
-            while ((bytesRead = bin.read(buffer, 0, BUFFER_SIZE)) != -1) {
+            while ((bytesRead = bin.read(buffer, 0, bufferSize)) != -1) {
                 bout.write(buffer, 0, bytesRead);
             }
         } catch (Exception e) {
@@ -234,7 +254,7 @@ public class FileUtil {
      * @return true/false
      */
     public static int channelFileCopy(String source, String target) {
-        int retValue = nSUCCESS;
+        int retValue = nSuccess;
         long retSize;
         /** source file Define **/
         File sourceFile = new File(source);
@@ -771,7 +791,7 @@ public class FileUtil {
         OutputStream out = new FileOutputStream(tFile);
 
         int read = 0;
-        byte[] buf = new byte[BUFFER_SIZE];
+        byte[] buf = new byte[bufferSize];
         while ((read = in.read(buf)) != -1) {
             out.write(buf, 0, read);
         }
@@ -1055,26 +1075,26 @@ public class FileUtil {
      * @return
      */
     public static List<String> getClassList(Class<?> clz) {
-        List<String> classList = new ArrayList<String>();
+        List<String> classNames = new ArrayList<String>();
         //logger.fine("clz.getResource : " + clz.getResource(""));
-        File ncpCommonUtil = null;
+        File resourceFile = null;
 
         try {
-            ncpCommonUtil = new File(clz.getResource("").getFile());
+            resourceFile = new File(clz.getResource("").getFile());
         } catch (Exception e) {
             //logger.severe(e.toString());
             return null;
         }
 
-        if (ncpCommonUtil.exists() && ncpCommonUtil.isDirectory()) {
+        if (resourceFile.exists() && resourceFile.isDirectory()) {
             //logger.fine("is Classes");
             String packageName = FileUtil.class.getPackage().getName();
-            for (String className : ncpCommonUtil.list()) {
-                classList.add(packageName + "." + className.replace(".class", ""));
+            for (String fileName : resourceFile.list()) {
+                classNames.add(packageName + "." + fileName.replace(".class", ""));
             }
         } else {
             //logger.fine("is Jar");
-            String path = ncpCommonUtil.getPath().substring(6).replace('\\', '/');
+            String path = resourceFile.getPath().substring(6).replace('\\', '/');
             String[] info = path.split("!/");
             JarFile jar = null;
             try {
@@ -1082,16 +1102,16 @@ public class FileUtil {
             } catch (IOException e1) {
                 //logger.severe(e1.toString());
             }
-            Enumeration<JarEntry> e = jar.entries();
-            while (e.hasMoreElements()) {
-                String className = e.nextElement().getName();
-                if (className.startsWith(info[1]) && className.length() > 16) {
-                    classList.add(className.replace("/", ".").replace(".class", ""));
+            Enumeration<JarEntry> entries = jar.entries();
+            while (entries.hasMoreElements()) {
+                String entryName = entries.nextElement().getName();
+                if (entryName.startsWith(info[1]) && entryName.length() > 16) {
+                    classNames.add(entryName.replace("/", ".").replace(".class", ""));
                 }
             }
         }
 
-        return classList;
+        return classNames;
     }
 
     /**
@@ -1102,37 +1122,37 @@ public class FileUtil {
      * @return
      */
     public static Map<String, InputStream> getFileListInJar(String classpath, List<String> extList) {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        URL url = loader.getResource(classpath);
-        String path = url.getFile().substring(6).replace('\\', '/');
-        String[] info = path.split("!/");
-        JarFile jar = null;
-        Map<String, InputStream> result = new HashMap<String, InputStream>();
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        URL resourceUrl = classLoader.getResource(classpath);
+        String resourcePath = resourceUrl.getFile().substring(6).replace('\\', '/');
+        String[] resourceInfo = resourcePath.split("!/");
+        JarFile jarFile = null;
+        Map<String, InputStream> resultMap = new HashMap<>();
         try {
-            jar = new JarFile(info[0]);
-        } catch (IOException e1) {
+            jarFile = new JarFile(resourceInfo[0]);
+        } catch (IOException ioException) {
         }
-        Enumeration<JarEntry> e = jar.entries();
-        while (e.hasMoreElements()) {
-            ZipEntry ze = e.nextElement();
-            String className = ze.getName();
+        Enumeration<JarEntry> jarEntries = jarFile.entries();
+        while (jarEntries.hasMoreElements()) {
+            ZipEntry zipEntry = jarEntries.nextElement();
+            String entryName = zipEntry.getName();
 
-            if (className.startsWith(info[1])) {
+            if (entryName.startsWith(resourceInfo[1])) {
                 try {
-                    String[] fs = className.split("\\.");
-                    if (fs.length > 1 && extList.contains(fs[1])) {
-                        // logger.fine(className);
-                        result.put(className, jar.getInputStream(ze));
+                    String[] fileSplit = entryName.split("\\.");
+                    if (fileSplit.length > 1 && extList.contains(fileSplit[1])) {
+                        // logger.fine(entryName);
+                        resultMap.put(entryName, jarFile.getInputStream(zipEntry));
                     }
 
-                } catch (IOException e1) {
+                } catch (IOException ioException) {
                     // Auto-generated catch block
-                    e1.printStackTrace();
+                    ioException.printStackTrace();
                 }
             }
         }
 
-        return result;
+        return resultMap;
     }
 
     public static JarFile getJarFile(String classpath) throws IOException {
@@ -1223,7 +1243,7 @@ public class FileUtil {
             file.transferTo(file1);
             BufferedImage srcImage = ImageIO.read(file1);
             int type = srcImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : srcImage.getType();
-            if (srcImage.getWidth() > IMG_WIDTH && srcImage.getHeight() > IMG_HEIGHT) {
+            if (srcImage.getWidth() > imgWidth && srcImage.getHeight() > imgHeight) {
                 BufferedImage resizeImageJpg = resizeImage(srcImage, type);
                 ImageIO.write(resizeImageJpg, ext, new File(serverFullPath + "1"));
                 newName += "1";
@@ -1245,12 +1265,12 @@ public class FileUtil {
         return path + filename.substring(0, 4) + "/" + filename.substring(4, 6) + "/" + filename.substring(6, 8) + "/";
     }
 
-    public int getBUFFER_SIZE() {
-        return BUFFER_SIZE;
+    public int getBufferSize() {
+        return bufferSize;
     }
 
-    public void setBUFFER_SIZE(int BUFFER_SIZE) {
-        FileUtil.BUFFER_SIZE = BUFFER_SIZE;
+    public void setBufferSize(int bufferSize) {
+        FileUtil.bufferSize = bufferSize;
     }
 
     /**
@@ -1262,9 +1282,9 @@ public class FileUtil {
      */
     public int streamFileCopy(String source, String target) {
         if (source == null || target == null) {
-            return nFAILER;
+            return nFailer;
         }
-        int retValue = nSUCCESS;
+        int retValue = nSuccess;
 
         File sourceFile = new File(source);
 
@@ -1272,13 +1292,13 @@ public class FileUtil {
         FileOutputStream outputStream = null;
 
         int bytesRead;
-        byte[] buffer = new byte[BUFFER_SIZE];
+        byte[] buffer = new byte[bufferSize];
 
         try {
             inputStream = new FileInputStream(sourceFile);
             outputStream = new FileOutputStream(target);
 
-            while ((bytesRead = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1) {
+            while ((bytesRead = inputStream.read(buffer, 0, bufferSize)) != -1) {
                 outputStream.write(buffer, 0, bytesRead);
             }
         } catch (Exception e) {

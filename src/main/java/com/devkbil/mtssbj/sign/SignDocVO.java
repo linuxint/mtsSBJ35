@@ -1,8 +1,10 @@
 package com.devkbil.mtssbj.sign;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,8 +17,7 @@ import lombok.Setter;
  */
 @Schema(description = "결재문서를 나타내는 VO 객체 : SignDocVO")
 @XmlRootElement(name = "SignDocVO") // XML의 루트 엘리먼트 정의
-@XmlType(propOrder = {"docno", "doctitle", "doccontents", "docstatus", "docstep", "dtno", "dttitle", "userno", "usernm",
-        "deptnm", "chgdate", "docsignpath"}) // XML 직렬화 순서 지정
+@XmlType(propOrder = {"docno", "doctitle", "doccontents", "docstatus", "docstep", "dtno", "dttitle", "userno", "usernm", "deptnm", "chgdate", "docsignpath"}) // XML 직렬화 순서 지정
 @Getter
 @Setter
 public class SignDocVO {

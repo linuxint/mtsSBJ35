@@ -3,12 +3,15 @@ package com.devkbil.mtssbj.config;
 import com.github.gavlyukovskiy.boot.jdbc.decorator.dsproxy.ConnectionIdManagerProvider;
 import com.p6spy.engine.common.ConnectionInformation;
 import com.p6spy.engine.event.JdbcEventListener;
+
 import lombok.extern.slf4j.Slf4j;
+
 import net.ttddyy.dsproxy.ExecutionInfo;
 import net.ttddyy.dsproxy.QueryInfo;
 import net.ttddyy.dsproxy.listener.QueryExecutionListener;
 import net.ttddyy.dsproxy.transform.ParameterTransformer;
 import net.ttddyy.dsproxy.transform.QueryTransformer;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,13 +36,13 @@ public class P6SpyConfig {
     public JdbcEventListener myListener() {
         return new JdbcEventListener() {
             @Override
-            public void onAfterGetConnection(ConnectionInformation connectionInformation, SQLException e) {
-                log.info("got connection");
+            public void onAfterGetConnection(ConnectionInformation connectionInformation, SQLException ex) {
+                log.info("got connection {}", ex.getMessage());
             }
 
             @Override
-            public void onAfterConnectionClose(ConnectionInformation connectionInformation, SQLException e) {
-                log.info("connection closed");
+            public void onAfterConnectionClose(ConnectionInformation connectionInformation, SQLException ex) {
+                log.info("connection closed {}", ex.getMessage());
             }
         };
     }

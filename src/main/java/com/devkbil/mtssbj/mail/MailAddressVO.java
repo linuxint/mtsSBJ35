@@ -1,8 +1,10 @@
 package com.devkbil.mtssbj.mail;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,4 +32,4 @@ public class MailAddressVO {
     @Schema(description = "주소 순번", example = "1")
     private Integer easeq; // 주소 순번
 
-} 
+}

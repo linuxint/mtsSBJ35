@@ -2,9 +2,12 @@ package com.devkbil.mtssbj.mail;
 
 import com.devkbil.mtssbj.common.util.FileVO;
 import com.devkbil.mtssbj.search.SearchVO;
+
 import jakarta.mail.MessagingException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionException;
@@ -161,11 +164,11 @@ public class MailService {
 
             // SMTP 전송
             SendMail mailSender = new SendMail(
-                    fromVO.getEmismtp()
-                    , fromVO.getEmismtpport()
-                    , fromVO.getEmiuser()
-                    , fromVO.getUsernm()
-                    , fromVO.getEmipw()
+                fromVO.getEmismtp(),
+                fromVO.getEmismtpport(),
+                fromVO.getEmiuser(),
+                fromVO.getUsernm(),
+                fromVO.getEmipw()
             );
             mailSender.send(true, to, cc, bcc, param.getEmsubject(), param.getEmcontents());
 

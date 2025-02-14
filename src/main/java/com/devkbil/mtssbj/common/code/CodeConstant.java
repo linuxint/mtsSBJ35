@@ -44,23 +44,23 @@ public class CodeConstant {
     @Getter
     public enum CodeGroup {
         USER("사용자롤", new CodeOption[]{
-                CodeOption.ADMIN, CodeOption.USER
+            CodeOption.ADMIN, CodeOption.USER
         }),
         SIGN("문서결제상태", new CodeOption[]{
-                CodeOption.SAVE, CodeOption.DELAY, CodeOption.CONTINUE, CodeOption.REJECT, CodeOption.COMPLETE
+            CodeOption.SAVE, CodeOption.DELAY, CodeOption.CONTINUE, CodeOption.REJECT, CodeOption.COMPLETE
         }),
         POSITION("직책구", new CodeOption[]{
-                //CodeOption.SAVE, CodeOption.DELAY, CodeOption.CONTINUE, CodeOption.REJECT, CodeOption.COMPLETE
+            //CodeOption.SAVE, CodeOption.DELAY, CodeOption.CONTINUE, CodeOption.REJECT, CodeOption.COMPLETE
         }),
         WORK("근무상태", new CodeOption[]{
-                CodeOption.WORK, CodeOption.MEET
+            CodeOption.WORK, CodeOption.MEET
         }),
         REPEAT("반복단위", new CodeOption[]{
-                CodeOption.NOREPEAT, CodeOption.WREPEAT, CodeOption.MREPEAT
+            CodeOption.NOREPEAT, CodeOption.WREPEAT, CodeOption.MREPEAT
         }),
 
         OPEN("공개여부", new CodeOption[]{
-                CodeOption.OPEN, CodeOption.CLOSE
+            CodeOption.OPEN, CodeOption.CLOSE
         }),
         EMPTY("없음", new CodeOption[]{});
 
@@ -74,14 +74,14 @@ public class CodeConstant {
 
         public static CodeGroup findGroup(CodeOption searchTarget) {
             return Arrays.stream(CodeGroup.values())
-                    .filter(group -> hasCodeOption(group, searchTarget))
-                    .findAny()
-                    .orElse(CodeGroup.EMPTY);
+                .filter(group -> hasCodeOption(group, searchTarget))
+                .findAny()
+                .orElse(CodeGroup.EMPTY);
         }
 
         private static boolean hasCodeOption(CodeGroup from, CodeOption searchTarget) {
             return Arrays.stream(from.containCode)
-                    .anyMatch(containCode -> containCode == searchTarget);
+                .anyMatch(containCode -> containCode == searchTarget);
         }
 
     }

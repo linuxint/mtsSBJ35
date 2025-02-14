@@ -2,10 +2,14 @@ package com.devkbil.mtssbj.main;
 
 import com.devkbil.mtssbj.common.util.DateUtil;
 import com.devkbil.mtssbj.search.SearchVO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletRequest;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -81,8 +85,8 @@ public class IndexController {
     @Operation(summary = "캘린더 날짜 이동", description = "Ajax 호출로 주간 캘린더 데이터를 업데이트합니다.")
     @PostMapping("/moveDate")
     public String moveDate(
-            @RequestParam(value = "date", required = false) String date
-            , HttpServletRequest request, ModelMap modelMap) {
+            @RequestParam(value = "date", required = false) String date,
+            HttpServletRequest request, ModelMap modelMap) {
 
         Date today = DateUtil.stringToDate(date);
 

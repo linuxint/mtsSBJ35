@@ -1,25 +1,26 @@
 package com.devkbil.mtssbj.admin.code;
 
 import com.devkbil.mtssbj.search.SearchVO;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import java.io.InputStream;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import java.util.List;
+import java.util.Map;
 
 /**
  * 공통 코드 서비스 클래스
@@ -57,7 +58,9 @@ public class CodeService {
             List<CodeVO> excelData = new ArrayList<>();
             for (int i = 1; i <= sheet.getLastRowNum(); i++) { // 1부터 시작 (헤더 제외)
                 Row row = sheet.getRow(i);
-                if (row == null) continue;
+                if (row == null) {
+                    continue;
+                }
 
                 CodeVO codeVO = new CodeVO();
                 codeVO.setClassno(getCellValue(row.getCell(0)));
@@ -108,9 +111,7 @@ public class CodeService {
         String header3 = getCellValue(headerRow.getCell(2)).trim();
 
         // 예상되는 헤더 값 (CLASSNO, CODECD, CODENM)
-        return "CLASSNO".equalsIgnoreCase(header1) &&
-                "CODECD".equalsIgnoreCase(header2) &&
-                "CODENM".equalsIgnoreCase(header3);
+        return "CLASSNO".equalsIgnoreCase(header1) && "CODECD".equalsIgnoreCase(header2) && "CODENM".equalsIgnoreCase(header3);
     }
 
     /**

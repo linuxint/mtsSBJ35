@@ -1,10 +1,13 @@
 package com.devkbil.mtssbj.project;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+
 import lombok.Getter;
 import lombok.Setter;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -14,8 +17,7 @@ import java.util.List;
  */
 @Schema(description = "프로젝트 작업 정보 : TaskVO")
 @XmlRootElement(name = "TaskVO")
-@XmlType(propOrder = {"prno", "tsno", "tsparent", "tssort", "tstitle", "tsstartdate", "tsenddate", "tsendreal",
-        "tsrate", "userno", "usernm", "statuscolor", "uploadfile"})
+@XmlType(propOrder = {"prno", "tsno", "tsparent", "tssort", "tstitle", "tsstartdate", "tsenddate", "tsendreal", "tsrate", "userno", "usernm", "statuscolor", "uploadfile"})
 @Getter
 @Setter
 public class TaskVO {

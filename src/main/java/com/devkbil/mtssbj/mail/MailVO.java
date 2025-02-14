@@ -1,9 +1,12 @@
 package com.devkbil.mtssbj.mail;
 
 import com.devkbil.mtssbj.common.util.FileVO;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,8 +18,7 @@ import java.util.ArrayList;
  */
 @Schema(description = "메일 : MailVO")
 @XmlRootElement(name = "MailVO")
-@XmlType(propOrder = {"emno", "emtype", "emfrom", "emsubject", "emcontents", "regdate", "userno", "usernm", "emino",
-        "strTo", "strCc", "strBcc", "emto", "emcc", "embcc", "files"})
+@XmlType(propOrder = {"emno", "emtype", "emfrom", "emsubject", "emcontents", "regdate", "userno", "usernm", "emino", "strTo", "strCc", "strBcc", "emto", "emcc", "embcc", "files"})
 @Getter
 @Setter
 public class MailVO {

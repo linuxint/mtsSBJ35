@@ -3,12 +3,15 @@ package com.devkbil.mtssbj.config.security;
 import com.devkbil.mtssbj.config.ConfigConstant;
 import com.devkbil.mtssbj.member.MemberService;
 import com.devkbil.mtssbj.member.UserVO;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.DefaultRedirectStrategy;
@@ -96,12 +99,11 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
             String targetUrl = savedRequest.getRedirectUrl();
             log.info("targetUrl = {}", targetUrl);
             redirectStrategy.sendRedirect(request, response, targetUrl);
-        }
-        // 로그인 버튼 눌러서 로그인한 경우 기존에 있던 페이지로 리다이렉트
-        else {
+        } else {
+            // 로그인 버튼 눌러서 로그인한 경우 기존에 있던 페이지로 리다이렉트
             String prevPage = (String) request.getSession().getAttribute("prevPage");
             log.info("prevPage = {}", prevPage);
-            if(!StringUtils.hasText(prevPage)) {
+            if (!StringUtils.hasText(prevPage)) {
                 prevPage = ConfigConstant.URL_MAIN;
             }
             redirectStrategy.sendRedirect(request, response, prevPage);

@@ -1,8 +1,10 @@
 package com.devkbil.mtssbj.mail;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,8 +14,7 @@ import lombok.Setter;
  */
 @Schema(description = "메일정보 : MailInfoVO")
 @XmlRootElement(name = "MailInfoVO")
-@XmlType(propOrder = {"emino", "emiimap", "emiimapport", "emismtp", "emismtpport", "emiuser", "emipw", "userno",
-        "usernm"})
+@XmlType(propOrder = {"emino", "emiimap", "emiimapport", "emismtp", "emismtpport", "emiuser", "emipw", "userno", "usernm"})
 @Getter
 @Setter
 public class MailInfoVO {

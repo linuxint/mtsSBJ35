@@ -9,7 +9,7 @@ import java.sql.SQLException;
 public class P6SpyEventListener extends JdbcEventListener {
 
     @Override
-    public void onAfterGetConnection(ConnectionInformation connectionInformation, SQLException e) {
+    public void onAfterGetConnection(ConnectionInformation connectionInformation, SQLException ex) {
         P6SpyOptions.getActiveInstance().setLogMessageFormat(P6SpyFormatter.class.getName());
     }
 }

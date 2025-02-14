@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MaskingUtil {
-    public static String MaskingOf(MaskingType maskType, String value) {
+    public static String maskingOf(MaskingType maskType, String value) {
         return switch (maskType) {
             case NAME -> nameMaskOf(value);
             case PHONE_NUMBER -> phoneNumberMaskOf(value);

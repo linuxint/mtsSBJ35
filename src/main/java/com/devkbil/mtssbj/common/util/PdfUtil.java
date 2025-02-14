@@ -1,6 +1,7 @@
 package com.devkbil.mtssbj.common.util;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
@@ -11,11 +12,17 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
-import javax.imageio.*;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
-import java.awt.*;
+
+import java.awt.Color;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,8 +33,8 @@ import java.util.List;
 @Slf4j
 public class PdfUtil {
 
-    public void PdfUtil() {
-    }
+    static int dpi = 300;
+    static ImageType imageType = ImageType.RGB; //This can be GRAY,ARGB,BINARY, BGR
 
     /**
      * 박스를 그린다.
@@ -84,52 +91,34 @@ public class PdfUtil {
         contentStream.stroke();
     }
 
-    /**
-     * 테이블을 그린다.
-     *
-     * @param page
-     * @param contentStream
-     * @param y
-     * @param margin
-     * @param content
-     * @throws Exception
-     */
-    public void drawTable(PDPage page, PDPageContentStream contentStream, PDFont font, float y, float margin, String[][] content) throws Exception {
-        final int rows = content.length;
-        final int cols = content[0].length;
+    public static boolean separate(File pdfFile, int numPages, int start, int end) {
+        try {
+            //pdf 파일 로드
+            PDDocument pdfDocument = Loader.loadPDF(pdfFile);
+            // 분리함수사용하기 위한 객체 생성.
+            Splitter pdfSplitter = new Splitter();
+            pdfSplitter.setStartPage(start);
+            pdfSplitter.setSplitAtPage(numPages);
+            pdfSplitter.setEndPage(end);
+            // 분리후 파일 리스트
+            List<PDDocument> pdfPages = pdfSplitter.split(pdfDocument);
 
-        final float rowHeight = 20f;
-        final float tableWidth = page.getMediaBox().getWidth() - (2 * margin);
-        final float tableHeight = rowHeight * rows;
-
-        final float colWidth = tableWidth / (float) cols;
-        final float cellMargin = 5f;
-
-        // 행을 그린다.
-        float nexty = y;
-        for (int i = 0; i <= rows; i++) {
-            drawLine(contentStream, margin, nexty, margin + tableWidth, nexty);
-            nexty -= rowHeight;
-        }
-
-        // 열을 그린다.
-        float nextx = margin;
-        for (int i = 0; i <= cols; i++) {
-            drawLine(contentStream, nextx, y, nextx, y - tableHeight);
-            nextx += colWidth;
-        }
-
-        float textx = margin + cellMargin;
-        float texty = y - 15;
-
-        for (int i = 0; i < content.length; i++) {
-            for (int j = 0; j < content[i].length; j++) {
-                String text = content[i][j];
-                drawText(text, font, 12, textx, texty, contentStream);
-                textx += colWidth;
+            Iterator<PDDocument> pageIterator = pdfPages.listIterator();
+            //분리된 파일 저장
+            int iteration = 1;
+            while (pageIterator.hasNext()) {
+                PDDocument splitDoc = pageIterator.next();
+                String folderPath = pdfFile.getParent();
+                String baseName = pdfFile.getName().substring(0, pdfFile.getName().lastIndexOf("."));
+                int startPageNum = start + (iteration - 1) * numPages;
+                int endPageNum = iteration * numPages > end ? iteration * numPages : end;
+                splitDoc.save(folderPath + File.separator + baseName + (startPageNum + "~" + endPageNum) + ".pdf");
             }
-            texty -= rowHeight;
-            textx = margin + cellMargin;
+            System.out.println("PDF 분리완료!");
+            pdfDocument.close();
+            return true;
+        } catch (Exception error) {
+            return false;
         }
     }
 
@@ -151,34 +140,23 @@ public class PdfUtil {
         return separate(file, endPage - startPage + 1, startPage, endPage);
     }
 
-    public static boolean separate(File file, int page, int startPage, int endPage) {
-        try {
-            //pdf 파일 로드
-            PDDocument document = Loader.loadPDF(file);
-            // 분리함수사용하기 위한 객체 생성.
-            Splitter splitter = new Splitter();
-            splitter.setStartPage(startPage);
-            splitter.setSplitAtPage(page);
-            splitter.setEndPage(endPage);
-            // 분리후 파일 리스트
-            List<PDDocument> Pages = splitter.split(document);
+    /**
+     * pdf to images
+     *
+     * @param pdf
+     * @param type
+     * @throws Exception
+     */
+    public static void convertToSeparateImageFiles(File pdf, String type) throws Exception {
+//        try (PDDocument document = PDDocument.load(pdf)) { // pdfbox 2.x
+        try (PDDocument document = Loader.loadPDF(pdf)) { // pdfbox 3.x
+            PDFRenderer pdfRenderer = new PDFRenderer(document);
+            for (int page = 0; page < document.getNumberOfPages(); page++) {
+                BufferedImage bim = pdfRenderer.renderImageWithDPI(page, dpi, imageType);
 
-            Iterator<PDDocument> iterator = Pages.listIterator();
-            //분리된 파일 저장
-            int i = 1;
-            while (iterator.hasNext()) {
-                PDDocument pd = iterator.next();
-                String folderPath = file.getParent();
-                String fileName = file.getName().substring(0, file.getName().lastIndexOf("."));
-                int start = startPage + (i - 1) * page;
-                int end = i * page > endPage ? i * page : endPage;
-                pd.save(folderPath + File.separator + fileName + (start + "~" + end) + ".pdf");
+                File outputFile = new File(pdf.getAbsoluteFile().getParent() + File.separator + pdf.getName() + "-P-" + page + "." + type);
+                ImageIO.write(bim, type, outputFile);
             }
-            System.out.println("PDF 분리완료!");
-            document.close();
-            return true;
-        } catch (Exception e) {
-            return false;
         }
     }
 
@@ -222,30 +200,6 @@ public class PdfUtil {
     }
 
     /**
-     * pdf to images
-     *
-     * @param pdf
-     * @param type
-     * @throws Exception
-     */
-    public static void convertToSeparateImageFiles(File pdf, String type) throws Exception {
-        int DPI = 300;
-        ImageType IMAGE_TYPE = ImageType.RGB;//This can be GRAY,ARGB,BINARY, BGR
-
-//        try (PDDocument document = PDDocument.load(pdf)) { // pdfbox 2.x
-        try (PDDocument document = Loader.loadPDF(pdf)) { // pdfbox 3.x
-            PDFRenderer pdfRenderer = new PDFRenderer(document);
-            for (int page = 0; page < document.getNumberOfPages(); page++) {
-                BufferedImage bim = pdfRenderer.renderImageWithDPI(page, DPI, IMAGE_TYPE);
-
-                File outputFile = new File(pdf.getAbsoluteFile().getParent() +
-                        File.separator + pdf.getName() + "-P-" + page + "." + type);
-                ImageIO.write(bim, type, outputFile);
-            }
-        }
-    }
-
-    /**
      * pdf to image with compression
      *
      * @param pdf
@@ -253,9 +207,6 @@ public class PdfUtil {
      * @throws Exception
      */
     public static void convertToSeparateImageFilesWithCompression(File pdf, String type) throws Exception {
-        int DPI = 300;
-        ImageType IMAGE_TYPE = ImageType.RGB;//This can be GRAY,ARGB,BINARY, BGR
-
 //        try (PDDocument document = PDDocument.load(pdf)) { // pdfbox 2.x
         try (PDDocument document = Loader.loadPDF(pdf)) { // pdfbox 3.x
             ImageWriter writer = null;
@@ -269,10 +220,9 @@ public class PdfUtil {
                 PDFRenderer pdfRenderer = new PDFRenderer(document);
 
                 for (int page = 0; page < document.getNumberOfPages(); page++) {
-                    BufferedImage bim = pdfRenderer.renderImageWithDPI(page, DPI, IMAGE_TYPE);
+                    BufferedImage bim = pdfRenderer.renderImageWithDPI(page, dpi, imageType);
 
-                    File outputFile = new File(pdf.getAbsoluteFile().getParent() +
-                            File.separator + pdf.getName() + "-compressed-P-" + page + "." + type);
+                    File outputFile = new File(pdf.getAbsoluteFile().getParent() + File.separator + pdf.getName() + "-compressed-P-" + page + "." + type);
                     ImageOutputStream outputStream = new FileImageOutputStream(outputFile);
                     writer.setOutput(outputStream);
 
@@ -293,9 +243,6 @@ public class PdfUtil {
      * @throws Exception
      */
     public static void convertToSinglePageTiffs(File pdf) throws Exception {
-        int DPI = 300;
-        ImageType IMAGE_TYPE = ImageType.BINARY;//This can be GRAY,ARGB,BINARY, BGR
-
 //        try (PDDocument document = PDDocument.load(pdf)) { // pdfbox 2.x
         try (PDDocument document = Loader.loadPDF(pdf)) { // pdfbox 3.x
 
@@ -312,10 +259,9 @@ public class PdfUtil {
                 PDFRenderer pdfRenderer = new PDFRenderer(document);
 
                 for (int page = 0; page < document.getNumberOfPages(); page++) {
-                    BufferedImage bim = pdfRenderer.renderImageWithDPI(page, DPI, IMAGE_TYPE);
+                    BufferedImage bim = pdfRenderer.renderImageWithDPI(page, dpi, imageType);
 
-                    File outputFile = new File(pdf.getAbsoluteFile().getParent() +
-                            File.separator + pdf.getName() + "-compressed-P-" + page + ".tif");
+                    File outputFile = new File(pdf.getAbsoluteFile().getParent() + File.separator + pdf.getName() + "-compressed-P-" + page + ".tif");
                     ImageOutputStream outputStream = new FileImageOutputStream(outputFile);
                     writer.setOutput(outputStream);
                     writer.write(null, new IIOImage(bim, null, null), params);
@@ -336,9 +282,6 @@ public class PdfUtil {
      * @throws Exception
      */
     public static void convertToMultipageTiff(File pdf, File outputTiff) throws Exception {
-        int DPI = 300;
-        ImageType IMAGE_TYPE = ImageType.GRAY;//This can be GRAY,ARGB,BINARY, BGR
-
 //        try (PDDocument document = PDDocument.load(pdf)) { // pdfbox 2.x
         try (PDDocument document = Loader.loadPDF(pdf)) { // pdfbox 3.x
             try (ImageOutputStream ios = ImageIO.createImageOutputStream(outputTiff)) {
@@ -358,7 +301,7 @@ public class PdfUtil {
                     PDFRenderer pdfRenderer = new PDFRenderer(document);
 
                     for (int page = 0; page < document.getNumberOfPages(); page++) {
-                        BufferedImage bim = pdfRenderer.renderImageWithDPI(page, DPI, IMAGE_TYPE);
+                        BufferedImage bim = pdfRenderer.renderImageWithDPI(page, dpi, imageType);
 
                         IIOMetadata metadata = writer.getDefaultImageMetadata(new ImageTypeSpecifier(bim), params);
                         writer.writeToSequence(new IIOImage(bim, null, metadata), params);
@@ -369,6 +312,55 @@ public class PdfUtil {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * 테이블을 그린다.
+     *
+     * @param page
+     * @param contentStream
+     * @param posy
+     * @param margin
+     * @param content
+     * @throws Exception
+     */
+    public void drawTable(PDPage page, PDPageContentStream contentStream, PDFont font, float posy, float margin, String[][] content) throws Exception {
+        final int rows = content.length;
+        final int cols = content[0].length;
+
+        final float rowHeight = 20f;
+        final float tableWidth = page.getMediaBox().getWidth() - (2 * margin);
+        final float tableHeight = rowHeight * rows;
+
+        final float colWidth = tableWidth / (float) cols;
+        final float cellMargin = 5f;
+
+        // 행을 그린다.
+        float nexty = posy;
+        for (int i = 0; i <= rows; i++) {
+            drawLine(contentStream, margin, nexty, margin + tableWidth, nexty);
+            nexty -= rowHeight;
+        }
+
+        // 열을 그린다.
+        float nextx = margin;
+        for (int i = 0; i <= cols; i++) {
+            drawLine(contentStream, nextx, posy, nextx, posy - tableHeight);
+            nextx += colWidth;
+        }
+
+        float textx = margin + cellMargin;
+        float texty = posy - 15;
+
+        for (int i = 0; i < content.length; i++) {
+            for (int j = 0; j < content[i].length; j++) {
+                String text = content[i][j];
+                drawText(text, font, 12, textx, texty, contentStream);
+                textx += colWidth;
+            }
+            texty -= rowHeight;
+            textx = margin + cellMargin;
         }
     }
 

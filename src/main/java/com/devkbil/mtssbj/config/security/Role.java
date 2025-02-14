@@ -9,9 +9,9 @@ import java.util.Arrays;
 @Getter
 public enum Role {
 
-    ROLE_ADMIN("ADMIN")  // 관리자
-    , ROLE_USER("USER")  // 인가 사용자
-    , ROLE_GUEST("GUEST"); // 미인가 사용자
+    ROLE_ADMIN("ADMIN"),  // 관리자
+    ROLE_USER("USER"),  // 인가 사용자
+    ROLE_GUEST("GUEST"); // 미인가 사용자
 
     private final String value;
 

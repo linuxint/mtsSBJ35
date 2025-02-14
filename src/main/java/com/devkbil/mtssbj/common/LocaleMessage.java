@@ -1,6 +1,7 @@
 package com.devkbil.mtssbj.common;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Configuration;
 

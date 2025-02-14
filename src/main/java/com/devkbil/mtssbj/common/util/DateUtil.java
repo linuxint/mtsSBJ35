@@ -2,7 +2,9 @@ package com.devkbil.mtssbj.common.util;
 
 import com.devkbil.mtssbj.schedule.DateVO;
 import com.devkbil.mtssbj.schedule.MonthVO;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.util.StringUtils;
 
@@ -236,25 +238,25 @@ public class DateUtil {
         return cal.getTime();
     }
 
-    public static Date addDate(Date date, Date date1) {
+    public static Date addDate(Date baseDate, Date additionalDate) {
         if (evaluationOver()) {
             return new Date(0L);
         }
-        long l = date.getTime();
-        long l1 = date1.getTime();
-        long l2 = l + l1;
-        return new Date(l2);
+        long baseTime = baseDate.getTime();
+        long additionalTime = additionalDate.getTime();
+        long combinedTime = baseTime + additionalTime;
+        return new Date(combinedTime);
     }
 
-    public static Date addDay(Date date, long l) {
+    public static Date addDay(Date originalDate, long daysToAdd) {
         if (evaluationOver()) {
             return new Date(0L);
         }
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(5, (int) l);
-        Date date1 = calendar.getTime();
-        return date1;
+        calendar.setTime(originalDate);
+        calendar.add(Calendar.DATE, (int) daysToAdd);
+        Date updatedDate = calendar.getTime();
+        return updatedDate;
     }
 
     public static String addDay(String argBasicDate, int argAddDay) throws Exception {
@@ -315,56 +317,56 @@ public class DateUtil {
         return false;
     }
 
-    public static String formatDate(Date date, String s) {
+    public static String formatDate(Date inputDate, String dateFormatPattern) {
         if (evaluationOver()) {
             return MSG_ALERT;
         }
-        return DateFormatUtils.format(date, s);
+        return DateFormatUtils.format(inputDate, dateFormatPattern);
     }
 
     public static Date getGMTDate() {
         if (evaluationOver()) {
             return new Date(0L);
         }
-        Date date = new Date();
-        long l = date.getTime();
-        long l1 = (long) getServerGMTOffset() * 60 * 1000;
-        Date date1 = new Date(l - l1);
-        return date1;
+        Date currentDate = new Date();
+        long currentTimeMillis = currentDate.getTime();
+        long serverGMTOffsetMillis = (long) getServerGMTOffset() * 60 * 1000;
+        Date gmtDate = new Date(currentTimeMillis - serverGMTOffsetMillis);
+        return gmtDate;
     }
 
     public static int getGMTHour() {
         if (evaluationOver()) {
             return 0;
         }
-        Date date = getGMTDate();
-        int i = Integer.parseInt(formatDate(date, "H"));
-        return i;
+        Date gmtDate = getGMTDate();
+        int gmtHour = Integer.parseInt(formatDate(gmtDate, "H"));
+        return gmtHour;
     }
 
-    public static long getGMTOffset(Date date) {
+    public static long getGMTOffset(Date inputDate) {
         if (evaluationOver()) {
             return 0L;
         }
-        Date date1 = getGMTDate();
-        long l = date1.getTime();
-        long l1 = date.getTime();
-        double d = l1 - l;
-        double d1 = d / 1000.0D;
-        double d2 = Math.round(d1) / 60L;
-        return Math.round(d2);
+        Date gmtDate = getGMTDate();
+        long gmtDateTime = gmtDate.getTime();
+        long inputDateTime = inputDate.getTime();
+        double timeDifferenceMillis = inputDateTime - gmtDateTime;
+        double timeDifferenceSeconds = timeDifferenceMillis / 1000.0D;
+        double timeDifferenceMinutes = Math.round(timeDifferenceSeconds) / 60L;
+        return Math.round(timeDifferenceMinutes);
     }
 
-    public static String getMonthName(int argI) throws Exception {
-        int i = argI;
+    public static String getMonthName(int monthIndex) throws Exception {
+        int adjustedMonthIndex = monthIndex;
         if (evaluationOver()) {
             return MSG_ALERT;
         }
-        i--;
-        if ((i >= 0) && (i <= 11)) {
+        adjustedMonthIndex--;
+        if ((adjustedMonthIndex >= 0) && (adjustedMonthIndex <= 11)) {
             Calendar calendar = Calendar.getInstance();
-            calendar.set(5, 1);
-            calendar.set(2, i);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.MONTH, adjustedMonthIndex);
             return formatDate(calendar.getTime(), "MMMM");
         }
         return "";
@@ -383,14 +385,14 @@ public class DateUtil {
             return 0;
         }
         Calendar calendar = Calendar.getInstance();
-        int i = calendar.get(0);
-        int j = calendar.get(1);
-        int k = calendar.get(2);
-        int l = calendar.get(5);
-        int i1 = calendar.get(7);
-        int j1 = calendar.get(14);
-        int k1 = Calendar.getInstance().getTimeZone().getOffset(i, j, k, l, i1, j1);
-        return k1 / 1000 / 60;
+        int era = calendar.get(Calendar.ERA);
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        int millis = calendar.get(Calendar.MILLISECOND);
+        int offsetMillis = Calendar.getInstance().getTimeZone().getOffset(era, year, month, day, dayOfWeek, millis);
+        return offsetMillis / 1000 / 60;
     }
 
     /**
@@ -399,7 +401,6 @@ public class DateUtil {
      *
      * @return<br />
      */
-
     public static int getHour() {
 
         Calendar cal = Calendar.getInstance(Locale.getDefault());
@@ -413,7 +414,6 @@ public class DateUtil {
      *
      * @return<br />
      */
-
     public static int getMinute() {
 
         Calendar cal = Calendar.getInstance(Locale.getDefault());
@@ -427,7 +427,6 @@ public class DateUtil {
      *
      * @return<br />
      */
-
     public static int getYear() {
 
         Calendar cal = Calendar.getInstance(Locale.getDefault());
@@ -441,7 +440,6 @@ public class DateUtil {
      *
      * @return<br />
      */
-
     public static int getMonth() {
 
         Calendar cal = Calendar.getInstance(Locale.getDefault());
@@ -455,7 +453,6 @@ public class DateUtil {
      *
      * @return<br />
      */
-
     public static int getDate() {
 
         Calendar cal = Calendar.getInstance(Locale.getDefault());
@@ -475,7 +472,6 @@ public class DateUtil {
      * @param pOutformat String
      * @return java.lang.String
      */
-
     public static String getDateFormat(String pOutformat, Date vDate) {
 
         SimpleDateFormat pOutformatter = new SimpleDateFormat(pOutformat, Locale.KOREA);
@@ -499,7 +495,6 @@ public class DateUtil {
      * @param pOutformat String
      * @return java.lang.String
      */
-
     public static String getDateFormat(String pIndate, String pInformat, String pOutformat) {
 
         SimpleDateFormat pInformatter = new SimpleDateFormat(pInformat, Locale.KOREA);
@@ -526,7 +521,6 @@ public class DateUtil {
      * @param type String
      * @return java.lang.String
      */
-
     public static String getDateFormat(String date, String type) {
         String rDateString;
 
@@ -555,12 +549,11 @@ public class DateUtil {
      * @param type String
      * @return java.lang.String
      */
-
     public static String getDateFormat2(String date, String type) {
 
         String rDateString;
 
-        if ("00000000".equals(date) || "0".equals(date) || "".equals(date)) {// 00000000
+        if ("00000000".equals(date) || "0".equals(date) || "".equals(date)) {
             // 날짜이면
             // 공백리턴함
             rDateString = "";
@@ -578,7 +571,6 @@ public class DateUtil {
      * @param type String
      * @return java.lang.String
      */
-
     public static String getTimeFormat(String date, String type) {
 
         String rDateString = "";
@@ -613,7 +605,6 @@ public class DateUtil {
      * @param pMin       int
      * @return java.lang.String
      */
-
     public static String getFormattedDateAdd(String pIndate, String pInformat, String pOutformat, int pDay, int pHour, int pMin) {
 
         SimpleDateFormat pInformatter = new SimpleDateFormat(pInformat, Locale.KOREA);
@@ -693,7 +684,6 @@ public class DateUtil {
      * @param pMonth     int
      * @return java.lang.String
      */
-
     public static String getFormattedDateMonthAdd(String pIndate, String pInformat, String pOutformat, int pMonth) {
 
         SimpleDateFormat pInformatter = new SimpleDateFormat(pInformat, Locale.KOREA);
@@ -736,7 +726,6 @@ public class DateUtil {
      * @param pOutformat String
      * @param pHour      int
      */
-
     public static String getFormattedDateHourAdd(String pIndate, String pInformat, String pOutformat, int pHour) {
 
         SimpleDateFormat pInformatter = new SimpleDateFormat(pInformat, Locale.KOREA);
@@ -815,7 +804,6 @@ public class DateUtil {
      * @param amount
      * @return
      */
-
     public static String getAddDate(int amount) {
 
         Calendar cal = Calendar.getInstance(Locale.getDefault());
@@ -850,7 +838,6 @@ public class DateUtil {
      * @param amount
      * @return
      */
-
     public static String getAddMonth(String basicDate, int amount) {
 
         Calendar cal = Calendar.getInstance(Locale.getDefault());
@@ -891,7 +878,6 @@ public class DateUtil {
      * @param amount
      * @return
      */
-
     public static String getAddHour(int amount) {
 
         Calendar cal = Calendar.getInstance(Locale.getDefault());
@@ -909,7 +895,6 @@ public class DateUtil {
      * @param amount
      * @return
      */
-
     public static String getAddMonth(int amount) {
 
         Calendar cal = Calendar.getInstance(Locale.getDefault());
@@ -943,7 +928,6 @@ public class DateUtil {
      * @param yearMonth
      * @return
      */
-
     public static int getLastDayOfMonth(String yearMonth) {
 
         Calendar cal = Calendar.getInstance();
@@ -968,7 +952,6 @@ public class DateUtil {
      * @return "yyyy-MM-dd HH:mm:ss"
      * @throws ParseException
      */
-
     public static String getReqDate(String date, String format) {
 
         return getCurrentDate(date, format, yyyyMMddHHmmss_bar);
@@ -991,15 +974,14 @@ public class DateUtil {
      * [오퍼레이션명] getCurrentDate<br />
      * [요약] 날자 반환<br />
      *
-     * @param s
+     * @param dateFormat
      * @return<br />
      */
+    public static String getCurrentDate(String dateFormat) {
 
-    public static String getCurrentDate(String s) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.KOREA);
 
-        SimpleDateFormat simpledateformat = new SimpleDateFormat(s, Locale.KOREA);
-
-        return simpledateformat.format(new Date());
+        return simpleDateFormat.format(new Date());
 
     }
 
@@ -1007,19 +989,18 @@ public class DateUtil {
      * [오퍼레이션명] getCurrentDate<br />
      * [요약] 날자 반환<br />
      *
-     * @param date
-     * @param format
-     * @param s
+     * @param inputDate
+     * @param inputFormat
+     * @param outputFormat
      * @return<br />
      */
+    public static String getCurrentDate(String inputDate, String inputFormat, String outputFormat) {
 
-    public static String getCurrentDate(String date, String format, String s) {
-
-        SimpleDateFormat simpledateformat = new SimpleDateFormat(s, Locale.KOREA);
-        SimpleDateFormat simpledateformat2 = new SimpleDateFormat(format, Locale.KOREA);
+        SimpleDateFormat outputDateFormat = new SimpleDateFormat(outputFormat, Locale.KOREA);
+        SimpleDateFormat inputDateFormat = new SimpleDateFormat(inputFormat, Locale.KOREA);
 
         try {
-            return simpledateformat.format(simpledateformat2.parse(date));
+            return outputDateFormat.format(inputDateFormat.parse(inputDate));
         } catch (ParseException e) {
             return "";
         }
@@ -1030,15 +1011,14 @@ public class DateUtil {
      * [요약] 날자 반환<br />
      *
      * @param date
-     * @param s
+     * @param dateFormat
      * @return<br />
      */
+    public static String getCurrentDate(Date date, String dateFormat) {
 
-    public static String getCurrentDate(Date date, String s) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.KOREA);
 
-        SimpleDateFormat simpledateformat = new SimpleDateFormat(s, Locale.KOREA);
-
-        return simpledateformat.format(date);
+        return simpleDateFormat.format(date);
 
     }
 
