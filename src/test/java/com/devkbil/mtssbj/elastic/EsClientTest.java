@@ -77,8 +77,8 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
 
-import static org.junit.Assume.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assume.assumeNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class EsClientTest {
 
