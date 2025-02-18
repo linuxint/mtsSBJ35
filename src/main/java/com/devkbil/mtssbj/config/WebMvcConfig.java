@@ -1,6 +1,5 @@
 package com.devkbil.mtssbj.config;
 
-
 import com.devkbil.mtssbj.common.LocalDateFormatter;
 import com.devkbil.mtssbj.common.interceptor.AdminInterceptor;
 import com.devkbil.mtssbj.common.interceptor.CommonInterceptor;
@@ -18,6 +17,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.CacheControl;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.DefaultMessageCodesResolver;
 import org.springframework.validation.MessageCodesResolver;
 import org.springframework.validation.Validator;
@@ -117,17 +117,19 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 //        registry.addResourceHandler("/apidoc/**")
 //                .addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler(ConfigConstant.RESOURCES_JS)    //지정된 path pattern에 대한 handler를 추가합니다. ex) "/m/**"
-                .addResourceLocations(ConfigConstant.CLASSPATH_JS)  //반드시 /로 끝나야 정상적으로 동작함에 주의합니다. ex) "classpath:/m/"
-                .setCacheControl(CacheControl.noCache().cachePrivate());
-        registry.addResourceHandler(ConfigConstant.RESOURCES_IMAGES)
-                .addResourceLocations(ConfigConstant.CLASSPATH_IMAGES)
-                .setCachePeriod(20);    //caching period를 20초로 지정합니다. ex) 60 * 60 * 24 * 365
-        registry.addResourceHandler(ConfigConstant.RESOURCES_CSS)
-                .addResourceLocations(ConfigConstant.CLASSPATH_CSS)
-                .setCacheControl(CacheControl.noCache().cachePrivate());
+        addResourceHandler(registry, ResourcePath.RESOURCES_JS.getPath(), ResourcePath.CLASSPATH_JS.getPath());
+        addResourceHandler(registry, ResourcePath.RESOURCES_IMAGES.getPath(), ResourcePath.CLASSPATH_IMAGES.getPath());
+        addResourceHandler(registry, ResourcePath.RESOURCES_CSS.getPath(), ResourcePath.CLASSPATH_CSS.getPath());
+
+        // 에러 페이지는 공통 캐싱이 필요 없으므로 직접 추가
         registry.addResourceHandler(ConfigConstant.URL_ERROR)
-                .addResourceLocations(ConfigConstant.CLASSPATH_ERROR_PAGE);
+            .addResourceLocations(ConfigConstant.CLASSPATH_ERROR_PAGE);
+    }
+
+    private void addResourceHandler(ResourceHandlerRegistry registry, String path, String location) {
+        registry.addResourceHandler(path)
+            .addResourceLocations(location)
+            .setCacheControl(CacheControl.noCache().cachePrivate());
     }
 
     /**
@@ -141,7 +143,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addRedirectViewController(ConfigConstant.URL_MAIN, ConfigConstant.URL_LOGIN);
 
         // Index 페이지 설정
-        if (indexPage != null && !indexPage.isBlank()) {
+        if (StringUtils.hasText(indexPage)) {
             registry.addViewController("/").setViewName("forward:/" + indexPage);
         }
     }
