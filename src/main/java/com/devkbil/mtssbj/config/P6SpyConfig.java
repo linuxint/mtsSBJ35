@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Configuration
 @Slf4j
@@ -35,14 +36,22 @@ public class P6SpyConfig {
     @Bean
     public JdbcEventListener myListener() {
         return new JdbcEventListener() {
+
+            private void logConnection(String Msg, SQLException ex) {
+                String message = Optional.ofNullable(ex)
+                    .map(Throwable::getMessage)
+                    .orElse("ex is null");
+                log.info(Msg, message);
+            }
+
             @Override
             public void onAfterGetConnection(ConnectionInformation connectionInformation, SQLException ex) {
-                log.info("got connection {}", ex.getMessage());
+                logConnection("got connection : {}", ex);
             }
 
             @Override
             public void onAfterConnectionClose(ConnectionInformation connectionInformation, SQLException ex) {
-                log.info("connection closed {}", ex.getMessage());
+                logConnection("connection closed : {}", ex);
             }
         };
     }
