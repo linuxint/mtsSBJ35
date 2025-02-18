@@ -335,7 +335,7 @@
          WHERE REDELETEFLAG='N'
          ORDER BY RENO
        ]]>
-</select>
+    </select>
             
     <select id="selectBoardFiles4Indexing" parameterType="com.devkbil.mtssbj.common.ExtFieldVO" resultType="com.devkbil.mtssbj.common.util.FileVO">
         <![CDATA[
