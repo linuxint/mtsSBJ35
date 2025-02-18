@@ -1,5 +1,8 @@
 package com.devkbil.mtssbj;
 
+import org.junit.jupiter.api.Test;
+import org.springframework.util.StringUtils;
+
 public class StringUtilTest {
     public static void main(String[] args) {
         String[] page = "1".split(",");
@@ -29,5 +32,27 @@ public class StringUtilTest {
             nLoop++;
         }
 
+    }
+
+    @Test
+    public void hasTextTest() {
+        String str1 = "";
+        if(StringUtils.hasText(str1)) {
+            System.out.println("has text");
+        } else {
+            System.out.println("not has text");
+        }
+        String str2 = " ";
+        if(StringUtils.hasText(str2)) {
+            System.out.println("has text");
+        } else {
+            System.out.println("not has text");
+        }
+        String str3 = null;
+        if(StringUtils.hasText(str3)) {
+            System.out.println("has text");
+        } else {
+            System.out.println("not has text");
+        }
     }
 }
