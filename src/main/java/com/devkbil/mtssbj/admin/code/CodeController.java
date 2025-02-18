@@ -107,7 +107,7 @@ public class CodeController {
         modelMap.addAttribute("searchVO", searchVO);
         modelMap.addAttribute("listview", listview);
 
-        return "thymeleaf/admin/code/CodeList";
+        return "admin/code/CodeList";
     }
 
     /**
@@ -128,7 +128,7 @@ public class CodeController {
                 modelMap.addAttribute("readonly", "readonly");
             });
 
-        return "thymeleaf/admin/code/CodeForm";
+        return "admin/code/CodeForm";
     }
 
     /**
@@ -173,7 +173,7 @@ public class CodeController {
         Optional.ofNullable(codeService.selectCodeOne(codeVO))
             .ifPresent(codeInfo -> modelMap.addAttribute("codeInfo", codeInfo));
 
-        return "thymeleaf/admin/code/CodeRead";
+        return "admin/code/CodeRead";
     }
 
     /**
