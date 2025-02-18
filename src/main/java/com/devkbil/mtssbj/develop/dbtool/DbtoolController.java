@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,7 +37,7 @@ public class DbtoolController {
     public String viewTableData(@PathVariable("tableName") String tableName, Model model) {
         log.info("Request received for table: {}", tableName);
 
-        if (tableName == null || tableName.isBlank()) {
+        if (!StringUtils.hasText(tableName)) {
             log.error("Invalid tableName provided.");
             model.addAttribute("errorMessage", "Invalid or empty table name.");
             return "error";
