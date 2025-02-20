@@ -6,6 +6,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+/**
+ * ThemeInterceptor는 Spring MVC의 HandlerInterceptor를 구현한 클래스입니다.
+ * 요청에 대한 테마 설정을 관리하며, 세션에서 테마를 초기화하거나 가져와 뷰에서 사용할 수 있도록 제공합니다.
+ *
+ * 이 클래스는 모든 요청이 세션에 올바른 테마를 설정하도록 보장하며, 테마 정보를 뷰 레이어에 전달합니다.
+ */
 public class ThemeInterceptor implements HandlerInterceptor {
 
     @Override

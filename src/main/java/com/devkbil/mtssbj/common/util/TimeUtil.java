@@ -9,7 +9,6 @@ public class TimeUtil {
 
     private static long startTime;
     private static long endTime;
-    private static long diffTime;
 
     public void setStartTime() {
         startTime = System.currentTimeMillis();
@@ -20,8 +19,7 @@ public class TimeUtil {
     }
 
     public long getDiffTime() {
-        diffTime = endTime - startTime;
-        return diffTime;
+        return endTime - startTime;
     }
 
     public String formatTime(long lTime) {
@@ -34,17 +32,16 @@ public class TimeUtil {
 
     /**
      * diffTime
-     * <p>
+     *
      * 두 시각과의 차이를 구한다.
      *
+     * @param fromTime String - 시작시각
+     * @param toTime String - 종료시각
      * @return 시간차이
-     * @throws
-     * @praam fromTime String - 시작시각
-     * @praam toTime String - 종료시각
      */
     public long diffTime(String fromTime, String toTime) {
 
-        long lDiff = 0;
+        long lDiff;
 
         try {
             long lFromTime = DateUtil.convDate(fromTime).getTime() / 1000;
@@ -52,10 +49,12 @@ public class TimeUtil {
             long lToTime = DateUtil.convDate(toTime).getTime() / 1000;
 
             lDiff = lToTime - lFromTime;
-        } catch (Exception e) {
-        }
 
-        return lDiff;
+            return lDiff;
+
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
 }

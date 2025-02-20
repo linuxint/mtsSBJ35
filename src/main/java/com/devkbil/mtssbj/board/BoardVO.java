@@ -8,6 +8,7 @@ import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
  * 게시글 정보 VO (Value Object)
  * - 게시글의 기본 정보를 담고 있는 데이터 객체입니다.
  * - 게시판 기본 정보, 작성자 정보, 첨부파일 정보, 추가 필드 등을 포함합니다.
- * <p>
+ *
  * Swagger와 XML 마샬링을 통해 API 문서 생성 및 데이터 처리가 가능하도록 설계되었습니다.
  */
 @Schema(description = "게시글 정보 : Board")
@@ -100,7 +101,7 @@ public class BoardVO {
     private List<MultipartFile> uploadfile;
 
     public String getBrdmemo() {
-        if (brdmemo == null || brdmemo == "") {
+        if (!StringUtils.hasText(brdmemo)) {
             return "";
         }
         return brdmemo.replaceAll("(?i)<script", "&lt;script"); // XSS 태그 치환

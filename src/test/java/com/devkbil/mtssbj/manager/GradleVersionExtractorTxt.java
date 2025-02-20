@@ -93,4 +93,37 @@ public class GradleVersionExtractorTxt {
         String[] parts = dependency.split(":");
         return parts.length > 2 ? parts[2] : null;
     }
+
+    private static boolean isMinorUpdate(String currentVersion, String latestVersion) {
+        String[] current = currentVersion.split("\\.");
+        String[] latest = latestVersion.split("\\.");
+
+        // 버전 문자열이 적어도 "주버전.부버전" 형태여야 함
+        if (current.length < 2 || latest.length < 2) {
+            return false;
+        }
+
+        // 주버전이 동일한 경우에만 부버전을 비교
+        if (!current[0].equals(latest[0])) {
+            return false;
+        }
+
+        int currentMinor = extractNumeric(current[1]);
+        int latestMinor = extractNumeric(latest[1]);
+
+        return latestMinor > currentMinor;
+    }
+
+    // 의존성의 새 버전으로 업데이트합니다.
+    private static String replaceVersion(String dependency, String newVersion) {
+        String[] parts = dependency.split(":");
+        if (parts.length < 3) return dependency;
+        return String.join(":", parts[0], parts[1], newVersion);
+    }
+
+    // 숫자 부분만 추출하는 헬퍼 메서드
+    private static int extractNumeric(String str) {
+        String numeric = str.replaceAll("[^0-9]", "");
+        return numeric.isEmpty() ? 0 : Integer.parseInt(numeric);
+    }
 }

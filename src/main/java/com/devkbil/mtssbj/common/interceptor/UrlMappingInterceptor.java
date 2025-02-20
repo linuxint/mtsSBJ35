@@ -72,7 +72,7 @@ public class UrlMappingInterceptor implements HandlerInterceptor {
      * @param modelAndView 컨트롤러가 반환하는 ModelAndView 객체
      */
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
         if (modelAndView == null) {
             return; // ModelAndView가 null일 경우 더 이상 처리하지 않음
         }

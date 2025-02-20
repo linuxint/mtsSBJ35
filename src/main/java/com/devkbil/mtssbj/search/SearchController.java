@@ -35,7 +35,7 @@ import java.io.IOException;
 
 /**
  * 검색 관련 기능을 관리하는 컨트롤러입니다.
- * <p>
+ *
  * 이 컨트롤러는 Elasticsearch를 활용한 검색 작업(게시판, 댓글, 파일 등)을 수행하며,
  * 검색 결과를 Ajax 또는 HTML 형식으로 반환합니다.
  */

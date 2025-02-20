@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.IntStream;
 
-
 /**
  * Imap 클래스는 IMAP 이메일 서버에 연결하고, 이메일 메시지를 관리하며,
  * 첨부 파일을 포함한 이메일 콘텐츠를 추출하는 기능을 제공합니다.

@@ -108,7 +108,7 @@ public class BoardGroupService {
      * 게시판 그룹 조회/삭제 실패 시 예외 처리 클래스
      * - 호출한 게시판 그룹 데이터가 존재하지 않을 경우 사용됩니다.
      */
-    public class BoardGroupNotFoundException extends RuntimeException {
+    public static class BoardGroupNotFoundException extends RuntimeException {
         public BoardGroupNotFoundException(String message) {
             super(message);
         }

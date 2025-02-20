@@ -37,11 +37,11 @@ public class P6SpyConfig {
     public JdbcEventListener myListener() {
         return new JdbcEventListener() {
 
-            private void logConnection(String Msg, SQLException ex) {
+            private void logConnection(String msg, SQLException ex) {
                 String message = Optional.ofNullable(ex)
                     .map(Throwable::getMessage)
                     .orElse("ex is null");
-                log.info(Msg, message);
+                log.info(msg, message);
             }
 
             @Override

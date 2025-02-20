@@ -40,7 +40,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public List<DeptVO> fetchDepartmentList() {
         // 모든 부서 정보를 조회
-        return (List<DeptVO>) departmentRepository.findAll();
+        return departmentRepository.findAll();
     }
 
     /**

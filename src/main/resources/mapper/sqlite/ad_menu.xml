@@ -5,7 +5,7 @@
 
 <mapper namespace="ad_menu">
     <select id="selectMenu" resultType="com.devkbil.mtssbj.common.tree.TreeVO" >
-        SELECT MNU_NO as `KEY`, MNU_NM as `TITLE`, MNU_PARENT as `PARENT`
+        SELECT MNU_NO as "KEY", MNU_NM as "TITLE", MNU_PARENT as "PARENT"
           FROM COM_MENU
          WHERE DELETEFLAG = 'N'
          ORDER BY MNU_NO

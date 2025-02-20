@@ -10,7 +10,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 /**
  * CommonInterceptor는 모든 요청에 대해 사전 및 사후 로직을 공통적으로 처리하기 위한 목적의 인터셉터입니다.
- *
  * 주요 역할:
  * 1. 요청을 처리하기 전에 파라미터를 변경하거나 새로운 작업을 추가.
  * 2. 컨트롤러 작업 이후 추가 로직 실행 가능.
@@ -26,10 +25,9 @@ public class CommonInterceptor implements HandlerInterceptor {
      * @param response 응답 객체
      * @param handler 요청 핸들러 (컨트롤러)
      * @return 항상 true (요청 흐름 계속)
-     * @throws Exception 처리 중 예외 발생 시
      */
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         // 요청 파라미터 변경 처리
         modifyRequestParameters(request);
         return true;

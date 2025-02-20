@@ -22,18 +22,18 @@ import java.util.UUID;
  * Mapped Diagnostic Context (MDC)를 초기화하는 서블릿 필터입니다.
  * 사용자 정보, 요청 상관 ID, 클라이언트 IP 주소와 같은 특정 컨텍스트 정보를 가져와 MDC에 설정합니다.
  * 이를 통해 요청의 추적성과 디버깅 로그 항목을 개선할 수 있습니다.
- * <p>
+ *
  * 이 클래스는 `OncePerRequestFilter`를 확장하여 단일 요청 내에서 한 번만 실행되게 합니다.
- * <p>
+ *
  * 필터링 과정에서:
  * - 인증된 사용자 정보를 얻어 MDC의 USER_NAME 키에 설정합니다.
  * - 트랜잭션 ID(TRX_ID)를 생성하여 MDC에 추가하고 로그에서 사용 가능하게 합니다.
  * - 요청 헤더에서 상관 ID(CORRELATION_ID)를 가져와 MDC에 설정합니다.
  * - 사용자의 IP 주소를 가져와 MDC의 USER_IP 키에 저장합니다.
  * - 요청 처리가 완료된 후 MDC 컨텍스트를 정리하여 스레드 간 컨텍스트 누출을 방지합니다.
- * <p>
+ *
  * 필터는 또한 사용자 IP와 같은 주요 요청 세부 정보를 기록하고 가로챈 요청에 대한 감사 추적을 제공합니다.
- * <p>
+ *
  * 참고:
  * - `getUserPrincipal` 메서드는 인증 서비스(Authentication Service)를 사용하여 인증된 사용자 ID와 이름을 가져와 연결합니다.
  * - 구현에서 사용된 MDC 키는 `MDCKey` 열거형 클래스에 사전 정의되어 있습니다.
@@ -103,11 +103,11 @@ public class MDCFilter extends OncePerRequestFilter {
 
         try {
             String userId = authService.getAuthOpt()
-                               .map(auth -> auth.getUserid())
-                               .orElse(""); // 사용자 ID 가져오기
+                .map(auth -> auth.getUserid())
+                .orElse(""); // 사용자 ID 가져오기
             String userName = authService.getAuthOpt()
-                               .map(auth -> auth.getUsernm())
-                               .orElse(""); // 사용자 이름 가져오기
+                .map(auth -> auth.getUsernm())
+                .orElse(""); // 사용자 이름 가져오기
             return userId + "@" + userName; // ID와 이름을 연결하여 반환
         } catch (NullPointerException e) {
             log.warn("사용자 정보를 가져오는 데 실패했습니다. ", e);

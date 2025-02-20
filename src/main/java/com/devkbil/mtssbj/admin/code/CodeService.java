@@ -180,21 +180,25 @@ public class CodeService {
      * @throws RuntimeException         코드 저장 중 오류가 발생할 경우 발생
      */
     @Transactional
-    public void insertCode(String codeFormType, CodeVO param) {
+    public int insertCode(String codeFormType, CodeVO param) {
         if (ObjectUtils.isEmpty(param)) {
             throw new IllegalArgumentException("CodeVO 객체는 null일 수 없습니다.");
         }
+
+        int affectedRows;
+
         try {
             if ("U".equals(codeFormType)) {
                 // 코드 업데이트
-                sqlSession.update("updateCode", param);
+                affectedRows = sqlSession.update("updateCode", param);
             } else {
                 // 코드 중복 확인 후 코드 삽입
                 if (sqlSession.selectOne("selectCodeOne", param) != null) {
                     throw new IllegalArgumentException("이미 존재하는 코드입니다.");
                 }
-                sqlSession.insert("insertCode", param);
+                affectedRows = sqlSession.insert("insertCode", param);
             }
+            return affectedRows;
         } catch (Exception e) {
             log.error("코드 저장 중 오류 발생: {}", e.getMessage(), e);
             throw new RuntimeException("코드 추가 작업 중 오류 발생", e);

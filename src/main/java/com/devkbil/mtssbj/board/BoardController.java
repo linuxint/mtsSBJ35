@@ -295,12 +295,6 @@ public class BoardController {
     /**
      * 게시물에 새로운 좋아요 데이터를 추가합니다.
      *
-     * @param request  요청 정보를 포함하는 `HttpServletRequest` 객체
-     * @param response 작업 결과를 JSON 형식으로 반환하기 위해 사용되는 객체
-     */
-    /**
-     * 게시물에 새로운 좋아요 데이터를 추가합니다.
-     *
      * @param brdno    The unique identifier of the board post to be liked. This parameter is optional.
      * @param response 작업 결과를 JSON 형식으로 반환하기 위해 사용되는 객체
      */

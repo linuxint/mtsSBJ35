@@ -55,13 +55,11 @@ public class DeviceDetectorInterceptor implements HandlerInterceptor {
 
         String lowerUserAgent = userAgent.toLowerCase();
 
-        if (lowerUserAgent.contains("android")) {
-            return lowerUserAgent.contains("mobile") ? DEVICE_MOBILE : DEVICE_TABLET;
-        }
-        if (containsAny(lowerUserAgent, TABLET_KEYWORDS)) {
+        if (lowerUserAgent.contains("android") && lowerUserAgent.contains("mobile")) {
+            return DEVICE_MOBILE;
+        } else if (lowerUserAgent.contains("android") || containsAny(lowerUserAgent, TABLET_KEYWORDS)) {
             return DEVICE_TABLET;
-        }
-        if (containsAny(lowerUserAgent, MOBILE_KEYWORDS)) {
+        } else if (containsAny(lowerUserAgent, MOBILE_KEYWORDS)) {
             return DEVICE_MOBILE;
         }
         return DEVICE_NORMAL;

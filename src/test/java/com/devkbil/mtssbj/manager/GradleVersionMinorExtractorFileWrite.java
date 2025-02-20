@@ -5,7 +5,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -168,19 +171,30 @@ public class GradleVersionMinorExtractorFileWrite {
         return String.join(":", parts[0], parts[1], newVersion);
     }
 
-    // Minor 업데이트인지 확인합니다.
+    // 숫자 부분만 추출하는 헬퍼 메서드
+    private static int extractNumeric(String str) {
+        String numeric = str.replaceAll("[^0-9]", "");
+        return numeric.isEmpty() ? 0 : Integer.parseInt(numeric);
+    }
+
     private static boolean isMinorUpdate(String currentVersion, String latestVersion) {
-        String[] currentParts = currentVersion.split("\\.");
-        String[] latestParts = latestVersion.split("\\.");
+        String[] current = currentVersion.split("\\.");
+        String[] latest = latestVersion.split("\\.");
 
-        if (currentParts.length < 2 || latestParts.length < 2) return false;
+        // 버전 문자열이 적어도 "주버전.부버전" 형태여야 함
+        if (current.length < 2 || latest.length < 2) {
+            return false;
+        }
 
-        // Major version은 같아야 함
-        if (!currentParts[0].equals(latestParts[0])) return false;
+        // 주버전이 동일한 경우에만 부버전을 비교
+        if (!current[0].equals(latest[0])) {
+            return false;
+        }
 
-        // Minor version이 증가해야 함
-        return !currentParts[1].equals(latestParts[1]) &&
-                Integer.parseInt(latestParts[1]) > Integer.parseInt(currentParts[1]);
+        int currentMinor = extractNumeric(current[1]);
+        int latestMinor = extractNumeric(latest[1]);
+
+        return latestMinor > currentMinor;
     }
 
 }

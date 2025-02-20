@@ -31,17 +31,17 @@ import java.util.List;
 /**
  * 인증 성공 핸들러 - Spring Security 환경에서 인증 성공 시 이벤트 처리
  * 성공적인 인증 후 사용자를 리다이렉트하고 세션 및 쿠키 관리
- * <p>
+ *
  * 주요 책임:
  * - 인증 성공 후 저장된 요청 또는 이전 페이지로 리다이렉트 처리
  * - 사용자 정보 및 리멤버 미 기능을 위한 쿠키 관리
  * - 세션에 인증 사용자 정보 저장
  * - 인증 성공 후 사용자 정보 로깅 및 추가 작업 수행
- * <p>
+ *
  * 의존성:
  * - MemberService: 로그인 이벤트와 같은 회원 관련 작업 처리 서비스
  * - RequestCache 및 RedirectStrategy: 저장된 요청 검색 및 리다이렉션 로직 관리
- * <p>
+ *
  * 스레드 안정성:
  * 이 클래스는 스레드 간 공유 상태를 유지하지 않으므로 Spring 멀티스레드 환경에서 안전하게 사용 가능
  */
@@ -101,7 +101,7 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
             redirectStrategy.sendRedirect(request, response, targetUrl);
         } else {
             // 로그인 버튼 눌러서 로그인한 경우 기존에 있던 페이지로 리다이렉트
-            String prevPage = (String) request.getSession().getAttribute("prevPage");
+            String prevPage = (String)request.getSession().getAttribute("prevPage");
             log.info("prevPage = {}", prevPage);
             if (!StringUtils.hasText(prevPage)) {
                 prevPage = ConfigConstant.URL_MAIN;
@@ -109,11 +109,11 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
             redirectStrategy.sendRedirect(request, response, prevPage);
         }
 
-        List<GrantedAuthority> grantedAuthorities = (List<GrantedAuthority>) authentication.getAuthorities().stream().toList();
+        List<GrantedAuthority> grantedAuthorities = (List<GrantedAuthority>)authentication.getAuthorities().stream().toList();
 
-        WebAuthenticationDetails web = (WebAuthenticationDetails) authentication.getDetails();
+        WebAuthenticationDetails web = (WebAuthenticationDetails)authentication.getDetails();
         // Authentication에서 UserVO 객체 가져오기
-        UserVO userVO = (UserVO) authentication.getPrincipal();
+        UserVO userVO = (UserVO)authentication.getPrincipal();
         if (userVO instanceof UserVO) {
             log.info("UserVO 정보: {}", userVO);
         } else {
@@ -121,25 +121,24 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
             throw new IllegalStateException("인증된 객체가 UserVO가 아닙니다: " + userVO.getClass());
         }
 
-        List<GrantedAuthority> authList = (List<GrantedAuthority>) authentication.getAuthorities();
+        List<GrantedAuthority> authList = (List<GrantedAuthority>)authentication.getAuthorities();
 
         // 로그인 로직 수행
         memberService.insertLogIn(userVO.getUserno());
         saveUserSession(request.getSession(), userVO);
 
         // 이중 로그인 방지 처리
-//        EgovHttpSessionBindingListener listener = new EgovHttpSessionBindingListener();
-//        request.getSession().setAttribute(userVO.getUserid(), listener);
-
+        //        EgovHttpSessionBindingListener listener = new EgovHttpSessionBindingListener();
+        //        request.getSession().setAttribute(userVO.getUserid(), listener);
 
         // Remember-me 체크 추가
         rememberMeCheck(request, response, authentication, userVO);
 
         //if ("Y".equalsIgnoreCase(loginInfo.getRemember())) {
-//            saveCookie(response, "sid", loginInfo.getUserid(), COOKIE_EXPIRE);
-//        } else {
-//            saveCookie(response, "sid", "", 0);
-//        }
+        //            saveCookie(response, "sid", loginInfo.getUserid(), COOKIE_EXPIRE);
+        //        } else {
+        //            saveCookie(response, "sid", "", 0);
+        //        }
 
     }
 
@@ -147,7 +146,7 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
      * Remember-Me 옵션 활성화 시 쿠키 저장 또는 처리
      */
     private void rememberMeCheck(HttpServletRequest request, HttpServletResponse response, Authentication authentication, UserVO userVO) {
-        WebAuthenticationDetails webDetails = (WebAuthenticationDetails) authentication.getDetails();
+        WebAuthenticationDetails webDetails = (WebAuthenticationDetails)authentication.getDetails();
 
         // Remember-Me 여부 확인
         boolean isRememberMe = webDetails == null ? false : request.getParameter(ConfigConstant.PARAMETER_REMEMBER_ME) != null;

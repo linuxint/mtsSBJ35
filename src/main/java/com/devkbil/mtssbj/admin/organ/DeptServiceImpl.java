@@ -43,7 +43,7 @@ public class DeptServiceImpl implements DeptService {
     @Override
     @Transactional
     public int insertDept(DeptVO param) {
-        int affectedRows = 0;
+        int affectedRows;
 
         // 부모 번호가 빈 문자열이면 null로 처리
         if ("".equals(param.getParentno())) {

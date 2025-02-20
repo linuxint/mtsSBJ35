@@ -1,2 +1,3 @@
 #!/bin/bash
-../gradlew dependencies --configuration compileClasspath
+cd ..
+./gradlew dependencies --configuration compileClasspath

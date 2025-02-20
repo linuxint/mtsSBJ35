@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -26,7 +25,6 @@ import java.util.List;
 public class SchService {
 
     private final SqlSessionTemplate sqlSession;
-    private final JpaTransactionManager txManager;
 
     /**
      * 캘린더 일정 조회
@@ -37,12 +35,12 @@ public class SchService {
      */
     public List<?> selectCalendar(MonthVO param, String userno) {
 
-        List<?> list = sqlSession.selectList("selectCalendar", param);
+        List<CalendarVO> list = sqlSession.selectList("selectCalendar", param);
 
         ExtFieldVO fld = new ExtFieldVO();
         fld.setField1(userno);
 
-        for (CalendarVO cvo : (List<CalendarVO>) list) {
+        for (CalendarVO cvo : list) {
             fld.setField2(cvo.getCddate());
             cvo.setList(sqlSession.selectList("selectSchList4Calen", fld));
         }
@@ -56,6 +54,7 @@ public class SchService {
      * @param param 검색 조건
      * @return 일정 개수
      */
+    @SuppressWarnings("unused") // 사용되지 않는 경고를 억제
     public int selectSchCount(SearchVO param) {
         return sqlSession.selectOne("selectSchCount", param);
     }
@@ -66,6 +65,7 @@ public class SchService {
      * @param param 검색 조건
      * @return 일정 리스트
      */
+    @SuppressWarnings("unused") // 사용되지 않는 경고를 억제
     public List<?> selectSchList(SearchVO param) {
         return sqlSession.selectList("selectSchList", param);
     }

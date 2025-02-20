@@ -462,11 +462,11 @@ public class DateUtil {
 
     /**
      * 전달받은 날짜(Date)를 지정된 Format의 날짜 표현형식으로 돌려준다. <BR>
-     * <BR>
+     *
      * 사용예) getToday("yyyy/MM/dd hh:mm a")<BR>
      * 결 과 ) 2001/12/07 10:10 오후<BR>
-     * <BR>
-     * <p>
+     *
+     *
      * Format은 J2SE의 SimpleDateFormat의 Documentation을 참고한다.
      *
      * @param pOutformat String
@@ -486,10 +486,10 @@ public class DateUtil {
 
     /**
      * 전달받은 날짜(Date)를 지정된 Format의 날짜 표현형식으로 돌려준다. <BR>
-     * <BR>
+     *
      * 사용예) getToday("yyyy/MM/dd hh:mm a")<BR>
      * 결 과 ) 2001/12/07 10:10 오후<BR>
-     * <BR>
+     *
      * Format은 J2SE의 SimpleDateFormat의 Documentation을 참고한다.
      *
      * @param pOutformat String
@@ -513,10 +513,10 @@ public class DateUtil {
 
     /**
      * 전달받은 날짜(Date)를 지정된 Format의 날짜 표현형식으로 돌려준다. <BR>
-     * <BR>
+     *
      * 사용예) getDateFormat("20101121","-")<BR>
      * 결 과 ) 2010-11-21<BR>
-     * <BR>
+     *
      *
      * @param type String
      * @return java.lang.String
@@ -540,10 +540,10 @@ public class DateUtil {
 
     /**
      * 전달받은 날짜(Date)를 지정된 Format의 날짜 표현형식으로 돌려준다. <BR>
-     * <BR>
+     *
      * 사용예) getDateFormat("20101121","-")<BR>
      * 결 과 ) 2010-11-21<BR>
-     * <BR>
+     *
      * 전달받은 날짜가 00000000 으로 내려오면 공백리턴함 (윤진욱)
      *
      * @param type String
@@ -566,7 +566,7 @@ public class DateUtil {
 
     /**
      * 전달받은 날짜(Date)를 지정된 Format의 날짜 표현형식으로 돌려준다. <BR>
-     * <BR>
+     *
      *
      * @param type String
      * @return java.lang.String
@@ -587,7 +587,7 @@ public class DateUtil {
 
     /**
      * 입력받은 날짜에 일/시/분 단위의 값을 더하여 출력Format에 따라 값을 넘겨준다. <BR>
-     * <BR>
+     *
      * Parameter는 입력일, 입력일 Format, 출력일 Format, 일단위 더하기, 시단위 더하기,
      * 분단위 더하기이다.
      * 간단한 사용예는 다음과 같다.
@@ -625,7 +625,7 @@ public class DateUtil {
 
     /**
      * 입력받은 날짜에 월 단위의 값을 더하여 출력Format에 따라 값을 넘겨준다. <BR>
-     * <BR>
+     *
      * Parameter는 입력일, 입력일 Format, 출력일 Format, 일단위 더하기, 시단위 더하기,
      * 분단위 더하기이다.
      * 간단한 사용예는 다음과 같다.
@@ -668,7 +668,7 @@ public class DateUtil {
 
     /**
      * 입력받은 날짜에 월 단위의 값을 더하여 출력Format에 따라 값을 넘겨준다. <BR>
-     * <BR>
+     *
      * Parameter는 입력일, 입력일 Format, 출력일 Format, 일단위 더하기, 시단위 더하기,
      * 분단위 더하기이다.
      * 간단한 사용예는 다음과 같다.
@@ -711,7 +711,7 @@ public class DateUtil {
 
     /**
      * 입력받은 날짜에 월 단위의 값을 더하여 출력Format에 따라 값을 넘겨준다. <BR>
-     * <BR>
+     *
      * Parameter는 입력일, 입력일 Format, 출력일 Format, 일단위 더하기, 시단위 더하기,
      * 분단위 더하기이다.
      * 간단한 사용예는 다음과 같다.
@@ -764,10 +764,10 @@ public class DateUtil {
      * 나온 결과를 돌려준다.
      * Format은 J2SE의 SimpleDateFormat의 Documentation을 참고한다.
      * 간단한 사용예는 다음과 같다.
-     * <p>
+     *
      * LLog.debug.println(getComputedDate("2002/01/04 00:01","yyyy/MM/dd hh:mm",
      * "2002/01/02 23:59","yyyy/MM/dd hh:mm",ECOMJDateU.DAY));
-     * <p>
+     *
      * 작업 결과로 '1'이 표시된다.
      *
      * @param pIndate1   java.lang.String
@@ -1358,7 +1358,7 @@ public class DateUtil {
 
     /**
      * [오퍼레이션명] getCurrDate<br />
-     * <p>
+     *
      * [요약] 현재 시간을 가져오기 년도,월,일<br />
      *
      * @return<br />

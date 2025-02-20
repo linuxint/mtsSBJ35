@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
@@ -29,8 +31,6 @@ import java.io.Serializable;
 @Entity(name = "com_dept") // JPA 엔터티 설정
 public class DeptVO implements Serializable {
 
-    private static final long serialVersionUID = 1L; // 직렬화 식별자 설정
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO) // ID 자동 생성 설정
     @Column(name = "deptno", nullable = false, length = 10)
@@ -39,14 +39,17 @@ public class DeptVO implements Serializable {
 
     @Column(name = "deptnm", nullable = false, length = 20)
     @Schema(description = "부서명", example = "IT부서") // Swagger 필드 설명 및 예제
+    @Pattern(regexp = "^[a-zA-Z가-힣 ]+$", message = "부서명은 알파벳, 한글, 공백만 허용됩니다.")
     private String deptnm;
 
     @Column(name = "parentno", nullable = false, length = 10)
     @Schema(description = "상위 부서 코드", example = "P001") // Swagger API에서 필드 설명 및 예제 명시
+    @NotBlank(message = "상위 부서 코드는 필수 항목입니다.")
     private String parentno;
 
     @Column(name = "deleteflag", nullable = false, length = 1)
     @Schema(description = "삭제 여부", example = "0", allowableValues = {"0", "1"}) // 값의 범위를 Swagger에 명시
+    @Pattern(regexp = "^[01]$", message = "삭제 여부는 '0' 또는 '1'만 허용됩니다.")
     private String deleteflag;
 
 }

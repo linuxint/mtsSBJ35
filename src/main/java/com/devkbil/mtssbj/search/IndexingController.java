@@ -49,14 +49,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.elasticsearch.xcontent.XContentFactory.jsonBuilder;
+import static org.elasticsearch.xcontent.XContentFactory.*;
 
 /**
  * Elasticsearch 색인을 관리하는 컨트롤러 클래스입니다.
- * <p>
+ *
  * 이 클래스는 게시판, 댓글, 첨부파일 등 데이터를 Elasticsearch에 색인 작업과 관련된 로직을 포함합니다.
  * 또한, 텍스트 추출 및 색인 파일 관리 등을 수행합니다.
- * <p>
+ *
  * 색인
  * 1. 게시판
  * 2. 댓글
@@ -98,7 +98,7 @@ public class IndexingController {
 
     /**
      * Elasticsearch 색인 작업을 실행합니다.
-     * <p>
+     *
      * - 게시판 데이터 색인
      * - 댓글 색인
      * - 첨부파일 색인

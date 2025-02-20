@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Date;
 import java.util.List;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.*;
 
 /**
  * Controller for managing schedules (일정 관리).
@@ -167,7 +167,7 @@ public class SchController {
 
     /**
      * 일정 읽기 (일반 요청)
-     * <p>
+     *
      * 일정 열람 요청을 처리합니다. 특정 일정의 세부정보를 검색합니다.
      * 제공된 일정 정보를 기반으로 표시할 뷰 이름을 반환합니다.
      * 일정 세부정보입니다.
@@ -201,7 +201,7 @@ public class SchController {
     @PostMapping("/schDelete")
     public String schDelete(@ModelAttribute @Valid SchVO schVO) {
 
-        schService.deleteSch(schVO);
+        int affectedRows = schService.deleteSch(schVO);
 
         log.info("일정 삭제: Schedule Info={}", schVO);
         return "redirect:/schList";

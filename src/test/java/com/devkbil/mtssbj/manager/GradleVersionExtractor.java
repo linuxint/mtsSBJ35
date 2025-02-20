@@ -48,43 +48,38 @@ public class GradleVersionExtractor {
 
     private static String findLatestVersion(String dependency) {
         String[] parts = dependency.split(":");
-        if (parts.length < 3) {
+        if (parts.length < 2) {
             return null; // invalid dependency format
         }
+
         String groupId = parts[0];
         String artifactId = parts[1];
 
         try {
-            String encodedGroupId = URLEncoder.encode(groupId, StandardCharsets.UTF_8.toString());
-            String encodedArtifactId = URLEncoder.encode(artifactId, StandardCharsets.UTF_8.toString());
-            String urlString = String.format("https://search.maven.org/solrsearch/select?q=g:%s%%20a:%s&rows=1&wt=json", encodedGroupId, encodedArtifactId);
+            String urlString = String.format(
+                "https://search.maven.org/solrsearch/select?q=g:%s%%20AND%%20a:%s&rows=1&wt=json",
+                URLEncoder.encode(groupId, StandardCharsets.UTF_8),
+                URLEncoder.encode(artifactId, StandardCharsets.UTF_8)
+            );
 
-            URL url = (new URI(urlString)).toURL();
-
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URL(urlString).openConnection();
             connection.setRequestMethod("GET");
 
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                    String inputLine;
-                    StringBuilder response = new StringBuilder();
-                    while ((inputLine = in.readLine()) != null) {
-                        response.append(inputLine);
-                    }
-                    JSONObject jsonObject = new JSONObject(response.toString());
-                    JSONArray docs = jsonObject.getJSONObject("response").getJSONArray("docs");
-                    if (docs.length() > 0) {
-                        return docs.getJSONObject(0).getString("latestVersion");
-                    }
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                String jsonResponse = new BufferedReader(new InputStreamReader(connection.getInputStream()))
+                    .lines().collect(Collectors.joining());
+
+                JSONObject jsonObject = new JSONObject(jsonResponse);
+                JSONArray docs = jsonObject.getJSONObject("response").optJSONArray("docs");
+                if (docs != null && docs.length() > 0) {
+                    return docs.getJSONObject(0).getString("latestVersion");
                 }
-            } else {
-                System.err.println("Server returned non-OK status: " + responseCode);
             }
-        } catch (IOException | JSONException | URISyntaxException e) {
+        } catch (IOException | JSONException e) {
             System.err.println("Error occurred while fetching the latest version: " + e.getMessage());
             e.printStackTrace();
         }
+
         return null;
     }
 

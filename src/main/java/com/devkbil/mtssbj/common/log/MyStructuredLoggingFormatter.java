@@ -1,13 +1,11 @@
 package com.devkbil.mtssbj.common.log;
 
-
 import ch.qos.logback.classic.spi.ILoggingEvent;
 
 import org.springframework.boot.json.JsonWriter;
 import org.springframework.boot.logging.structured.StructuredLogFormatter;
 
 import java.nio.charset.Charset;
-
 
 /**
  * 커스텀 로그 포매터로, 로그 이벤트를 구조화된 JSON 출력으로 포맷합니다.

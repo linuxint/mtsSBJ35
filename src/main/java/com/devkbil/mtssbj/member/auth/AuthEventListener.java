@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * 인증 성공 이벤트를 수신하고, 인증 성공 시 추가 작업을 수행하는 커스텀 리스너입니다.
  * 인증된 사용자의 이전 세션을 만료시켜 단일 세션 동작을 강제하도록 설계되었습니다.
  * {@code AuthenticationSuccessEvent}에 대한 Spring의 {@code ApplicationListener}를 구현합니다.
- * <p>
+ *
  * 이 클래스는 {@code CustomSessionHandler}를 사용하여 사용자 세션을 관리하며,
  * 사용자에 대해 활성 세션만 유효하도록 보장합니다.
  */

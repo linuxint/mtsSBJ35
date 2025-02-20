@@ -65,8 +65,8 @@ public class BoardGroupController {
 
         modelMap.addAttribute("treeStr", treeStr);
         log.debug("boardGroupList modelMap {}", modelMap);
-        return "";
-        //return "admin/board/BoardGroupList";
+
+        return "admin/board/BoardGroupList";
     }
 
     /**

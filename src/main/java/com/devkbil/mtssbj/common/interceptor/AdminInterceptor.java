@@ -18,8 +18,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * AdminInterceptor는 관리자 페이지 접근 요청에 대한 인증 및 권한 확인을 처리합니다.
+ * AdminInterceptor는 Spring MVC의 HandlerInterceptor를 구현하여
  *
+ * 관리자 페이지에 대한 요청을 사전에 처리하고, 권한 확인 및 페이지 접근 제어를 수행하는 클래스입니다.
  * 주요 역할:
  * 1. 요청 사용자에 대한 인증 상태 확인.
  * 2. 사용자가 관리자 권한을 가지고 있는지 검증.
@@ -29,17 +30,15 @@ import java.util.List;
 @Component
 public class AdminInterceptor implements HandlerInterceptor {
 
-    // 관리자 접근이 필요한 URL 패턴
-    private final String loginPage = "memberLogin"; // 로그인 페이지 URL
     private final String noAuthPage = "noAuthMessage"; // 권한 없음 페이지 URL
 
-    private final List<String> adminEssential = Collections.singletonList("/ad**"); // 관리자 필수 URL 목록
-
     /**
-     * @return 관리자 접근이 필요한 URL 패턴 리스트를 반환합니다.
+     * 관리자 접근이 필요한 URL 패턴 리스트를 반환합니다.
+     *
+     * @return 관리자 접근이 필요한 URL 패턴 리스트
      */
     public List<String> getAdminEssential() {
-        return adminEssential;
+        return Collections.singletonList("/ad**"); // 관리자 필수 URL 목록
     }
 
     /**
@@ -49,7 +48,6 @@ public class AdminInterceptor implements HandlerInterceptor {
      * @param res  응답 객체
      * @param handler  요청 핸들러 (컨트롤러)
      * @return 관리자로 인증된 경우 true, 그렇지 않은 경우 false
-     * @throws IOException 예외 발생 시 처리
      */
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object handler) {
@@ -61,6 +59,9 @@ public class AdminInterceptor implements HandlerInterceptor {
             // 1. 세션 확인
             if (!StringUtils.hasText(userno)) {
                 log.warn("접근 권한 없음: 유저 세션 없음");
+                // 관리자 접근이 필요한 URL 패턴
+                // 로그인 페이지 URL
+                String loginPage = "memberLogin";
                 redirectToPage(res, loginPage); // 로그인 페이지로 이동
                 return false;
             }

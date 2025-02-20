@@ -20,8 +20,7 @@ public class CodeCacheDAO { // extends EgovComAbstractDAO
     /**
      * 공통코드그룹 List 조회
      *
-     * @param
-     * @return
+     * @return 공통코드 그룹 리스트
      */
     public List<?> selectListCodeGroup() {
         return sqlSession.selectList("selectListCodeGroup");
@@ -30,8 +29,7 @@ public class CodeCacheDAO { // extends EgovComAbstractDAO
     /**
      * 공통코드상세 List 조회
      *
-     * @param
-     * @return
+     * @return 공통코드리스트
      */
     public List<?> selectListCode() {
         return sqlSession.selectList("selectListCode");

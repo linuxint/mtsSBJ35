@@ -42,21 +42,21 @@ public class MenuService {
      * @return boolean 작업 성공 여부 (true: 성공, false: 실패)
      */
     @Transactional
-    public boolean insertMenu(MenuVO menuVO) {
+    public int insertMenu(MenuVO menuVO) {
         try {
             // 부모 메뉴 값 검증 (값이 없을 경우 null로 설정)
             validateMenuParent(menuVO);
 
+            int affectedRows;
+
             if (!StringUtils.hasText(menuVO.getMnuNo())) {
-                // 신규 메뉴 삽입
-                sqlSession.insert("insertMenu", menuVO);
+                affectedRows = sqlSession.insert("insertMenu", menuVO); // 신규 메뉴 삽입
                 log.info("insertMenu: 메뉴가 성공적으로 추가되었습니다: {}", menuVO);
             } else {
-                // 기존 메뉴 업데이트
-                sqlSession.update("updateMenu", menuVO);
+                affectedRows = sqlSession.update("updateMenu", menuVO); // 기존 메뉴 업데이트
                 log.info("updateMenu: 메뉴가 성공적으로 업데이트되었습니다: {}", menuVO);
             }
-            return true;
+            return affectedRows;
         } catch (DataAccessException e) {
             // 오류 발생 시 로그 출력 및 예외 처리
             log.error("메뉴 저장 실패: {}", menuVO, e);
