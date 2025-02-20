@@ -47,16 +47,17 @@ configurations {
 dependencyManagement {
     imports {
         mavenBom('org.springframework.boot:spring-boot-dependencies:3.5.0-M1') {
-//            bomProperty 'spring-framework.version', '7.0.0-M1'
-            bomProperty 'spring-security.version', '6.5.0-M1'
-            bomProperty 'spring-integration.version', '6.5.0-M1'
+//            bomProperty 'spring-framework.version', '7.0.0-M2'
+            bomProperty 'spring-security.version', '6.5.0-M2'
+            bomProperty 'spring-session.version', '3.4.2'
+            bomProperty 'spring-integration.version', '6.5.0-M2'
             bomProperty 'spring-hateoas.version', '3.0.0-M1'
             bomProperty 'spring-retry.version', '2.0.11'
         }
-//        mavenBom 'org.springframework:spring-framework-bom:7.0.0-M1'
+//        mavenBom 'org.springframework:spring-framework-bom:7.0.0-M2'
         mavenBom 'org.springframework.data:spring-data-bom:2025.1.0-M1'
-        mavenBom 'org.springframework.integration:spring-integration-bom:6.5.0-M1'
-        mavenBom 'org.springframework.ai:spring-ai-bom:1.0.0-M5'
+        mavenBom 'org.springframework.integration:spring-integration-bom:6.5.0-M2'
+        mavenBom 'org.springframework.ai:spring-ai-bom:1.0.0-M6'
         mavenBom 'com.fasterxml.jackson:jackson-bom:2.18.2'
         mavenBom 'io.micrometer:micrometer-bom:1.15.0-M2'
         mavenBom 'org.springframework.modulith:spring-modulith-bom:1.4.0-M1'
@@ -111,11 +112,11 @@ dependencies {
     implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.5'
 
     runtimeOnly 'org.springframework.boot:spring-boot-starter-tomcat'        // 내장 Tomcat 런타임
-    implementation 'org.apache.tomcat.embed:tomcat-embed-core:11.0.2'        // Tomcat 코어
-    implementation 'org.apache.tomcat.embed:tomcat-embed-websocket:11.0.2'   // WebSocket 지원
-    implementation 'org.apache.tomcat.embed:tomcat-embed-el:11.0.2'          // JSP / EL 처리 모듈
-    implementation 'org.apache.tomcat:tomcat-annotations-api:11.0.2'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:11.0.2'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-core:11.0.4'        // Tomcat 코어
+    implementation 'org.apache.tomcat.embed:tomcat-embed-websocket:11.0.4'   // WebSocket 지원
+    implementation 'org.apache.tomcat.embed:tomcat-embed-el:11.0.4'          // JSP / EL 처리 모듈
+    implementation 'org.apache.tomcat:tomcat-annotations-api:11.0.4'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:11.0.4'
 //    runtimeOnly 'org.apache.tomcat:tomcat-native:1.2.35'
 
 //    runtimeOnly 'org.springframework.boot:spring-boot-starter-jetty'        // 내장 Tomcat 런타임
@@ -137,7 +138,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'    // JDBC
     implementation 'org.xerial:sqlite-jdbc:3.49.0.0'                           // SQLite JDBC 드라이버
     implementation 'com.oracle.database.jdbc:ojdbc11:23.7.0.25.01'             // Oracle JDBC 드라이버
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.5.1'                   // MariaDB JDBC 클라이언트
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.5.2'                   // MariaDB JDBC 클라이언트
     runtimeOnly 'com.h2database:h2:2.3.232'                                    // H2 데이터베이스 (테스트용)
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4' // MyBatis 지원
 
@@ -145,11 +146,13 @@ dependencies {
     // 6. 검색엔진 및 Elasticsearch
     // ======================
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'       // Elasticsearch Starter
-    implementation 'co.elastic.clients:elasticsearch-java:8.17.1'                          // Elasticsearch Java API
-    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.27' // Elasticsearch 클라이언트
-    testImplementation 'org.testcontainers:elasticsearch:1.20.3'
-    implementation 'org.elasticsearch.client:elasticsearch-rest-client:8.17.1'
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.2'
+    implementation 'co.elastic.clients:elasticsearch-java:9.0.0-beta1'                          // Elasticsearch Java API
+    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.27'      // Elasticsearch 클라이언트
+//    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:8.0.0-alpha2' // Elasticsearch 클라이언트
+    implementation 'org.elasticsearch.client:elasticsearch-rest-client:9.0.0-beta1'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.5-alpha1'
+    testImplementation 'org.testcontainers:elasticsearch:1.20.4'
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'       // Elasticsearch Starter
 
     // ======================
     // 7. 로깅 및 모니터링
@@ -159,7 +162,7 @@ dependencies {
     implementation 'io.micrometer:micrometer-jakarta9'            // Micrometer Jakarta 지원
     implementation 'io.micrometer:micrometer-observation'         // 관측 시스템
     implementation 'io.micrometer:micrometer-commons'
-    implementation 'io.micrometer:micrometer-tracing:latest.integration'
+    implementation 'io.micrometer:micrometer-tracing:1.5.0-M2'
 
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.10.0'            // SQL 쿼리 로깅
     implementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:1.10.0' // DB 커넥션 상태 추적
@@ -201,8 +204,8 @@ dependencies {
     // ======================
     // 10. API 문서화 및 Swagger
     // ======================
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4' // SpringDoc OpenAPI UI
-//    implementation 'io.swagger.parser.v3:swagger-parser-v3:2.1.24'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5' // SpringDoc OpenAPI UI
+//    implementation 'io.swagger.parser.v3:swagger-parser-v3:2.1.25'
 
     // ======================
     // 11. 테스트 관련 라이브러리
@@ -232,12 +235,10 @@ dependencies {
     // 14. persistence
     // ======================
     implementation 'org.hibernate.validator:hibernate-validator:9.0.0.CR1'
-//    implementation 'org.hibernate.orm:hibernate-jcache:6.6.5.Final'
-//    implementation 'org.hibernate.orm:hibernate-core:6.6.5.Final'
-    implementation 'org.hibernate.orm:hibernate-core:7.0.0.Beta3'
-    implementation 'org.hibernate.orm:hibernate-jcache:7.0.0.Beta3'
+    implementation 'org.hibernate.orm:hibernate-core:7.0.0.Beta4'
+    implementation 'org.hibernate.orm:hibernate-jcache:7.0.0.Beta4'
 
-    implementation 'jakarta.validation:jakarta.validation-api:3.1.0'
+    implementation 'jakarta.validation:jakarta.validation-api:3.1.1'
     implementation 'jakarta.persistence:jakarta.persistence-api:3.2.0'
 
     implementation 'org.springframework.boot:spring-boot-starter-cache'
@@ -271,7 +272,7 @@ dependencies {
     // 미정렬
     //implementation 'org.springframework.ai:spring-ai-bedrock-converse-spring-boot-starter'
 
-    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.0.RC2'
+    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.0.RC3'
 
     implementation 'org.eclipse.jgit:org.eclipse.jgit:7.1.0.202411261347-r'
 
@@ -282,7 +283,7 @@ tasks.withType(Checkstyle).configureEach { task ->
     task.reports {
         xml.required = false
         html.required = true
-        html.outputLocation = file("$rootDir/reports/checkstyle.html")
+        html.outputLocation = file("$buildDir/reports/checkstyle.html")
     }
 }
 tasks.withType(Checkstyle) {
@@ -339,35 +340,45 @@ spotless {
 //        prettier()
 //    }
     java {
+
+        target 'src/**/*.java' // 대상 파일 설정
+
         importOrder(
-                "ch",    // 그룹 1
-                "",       // 그룹 간 빈 줄
-                "co",    // 그룹 1
-                "",       // 그룹 간 빈 줄
-                "com",    // 그룹 1
-                "",       // 그룹 간 빈 줄
-                "io",     // 그룹 2
-                "",       // 그룹 간 빈 줄
-                "jakarta", // 그룹 3
-                "",       // 그룹 간 빈 줄
-                "lombok", // 그룹 4
-                "",       // 그룹 간 빈 줄
-                "net", // 그룹 4
-                "",       // 그룹 간 빈 줄
-                "org",    // 그룹 5
-                "",       // 그룹 간 빈 줄
-                "javax",   // 그룹 6 (표준 Java API)
-                "",       // 그룹 간 빈 줄
-                "java",   // 그룹 6 (표준 Java API)
-                "",       // 그룹 간 빈 줄
-                "\\#static"  // 그룹 7 (STATIC import 마지막)
+                "ch",
+                "", "co",
+                "", "com",
+                "", "io",
+                "", "jakarta",
+                "", "lombok",
+                "", "net",
+                "", "org",
+                "", "javax",
+                "", "java",
+                "", "\\#static"
         )
         removeUnusedImports() // 불필요한 Import 자동 제거
+
+        // Eclipse Formatter 설정 (필수)
+        eclipse().configFile rootProject.file("codestyle/naver-intellij-formatter.xml")
+
+        // 커스텀 규칙: /** 주석을 <pre>로 감싸도록 설정
+        custom 'Format comments with <pre>', { content ->
+            content.replaceAll(/\/\*\*([\s\S]*?)\*\//, { match, body ->
+                // 기존의 '<p>' 태그 제거
+                String updatedBody = body.replaceAll(/<p>/, "").replaceAll(/<\/p>/, "")
+
+                // 변경된 결과를 기존과 비교하여 변경점이 없으면 그대로 반환 (무한 반복 방지)
+                def result = "/**\n *<pre>${updatedBody}\n *</pre>\n */"
+                return result == match ? match : result
+            })
+        }
+    }
+
 //        prettier() // 코드 정렬 (선택 사항)
 
 //        pipeToCommand(['sed', 's/oldText/newText/g']) // 텍스트를 sed로 처리
 //        replace('oldText', 'newText') // 특정 텍스트를 다른 텍스트로 바꿈
-//        custom('Remove TODOs') { str -> str.replace('TODO', '') } // TODO 제거
+//        custom('Remove TODOs') { str -> str.replace('TODO', '') }
 //        target '**/*.java' // 모든 Java 파일 대상
 //        target 'src/main/**/*.java', 'src/test/**/*.java'
 //        trimTrailingWhitespace() // 행 끝 공백 제거
@@ -383,9 +394,8 @@ spotless {
 //         importOrder('java', 'javax', 'org', 'com') // 순서대로 정렬
 //         prettier() // Prettier 규칙 설정 (주로 JavaScript에 적합)
 //         eclipse().configFile 'path/to/eclipse-java-formatter.xml' // Eclipse Formatter 설정 파일 적용
-        indentWithSpaces(4) // 스페이스 4칸 설정
+//        indentWithSpaces(4) // 스페이스 4칸 설정
 //        endWithNewline() // 파일 마지막에 항상 줄바꿈
-    }
 }
 
 tasks.register("checkFormatMain") {
