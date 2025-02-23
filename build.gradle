@@ -80,7 +80,7 @@ dependencies {
     // 2. Spring Data (JPA, Redis 등 관련)
     // ======================
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'   // JPA 스펙 지원
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis' // Redis 데이터베이스 지원
+//    implementation 'org.springframework.boot:spring-boot-starter-data-redis' // Redis 데이터베이스 지원
     implementation 'org.springframework.boot:spring-boot-starter-mail'       // SMTP 이메일 전송
     implementation 'org.springframework.boot:spring-boot-starter-integration' // 메시징 지원
     implementation 'org.springframework.integration:spring-integration-mail' // 메일 통합
@@ -169,7 +169,7 @@ dependencies {
     implementation 'com.github.gavlyukovskiy:flexy-pool-spring-boot-starter:1.10.0'       // 커넥션 풀 동적 크기 제어 및 메트릭 모니터링
     implementation 'net.ttddyy:datasource-proxy:1.10.1'                                   // 넥션 및 SQL 상태를 추적하고, 이벤트 기반 알림 처리
 
-    implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.1'
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.3'
 
     implementation 'org.springframework.cloud:spring-cloud-starter-sleuth:3.1.11'
     implementation 'org.springframework.cloud:spring-cloud-starter-zipkin:2.2.8.RELEASE'
