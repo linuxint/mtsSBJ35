@@ -74,7 +74,7 @@ public class SearchController {
      * @param response HttpServletResponse 객체 (검색 결과 반환용).
      * @param searchVO 검색 조건을 담은 객체.
      */
-    @PostMapping("/search4Ajax")
+    @GetMapping("/search4Ajax")
     @Operation(summary = "Ajax 기반 검색", description = "Elasticsearch를 통해 검색을 수행하고 JSON 형식으로 결과를 반환합니다.")
     public void search4Ajax(HttpServletResponse response, @ModelAttribute @Valid FullTextSearchVO searchVO) {
 
@@ -87,7 +87,7 @@ public class SearchController {
                 return;
             }
 
-            if ("".equals(searchVO.getSearchKeyword()) || !"".equals(indexName)) {
+            if ("".equals(searchVO.getSearchKeyword()) && !"".equals(indexName)) {
                 return;
             }
 
