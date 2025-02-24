@@ -49,7 +49,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.elasticsearch.xcontent.XContentFactory.*;
+import static org.elasticsearch.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * Elasticsearch 색인을 관리하는 컨트롤러 클래스입니다.
