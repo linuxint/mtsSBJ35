@@ -166,9 +166,7 @@ public class GradleVersionMinorExtractorFileWrite {
 
     // 의존성의 새 버전으로 업데이트합니다.
     private static String replaceVersion(String dependency, String newVersion) {
-        String[] parts = dependency.split(":");
-        if (parts.length < 3) return dependency;
-        return String.join(":", parts[0], parts[1], newVersion);
+        return dependency.replaceAll(":[^:]+$", ":" + newVersion); // 마지막 버전만 교환
     }
 
     // 숫자 부분만 추출하는 헬퍼 메서드
