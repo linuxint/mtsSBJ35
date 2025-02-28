@@ -35,35 +35,47 @@ springBoot {
     buildInfo()
 }
 
+
+// 기존 configurations 블록 수정
 configurations {
+    // compileOnly 설정
     compileOnly {
-        extendsFrom annotationProcessor
+        extendsFrom configurations.annotationProcessor
     }
-    configureEach {
-        exclude group: 'com.itextpdf', module: 'itextpdf' // iTextPDF 제외
-    }
+}
+
+// 각 configuration에 대한 exclude 설정
+configurations.configureEach {
+    exclude group: 'com.itextpdf', module: 'itextpdf' // iTextPDF 제외
 }
 
 dependencyManagement {
     imports {
         mavenBom('org.springframework.boot:spring-boot-dependencies:3.5.0-M2') {
 //            bomProperty 'spring-framework.version', '7.0.0-M2'
-            bomProperty 'spring-security.version', '6.5.0-M2'
-            bomProperty 'spring-session.version', '3.4.2'
-            bomProperty 'spring-integration.version', '6.5.0-M2'
-            bomProperty 'spring-hateoas.version', '3.0.0-M1'
-            bomProperty 'spring-retry.version', '2.0.11'
+//            bomProperty 'spring-security.version', '6.5.0-M2'
+//            bomProperty 'spring-session.version', '3.4.2'
+//            bomProperty 'spring-integration.version', '6.5.0-M2'
+//            bomProperty 'spring-hateoas.version', '3.0.0-M1'
+//            bomProperty 'spring-retry.version', '2.0.11'
+        }
+        mavenBom('org.springframework.data:spring-data-bom:2025.1.0-M1') {
+            bomProperty 'spring-data-jpa', '4.0.0-M1'
+            bomProperty 'spring-data-jdbc', '4.0.0-M1'
+            bomProperty 'spring-data-elasticsearch', '6.0.0-M1'
+            bomProperty 'spring-data-commons', '4.0.0-M1'
+            bomProperty 'spring-data-relational', '4.0.0-M1'
         }
     }
 }
 
 dependencies {
-    implementation platform("org.springframework.data:spring-data-bom:2025.1.0-M1")
-    implementation platform("org.springframework.integration:spring-integration-bom:6.5.0-M2")
-    implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-M6")
+//    implementation platform("org.springframework.data:spring-data-bom:2025.1.0-M1")
+//    implementation platform("org.springframework.integration:spring-integration-bom:6.5.0-M2")
+//    implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-M6")
     implementation platform("com.fasterxml.jackson:jackson-bom:2.18.2")
     implementation platform("io.micrometer:micrometer-bom:1.15.0-M2")
-    implementation platform("org.springframework.modulith:spring-modulith-bom:1.4.0-M1")
+//    implementation platform("org.springframework.modulith:spring-modulith-bom:1.4.0-M1")
 
     checkstyle 'com.puppycrawl.tools:checkstyle:10.21.3' // 현재 사용 중인 Checkstyle 버전
     // ======================
@@ -410,3 +422,30 @@ checkstyle {
     ]
     toolVersion = '10.21.3' // Checkstyle 버전
 }
+build.dependsOn spotlessApply //, spotlessCheck
+
+// JVM 종속성만 포함된 SBOM 생성
+task jvmCyclonedxBom(type: org.cyclonedx.gradle.CycloneDxTask) {
+    group = 'reporting'
+    description = 'Generates an SBOM for only JVM dependencies'
+    // JVM 종속성만 포함 (compileClasspath 설정)
+    skipConfigs = configurations.names - 'compileClasspath' // compileClasspath만 대상
+    outputName = "jvm-sbom"
+    destination = file("src/main/resources") // JVM SBOM 저장 경로
+    outputFormat = 'json'// JSON 파일만 생성
+}
+
+// 애플리케이션(전체 실행)에 사용될 SBOM 생성
+task appCyclonedxBom(type: org.cyclonedx.gradle.CycloneDxTask) {
+    group = 'reporting'
+    description = 'Generates an SBOM for the application runtime dependencies'
+    // 실행 시 필요한 모든 Configurations 포함 (runtimeClasspath 설정)
+    skipConfigs = configurations.names - 'runtimeClasspath' // runtimeClasspath만 대상
+    outputName = "application-sbom"
+    destination = file("src/main/resources") // 애플리케이션 SBOM 저장 경로
+    outputFormat = 'json'// JSON 파일만 생성
+}
+build.dependsOn jvmCyclonedxBom, appCyclonedxBom// 빌드 프로세스에 SBOM 태스크를 포함
+
+
+
