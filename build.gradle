@@ -73,7 +73,7 @@ dependencies {
 //    implementation platform("org.springframework.data:spring-data-bom:2025.1.0-M1")
 //    implementation platform("org.springframework.integration:spring-integration-bom:6.5.0-M2")
 //    implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-M6")
-    implementation platform("com.fasterxml.jackson:jackson-bom:2.18.2")
+    implementation platform("com.fasterxml.jackson:jackson-bom:2.18.3")
     implementation platform("io.micrometer:micrometer-bom:1.15.0-M2")
 //    implementation platform("org.springframework.modulith:spring-modulith-bom:1.4.0-M1")
 
