@@ -182,7 +182,7 @@ dependencies {
     implementation 'com.github.gavlyukovskiy:flexy-pool-spring-boot-starter:1.10.0'       // 커넥션 풀 동적 크기 제어 및 메트릭 모니터링
     implementation 'net.ttddyy:datasource-proxy:1.10.1'                                   // 넥션 및 SQL 상태를 추적하고, 이벤트 기반 알림 처리
 
-    implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.3'
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.4'
 
     implementation 'org.springframework.cloud:spring-cloud-starter-sleuth:3.1.11'
     implementation 'org.springframework.cloud:spring-cloud-starter-zipkin:2.2.8.RELEASE'
