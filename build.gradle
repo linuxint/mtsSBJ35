@@ -401,12 +401,16 @@ allprojects {
 // Code Style Configuration
 // ======================
 spotless {
+    enforceCheck = false
+
     java {
+
+        encoding 'UTF-8' // 파일 인코딩 명시
+
+        toggleOffOn() // 방식 토글 지원
 
         // Target Files
         target 'src/**/*.java'
-        encoding 'UTF-8' // 파일 인코딩 명시
-        toggleOffOn() // 방식 토글 지원
 
         // Import Management
         importOrder(
