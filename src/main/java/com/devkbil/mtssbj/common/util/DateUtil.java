@@ -466,11 +466,9 @@ public class DateUtil {
     /**
      * 문자열을 Date 객체로 변환합니다. 기본 형식(yyyy-MM-dd)을 사용합니다.
      * 
-     * @deprecated Use {@link #stringToDate(String)} instead
      * @param dateStr 변환할 날짜 문자열
      * @return 변환된 Date 객체, 변환 실패시 null 반환
      */
-    @Deprecated
     public static Date str2Date(String dateStr) {
         return stringToDate(dateStr);
     }

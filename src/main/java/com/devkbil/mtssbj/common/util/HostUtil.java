@@ -24,7 +24,7 @@ public class HostUtil {
      */
     public static String getHostNameRt() {
         String hostName = "";
-        String[] cmdArray = {"hostname"}; // @Deprecated(since="18")
+        String[] cmdArray = {"hostname"};
 
         try {
             Runtime rt = Runtime.getRuntime();
