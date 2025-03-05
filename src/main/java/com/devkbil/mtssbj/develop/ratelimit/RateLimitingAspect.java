@@ -22,7 +22,6 @@ public class RateLimitingAspect {
      *
      * @param apiRateLimiter API 호출 토큰과 제한을 관리하여 레이트 리미팅을 적용하는 APIRateLimiter 인스턴스
      */
-    @Autowired
     public RateLimitingAspect(APIRateLimiter apiRateLimiter) {
         this.apiRateLimiter = apiRateLimiter;
     }
