@@ -150,7 +150,7 @@ public class SpringSecurityConfig {
                         response.sendRedirect(ConfigConstant.URL_ACCESS_DENIED); // 권한 부족 페이지로 리다이렉트
                     }
                 }
-                ErrorResponse fail = ErrorResponse.of(ErrorCode.UNAUTHORIZED_ERROR, "Spring security unauthorized...");
+                ErrorResponse fail = ErrorResponse.of(ErrorCode.UNAUTHORIZED_ERROR, "스프링 시큐리티 인증 실패...");
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 String json = new ObjectMapper().writeValueAsString(fail);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -163,7 +163,7 @@ public class SpringSecurityConfig {
             (request, response, accessDeniedException) -> {
                 // 1. 입력이 없는 경우
 
-                ErrorResponse fail = ErrorResponse.of(ErrorCode.FORBIDDEN_ERROR, "Spring security forbidden...");
+                ErrorResponse fail = ErrorResponse.of(ErrorCode.FORBIDDEN_ERROR, "스프링 시큐리티 접근 거부...");
                 response.setStatus(HttpStatus.FORBIDDEN.value());
                 String json = new ObjectMapper().writeValueAsString(fail);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);

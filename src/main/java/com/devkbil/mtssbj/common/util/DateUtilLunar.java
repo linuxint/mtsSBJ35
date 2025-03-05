@@ -7,13 +7,32 @@ import org.springframework.util.StringUtils;
 import java.util.Calendar;
 import java.util.HashMap;
 
+/**
+ * 음력/양력 날짜 변환을 위한 유틸리티 클래스입니다.
+ * 
+ * 주요 기능:
+ * - 양력에서 음력으로 날짜 변환
+ * - 음력에서 양력으로 날짜 변환
+ * - 날짜 문자열 형식 변환
+ * - 날짜 문자열 유효성 검사
+ */
 public class DateUtilLunar {
 
     /**
-     * 입력받은 양력일자를 변환하여 음력일자로 반환
+     * 양력 날짜를 음력 날짜로 변환합니다.
      *
-     * @param sDate 양력일자
-     * @return 음력일자
+     * @param sDate 양력 날짜 (형식: "yyyyMMdd" 또는 "yyyy-MM-dd")
+     * @return HashMap 객체로 다음 정보를 포함합니다:
+     *         - "day": 음력 날짜 (yyyyMMdd 형식)
+     *         - "leap": 윤달 여부 (0: 평달, 1: 윤달)
+     * @throws IllegalArgumentException 날짜 형식이 잘못된 경우
+     * 
+     * <pre>
+     * 예제:
+     * HashMap result = DateUtilLunar.toLunar("20240210");
+     * String lunarDate = (String) result.get("day");    // "20231201"
+     * String isLeap = (String) result.get("leap");      // "0"
+     * </pre>
      */
     public static HashMap toLunar(String sDate) {
         String dateStr = validChkDate(sDate);
@@ -59,11 +78,18 @@ public class DateUtilLunar {
     }
 
     /**
-     * 입력받은 음력일자를 변환하여 양력일자로 반환
+     * 음력 날짜를 양력 날짜로 변환합니다.
      *
-     * @param sDate      음력일자
-     * @param iLeapMonth 음력윤달여부(IS_LEAP_MONTH)  윤달구분[0,1] (예, 1)
-     * @return 양력일자
+     * @param sDate 음력 날짜 (형식: "yyyyMMdd" 또는 "yyyy-MM-dd")
+     * @param iLeapMonth 윤달 여부 (0: 평달, 1: 윤달)
+     * @return 양력 날짜 (yyyyMMdd 형식)
+     * @throws IllegalArgumentException 날짜 형식이 잘못된 경우
+     * 
+     * <pre>
+     * 예제:
+     * String solarDate = DateUtilLunar.toSolar("20231201", 0);  // "20240210"
+     * String solarLeapDate = DateUtilLunar.toSolar("20231201", 1);  // 윤달인 경우
+     * </pre>
      */
     public static String toSolar(String sDate, int iLeapMonth) {
         String dateStr = validChkDate(sDate);
@@ -94,16 +120,29 @@ public class DateUtilLunar {
 
 
     /**
-     * yyyyMMdd 형식의 날짜문자열을 원하는 캐릭터(ch)로 쪼개 돌려준다<br/>
+     * 날짜 문자열에 구분자를 추가하여 형식화된 문자열로 변환합니다.
+     * 
+     * 입력 문자열은 다음 형식을 지원합니다:
+     * - yyyyMMdd (8자리)
+     * - yyyyMM (6자리)
+     * - yyyy (4자리)
+     *
      * <pre>
-     * ex) 20030405, ch(.) -> 2003.04.05
-     * ex) 200304, ch(.) -> 2003.04
-     * ex) 20040101,ch(/) --> 2004/01/01 로 리턴
+     * 예제:
+     * formatDate("20240210", ".") → "2024.02.10"
+     * formatDate("202402", "-")   → "2024-02"
+     * formatDate("2024", "/")     → "2024"
+     * 
+     * 특수 케이스:
+     * - 월이 "00"인 경우 연도만 반환
+     * - 일이 "00"인 경우 연도와 월만 반환
+     * - 연도가 "0000"인 경우 빈 문자열 반환
      * </pre>
      *
-     * @param sDate yyyyMMdd 형식의 날짜문자열
-     * @param ch    구분자
-     * @return 변환된 문자열
+     * @param sDate 날짜 문자열 (yyyyMMdd, yyyyMM, yyyy 형식)
+     * @param ch 구분자 (예: ".", "-", "/")
+     * @return 형식화된 날짜 문자열
+     * @throws IllegalArgumentException 날짜 형식이 잘못된 경우
      */
     public static String formatDate(String sDate, String ch) {
         String dateStr = validChkDate(sDate);
@@ -151,16 +190,24 @@ public class DateUtilLunar {
     }
 
     /**
-     * 입력된 일자 문자열을 확인하고 8자리로 리턴
+     * 날짜 문자열의 유효성을 검사하고 표준 형식으로 변환합니다.
+     * 
+     * 지원하는 입력 형식:
+     * - yyyyMMdd (8자리)
+     * - yyyy-MM-dd (10자리)
      *
-     * @param dateStr 날짜문자열
-     * @return 변환문자열
+     * @param dateStr 검사할 날짜 문자열
+     * @return 하이픈이 제거된 8자리 날짜 문자열 (yyyyMMdd)
+     * @throws IllegalArgumentException 다음의 경우 발생:
+     *         - 입력이 null인 경우
+     *         - 날짜 문자열이 8자리 또는 10자리가 아닌 경우
+     *         - 날짜 형식이 올바르지 않은 경우
      */
     public static String validChkDate(String dateStr) {
         String retValue = dateStr;
 
         if (dateStr == null || !(dateStr.trim().length() == 8 || dateStr.trim().length() == 10)) {
-            throw new IllegalArgumentException("Invalid date format: " + dateStr);
+            throw new IllegalArgumentException("날짜 형식이 올바르지 않습니다: " + dateStr);
         }
         if (dateStr.length() == 10) {
             retValue = dateStr.replace("-", "");
@@ -170,20 +217,20 @@ public class DateUtilLunar {
 
 
     /**
-     *
-     * String이 비었거나("") 혹은 null 인지 검증한다.
-     * </p>
-     *
+     * 문자열이 비어있거나 null인지 검사합니다.
+     * 
+     * 다음과 같은 규칙으로 판단합니다:
      * <pre>
-     *  StringUtil.isEmpty(null)      = true
-     *  StringUtil.isEmpty("")        = true
-     *  StringUtil.isEmpty(" ")       = false
-     *  StringUtil.isEmpty("bob")     = false
-     *  StringUtil.isEmpty("  bob  ") = false
+     * isEmpty(null)      → true   (null인 경우)
+     * isEmpty("")        → true   (빈 문자열인 경우)
+     * isEmpty(" ")       → false  (공백 문자인 경우)
+     * isEmpty("test")    → false  (일반 문자열인 경우)
+     * isEmpty("  test ") → false  (앞뒤 공백이 있는 경우)
      * </pre>
      *
-     * @param str - 체크 대상 스트링오브젝트이며 null을 허용함
-     * @return <code>true</code> - 입력받은 String 이 빈 문자열 또는 null인 경우
+     * @param str 검사할 문자열 (null 허용)
+     * @return true: 문자열이 null이거나 빈 문자열인 경우
+     *         false: 문자열에 공백이나 문자가 포함된 경우
      */
     public static boolean isEmpty(String str) {
         return !StringUtils.hasText(str);

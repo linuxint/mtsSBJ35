@@ -38,19 +38,19 @@ public class P6SpyConfig {
         return new JdbcEventListener() {
 
             private void logConnection(String msg, SQLException ex) {
-                String message = Optional.ofNullable(ex)
-                    .map(Throwable::getMessage)
-                    .orElse("ex is null");
+                String message = Optional.ofNullable(ex).map(Throwable::getMessage).orElse("ex is null");
                 log.info(msg, message);
             }
 
             @Override
-            public void onAfterGetConnection(ConnectionInformation connectionInformation, SQLException ex) {
+            public void onAfterGetConnection(
+                ConnectionInformation connectionInformation, SQLException ex) {
                 logConnection("got connection : {}", ex);
             }
 
             @Override
-            public void onAfterConnectionClose(ConnectionInformation connectionInformation, SQLException ex) {
+            public void onAfterConnectionClose(
+                ConnectionInformation connectionInformation, SQLException ex) {
                 logConnection("connection closed : {}", ex);
             }
         };
@@ -85,5 +85,4 @@ public class P6SpyConfig {
     public ConnectionIdManagerProvider connectionIdManagerProvider() {
         return MyConnectionIdManager::new;
     }
-
 }

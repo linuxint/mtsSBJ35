@@ -23,8 +23,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 공통 코드 서비스 클래스
- * - 공통 코드의 조회, 저장, 삭제 등의 작업을 담당합니다.
+ * 이 서비스 클래스는 코드를 관리하고 엑셀 파일 작업을 수행하는 메서드를 제공합니다.
+ * 생성자는 Lombok의 @RequiredArgsConstructor를 사용하여 자동 생성됩니다.
+ * 내부적으로 SqlSessionTemplate을 의존성 주입받아 사용합니다.
  */
 @Slf4j
 @Service
@@ -131,7 +132,7 @@ public class CodeService {
                 if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getDateCellValue().toString();
                 } else {
-                    return String.valueOf((int) cell.getNumericCellValue());
+                    return String.valueOf((int)cell.getNumericCellValue());
                 }
             case BOOLEAN:
                 return String.valueOf(cell.getBooleanCellValue());
@@ -154,7 +155,11 @@ public class CodeService {
         return sqlSession.selectOne("selectCodeCount", param);
     }
 
-    // 기존 데이터 조회
+    /**
+     * 데이터베이스에서 모든 CodeVO 객체를 조회합니다.
+     *
+     * @return 모든 CodeVO 객체가 포함된 리스트
+     */
     public List<CodeVO> selectCodeListAll() {
         return sqlSession.selectList("selectCodeListAll");
     }
@@ -171,13 +176,17 @@ public class CodeService {
     }
 
     /**
-     * 공통 코드 저장
-     * - 새 공통 코드를 추가하거나 기존 코드를 업데이트합니다.
+     * 지정된 작업 유형에 따라 데이터베이스에 코드를 삽입 또는 업데이트합니다.
+     * 작업 유형이 "U"인 경우 기존 코드를 업데이트합니다. 
+     * 그렇지 않으면 중복 여부를 확인한 후 새 코드를 삽입합니다.
      *
-     * @param codeFormType 작업 유형 (U: 업데이트, 기타: 삽입)
-     * @param param        저장할 공통 코드 정보 (CodeVO)
-     * @throws IllegalArgumentException CodeVO가 null이거나 이미 존재하는 코드일 경우 발생
-     * @throws RuntimeException         코드 저장 중 오류가 발생할 경우 발생
+     * @param codeFormType 수행할 작업 유형. "U"는 업데이트를 나타내며,
+     *                     다른 값은 삽입 작업을 나타냅니다.
+     * @param param 삽입하거나 업데이트할 코드 세부 정보가 포함된 CodeVO 객체.
+     *              이 객체는 null이 될 수 없습니다.
+     * @return 데이터베이스에서 영향을 받은 행 수를 반환합니다.
+     * @throws IllegalArgumentException param 객체가 null이거나 삽입 시 코드가 이미 존재할 경우
+     * @throws RuntimeException 예상치 못한 오류가 발생한 경우
      */
     @Transactional
     public int insertCode(String codeFormType, CodeVO param) {
@@ -217,11 +226,10 @@ public class CodeService {
     }
 
     /**
-     * 공통 코드 삭제
-     * - 특정 코드를 삭제합니다.
+     * 주어진 매개변수를 기준으로 데이터베이스에서 단일 코드 항목을 삭제합니다.
      *
-     * @param param 삭제할 공통 코드 정보 (CodeVO)
-     * @throws IllegalArgumentException 삭제할 코드가 존재하지 않을 경우 발생
+     * @param param 삭제할 코드의 세부 정보를 포함하는 CodeVO 객체
+     * @return 삭제 작업으로 인해 영향을 받은 행 수를 나타내는 정수
      */
     @Transactional
     public int deleteCodeOne(CodeVO param) {

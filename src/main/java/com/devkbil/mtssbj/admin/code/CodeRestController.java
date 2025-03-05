@@ -37,11 +37,14 @@ public class CodeRestController {
 
     private final CodeService codeService;
 
+    /**
+     * 공통 코드 데이터를 처리하고 관리하기 위한 엑셀 파일 업로드를 처리합니다.
+     *
+     * @param file 업로드하여 처리할 엑셀 파일
+     * @return 처리 결과를 문자열로 포함하는 ResponseEntity
+     */
     @PostMapping("/upload")
-    @Operation(
-        summary = "엑셀 파일 업로드",
-        description = "엑셀 파일을 업로드하여 공통 코드 데이터를 처리합니다."
-    )
+    @Operation(summary = "엑셀 파일 업로드", description = "엑셀 파일을 업로드하여 공통 코드 데이터를 처리합니다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "엑셀 데이터 업로드 성공"),
         @ApiResponse(responseCode = "400", description = "엑셀 파일에 헤더 또는 데이터가 없습니다."),

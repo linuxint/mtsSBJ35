@@ -23,15 +23,16 @@ public class SqlXmlLoader {
 
     private static final Map<String, QueryInfo> SQL_MAP = new HashMap<>(); // SQL ID를 저장하는 맵
 
-    private static final ThreadLocal<DocumentBuilder> DOCUMENT_BUILDER = ThreadLocal.withInitial(() -> {
-        // 다중 스레드 환경에서도 XML 파서를 안전하게 사용할 수 있도록 ThreadLocal로 관리
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            return factory.newDocumentBuilder();
-        } catch (Exception e) {
-            throw new IllegalStateException("DocumentBuilder 생성 중 오류 발생", e);
-        }
-    });
+    private static final ThreadLocal<DocumentBuilder> DOCUMENT_BUILDER = ThreadLocal.withInitial(
+        () -> {
+            // 다중 스레드 환경에서도 XML 파서를 안전하게 사용할 수 있도록 ThreadLocal로 관리
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                return factory.newDocumentBuilder();
+            } catch (Exception e) {
+                throw new IllegalStateException("DocumentBuilder 생성 중 오류 발생", e);
+            }
+        });
 
     public static void loadSqlQueries(String mapperLocations) {
         try {
@@ -75,10 +76,14 @@ public class SqlXmlLoader {
             // SQL ID와 관련된 속성을 맵에 저장
             String id = node.getAttributes().getNamedItem("id").getNodeValue(); // SQL ID 추출
             String parameterType = Optional.ofNullable(node.getAttributes().getNamedItem("parameterType"))
-                                            .map(attr -> attr.getNodeValue()).orElse(null); // Parameter 타입 추출
+                .map(attr -> attr.getNodeValue())
+                .orElse(null); // Parameter 타입 추출
             String resultType = Optional.ofNullable(node.getAttributes().getNamedItem("resultType"))
-                                        .map(attr -> attr.getNodeValue()).orElse(null); // Result 타입 추출
-            SQL_MAP.put(namespace + "." + id, new QueryInfo(id, parameterType, resultType, namespace)); // SQL 맵에 저장
+                .map(attr -> attr.getNodeValue())
+                .orElse(null); // Result 타입 추출
+            SQL_MAP.put(
+                namespace + "." + id,
+                new QueryInfo(id, parameterType, resultType, namespace)); // SQL 맵에 저장
             log.debug("SQL 등록됨: {} (namespace: {})", id, namespace); // 디버그 로그
         } catch (Exception e) {
             log.error("SQL ID 등록 중 오류 발생. namespace: {}, node: {}", namespace, node, e); // 실패 시 오류 처리
@@ -91,14 +96,19 @@ public class SqlXmlLoader {
 
     public static Set<String> getPureSqlIds() {
         // Namespace를 제외한 SQL ID만 추출하여 반환
-        return SQL_MAP.keySet().stream().map(id -> id.contains(".") ? id.split("\\.")[1] : id)
-                      .collect(Collectors.toSet());
+        return SQL_MAP.keySet()
+            .stream()
+            .map(id -> id.contains(".") ? id.split("\\.")[1] : id)
+            .collect(Collectors.toSet());
     }
 
     public static Set<String> getNamespaces() {
         // 모든 Namespace 반환
-        return SQL_MAP.values().stream().map(QueryInfo::getNamespace)
-                      .filter(Objects::nonNull).collect(Collectors.toSet());
+        return SQL_MAP.values()
+            .stream()
+            .map(QueryInfo::getNamespace)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
     }
 
     public static class QueryInfo {

@@ -18,8 +18,7 @@ import lombok.Setter;
  */
 @Schema(description = "게시글 댓글 : Board Reply") // Swagger API의 데이터 모델 설명
 @XmlRootElement(name = "boardreplyvo")
-@XmlType(propOrder = {"brdno", "reno", "rewriter", "rememo", "regdate", "reparent", "redepth", "reorder", "userno",
-    "usernm", "photo"}) // XML 정렬 순서
+@XmlType(propOrder = {"brdno", "reno", "rewriter", "rememo", "regdate", "reparent", "redepth", "reorder", "userno", "usernm", "photo"}) // XML 정렬 순서
 @Getter
 @Setter
 public class BoardReplyVO {
@@ -57,6 +56,12 @@ public class BoardReplyVO {
     @Schema(description = "사용자사진")
     private String photo;
 
+    /**
+     * 댓글의 일반 텍스트 내용을 HTML 형식으로 변환합니다.
+     * 이 메서드는 공백을 non-breaking space 엔티티로 대체하고 줄 바꿈 문자를 HTML 줄 바꿈 태그로 변환합니다.
+     *
+     * @return 댓글 내용의 HTML 형식 문자열 표현
+     */
     @Schema(description = "댓글내용 HTML")
     public String getRememoByHTML() {
         return UtilEtc.text2Html(rememo);

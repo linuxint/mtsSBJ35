@@ -30,6 +30,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomApplicationEventListener {
 
+    /**
+     * <p>{@link CustomApplicationEvent} 유형의 사용자 정의 애플리케이션 이벤트를 처리합니다.
+     * 이 메서드는 {@link CustomApplicationEvent}가 Spring ApplicationContext에 게시되었을 때 자동으로 실행됩니다.</p>
+     *
+     * @param event 사용자 정의 애플리케이션 이벤트로, 메시지와 같은 이벤트 세부 정보를 포함합니다.
+     */
     @EventListener
     public void handleCustomEvent(CustomApplicationEvent event) {
         log.info("CustomApplicationEvent received. Message: {}", event.getMessage());

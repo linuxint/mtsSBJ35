@@ -11,7 +11,6 @@ import static com.devkbil.mtssbj.common.util.PdfUtil.convertToSinglePageTiffs;
 
 public class PdfToImageTest {
 
-
     public static void main(String[] args) throws Exception {
 
         Path resourceDirectory = Paths.get("src", "test", "resources");
@@ -22,11 +21,11 @@ public class PdfToImageTest {
         convertToSeparateImageFiles(pdf, "png");
         convertToSeparateImageFilesWithCompression(pdf, "jpg");
 
-        //tiff
+        // tiff
         convertToSinglePageTiffs(pdf);
-        convertToMultipageTiff(pdf, new File(pdf.getAbsoluteFile().getParent() +
-                File.separator + pdf.getName() + "multi-page.tif"));
-
+        convertToMultipageTiff(
+            pdf,
+            new File(
+                pdf.getAbsoluteFile().getParent() + File.separator + pdf.getName() + "multi-page.tif"));
     }
-
 }

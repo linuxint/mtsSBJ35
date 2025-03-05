@@ -1,14 +1,14 @@
 package com.devkbil.mtssbj.manager;
-import java.util.Comparator;
-import java.util.regex.Matcher;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GradleDependencyChecker {
@@ -36,7 +36,8 @@ public class GradleDependencyChecker {
 
                 // 최신 버전 확인 후 현재 버전과 비교
                 if (latestVersion != null && !currentVersion.equals(latestVersion)) {
-                    System.out.printf("Dependency: %s:%s:%s -> 마지막 버전: %s%n",
+                    System.out.printf(
+                        "Dependency: %s:%s:%s -> 마지막 버전: %s%n",
                         groupId, artifactId, currentVersion, latestVersion);
                 }
             }
@@ -75,17 +76,16 @@ public class GradleDependencyChecker {
 
             // 모든 <version> 태그 추출
             Pattern versionPattern = Pattern.compile("<version>(.*?)</version>");
-            versionPattern.matcher(content).results()
-                .map(match -> match.group(1))
-                .forEach(versions::add);
+            versionPattern.matcher(content).results().map(match -> match.group(1)).forEach(versions::add);
 
             // 버전 정렬 (오름차순, Semantic Versioning 기반)
-            versions.sort(new Comparator<String>() {
-                @Override
-                public int compare(String v1, String v2) {
-                    return compareVersions(v1, v2);
-                }
-            });
+            versions.sort(
+                new Comparator<String>() {
+                    @Override
+                    public int compare(String v1, String v2) {
+                        return compareVersions(v1, v2);
+                    }
+                });
 
         } catch (Exception e) {
             System.err.println("모든 버전 목록을 가져오는 중 오류 발견: " + e.getMessage());

@@ -34,11 +34,13 @@ public class BoardGroupService {
     }
 
     /**
-     * 게시판 그룹 저장
-     * - 게시판 그룹을 추가 삽입하거나 수정 작업을 처리합니다.
+     * 제공된 BoardGroupVO 상세 정보에 따라 게시판 그룹을 삽입하거나 업데이트합니다.
+     * 매개변수의 bgno 속성이 설정되지 않은 경우 새로운 게시판 그룹이 삽입됩니다.
+     * 설정된 경우 기존 게시판 그룹이 업데이트됩니다.
      *
-     * @param param 게시판 그룹 정보 객체(BoardGroupVO)
-     * @throws IllegalArgumentException BoardGroupVO가 null일 경우 예외 발생
+     * @param param 삽입 또는 업데이트할 게시판 그룹의 상세 정보를 포함하는 BoardGroupVO 객체
+     * @return int 데이터베이스 작업에 영향을 받은 행의 수
+     * @throws IllegalArgumentException 제공된 BoardGroupVO가 null인 경우 발생
      */
     @Transactional
     public int insertBoard(BoardGroupVO param) {
@@ -46,15 +48,12 @@ public class BoardGroupService {
             throw new IllegalArgumentException("BoardGroupVO는 null일 수 없습니다.");
         }
 
-        // 부모 그룹 ID 검증
-        param.setBgparent(validateBgparent(param.getBgparent()));
+        param.setBgparent(validateBgparent(param.getBgparent()));// 부모 그룹 ID 검증
 
         if (!StringUtils.hasText(param.getBgno())) {
-            // 신규 그룹 삽입
-            return sqlSession.insert("insertBoardGroup", param);
+            return sqlSession.insert("insertBoardGroup", param);// 신규 그룹 삽입
         } else {
-            // 기존 그룹 수정
-            return sqlSession.update("updateBoardGroup", param);
+            return sqlSession.update("updateBoardGroup", param);// 기존 그룹 수정
         }
     }
 
@@ -104,13 +103,4 @@ public class BoardGroupService {
         return (!StringUtils.hasText(bgparent)) ? null : bgparent;
     }
 
-    /**
-     * 게시판 그룹 조회/삭제 실패 시 예외 처리 클래스
-     * - 호출한 게시판 그룹 데이터가 존재하지 않을 경우 사용됩니다.
-     */
-    public static class BoardGroupNotFoundException extends RuntimeException {
-        public BoardGroupNotFoundException(String message) {
-            super(message);
-        }
-    }
 }

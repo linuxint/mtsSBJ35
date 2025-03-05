@@ -14,6 +14,9 @@ import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +64,7 @@ public class BoardService {
      * @param param 검색 조건 VO
      * @return List 게시글 목록
      */
+    @Cacheable(value = "boardList", key = "#param.bgno + '_' + #param.searchKeyword + '_' + #param.rowStart", condition = "#param.rowStart != null")
     public List<?> selectBoardList(BoardSearchVO param) {
         return sqlSession.selectList("selectBoardList", param);
     }
@@ -72,6 +76,7 @@ public class BoardService {
      * @param param 검색 조건 VO
      * @return List 공지사항 목록
      */
+    @Cacheable(value = "boardNotices", key = "#param.bgno != null ? #param.bgno : 'all'")
     public List<?> selectNoticeList(BoardSearchVO param) {
         return sqlSession.selectList("selectNoticeList", param);
     }
@@ -86,14 +91,16 @@ public class BoardService {
      * @param fileno   삭제할 파일 번호 목록
      */
     @Transactional(rollbackFor = Exception.class)
+    @Caching(evict = {
+        @CacheEvict(value = "boardList", allEntries = true),
+        @CacheEvict(value = "boardNotices", allEntries = true)
+    })
     public void insertBoard(BoardVO param, List<FileVO> filelist, String[] fileno) {
         try {
             if (!StringUtils.hasText(param.getBrdno())) {
-                // 신규 등록
-                sqlSession.insert("insertBoard", param);
+                sqlSession.insert("insertBoard", param);// 신규 등록
             } else {
-                // 업데이트
-                sqlSession.update("updateBoard", param);
+                sqlSession.update("updateBoard", param);// 업데이트
             }
 
             // 첨부 파일 관리
@@ -120,6 +127,7 @@ public class BoardService {
      * @param param 검색 조건 VO
      * @return BoardVO 게시글 상세 정보
      */
+    @Cacheable(value = "boardDetail", key = "#param.field1 + '_' + #param.field2", unless = "#result == null")
     public BoardVO selectBoardOne(ExtFieldVO param) {
         return sqlSession.selectOne("selectBoardOne", param);
     }
@@ -153,6 +161,10 @@ public class BoardService {
      * @param param 게시글 ID
      * @return int 삭제된 행(row) 개수
      */
+    @Caching(evict = {
+        @CacheEvict(value = "boardList", allEntries = true),
+        @CacheEvict(value = "boardNotices", allEntries = true)
+    })
     public int deleteBoardOne(String param) {
         return sqlSession.delete("deleteBoardOne", param);
     }
@@ -164,6 +176,7 @@ public class BoardService {
      * @param param 확장 필드 VO
      */
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "boardList", allEntries = true)
     public void insertBoardLike(ExtFieldVO param) {
         try {
             sqlSession.insert("insertBoardLike", param);

@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,12 +46,15 @@ public class CodeController {
     private final CodeService codeService;
 
     /**
-     * 공통 코드 리스트를 엑셀 파일로 다운로드
+     * 코드 목록을 포함하는 엑셀 파일을 생성하고 다운로드 가능한 HTTP 응답으로 제공합니다.
+     * 메소드는 코드 데이터를 조회하고, 엑셀 파일을 생성하며 데이터를 채웁니다.
+     * 생성된 엑셀 파일은 HTTP 응답으로 바이너리 파일 형식으로 반환됩니다.
      *
-     * @return 엑셀 파일 응답
+     * @return 생성된 엑셀 파일의 바이너리 콘텐츠를 포함하는 ResponseEntity.
+     * @throws IOException 데이터 조회, 엑셀 파일 생성 또는 데이터 스트리밍 중 오류가 발생한 경우.
      */
     @GetMapping("/adCodeListExcel")
-    public ResponseEntity<byte[]> codeListExcel() throws Exception {
+    public ResponseEntity<byte[]> codeListExcel() throws IOException {
         // 1. 데이터 조회
         List<?> codeList = codeService.selectCodeList(new SearchVO());
 
@@ -190,14 +194,15 @@ public class CodeController {
     }
 
     /**
-     * 공통 코드 리스트를 API 형태로 제공하며, 결과 데이터를 JSON 형식으로 반환합니다.
+     * 제공된 검색 조건에 따라 공통 코드 리스트를 JSON 형식으로 반환합니다.
      *
-     * @param searchVO 공통 코드 검색 조건 객체
-     * @return ResponseEntity<List < ?>> : 조회된 공통 코드 데이터 및 HTTP 상태 코드
+     * @param searchVO 페이징 정보와 필터 등을 포함한 공통 코드 리스트 검색 조건 객체.
+     *                 반드시 유효하고 적절히 채워져 있어야 합니다.
+     * @return 성공 시 공통 코드 리스트를 포함한 ResponseEntity 객체,
+     *         예외가 발생하면 HTTP 500 내부 서버 오류 상태를 반환합니다.
      */
     @PostMapping("/codeList")
-    @Operation(summary = "공통 코드 리스트 조회 (API)",
-        description = "공통 코드 데이터를 JSON 형태로 반환합니다.")
+    @Operation(summary = "공통 코드 리스트 조회 (API)", description = "공통 코드 데이터를 JSON 형태로 반환합니다.")
     public ResponseEntity<List<?>> codeList(@ModelAttribute @Valid SearchVO searchVO) {
         try {
             log.debug("코드 리스트를 조회합니다.");
@@ -206,7 +211,7 @@ public class CodeController {
             List<?> resultList = codeService.selectCodeList(searchVO);
             return ResponseEntity.ok(resultList);
         } catch (Exception e) {
-            log.error("Error fetching code list", e);
+            log.error("코드 리스트 조회 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

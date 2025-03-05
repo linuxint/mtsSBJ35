@@ -7,6 +7,5 @@ public class EnumPortTest {
         String divCode = "02";
 
         System.out.println(EnumPort.getBwcdOfPort(divCode));
-
     }
 }

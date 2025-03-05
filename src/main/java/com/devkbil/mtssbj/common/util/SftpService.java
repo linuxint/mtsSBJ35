@@ -39,15 +39,17 @@ public class SftpService {
             throw new IllegalStateException("SFTP Service is not configured. Call configure() first.");
         }
 
-        remoteFileTemplate.execute(session -> {
-            try (InputStream inputStream = Files.newInputStream(file.toPath())) {
-                session.write(inputStream, remoteDirectory + "/" + file.getName());
-            }
-            return null;
-        });
+        remoteFileTemplate.execute(
+            session -> {
+                try (InputStream inputStream = Files.newInputStream(file.toPath())) {
+                    session.write(inputStream, remoteDirectory + "/" + file.getName());
+                }
+                return null;
+            });
     }
 
-    public void downloadFile(String remoteDirectory, String remoteFileName, String localFilePath) throws IOException {
+    public void downloadFile(String remoteDirectory, String remoteFileName, String localFilePath)
+        throws IOException {
         if (remoteFileTemplate == null) {
             throw new IllegalStateException("SFTP Service is not configured. Call configure() first.");
         }
@@ -55,13 +57,13 @@ public class SftpService {
         Path localPath = Path.of(localFilePath);
         Files.createDirectories(localPath.getParent());
 
-        remoteFileTemplate.execute(session -> {
-            try (InputStream inputStream = session.readRaw(remoteDirectory + "/" + remoteFileName);
-                 FileOutputStream outputStream = new FileOutputStream(localPath.toFile())) {
-                IOUtils.copy(inputStream, outputStream);
-            }
-            return null;
-        });
+        remoteFileTemplate.execute(
+            session -> {
+                try (InputStream inputStream = session.readRaw(remoteDirectory + "/" + remoteFileName); FileOutputStream outputStream = new FileOutputStream(localPath.toFile())) {
+                    IOUtils.copy(inputStream, outputStream);
+                }
+                return null;
+            });
     }
 
     public String sftpSearchFile(String remoteDirectory, String fileNamePattern) {
@@ -69,20 +71,21 @@ public class SftpService {
             throw new IllegalStateException("SFTP Service is not configured. Call configure() first.");
         }
 
-        return remoteFileTemplate.execute(session -> Arrays.stream(session.list(remoteDirectory))
+        return remoteFileTemplate.execute(
+            session -> Arrays.stream(session.list(remoteDirectory))
                 .map(file -> file.getFilename())
                 .filter(filename -> filename.matches(fileNamePattern))
                 .findFirst()
-                .orElse(null)
-        );
+                .orElse(null));
     }
 
     public void disconnect() {
         if (remoteFileTemplate != null) {
-            remoteFileTemplate.execute(session -> {
-                session.close();
-                return null;
-            });
+            remoteFileTemplate.execute(
+                session -> {
+                    session.close();
+                    return null;
+                });
         }
     }
 }

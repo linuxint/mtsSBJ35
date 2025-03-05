@@ -27,6 +27,13 @@ public class ExtFieldVO {
     public ExtFieldVO() {
     }
 
+    /**
+     * Constructs an ExtFieldVO object with the provided field values.
+     *
+     * @param field1 the first field value
+     * @param field2 the second field value
+     * @param field3 the third field value
+     */
     public ExtFieldVO(String field1, String field2, String field3) {
         this.field1 = field1;
         this.field2 = field2;

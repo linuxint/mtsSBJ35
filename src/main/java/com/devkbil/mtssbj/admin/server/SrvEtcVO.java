@@ -18,8 +18,8 @@ public class SrvEtcVO extends ConnVO {
     @Schema(description = "기타 정보 ID", example = "1")
     private String etcId;
 
-//    @Schema(description = "접속 정보 ID", example = "2001")
-//    private String connId;
+    //    @Schema(description = "접속 정보 ID", example = "2001")
+    //    private String connId;
 
     @Schema(description = "기타 정보명", example = "Configuration")
     private String etcName;

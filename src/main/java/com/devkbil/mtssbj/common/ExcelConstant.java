@@ -5,5 +5,4 @@ public class ExcelConstant {
     public static final String HEADER_KEY_NAME = "header"; // excel export - header String key
     public static final String DATA_KEY_NAME = "listview"; // excel export - data String key
     public static final String SHEET_KEY_NAME = "sheetname"; // excel export - excel sheet name key
-
 }

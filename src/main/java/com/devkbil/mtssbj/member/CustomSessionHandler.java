@@ -16,7 +16,11 @@ public class CustomSessionHandler {
 
     private final SessionRegistry sessionRegistry;
 
-    // SessionRegistry를 주입받는 생성자
+    /**
+     * 주어진 SessionRegistry 인스턴스를 사용하여 CustomSessionHandler를 생성합니다.
+     *
+     * @param sessionRegistry 사용자 세션을 관리하는 데 사용되는 SessionRegistry
+     */
     public CustomSessionHandler(SessionRegistry sessionRegistry) {
         this.sessionRegistry = sessionRegistry;
     }

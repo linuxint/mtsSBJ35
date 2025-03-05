@@ -26,9 +26,9 @@ public class IfUtil {
             return ifFalse;
         }
         if (src instanceof Collection<?>) {
-            return ((Collection<?>) src).contains(value) ? ifTrue : ifFalse;
+            return ((Collection<?>)src).contains(value) ? ifTrue : ifFalse;
         } else if (src instanceof String) {
-            return ((String) src).contains(String.valueOf(value)) ? ifTrue : ifFalse;
+            return ((String)src).contains(String.valueOf(value)) ? ifTrue : ifFalse;
         }
         return ifFalse;
     }

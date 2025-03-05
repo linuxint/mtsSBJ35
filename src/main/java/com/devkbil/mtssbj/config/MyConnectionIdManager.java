@@ -19,7 +19,6 @@ public class MyConnectionIdManager implements ConnectionIdManager {
 
     @Override
     public void addClosedId(String connectionId) {
-
     }
 
     @Override

@@ -27,7 +27,7 @@ public class UserService {
      * - 부서 번호 또는 특정 조건에 따른 사용자 데이터를 조회합니다.
      *
      * @param param 부서 번호 또는 기타 조건 (String)
-     * @return 사용자 리스트 (List<?>)
+     * @return 사용자 리스트
      */
     public List<?> selectUserList(String param) {
         return sqlSession.selectList("selectUserList", param);
@@ -37,8 +37,8 @@ public class UserService {
      * 부서 정보 포함 사용자 리스트 조회
      * - 검색 조건(SearchVO)을 사용하여 사용자와 부서를 포함한 데이터를 조회합니다.
      *
-     * @param param 검색 조건을 담은 객체 (SearchVO)
-     * @return 사용자 리스트 (부서 정보 포함) (List<?>)
+     * @param param 사용자와 부서 데이터를 필터링하기 위한 검색 조건이 담긴 SearchVO 객체
+     * @return 검색 조건과 일치하는 사용자 및 부서 정보 목록
      */
     public List<?> selectUserListWithDept(SearchVO param) {
         return sqlSession.selectList("selectUserListWithDept", param);
@@ -54,11 +54,9 @@ public class UserService {
      */
     public int insertUser(UserVO param) {
         if (!StringUtils.hasText(param.getUserno())) {
-            // 신규 사용자 등록
-            return sqlSession.insert("insertUser", param);
+            return sqlSession.insert("insertUser", param);// 신규 사용자 등록
         } else {
-            // 기존 사용자 정보 업데이트
-            return sqlSession.insert("updateUser", param);
+            return sqlSession.insert("updateUser", param);// 기존 사용자 정보 업데이트
         }
     }
 

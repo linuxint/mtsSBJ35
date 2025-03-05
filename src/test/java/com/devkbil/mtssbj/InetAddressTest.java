@@ -1,6 +1,5 @@
 package com.devkbil.mtssbj;
 
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -13,7 +12,5 @@ public class InetAddressTest {
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
-
     }
-
 }

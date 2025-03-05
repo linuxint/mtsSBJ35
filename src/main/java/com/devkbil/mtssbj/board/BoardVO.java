@@ -100,6 +100,12 @@ public class BoardVO {
     @Schema(description = "게시글 업로드 파일 목록")
     private List<MultipartFile> uploadfile;
 
+    /**
+     * `brdmemo` 필드의 값을 가져온 뒤 XSS 취약점을 방지하기 위해 필요한 세척을 수행합니다.
+     * 필드 값이 비어있거나 null인 경우 빈 문자열을 반환합니다.
+     *
+     * @return 세척된 `brdmemo` 값 또는 값이 null이거나 비어있을 경우 빈 문자열
+     */
     public String getBrdmemo() {
         if (!StringUtils.hasText(brdmemo)) {
             return "";

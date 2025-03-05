@@ -187,7 +187,7 @@ public class QrCodeController {
      * @param left
      * @param bottom
      * @param contentStream
-     * @throws Exception
+     * @throws IOException
      */
     public void drawText(String text, PDFont font, int fontSize, float left, float bottom, PDPageContentStream contentStream) throws IOException {
 
@@ -209,7 +209,7 @@ public class QrCodeController {
      * @param left
      * @param bottom
      * @param contentStream
-     * @throws Exception
+     * @throws IOException
      */
     public void drawText(String text, Color color, PDFont font, int fontSize, float left, float bottom, PDPageContentStream contentStream) throws IOException {
 

@@ -46,6 +46,8 @@ public class DevelopLogbackAppenderService<E> {
     /**
      * 로그 객체 클래스
      * - 이벤트와 메시지를 함께 저장합니다.
+     *
+     * @param <E> 이벤트 객체의 타입
      */
     @Data
     @AllArgsConstructor

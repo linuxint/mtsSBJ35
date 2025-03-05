@@ -5,11 +5,22 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * 어플리케이션의 전역 CORS 설정을 정의하는 Configuration 클래스입니다.
+ * WebMvcConfigurer bean을 사용하여 CORS 매핑을 커스터마이징합니다.
+ *
+ * 이 설정은 지정된 출처(Origin)로부터의 교차 출처 요청을 
+ * 지정된 HTTP 메서드 및 헤더와 함께 처리할 수 있도록 합니다.
+ */
 @Configuration
 public class CorsConfig {
 
     /**
-     * CORS 처리 전역 설정
+     * 애플리케이션의 CORS 설정을 구성합니다.
+     * 이 메서드는 지정된 출처, HTTP 메서드 및 헤더에 대한
+     * 교차 출처 요청을 허용하는 전역 CORS 구성을 정의합니다.
+     *
+     * @return CORS 매핑을 사용자 정의하는 WebMvcConfigurer 빈
      */
     @Bean
     public WebMvcConfigurer corsConfigurer() {

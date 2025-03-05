@@ -10,19 +10,25 @@ import java.nio.charset.Charset;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+/**
+ * DecompressZip 클래스는 ZIP 파일을 특정 디렉토리에 압축 해제하는 기능을 제공합니다.
+ * ZIP 파일의 확장자 타입, 위치 등을 지정해 압축 해제를 수행하며 디렉토리나 파일을 처리하는 관련
+ * 기능을 포함합니다.
+ */
 @Slf4j
 public class DecompressZip {
 
     /**
-     * 압축 해제 진행 == GOGO ==!
+     * 주어진 압축파일을 지정된 디렉토리에 압축해제합니다.
      *
-     * @param zipPath
-     * @param zipFileName
-     * @param zipUnzipPath
-     * @return 파일 압축 해제 성공 여부
-     * @throws Exception
+     * @param zipPath        압축파일이 있는 디렉토리 경로
+     * @param zipFileName    압축파일의 이름
+     * @param zipUnzipPath   압축파일의 내용이 압축해제될 디렉토리
+     * @param type          압축파일의 확장자 타입 (예: .zip, .tar)
+     * @return 압축해제 프로세스 성공 시 true, 실패 시 false
+     * @throws IOException   압축해제 과정중 입출력 오류 발생시
      */
-    public boolean unZip(String zipPath, String zipFileName, String zipUnzipPath, String type) throws Exception {
+    public boolean unZip(String zipPath, String zipFileName, String zipUnzipPath, String type) throws IOException {
 
         System.out.println(" unZip() - zipPath : " + zipPath);  //압축 파일 위치
         System.out.println(" unZip() - zipFileName : " + zipFileName);  //압축파일 이름
@@ -80,7 +86,7 @@ public class DecompressZip {
 
             isChk = true;
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             isChk = false;
 
         } finally {
@@ -105,11 +111,10 @@ public class DecompressZip {
     }
 
     /**
-     * 폴더 디렉토리 체크 및 생성
+     * 폴더가 존재하지 않는 경우 폴더를 생성합니다.
      *
-     * @param folder
-     * @return
-     * @throws Exception
+     * @param folder 생성할 폴더의 경로
+     * @return 폴더가 성공적으로 생성되었거나 이미 존재하는 경우 true, 그렇지 않으면 false
      */
     private boolean makeFolder(String folder) {
         System.out.println(" makeFolder() - folder : " + folder);
@@ -137,13 +142,15 @@ public class DecompressZip {
     }
 
     /**
-     * 파일 체크 및 생성
+     * ZipInputStream의 데이터로부터 새 파일을 생성합니다. 지정된 파일의 상위 디렉토리가
+     * 존재하지 않는 경우 생성됩니다. 제공된 ZipInputStream에서 데이터를 읽어
+     * 지정된 파일에 기록합니다.
      *
-     * @param file
-     * @param zis
-     * @throws Exception
+     * @param file 생성되고 기록될 파일
+     * @param zis 파일에 기록할 데이터를 제공하는 ZipInputStream
+     * @throws Exception 파일 생성 또는 데이터 쓰기 중 입출력 오류가 발생한 경우
      */
-    private void createFile(File file, ZipInputStream zis) throws Exception {
+    private void createFile(File file, ZipInputStream zis) throws IOException {
         System.out.println(" createFile() - file : " + file);
         //디렉토리 확인
         File parentDir = new File(file.getParent());
@@ -166,7 +173,7 @@ public class DecompressZip {
                 fos.write(buffer, 0, size);  //스트림 작성
             }
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw e;
 
         } finally {

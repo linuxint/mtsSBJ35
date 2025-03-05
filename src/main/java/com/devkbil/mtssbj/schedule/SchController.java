@@ -51,8 +51,8 @@ public class SchController {
 
         if (!StringUtils.hasText(searchVO.getYear())) {
             Date today = DateUtil.getToday();
-            searchVO.setYear(DateUtil.getYear(today).toString());
-            searchVO.setMonth(DateUtil.getMonth(today).toString());
+            searchVO.setYear(String.valueOf(DateUtil.getYear(today)));
+            searchVO.setMonth(String.valueOf(DateUtil.getMonth(today)));
         }
 
         if ("0".equals(searchVO.getMonth()) || "13".equals(searchVO.getMonth())) {

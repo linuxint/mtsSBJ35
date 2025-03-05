@@ -13,7 +13,7 @@ public interface DeptService {
      * 부서 리스트 조회
      * - 등록된 모든 부서 정보를 반환합니다.
      *
-     * @return 부서 리스트 (List<?>)
+     * @return 부서 리스트 (List)
      */
     List<?> selectDept();
 

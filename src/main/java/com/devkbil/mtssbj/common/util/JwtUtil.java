@@ -15,15 +15,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-
 @Component
 public class JwtUtil {
 
-//    private String SECRET_KEY = Base64.getEncoder().encodeToString("secret".getBytes());
+    //    private String SECRET_KEY = Base64.getEncoder().encodeToString("secret".getBytes());
 
     private final SecretKey secretKey = Keys.hmacShaKeyFor(
-            Base64.getEncoder().encodeToString("N8smKe2pXyZCd3Rsv7nNni0gfZsl7J7MfinPxaO2Bgk=".getBytes()).getBytes()
-    );
+        Base64.getEncoder()
+            .encodeToString("N8smKe2pXyZCd3Rsv7nNni0gfZsl7J7MfinPxaO2Bgk=".getBytes())
+            .getBytes());
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -39,11 +39,7 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-            .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        return Jwts.parser().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -58,12 +54,12 @@ public class JwtUtil {
 
     private String createToken(Map<String, Object> claims, String subject) { // claims 매개변수 추가
         return Jwts.builder()
-                .setClaims(claims)               // Claim 정보 지정
-                .setSubject(subject)             // 서브젝트 설정
-                .setIssuedAt(new Date(System.currentTimeMillis())) // 토큰 생성 시간
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 만료 시간
-            .signWith(secretKey)            // SECRET_KEY로 서명
-                .compact();                      // Token 문자열로 직렬화
+            .setClaims(claims) // Claim 정보 지정
+            .setSubject(subject) // 서브젝트 설정
+            .setIssuedAt(new Date(System.currentTimeMillis())) // 토큰 생성 시간
+            .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 만료 시간
+            .signWith(secretKey) // SECRET_KEY로 서명
+            .compact(); // Token 문자열로 직렬화
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {

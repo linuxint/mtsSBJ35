@@ -97,11 +97,11 @@ public class SampleController {
     }
 
     /**
-     * 목록 & 엑셀 사용 샘플 페이지를 반환합니다.
+     * 목록  엑셀 사용 샘플 페이지를 반환합니다.
      *
      * @param searchVO 검색 조건 객체
      * @param modelMap 모델 맵 객체
-     * @return 목록 & 엑셀 사용 샘플 페이지(html 파일 이름)
+     * @return 목록  엑셀 사용 샘플 페이지(html 파일 이름)
      */
     @Operation(summary = "목록 & 엑셀 샘플", description = "목록 표시와 엑셀 다운로드 기능을 테스트합니다.")
     @GetMapping("/sample4")

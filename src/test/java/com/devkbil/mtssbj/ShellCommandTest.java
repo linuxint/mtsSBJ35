@@ -8,7 +8,8 @@ public class ShellCommandTest {
     private static class StreamGobbler implements Runnable {
         private final InputStream inputStream;
         private final Consumer<String> consumer;
-        public StreamGobbler(InputStream inputStream, Consumer<String>consumer) {
+
+        public StreamGobbler(InputStream inputStream, Consumer<String> consumer) {
             this.inputStream = inputStream;
             this.consumer = consumer;
         }
@@ -25,14 +26,14 @@ public class ShellCommandTest {
         System.out.println(":: homeDirectory is " + homeDirectory);
 
         ProcessBuilder builder = new ProcessBuilder();
-        //builder.redirectInput(ProcessBuilder.Redirect.INHERIT);
-        //builder.redirectOutput(ProcessBuilder.Redirect.PIPE);
+        // builder.redirectInput(ProcessBuilder.Redirect.INHERIT);
+        // builder.redirectOutput(ProcessBuilder.Redirect.PIPE);
         builder.directory(new File(homeDirectory));
         String[] commandAndOptions_ProcessBuilder;
-        if(isWindows) {
-            commandAndOptions_ProcessBuilder = new String[]{"cmd.exe", "/c", "gradlew dependencies --configuration compileClasspath"};
+        if (isWindows) {
+            commandAndOptions_ProcessBuilder = new String[] {"cmd.exe", "/c", "gradlew dependencies --configuration compileClasspath"};
         } else {
-            commandAndOptions_ProcessBuilder = new String[]{"sh", "-c", "ls -l | grep P"};
+            commandAndOptions_ProcessBuilder = new String[] {"sh", "-c", "ls -l | grep P"};
         }
         builder.command(commandAndOptions_ProcessBuilder);
         builder.redirectErrorStream(true);

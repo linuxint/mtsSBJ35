@@ -33,6 +33,17 @@ public class DbtoolController {
 
     private final DbtoolService dbtoolService;
 
+    /**
+     * 주어진 {@code tableName}에 따라 테이블 데이터와 레이아웃 정보를 검색하고,
+     * 뷰에 결과를 표시하기 위해 모델에 데이터를 추가합니다.
+     *
+     * 빈 값 또는 잘못된 테이블 이름, 데이터가 없는 테이블, 데이터 검색 중 오류가 발생하는 
+     * 시나리오를 처리합니다.
+     *
+     * @param tableName 검색할 테이블 이름
+     * @param model 속성을 뷰에 전달하기 위한 {@code Model} 객체
+     * @return 렌더링할 Thymeleaf 템플릿 이름
+     */
     @GetMapping("/table/view/{tableName}")
     public String viewTableData(@PathVariable("tableName") String tableName, Model model) {
         log.info("Request received for table: {}", tableName);
@@ -76,13 +87,17 @@ public class DbtoolController {
     }
 
     /**
-     * 테이블 레이아웃 조회
-     * - 사용자가 요청한 테이블과 컬럼 정보에 대한 레이아웃을 조회합니다.
+     * 특정 테이블과 컬럼의 상세 레이아웃 정보를 조회합니다.
+     * 제공된 매개변수를 기반으로 테이블 레이아웃 세부 정보를 가져오고
+     * 조회된 정보를 프론트엔드에 전달합니다.
      *
-     * @param dbtoolVO 테이블/컬럼 정보를 담고 있는 VO 객체
-     * @param modelMap 화면에 데이터를 전달하기 위한 모델 객체
-     * @return 테이블 레이아웃 페이지
-     * @throws IOException I/O 처리 중 오류 발생 시 예외 처리
+     * @param columnComments 컬럼에 대한 설명(선택사항).
+     * @param columnName 컬럼 이름(선택사항).
+     * @param tableName 테이블 이름(선택사항).
+     * @param dbtoolVO 데이터베이스 툴 조회 매개변수를 포함하는 객체.
+     * @param modelMap 뷰 계층에 전달할 속성을 보유하는 ModelMap 객체.
+     * @return 테이블 레이아웃을 렌더링할 뷰 페이지 이름("thymeleaf/tableLayout").
+     * @throws IOException 처리 중 I/O 오류가 발생한 경우.
      */
     @Operation(summary = "테이블 레이아웃 조회", description = "특정 테이블과 컬럼의 상세 레이아웃 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "레코드가 정상적으로 조회되었습니다.")

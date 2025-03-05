@@ -42,10 +42,11 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * [Exception] API 호출 시 'Header' 내에 데이터 값이 유효하지 않은 경우
+     * {@link MissingRequestHeaderException} 유형의 예외를 처리합니다.
+     * 오류를 로깅하고 적절한 {@link ErrorResponse} 객체를 준비한 후 ResponseEntity로 반환합니다.
      *
-     * @param ex MissingRequestHeaderException
-     * @return ResponseEntity<ErrorResponse>
+     * @param ex 처리할 {@link MissingRequestHeaderException}, 누락된 요청 헤더 오류에 대한 세부 정보를 포함합니다.
+     * @return 오류 세부 정보와 적합한 HTTP 상태 코드를 포함하는 {@link ErrorResponse} 객체를 가진 {@link ResponseEntity}.
      */
     @ExceptionHandler(MissingRequestHeaderException.class)
     protected ResponseEntity<ErrorResponse> handleMissingRequestHeaderException(MissingRequestHeaderException ex) {
@@ -54,42 +55,39 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, httpStatusOk);
     }
 
-
     /**
-     * [Exception] 클라이언트에서 Body로 '객체' 데이터가 넘어오지 않았을 경우
+     * HttpMessageNotReadableException을 처리합니다. 이 예외는 요청 본문이 누락되었거나
+     * 형식 또는 구문 오류로 인해 원하는 객체로 역직렬화할 수 없을 때 발생합니다.
      *
-     * @param ex HttpMessageNotReadableException
-     * @return ResponseEntity<ErrorResponse>
+     * @param ex 발생한 HttpMessageNotReadableException 인스턴스
+     * @return 적절한 오류 세부 정보를 가진 ErrorResponse 객체를 포함하는 ResponseEntity
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    protected ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
-            HttpMessageNotReadableException ex) {
+    protected ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         log.error("HttpMessageNotReadableException", ex);
         final ErrorResponse response = ErrorResponse.of(ErrorCode.REQUEST_BODY_MISSING_ERROR, ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-
     /**
-     * [Exception] 클라이언트에서 request로 '파라미터로' 데이터가 넘어오지 않았을 경우
+     * {@link MissingServletRequestParameterException} 유형의 예외를 처리합니다.
+     * 이 메서드는 필수 요청 매개변수가 누락된 경우 호출됩니다.
+     * 오류를 로깅하고 적절한 {@link ErrorResponse} 객체를 생성하여 400 Bad Request HTTP 상태와 함께 반환합니다.
      *
-     * @param ex MissingServletRequestParameterException
-     * @return ResponseEntity<ErrorResponse>
+     * @param ex 필수 요청 매개변수가 누락되어 발생한 {@link MissingServletRequestParameterException}
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    protected ResponseEntity<ErrorResponse> handleMissingRequestHeaderExceptionException(
-            MissingServletRequestParameterException ex) {
+    protected ResponseEntity<ErrorResponse> handleMissingRequestHeaderExceptionException(MissingServletRequestParameterException ex) {
         log.error("handleMissingServletRequestParameterException", ex);
         final ErrorResponse response = ErrorResponse.of(ErrorCode.MISSING_REQUEST_PARAMETER_ERROR, ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-
     /**
-     * [Exception] 잘못된 서버 요청일 경우 발생한 경우
+     * HttpClientErrorException.BadRequest 예외를 처리하고 적절한 ResponseEntity를 생성합니다.
      *
-     * @param ex HttpClientErrorException
-     * @return ResponseEntity<ErrorResponse>
+     * @param ex Bad Request 예외를 나타내는 HttpClientErrorException
+     * @return 오류 코드와 메시지가 채워진 ErrorResponse 객체와 성공을 나타내는 HTTP 상태 코드를 포함하는 ResponseEntity
      */
     @ExceptionHandler(HttpClientErrorException.BadRequest.class)
     protected ResponseEntity<ErrorResponse> handleBadRequestException(HttpClientErrorException ex) {
@@ -98,12 +96,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, httpStatusOk);
     }
 
-
     /**
-     * [Exception] 잘못된 주소로 요청 한 경우
+     * 요청된 처리기를 찾을 수 없을 때 발생하는 예외를 처리합니다. 
+     * 예를 들어, 요청된 URI가 정의된 경로나 처리기와 일치하지 않을 때 {@link NoHandlerFoundException}에 의해 트리거됩니다.
      *
-     * @param ex NoHandlerFoundException
-     * @return ResponseEntity<ErrorResponse>
+     * @param ex 처리기를 찾을 수 없음을 나타내는 예외
+     * @return 오류 응답의 세부 정보를 포함하는 {@link ResponseEntity}
      */
     @ExceptionHandler(NoHandlerFoundException.class)
     protected ResponseEntity<ErrorResponse> handleNoHandlerFoundExceptionException(NoHandlerFoundException ex) {
@@ -112,12 +110,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, httpStatusOk);
     }
 
-
     /**
-     * [Exception] NULL 값이 발생한 경우
+     * 애플리케이션 실행 중에 발생한 NullPointerException을 처리합니다.
+     * 이 메서드는 예외를 로깅하고 오류에 대한 세부 정보를 가진 적절한 응답을 반환합니다.
      *
-     * @param ex NullPointerException
-     * @return ResponseEntity<ErrorResponse>
+     * @param ex 던져진 NullPointerException
+     * @return ErrorResponse 객체와 연결된 HTTP 상태를 포함한 ResponseEntity
      */
     @ExceptionHandler(NullPointerException.class)
     protected ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException ex) {
@@ -127,10 +125,10 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Input / Output 내에서 발생한 경우
+     * IOException을 처리하고 표준화된 오류 응답을 구성합니다.
      *
-     * @param ex IOException
-     * @return ResponseEntity<ErrorResponse>
+     * @param ex 발생한 IOException
+     * @return 오류 세부 정보와 HTTP 상태를 가진 ErrorResponse를 포함하는 ResponseEntity
      */
     @ExceptionHandler(IOException.class)
     protected ResponseEntity<ErrorResponse> handleIOException(IOException ex) {
@@ -139,12 +137,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, httpStatusOk);
     }
 
-
     /**
-     * com.google.gson 내에 Exception 발생하는 경우
+     * {@link JsonParseException} 유형의 예외를 처리합니다. 
+     * 이 메서드는 JSON 구문 분석 중 오류가 발생했을 때 호출됩니다.
+     * 오류를 로깅하고 적절한 오류 응답을 생성합니다.
      *
-     * @param ex JsonParseException
-     * @return ResponseEntity<ErrorResponse>
+     * @param ex JSON 파싱 중 발생한 {@link JsonParseException} 인스턴스
+     * @return 적절한 HTTP 상태와 오류 세부 정보를 포함하는 {@link ResponseEntity}
      */
     @ExceptionHandler(JsonParseException.class)
     protected ResponseEntity<ErrorResponse> handleJsonParseExceptionException(JsonParseException ex) {
@@ -154,10 +153,10 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * com.fasterxml.jackson.core 내에 Exception 발생하는 경우
+     * JsonProcessingException 유형의 예외를 처리하고 적절한 오류 응답을 반환합니다.
      *
-     * @param ex JsonProcessingException
-     * @return ResponseEntity<ErrorResponse>
+     * @param ex 발생한 예외
+     * @return 오류 응답과 HTTP 상태 코드를 포함하는 ResponseEntity
      */
     @ExceptionHandler(JsonProcessingException.class)
     protected ResponseEntity<ErrorResponse> handleJsonProcessingException(JsonProcessingException ex) {
@@ -166,14 +165,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, httpStatusOk);
     }
 
-
     // ==================================================================================================================
 
     /**
-     * [Exception] 모든 Exception 경우 발생
+     * 애플리케이션 내에서 발생하는 모든 예외를 처리합니다.
+     * 이 메서드는 적절한 오류 응답을 생성하고 ResponseEntity로 반환합니다.
      *
-     * @param ex Exception
-     * @return ResponseEntity<ErrorResponse>
+     * @param ex 던져진 예외
+     * @return 오류 응답과 해당 오류 코드 및 메시지가 포함된 ResponseEntity
      */
     @ExceptionHandler(Exception.class)
     protected final ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex) {
@@ -183,7 +182,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * BusinessException에서 발생한 에러
+     * BusinessException에서 발생한 에러를 처리합니다.
      *
      * @param ex BusinessException
      * @return ResponseEntity

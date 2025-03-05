@@ -26,25 +26,26 @@ public class FontLoadTest {
         final PDDocument doc = new PDDocument();
 
         // 배경이미지 로드
-        //PDImageXObject pdImage = PDImageXObject.createFromFile(webroot + "resources/back.jpg", doc);
+        // PDImageXObject pdImage = PDImageXObject.createFromFile(webroot + "resources/back.jpg", doc);
         PDImageXObject pdImage = PDImageXObject.createFromFile(absolutePath + "back.jpg", doc);
 
-        //ttf
+        // ttf
         InputStream fontStream = new FileInputStream(absolutePath + "/font/" + "NanumGothicLight.ttf");
         PDType0Font fontGulim = PDType0Font.load(doc, fontStream);
         String basefont = fontGulim.getBaseFont();
         Set<String> fonts = Standard14Fonts.getNames();
-        Standard14Fonts.FontName font_name_3v= Standard14Fonts.getMappedFontName("NanumGothicLight");
-        PDFont pdfFont=  new PDType1Font(font_name_3v);
+        Standard14Fonts.FontName font_name_3v = Standard14Fonts.getMappedFontName("NanumGothicLight");
+        PDFont pdfFont = new PDType1Font(font_name_3v);
 
-        //ttf
+        // ttf
         TrueTypeCollection trueTypeCollection = new TrueTypeCollection(fontStream);
-        trueTypeCollection.processAllFonts(new TrueTypeCollection.TrueTypeFontProcessor() {
-            @Override
-            public void process(TrueTypeFont trueTypeFont) throws IOException {
-                System.out.println(trueTypeFont);
-            }
-        });
+        trueTypeCollection.processAllFonts(
+            new TrueTypeCollection.TrueTypeFontProcessor() {
+                @Override
+                public void process(TrueTypeFont trueTypeFont) throws IOException {
+                    System.out.println(trueTypeFont);
+                }
+            });
         PDType0Font fontTimes = PDType0Font.load(doc, trueTypeCollection.getFontByName("Menlo-Regular"), true);
     }
 }

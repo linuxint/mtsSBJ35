@@ -43,10 +43,10 @@ public class MailService {
     }
 
     /**
-     * 수신 메일 리스트 조회.
+     * 제공된 검색 조건을 기반으로 수신 메일 리스트를 조회합니다.
      *
-     * @param param 검색 조건(SearchVO)
-     * @return 수신 메일 리스트(List<?>)
+     * @param param 검색 조건을 포함하는 SearchVO 객체
+     * @return 제공된 검색 조건에 해당하는 수신 메일 목록
      */
     public List<?> selectReceiveMailList(SearchVO param) {
         return sqlSession.selectList("selectReceiveMailList", param);
@@ -69,21 +69,21 @@ public class MailService {
             // 수신인(To) 추가
             addressVO.setEatype("t");
             List<String> addressList = sqlSession.selectList("selectMailAddressList", addressVO);
-            mail.setEmto((ArrayList<String>) addressList);
+            mail.setEmto((ArrayList<String>)addressList);
 
             // 참조인(Cc) 추가
             addressVO.setEatype("c");
             addressList = sqlSession.selectList("selectMailAddressList", addressVO);
-            mail.setEmcc((ArrayList<String>) addressList);
+            mail.setEmcc((ArrayList<String>)addressList);
 
             // 숨은 참조인(Bcc) 추가
             addressVO.setEatype("b");
             addressList = sqlSession.selectList("selectMailAddressList", addressVO);
-            mail.setEmbcc((ArrayList<String>) addressList);
+            mail.setEmbcc((ArrayList<String>)addressList);
 
             // 첨부파일 추가
             List<FileVO> files = sqlSession.selectList("selectMailFileList", addressVO);
-            mail.setFiles((ArrayList<FileVO>) files);
+            mail.setFiles((ArrayList<FileVO>)files);
 
         }
         return mail;
@@ -115,11 +115,13 @@ public class MailService {
     // ================================ 메일 전송 및 삽입 관련 메서드 ================================
 
     /**
-     * 다중 메일 삽입 처리.
+     * 메일 객체 리스트를 데이터베이스에 삽입합니다.
+     * 각 메일 객체는 사용 번호, 메일 타입, 이메일 번호가 설정된 후 삽입됩니다.
+     * 이 작업은 트랜잭션 컨텍스트 내에서 실행되며, 예외 발생 시 롤백됩니다.
      *
-     * @param param  삽입할 메일 리스트(ArrayList<MailVO>)
+     * @param param 삽입할 MailVO 객체 리스트
      * @param userno 사용자 번호
-     * @param emino  메일정보 번호
+     * @param emino 이메일 번호
      */
     @Transactional(rollbackFor = Exception.class)
     public void insertMails(ArrayList<MailVO> param, String userno, String emino) {
@@ -131,7 +133,7 @@ public class MailService {
                 insertMailOne(mail);
             }
         } catch (TransactionException ex) {
-            log.error("Error during insertMails", ex);
+            log.error("insertMails 도중 에러 발생", ex);
             throw ex;
         }
     }
@@ -145,8 +147,8 @@ public class MailService {
     @Transactional(rollbackFor = Exception.class)
     public void insertMail(MailVO param) {
         String[] to = param.getStrTo().split(";");
-        String[] cc = StringUtils.hasText(param.getStrCc()) ? param.getStrCc().split(";") : new String[]{};
-        String[] bcc = StringUtils.hasText(param.getStrBcc()) ? param.getStrBcc().split(";") : new String[]{};
+        String[] cc = StringUtils.hasText(param.getStrCc()) ? param.getStrCc().split(";") : new String[] {};
+        String[] bcc = StringUtils.hasText(param.getStrBcc()) ? param.getStrBcc().split(";") : new String[] {};
 
         // 주소 필드 설정
         param.setEmto(new ArrayList<>(Arrays.asList(to)));
@@ -173,7 +175,7 @@ public class MailService {
             mailSender.send(true, to, cc, bcc, param.getEmsubject(), param.getEmcontents());
 
         } catch (TransactionException | MessagingException ex) {
-            log.error("Error during insertMail", ex);
+            log.error("insertMail 도중 에러 발생", ex);
             throw new RuntimeException(ex);
         }
     }
@@ -210,10 +212,11 @@ public class MailService {
     }
 
     /**
-     * 메일 주소 삽입 처리.
+     * 리스트의 이메일 주소를 MailAddressVO 객체를 사용하여 데이터베이스에 삽입합니다.
+     * addressesList에 포함된 유효한 이메일 주소 각각은 MailAddressVO에 설정된 후 데이터베이스에 삽입됩니다.
      *
-     * @param addressesList 주소 데이터 리스트(ArrayList<String>)
-     * @param addressVO     주소 VO(MailAddressVO)
+     * @param addressesList 삽입할 이메일 주소 리스트; null이 아니어야 함
+     * @param addressVO 삽입을 위해 이메일 주소와 인덱스를 설정하는 MailAddressVO 객체; null이 아니어야 함
      */
     public void insertMailAddress(ArrayList<String> addressesList, MailAddressVO addressVO) {
         String email;
@@ -235,20 +238,20 @@ public class MailService {
     // ================================ 메일 정보 관련 메서드 ================================
 
     /**
-     * 메일 정보 리스트 조회.
+     * 제공된 검색 조건에 기반하여 메일 정보 레코드의 수를 조회합니다.
      *
-     * @param param 검색 조건(SearchVO)
-     * @return 메일 정보 리스트(List<?>)
+     * @param param SearchVO 객체에 캡슐화된 검색 조건
+     * @return 검색 조건에 맞는 메일 정보 레코드의 수(Integer)
      */
     public Integer selectMailInfoCount(SearchVO param) {
         return sqlSession.selectOne("selectMailInfoCount", param);
     }
 
     /**
-     * 메일 정보 리스트 조회.
+     * 제공된 파라미터에 따라 메일 정보 리스트를 조회합니다.
      *
-     * @param param 검색 조건(SearchVO)
-     * @return 메일 정보 리스트(List<?>)
+     * @param param 메일 정보 레코드를 필터링하는 데 사용된 파라미터
+     * @return 지정된 파라미터와 일치하는 메일 정보 객체 리스트
      */
     public List<?> selectMailInfoList(String param) {
         return sqlSession.selectList("selectMailInfoList", param);
@@ -268,7 +271,7 @@ public class MailService {
                 sqlSession.update("updateMailInfo", param);
             }
         } catch (TransactionException ex) {
-            log.error("Error during insertMailInfo", ex);
+            log.error("insertMailInfo 도중 에러 발생", ex);
             throw ex;
         }
     }

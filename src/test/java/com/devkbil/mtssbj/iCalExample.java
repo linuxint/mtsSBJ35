@@ -113,7 +113,7 @@ public class iCalExample {
 
     private static void readIcalendarFile(String path) {
         try {
-            FileInputStream fileInputStream =new FileInputStream(path);
+            FileInputStream fileInputStream = new FileInputStream(path);
             CalendarBuilder builder = new CalendarBuilder();
             Calendar calendar = builder.build(fileInputStream);
             List<CalendarComponent> events = calendar.getComponents(Component.VEVENT);
@@ -127,5 +127,4 @@ public class iCalExample {
             log.error("readIcalendarFile : CalendarBuilder Build Fail", e);
         }
     }
-
 }

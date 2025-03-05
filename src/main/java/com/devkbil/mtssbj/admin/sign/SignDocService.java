@@ -37,11 +37,10 @@ public class SignDocService {
     }
 
     /**
-     * 문서 유형 리스트 조회
-     * - 특정 조건(SearchVO)에 맞는 문서 유형 리스트를 반환합니다.
+     * 검색 조건에 맞는 문서 유형 목록을 조회합니다.
      *
      * @param param 검색 조건을 담은 객체 (SearchVO)
-     * @return 문서 유형 리스트 (List<?>)
+     * @return 검색 조건에 맞는 문서 유형 목록
      */
     public List<?> selectSignDocTypeList(SearchVO param) {
         return sqlSession.selectList("selectSignDocTypeList", param);

@@ -9,5 +9,4 @@ class MtssbjApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }

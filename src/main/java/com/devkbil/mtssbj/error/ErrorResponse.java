@@ -54,7 +54,7 @@ public class ErrorResponse {
      * ErrorResponse 생성자-3
      *
      * @param code   ErrorCode
-     * @param errors List<FieldError>
+     * @param errors List
      */
     @Builder
     protected ErrorResponse(final ErrorCode code, final List<FieldError> errors) {

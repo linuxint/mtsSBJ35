@@ -10,6 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * 서버 서비스 연결 기록을 관리하는 서비스 클래스입니다.
+ * MyBatis SqlSessionTemplate을 통해 데이터베이스에 연결하여
+ * 서비스 연결 데이터에 대한 CRUD 작업을 제공합니다.
+ */
 @Service
 @RequiredArgsConstructor
 public class ConnService {
@@ -37,9 +42,10 @@ public class ConnService {
     }
 
     /**
-     * ServiceConn 등록
+     * 새로운 서비스 연결 정보를 데이터베이스에 삽입합니다.
      *
-     * @param serviceConnVO 등록할 접속 정보
+     * @param serviceConnVO 삽입할 서비스 연결 정보
+     * @return 삽입된 레코드 수
      */
     @Transactional
     public int insertServiceConn(ConnVO serviceConnVO) {
@@ -47,9 +53,10 @@ public class ConnService {
     }
 
     /**
-     * ServiceConn 수정
+     * 기존 서비스 연결 정보를 데이터베이스에서 수정합니다.
      *
-     * @param serviceConnVO 수정할 접속 정보
+     * @param serviceConnVO 수정할 서비스 연결 정보
+     * @return 수정된 레코드 수
      */
     @Transactional
     public int updateServiceConn(ConnVO serviceConnVO) {
@@ -57,9 +64,10 @@ public class ConnService {
     }
 
     /**
-     * ServiceConn 삭제
+     * 제공된 연결 ID를 사용하여 데이터베이스에서 서비스 연결 정보를 삭제합니다.
      *
-     * @param connId 삭제할 접속 정보 ID
+     * @param connId 삭제할 서비스 연결의 ID
+     * @return 삭제된 레코드 수
      */
     @Transactional
     public int deleteServiceConn(String connId) {

@@ -32,8 +32,13 @@ public class RepositoryProfiler {
         long elapsedMs = System.currentTimeMillis() - startMs;
 
         // you may like to use logger.debug
-        logger.info(joinPoint.getTarget() + "." + joinPoint.getSignature()
-                + ": Execution time: " + elapsedMs + " ms");
+        logger.info(
+            joinPoint.getTarget()
+                + "."
+                + joinPoint.getSignature()
+                + ": Execution time: "
+                + elapsedMs
+                + " ms");
 
         // pay attention that this line may return null
         return result;

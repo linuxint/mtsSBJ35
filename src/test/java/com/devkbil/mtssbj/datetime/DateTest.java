@@ -58,21 +58,20 @@ public class DateTest {
         DayOfWeek dayOfWeek2 = date.getDayOfWeek();
 
         // 3. 텍스트 요일 구하기 (영문)
-        System.out.println(dayOfWeek2.getDisplayName(TextStyle.FULL, Locale.US));  // Saturday
-        System.out.println(dayOfWeek2.getDisplayName(TextStyle.NARROW, Locale.US));  // S
-        System.out.println(dayOfWeek2.getDisplayName(TextStyle.SHORT, Locale.US));  // Sat
+        System.out.println(dayOfWeek2.getDisplayName(TextStyle.FULL, Locale.US)); // Saturday
+        System.out.println(dayOfWeek2.getDisplayName(TextStyle.NARROW, Locale.US)); // S
+        System.out.println(dayOfWeek2.getDisplayName(TextStyle.SHORT, Locale.US)); // Sat
 
         // 4. 텍스트 요일 구하기 (한글)
-        System.out.println(dayOfWeek2.getDisplayName(TextStyle.FULL, Locale.KOREAN));  // 토요일
-        System.out.println(dayOfWeek2.getDisplayName(TextStyle.NARROW, Locale.KOREAN));  // 토
-        System.out.println(dayOfWeek2.getDisplayName(TextStyle.SHORT, Locale.KOREAN));  // 토
+        System.out.println(dayOfWeek2.getDisplayName(TextStyle.FULL, Locale.KOREAN)); // 토요일
+        System.out.println(dayOfWeek2.getDisplayName(TextStyle.NARROW, Locale.KOREAN)); // 토
+        System.out.println(dayOfWeek2.getDisplayName(TextStyle.SHORT, Locale.KOREAN)); // 토
 
         // 5. 텍스트 요일 구하기 (default)
-        System.out.println(dayOfWeek2.getDisplayName(TextStyle.FULL, Locale.getDefault()));  // 토요일
+        System.out.println(dayOfWeek2.getDisplayName(TextStyle.FULL, Locale.getDefault())); // 토요일
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         System.out.println(cal.getTime());
-
     }
 }

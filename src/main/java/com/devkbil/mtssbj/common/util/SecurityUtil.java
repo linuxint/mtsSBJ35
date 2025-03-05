@@ -7,25 +7,33 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public class SecurityUtil {
-    public static String sha256(String input) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    public static String sha256(String input)
+        throws NoSuchAlgorithmException,
+        UnsupportedEncodingException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         digest.reset();
         digest.update(input.getBytes(StandardCharsets.UTF_8));
         return byteArrayToHex(digest.digest());
     }
 
-    public static String sha512(String input) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    public static String sha512(String input)
+        throws NoSuchAlgorithmException,
+        UnsupportedEncodingException {
         MessageDigest digest = MessageDigest.getInstance("SHA-512");
         digest.reset();
         digest.update(input.getBytes(StandardCharsets.UTF_8));
         return byteArrayToHex(digest.digest());
     }
 
-    public static String encodeBase64(String input) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    public static String encodeBase64(String input)
+        throws NoSuchAlgorithmException,
+        UnsupportedEncodingException {
         return Base64.getEncoder().encodeToString(input.getBytes());
     }
 
-    public static String decodeBase64(String input) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    public static String decodeBase64(String input)
+        throws NoSuchAlgorithmException,
+        UnsupportedEncodingException {
         return new String(Base64.getDecoder().decode(input));
     }
 
@@ -43,7 +51,7 @@ public class SecurityUtil {
         if (hexString != null && hexString.length() != 0) {
             byteArray = new byte[hexString.length() / 2];
             for (int i = 0; i < byteArray.length; i++) {
-                byteArray[i] = (byte) Integer.parseInt(hexString.substring(2 * i, 2 * i + 2), 16);
+                byteArray[i] = (byte)Integer.parseInt(hexString.substring(2 * i, 2 * i + 2), 16);
             }
         }
         return byteArray;
@@ -56,7 +64,7 @@ public class SecurityUtil {
         StringBuffer sb = new StringBuffer();
 
         for (int i = 0; i < len; i++) {
-            idx = (int) (charSet.length * Math.random());
+            idx = (int)(charSet.length * Math.random());
             sb.append(charSet[idx]);
         }
 

@@ -17,7 +17,14 @@ public class P6SpyFormatter implements MessageFormattingStrategy {
     private static final String COMMENT = "comment";
 
     @Override
-    public String formatMessage(int connectionId, String now, long elapsed, String category, String prepared, String sql, String url) {
+    public String formatMessage(
+        int connectionId,
+        String now,
+        long elapsed,
+        String category,
+        String prepared,
+        String sql,
+        String url) {
         if (sql.trim().isEmpty()) {
             return formatByCommand(category);
         }
@@ -26,39 +33,29 @@ public class P6SpyFormatter implements MessageFormattingStrategy {
 
     private static String formatByCommand(String category) {
         return NEW_LINE
-                + "Execute Command : "
-                + NEW_LINE
-                + NEW_LINE
-                + TAP
-                + category
-                + NEW_LINE
-                + NEW_LINE
-                + "----------------------------------------------------------------------------------------------------";
+            + "Execute Command : "
+            + NEW_LINE
+            + NEW_LINE
+            + TAP
+            + category
+            + NEW_LINE
+            + NEW_LINE
+            + "----------------------------------------------------------------------------------------------------";
     }
 
     private String formatBySql(String sql, String category) {
         if (isStatementDDL(sql, category)) {
-            return NEW_LINE
-                    + "Execute DDL : "
-                    + NEW_LINE
-                    + FormatStyle.DDL
-                    .getFormatter()
-                    .format(sql);
+            return NEW_LINE + "Execute DDL : " + NEW_LINE + FormatStyle.DDL.getFormatter().format(sql);
         }
-        return NEW_LINE
-                + "Execute DML : "
-                + NEW_LINE
-                + FormatStyle.BASIC
-                .getFormatter()
-                .format(sql);
+        return NEW_LINE + "Execute DML : " + NEW_LINE + FormatStyle.BASIC.getFormatter().format(sql);
     }
 
     private String getAdditionalMessages(long elapsed) {
         return NEW_LINE
-                + NEW_LINE
-                + String.format("Execution Time: %s ms", elapsed)
-                + NEW_LINE
-                + "----------------------------------------------------------------------------------------------------";
+            + NEW_LINE
+            + String.format("Execution Time: %s ms", elapsed)
+            + NEW_LINE
+            + "----------------------------------------------------------------------------------------------------";
     }
 
     private boolean isStatementDDL(String sql, String category) {
@@ -71,8 +68,8 @@ public class P6SpyFormatter implements MessageFormattingStrategy {
 
     private boolean isDDL(String lowerSql) {
         return lowerSql.startsWith(CREATE)
-                || lowerSql.startsWith(ALTER)
-                || lowerSql.startsWith(DROP)
-                || lowerSql.startsWith(COMMENT);
+            || lowerSql.startsWith(ALTER)
+            || lowerSql.startsWith(DROP)
+            || lowerSql.startsWith(COMMENT);
     }
 }

@@ -21,10 +21,10 @@ public class SrvEtcService {
     private final SqlSessionTemplate sqlSession;
 
     /**
-     * 기타 정보 목록 조회
+     * 제공된 검색 조건에 따라 기타 서비스 정보를 조회합니다.
      *
-     * @param searchVO 검색 조건을 포함한 VO
-     * @return 기타 정보 목록 (List<ServiceEtcVO>)
+     * @param searchVO 검색 조건이 포함된 ServerSearchVO 객체
+     * @return 기타 서비스 정보를 나타내는 SrvEtcVO 객체 리스트
      */
     public List<SrvEtcVO> getServiceEtcList(ServerSearchVO searchVO) {
         return sqlSession.selectList("ad_srv_etc.selectSrvEtcList", searchVO);

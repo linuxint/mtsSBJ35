@@ -51,9 +51,9 @@ public class JpgToTIffTest {
                 writer.setOutput(ios);
                 // Set the compression parameters for Tiff image
                 ImageWriteParam param = writer.getDefaultWriteParam();
-                //param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                //param.setCompressionType(compressionType);
-                //param.setCompressionQuality(0.9F);
+                // param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                // param.setCompressionType(compressionType);
+                // param.setCompressionQuality(0.9F);
 
                 // Loop through all image files and write them to output tiff image
                 for (int i = 0; i < files.length; i++) {
@@ -79,11 +79,9 @@ public class JpgToTIffTest {
                             }
                         }
                     }
-
                 }
                 ios.flush();
                 generated = true;
-
             }
 
         } catch (FileNotFoundException ex) {

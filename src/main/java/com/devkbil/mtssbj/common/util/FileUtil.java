@@ -442,7 +442,7 @@ public class FileUtil {
     }
 
     /**
-     * 디렉토리로부터 파일목록을 가져온다. (하위 디렉터리&파일 포함)
+     * 디렉토리로부터 파일목록을 가져온다. (하위 디렉터리_파일 포함)
      *
      * @param path 파일을 가져올 디렉토리
      * @return File[]
@@ -560,9 +560,9 @@ public class FileUtil {
     /**
      * 주어진 경로로 부터 하위의 모든 파일들을 상대 경로로 반환한다.
      *
-     * @param fromPath
-     * @throws Exception
-     * @reuturn List<String>
+     * @param fromPath the directory path from which to retrieve the list of all sub-files and directories
+     * @return a list of strings, where each string represents the path of a sub-file or directory
+     * @throws Exception if an error occurs during the retrieval of file paths
      */
     public static List<String> getAllSubFiles(String fromPath) throws Exception {
         return getAllSubFiles(fromPath, null, null);
@@ -571,10 +571,10 @@ public class FileUtil {
     /**
      * 주어진 경로로 부터 하위의 특정확장자를 가진 파일들을 상대 경로로 반환한다.
      *
-     * @param fromPath
-     * @param ext      확장자 명 List<String>
-     * @throws Exception
-     * @reuturn List<String>
+     * @param fromPath the path of the directory to search for files.
+     * @param ext a list of file extensions to filter the files. If null or empty, all files are included.
+     * @return a list of strings representing the paths of the found files.
+     * @throws Exception if an error occurs while accessing the file system.
      */
     public static List<String> getAllSubFiles(String fromPath, List<String> ext) throws Exception {
         return getAllSubFiles(fromPath, null, ext);

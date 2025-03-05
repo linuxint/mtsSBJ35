@@ -8,6 +8,22 @@ import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Represents a Server Software Value Object (SWVO).
+ * This class extends HWVO and contains properties specific to software information,
+ * including software ID, name, type, activation and deletion flags, and audit information.
+ *
+ * It is used as a data transfer object for managing software-related details,
+ * particularly in relation to a server environment.
+ *
+ * The properties include:
+ * - Software details such as ID, name, and type.
+ * - Activation and deletion status.
+ * - Audit-related information such as registration and modification details.
+ *
+ * The class is annotated for both JAXB and OpenAPI integration, allowing it to be used
+ * for XML serialization and API schema documentation purposes.
+ */
 @Getter
 @Setter
 @Schema(description = "서버 소프트웨어 VO")
@@ -44,5 +60,4 @@ public class SWVO extends HWVO {
 
     @Schema(description = "수정자 번호", example = "102")
     private String chgUserNo;
-
 }

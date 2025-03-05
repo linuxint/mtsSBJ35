@@ -6,8 +6,7 @@ import java.util.EnumSet;
 
 @Getter
 public enum EnumPort {
-    CARD("04", 18911),
-    DEP("02",18912);
+    CARD("04", 18911), DEP("02", 18912);
 
     EnumPort(String bwcd, int port) {
         this.bwcd = bwcd;
@@ -18,9 +17,10 @@ public enum EnumPort {
     private final int port;
 
     static int getBwcdOfPort(String bwcd) {
-        final int[] port = { 0 };
+        final int[] port = {0};
         EnumSet.allOf(EnumPort.class)
-                .forEach(enumPort -> {
+            .forEach(
+                enumPort -> {
                     if (bwcd == enumPort.getBwcd()) {
                         port[0] = enumPort.getPort();
                     }

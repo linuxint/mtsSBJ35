@@ -23,19 +23,22 @@ public class SftpUtil {
         System.out.println("SFTP disconnected.");
     }
 
-    public void sftpFileUpload(String remoteDirectory, String localPath, String uploadFileNm) throws IOException {
+    public void sftpFileUpload(String remoteDirectory, String localPath, String uploadFileNm)
+        throws IOException {
         File file = new File(localPath + uploadFileNm);
         sftpService.uploadFile(remoteDirectory, file);
         System.out.println("SFTP file upload success.");
     }
 
-    public void sftpMultiFileUpload(String remoteDirectory, String localPath, List<String> uploadFiles) throws IOException {
+    public void sftpMultiFileUpload(
+        String remoteDirectory, String localPath, List<String> uploadFiles) throws IOException {
         for (String fileName : uploadFiles) {
             sftpFileUpload(remoteDirectory, localPath, fileName);
         }
     }
 
-    public void sftpFileDownload(String remoteDirectory, String remoteFileName, String localFilePath) throws IOException {
+    public void sftpFileDownload(String remoteDirectory, String remoteFileName, String localFilePath)
+        throws IOException {
         sftpService.downloadFile(remoteDirectory, remoteFileName, localFilePath);
         System.out.println("SFTP file download success.");
     }

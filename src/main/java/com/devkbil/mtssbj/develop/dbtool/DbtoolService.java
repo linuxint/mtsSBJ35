@@ -30,8 +30,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * 데이터베이스 도구 서비스
- * - 데이터베이스 테이블 및 컬럼 레이아웃 정보를 조회합니다.
+ * 데이터베이스와의 상호작용을 처리하고 특정 데이터 형식 변환 및 유효성 검사를 수행하는 서비스 클래스.
  */
 @Slf4j
 @Service
@@ -40,6 +39,16 @@ public class DbtoolService {
 
     private final SqlSessionTemplate sqlSession;
 
+    /**
+     * 지정된 테이블에서 데이터를 조회하고 필요한 컬럼 데이터 타입을 처리합니다.
+     * NUMBER, DATE, TIMESTAMP, CLOB, BLOB와 같은 특정 데이터 타입을 변환하거나 
+     * 적절한 인코딩을 수행합니다.
+     *
+     * @param tableName 데이터를 조회할 테이블 이름
+     * @return 테이블의 각 행을 나타내는 Map의 리스트. 각 Map은 컬럼명을 키로 하고
+     *         해당 처리된 값을 값으로 가집니다.
+     * @throws IllegalArgumentException 테이블의 컬럼 정보를 찾을 수 없는 경우
+     */
     public List<Map<String, Object>> getTableData(String tableName) {
         // 1. 테이블의 컬럼 순서와 데이터 타입 정보 가져오기
         List<Map<String, String>> columnsInfo = getColumnsForTable(tableName);
@@ -102,7 +111,16 @@ public class DbtoolService {
         return fullyProcessedData;
     }
 
-    // 4. BLOB 데이터를 Base64로 변환
+    /**
+     * 테이블의 BLOB 데이터를 Base64로 인코딩된 문자열로 변환
+     *
+     * @param tableData 테이블의 각 행을 나타내는 맵의 리스트
+     *                  키는 컬럼명이고 값은 해당 데이터입니다.
+     * @param columnsInfo 테이블 컬럼의 메타데이터 정보를 포함하는 맵의 리스트
+     *                    각 맵은 컬럼명과 데이터타입과 같은 상세 정보를 포함합니다.
+     * @return BLOB 타입 컬럼은 Base64 인코딩된 문자열로 변환되고
+     *         나머지 컬럼은 변경없이 유지된 맵의 리스트
+     */
     public List<Map<String, Object>> processBlobData(List<Map<String, Object>> tableData, List<Map<String, String>> columnsInfo) {
         return tableData.stream().map(row -> {
             Map<String, Object> processedRow = new HashMap<>();
@@ -144,6 +162,12 @@ public class DbtoolService {
         }
     }
 
+    /**
+     * 주어진 테이블의 컬럼 목록과 데이터 타입을 데이터베이스 메타데이터에서 조회합니다.
+     *
+     * @param tableName 컬럼 정보를 조회할 테이블명
+     * @return 각 컬럼의 이름과 데이터 타입 정보를 담은 Map 리스트
+     */
     private List<Map<String, String>> getColumnsForTable(String tableName) {
         // 데이터베이스 메타데이터에서 컬럼 목록과 데이터 타입 가져오기
         List<Map<String, String>> columns = new ArrayList<>();
@@ -165,10 +189,14 @@ public class DbtoolService {
     }
 
     /**
-     * 동적 테이블 처리를 위한 엑셀 데이터 처리
+     * 동적 엑셀 파일을 처리하고 파일 내용을 기반으로 데이터 유효성 검사 및 
+     * 데이터베이스 작업을 수행합니다.
      *
-     * @param inputStream 엑셀 파일 InputStream
-     * @return 처리 결과 메시지
+     * 이 메서드는 엑셀 파일을 읽어 테이블명, 키 컬럼, 컬럼명 및 데이터 행을 추출하고,
+     * 데이터베이스 테이블과 대조하여 검증한 후 데이터를 삽입하거나 갱신합니다.
+     *
+     * @param inputStream 처리할 엑셀 파일의 입력 스트림
+     * @return 처리 성공 여부나 특정 오류 메시지를 포함한 처리 결과 메시지
      */
     public String processDynamicExcelFile(InputStream inputStream) {
         try (Workbook workbook = new XSSFWorkbook(inputStream)) {
@@ -244,6 +272,14 @@ public class DbtoolService {
         }
     }
 
+    /**
+     * 데이터베이스 레코드를 비교 및 저장 처리
+     *
+     * @param tableName 데이터를 저장할 테이블 이름
+     * @param keyColumns 기준 키가 되는 컬럼명 목록
+     * @param columns 테이블의 전체 컬럼명 목록 
+     * @param rowData 저장할 데이터 행의 값
+     */
     @Transactional
     public void compareAndSaveData(String tableName, List<String> keyColumns, List<String> columns, Map<String, Object> rowData) {
         // 1. 기준 키 값을 조합하여 Map 생성

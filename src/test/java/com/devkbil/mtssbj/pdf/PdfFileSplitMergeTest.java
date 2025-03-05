@@ -15,15 +15,15 @@ public class PdfFileSplitMergeTest {
         String absolutePath = resourceDirectory.toFile().getAbsolutePath() + "/";
 
         // pdf split
-        separate(new File(absolutePath + "Demo_merge2.pdf"),1);
+        separate(new File(absolutePath + "Demo_merge2.pdf"), 1);
         // pdf merge
         File file1 = new File(absolutePath + "Demo1.pdf");
         File file2 = new File(absolutePath + "Demo2.pdf");
-        List<File> files = List.of(file1,file2);
-        merge(files,absolutePath + "Demo_merge.pdf");
+        List<File> files = List.of(file1, file2);
+        merge(files, absolutePath + "Demo_merge.pdf");
         file1 = new File(absolutePath + "Demo1.pdf");
         file2 = new File(absolutePath + "Demo_merge.pdf");
-        files = List.of(file1,file2);
-        merge(files,absolutePath + "Demo_merge2.pdf");
+        files = List.of(file1, file2);
+        merge(files, absolutePath + "Demo_merge2.pdf");
     }
 }

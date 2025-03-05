@@ -45,7 +45,6 @@ public class MemberService {
      *
      * @param param 회원 정보 요청 객체
      * @return 조회된 사용자 정보 VO
-     * @throws Exception SQL 문제가 발생할 경우 예외 발생
      */
     public UserVO selectMember4Login(UserVO param) {
         return sqlSession.selectOne("selectMember4Login", param);

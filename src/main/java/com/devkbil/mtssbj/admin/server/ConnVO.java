@@ -8,6 +8,21 @@ import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * ConnVO는 서버 서비스 접속 정보를 표현하는 Value Object입니다.
+ * {@link SvcVO}를 상속받아 서비스 세부 정보와 관련된 속성들을 상속합니다.
+ * 이 클래스는 접속 ID, 사용자 자격증명 및 접속 메타데이터와 같은 정보를 포함하여
+ * 서버 접속 데이터를 관리하는데 사용됩니다.
+ *
+ * <p>주요 기능:</p>
+ * <ul>
+ * <li>ID, 이름, 사용자 자격증명과 같은 접속 데이터 필드</li>
+ * <li>등록 및 수정 타임스탬프와 같은 메타데이터 필드</li>
+ * <li>활성화 및 삭제 상태를 나타내는 필드</li>
+ * </ul>
+ *
+ * <p>이 클래스는 XML 직렬화와 OpenAPI 문서화를 지원하기 위한 어노테이션이 적용되어 있습니다.</p>
+ */
 @Getter
 @Setter
 @Schema(description = "서버 서비스 접속 정보 VO")
@@ -21,23 +36,23 @@ public class ConnVO extends SvcVO {
     @Schema(description = "접속 정보명", example = "접속정보명")
     private String connName;
 
-//    @Schema(description = "서비스 ID", example = "1001")
-//    private String svcId;
+    //    @Schema(description = "서비스 ID", example = "1001")
+    //    private String svcId;
 
-//    @Schema(description = "서비스명", example = "Apache Service")
-//    private String svcName; // 서비스 이름(조회 조인 시 포함 가능)
+    //    @Schema(description = "서비스명", example = "Apache Service")
+    //    private String svcName; // 서비스 이름(조회 조인 시 포함 가능)
 
-//    @Schema(description = "하드웨어 ID", example = "2001")
-//    private String hwId;
+    //    @Schema(description = "하드웨어 ID", example = "2001")
+    //    private String hwId;
 
-//    @Schema(description = "하드웨어명", example = "서버1")
-//    private String hwName; // 하드웨어 이름(조회 조인 시 포함 가능)
+    //    @Schema(description = "하드웨어명", example = "서버1")
+    //    private String hwName; // 하드웨어 이름(조회 조인 시 포함 가능)
 
-//    @Schema(description = "소프트웨어 ID", example = "3001")
-//    private String swId;
+    //    @Schema(description = "소프트웨어 ID", example = "3001")
+    //    private String swId;
 
-//    @Schema(description = "소프트웨어명", example = "Apache")
-//    private String swName; // 소프트웨어 이름(조회 조인 시 포함 가능)
+    //    @Schema(description = "소프트웨어명", example = "Apache")
+    //    private String swName; // 소프트웨어 이름(조회 조인 시 포함 가능)
 
     @Schema(description = "접속 사용자 이름", example = "admin")
     private String userName;

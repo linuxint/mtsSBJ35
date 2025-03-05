@@ -38,6 +38,11 @@ public class BoardSearchVO extends PagingVO {
     @Schema(description = "검색 확장 필드", example = "EXT001")
     private String searchExt1 = "";
 
+    /**
+     * `searchType` 문자열을 콤마(,)로 구분하여 배열로 분리합니다.
+     *
+     * @return `searchType` 필드를 나누어 얻은 문자열 배열을 반환합니다.
+     */
     public String[] getSearchTypeArr() {
         return searchType.split(",");
     }

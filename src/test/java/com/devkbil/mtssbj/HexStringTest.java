@@ -8,9 +8,9 @@ public class HexStringTest {
         System.out.println(fileKey.substring(7, 14));
         System.out.println(fileKey1.substring(10, 18));
         System.out.println(Integer.valueOf(fileKey.substring(7, 14), 16));
-        //System.out.println(Integer.valueOf(fileKey1.substring(7,14),16).toString());
+        // System.out.println(Integer.valueOf(fileKey1.substring(7,14),16).toString());
 
-        //System.out.println(Integer.toString(20221123,16).toUpperCase());
+        // System.out.println(Integer.toString(20221123,16).toUpperCase());
 
     }
 }

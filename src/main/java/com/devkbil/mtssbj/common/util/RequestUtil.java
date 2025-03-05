@@ -32,7 +32,7 @@ public class RequestUtil {
     }
 
     public static String getRemoteAddr(ServletRequest request) throws UnknownHostException {
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletRequest httpRequest = (HttpServletRequest)request;
         String ip = getRemoteAddr(httpRequest);
 
         ip = getIpAddr(ip);
@@ -73,17 +73,23 @@ public class RequestUtil {
     }
 
     public static String getIpAddr(String remoteAddr) throws UnknownHostException {
-        if (remoteAddr.equals("0:0:0:0:0:0:0:1") || remoteAddr.equals("127.0.0.1") || remoteAddr == null) {
+        if (remoteAddr.equals("0:0:0:0:0:0:0:1")
+            || remoteAddr.equals("127.0.0.1")
+            || remoteAddr == null) {
             InetAddress address = InetAddress.getLocalHost();
-            //ip = address.getHostName() + "/" + address.getHostAddress();
+            // ip = address.getHostName() + "/" + address.getHostAddress();
             remoteAddr = address.getHostAddress();
         }
         return remoteAddr;
     }
 
     public static String getRequestBaseUrl(HttpServletRequest request) {
-        String path = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-                + request.getContextPath();
+        String path = request.getScheme()
+            + "://"
+            + request.getServerName()
+            + ":"
+            + request.getServerPort()
+            + request.getContextPath();
         return path;
     }
 

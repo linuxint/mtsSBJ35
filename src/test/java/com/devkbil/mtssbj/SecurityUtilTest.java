@@ -14,7 +14,9 @@ public class SecurityUtilTest {
     안녕? sha512 : 29F7079E6A30921EE941BE349D6479277B26F1A4FC2ACE7EE2DF48C9848EC1B70027B1E8111CB19E5D27ABE5B2F130D7AC6BE3E22DBCD6DA29A59FE71623D2A5
      */
 
-    public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    public static void main(String[] args)
+        throws NoSuchAlgorithmException,
+        UnsupportedEncodingException {
         System.out.println("1234 base64 encode : " + SecurityUtil.encodeBase64("1234"));
         System.out.println("안녕? base64 encode : " + SecurityUtil.encodeBase64("안녕?"));
         System.out.println("안녕? base64 decode : " + SecurityUtil.decodeBase64("7JWI64WVPw=="));
@@ -23,5 +25,4 @@ public class SecurityUtilTest {
         System.out.println("1234 sha512 : " + SecurityUtil.sha512("1234"));
         System.out.println("1234 sha256 : " + SecurityUtil.sha256("1234"));
     }
-
 }

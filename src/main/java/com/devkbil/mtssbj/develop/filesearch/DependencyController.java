@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import lombok.NoArgsConstructor;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +25,13 @@ import java.util.List;
 @Tag(name = "Dependency Controller", description = "Gradle 의존성 트리를 조회하기 위한 컨트롤러")
 public class DependencyController {
 
+    /**
+     * Executes the Gradle 'dependencies --configuration compileClasspath' command
+     * to retrieve the dependency tree and passes the output to the view.
+     *
+     * @param modelMap the Spring ModelMap object used to pass data to the view
+     * @return the name of the Thymeleaf template to render the dependency tree view
+     */
     @Operation(summary = "Gradle 의존성 검색", description = "Gradle 'dependencies --configuration compileClasspath' 명령어를 실행하여 의존성 트리를 반환합니다.")
     @ApiResponse(responseCode = "200", description = "정상적으로 의존성 트리가 반환되었습니다.")
     @GetMapping("/dependencySearch")

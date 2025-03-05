@@ -12,7 +12,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Slf4j
-public class ServerConfiguration implements WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
+public class ServerConfiguration
+    implements WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
 
     @Override
     public void customize(TomcatServletWebServerFactory factory) {
@@ -22,21 +23,25 @@ public class ServerConfiguration implements WebServerFactoryCustomizer<TomcatSer
             standardRoot.setCacheMaxSize(100 * 1024 * 1024); // 100M
             context.setResources(standardRoot);
             context.setReloadable(true);
-            context.addLifecycleListener(event -> {
-                if (event.getType().equals("before_start")) {
-                    context.addServletContainerInitializer((c, s) -> {
-                        log.debug(s.getRealPath("/WEB-INF/lib"));
-                        log.debug(s.getContextPath());
-                    }, null);
-                }
-            });
+            context.addLifecycleListener(
+                event -> {
+                    if (event.getType().equals("before_start")) {
+                        context.addServletContainerInitializer(
+                            (c, s) -> {
+                                log.debug(s.getRealPath("/WEB-INF/lib"));
+                                log.debug(s.getContextPath());
+                            },
+                            null);
+                    }
+                });
         };
         factory.addContextCustomizers(tomcatContextCustomizer);
-        factory.addConnectorCustomizers(new TomcatConnectorCustomizer() {
-            @Override
-            public void customize(Connector connector) {
-                connector.setProperty("maxHttpResponseHeaderSize", "100000");
-            }
-        });
+        factory.addConnectorCustomizers(
+            new TomcatConnectorCustomizer() {
+                @Override
+                public void customize(Connector connector) {
+                    connector.setProperty("maxHttpResponseHeaderSize", "100000");
+                }
+            });
     }
 }

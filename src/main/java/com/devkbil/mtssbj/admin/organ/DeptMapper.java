@@ -14,10 +14,10 @@ import java.util.List;
 public interface DeptMapper {
 
     /**
-     * 모든 부서 리스트 조회
-     * - 데이터베이스에서 등록된 전체 부서 정보를 반환합니다.
+     * 모든 부서 정보를 조회합니다.
+     * 데이터베이스에 등록된 전체 부서 목록을 반환합니다.
      *
-     * @return 부서 리스트 (List<?>)
+     * @return 부서 리스트 (List)
      */
     List<?> selectDept();
 

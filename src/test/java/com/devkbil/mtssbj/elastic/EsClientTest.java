@@ -9,12 +9,12 @@ package com.devkbil.mtssbj.elastic;
  * not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
+ * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
  */
@@ -94,9 +94,9 @@ class EsClientTest {
             log.info("Starting testcontainers.");
             // Start the container. This step might take some time...
             container = new ElasticsearchContainer(
-                    DockerImageName.parse("docker.elastic.co/elasticsearch/elasticsearch")
-                            .withTag("7.15.2"))
-                    .withPassword(PASSWORD);
+                DockerImageName.parse("docker.elastic.co/elasticsearch/elasticsearch")
+                    .withTag("7.15.2"))
+                .withPassword(PASSWORD);
             container.start();
             client = getClient(container.getHttpHostAddress());
             assumeNotNull(client);
@@ -118,18 +118,21 @@ class EsClientTest {
         }
     }
 
-    static private RestHighLevelClient getClient(String elasticsearchServiceAddress) {
+    private static RestHighLevelClient getClient(String elasticsearchServiceAddress) {
         try {
             final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(AuthScope.ANY,
-                    new UsernamePasswordCredentials("elastic", PASSWORD));
+            credentialsProvider.setCredentials(
+                AuthScope.ANY, new UsernamePasswordCredentials("elastic", PASSWORD));
 
             RestHighLevelClient client = new RestHighLevelClient(
-                    RestClient.builder(HttpHost.create(elasticsearchServiceAddress))
-                            .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
-            );
+                RestClient.builder(HttpHost.create(elasticsearchServiceAddress))
+                    .setHttpClientConfigCallback(
+                        httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)));
             MainResponse info = client.info(RequestOptions.DEFAULT);
-            log.info("Connected to a cluster running version {} at {}.", info.getVersion().getNumber(), elasticsearchServiceAddress);
+            log.info(
+                "Connected to a cluster running version {} at {}.",
+                info.getVersion().getNumber(),
+                elasticsearchServiceAddress);
             return client;
         } catch (Exception e) {
             log.info("No cluster is running yet at {}.", elasticsearchServiceAddress);
@@ -143,10 +146,16 @@ class EsClientTest {
             client.indices().delete(new DeleteIndexRequest("test"), RequestOptions.DEFAULT);
         } catch (ElasticsearchStatusException ignored) {
         }
-        client.index(new IndexRequest("test").id("1").source("{\"foo\":\"bar\", \"application_id\": 6}", XContentType.JSON), RequestOptions.DEFAULT);
-        GetResponse getResponse = client.get(new GetRequest("test", "1").fetchSourceContext(
-                new FetchSourceContext(true, new String[] {"application_id"}, null)
-        ), RequestOptions.DEFAULT);
+        client.index(
+            new IndexRequest("test")
+                .id("1")
+                .source("{\"foo\":\"bar\", \"application_id\": 6}", XContentType.JSON),
+            RequestOptions.DEFAULT);
+        GetResponse getResponse = client.get(
+            new GetRequest("test", "1")
+                .fetchSourceContext(
+                    new FetchSourceContext(true, new String[] {"application_id"}, null)),
+            RequestOptions.DEFAULT);
         log.info("doc = {}", getResponse);
     }
 
@@ -163,7 +172,9 @@ class EsClientTest {
             client.indices().delete(new DeleteIndexRequest("test"), RequestOptions.DEFAULT);
         } catch (ElasticsearchStatusException ignored) {
         }
-        client.index(new IndexRequest("test").id("1").source("{\"foo\":\"bar\"}", XContentType.JSON), RequestOptions.DEFAULT);
+        client.index(
+            new IndexRequest("test").id("1").source("{\"foo\":\"bar\"}", XContentType.JSON),
+            RequestOptions.DEFAULT);
         boolean exists1 = client.exists(new GetRequest("test", "1"), RequestOptions.DEFAULT);
         boolean exists2 = client.exists(new GetRequest("test", "2"), RequestOptions.DEFAULT);
         log.info("exists1 = {}", exists1);
@@ -172,15 +183,15 @@ class EsClientTest {
 
     @Test
     void createIndex() throws IOException {
-        String settings = "{\n" +
-                "  \"mappings\": {\n" +
-                "      \"properties\": {\n" +
-                "        \"content\": {\n" +
-                "          \"type\": \"text\"\n" +
-                "        }\n" +
-                "      }\n" +
-                "  }\n" +
-                "}\n";
+        String settings = "{\n"
+            + "  \"mappings\": {\n"
+            + "      \"properties\": {\n"
+            + "        \"content\": {\n"
+            + "          \"type\": \"text\"\n"
+            + "        }\n"
+            + "      }\n"
+            + "  }\n"
+            + "}\n";
 
         try {
             client.indices().delete(new DeleteIndexRequest("test"), RequestOptions.DEFAULT);
@@ -205,12 +216,14 @@ class EsClientTest {
         } catch (ElasticsearchStatusException ignored) {
         }
         client.indices().create(new CreateIndexRequest("test"), RequestOptions.DEFAULT);
-        PutMappingRequest request =
-                new PutMappingRequest("test").source("{\n" +
-                        "    \"properties\":{\n" +
-                        "        \"foo\":{\"type\":\"text\"}\n" +
-                        "    }\n" +
-                        "}", XContentType.JSON);
+        PutMappingRequest request = new PutMappingRequest("test")
+            .source(
+                "{\n"
+                    + "    \"properties\":{\n"
+                    + "        \"foo\":{\"type\":\"text\"}\n"
+                    + "    }\n"
+                    + "}",
+                XContentType.JSON);
         client.indices().putMapping(request, RequestOptions.DEFAULT);
     }
 
@@ -220,7 +233,9 @@ class EsClientTest {
             client.indices().delete(new DeleteIndexRequest("test"), RequestOptions.DEFAULT);
         } catch (ElasticsearchStatusException ignored) {
         }
-        client.index(new IndexRequest("test").id("1").source("{\"foo\":\"bar\"}", XContentType.JSON), RequestOptions.DEFAULT);
+        client.index(
+            new IndexRequest("test").id("1").source("{\"foo\":\"bar\"}", XContentType.JSON),
+            RequestOptions.DEFAULT);
         client.indices().refresh(new RefreshRequest("test"), RequestOptions.DEFAULT);
         SearchResponse response = client.search(new SearchRequest("test"), RequestOptions.DEFAULT);
         log.info("response.getHits().totalHits = {}", response.getHits().getTotalHits().value);
@@ -232,30 +247,34 @@ class EsClientTest {
             client.indices().delete(new DeleteIndexRequest("test"), RequestOptions.DEFAULT);
         } catch (ElasticsearchStatusException ignored) {
         }
-        client.index(new IndexRequest("test").id("1").source("{\"foo\":\"bar\"}", XContentType.JSON), RequestOptions.DEFAULT);
+        client.index(
+            new IndexRequest("test").id("1").source("{\"foo\":\"bar\"}", XContentType.JSON),
+            RequestOptions.DEFAULT);
         client.indices().refresh(new RefreshRequest("test"), RequestOptions.DEFAULT);
-        SearchResponse response = client.search(new SearchRequest("test").source(
-                new SearchSourceBuilder().query(
-                        QueryBuilders.matchQuery("foo", "bar")
-                )
-        ), RequestOptions.DEFAULT);
+        SearchResponse response = client.search(
+            new SearchRequest("test")
+                .source(new SearchSourceBuilder().query(QueryBuilders.matchQuery("foo", "bar"))),
+            RequestOptions.DEFAULT);
         log.info("response.getHits().totalHits = {}", response.getHits().getTotalHits().value);
-        response = client.search(new SearchRequest("test").source(
-                new SearchSourceBuilder().query(
-                        QueryBuilders.termQuery("foo", "bar")
-                )
-        ), RequestOptions.DEFAULT);
+        response = client.search(
+            new SearchRequest("test")
+                .source(new SearchSourceBuilder().query(QueryBuilders.termQuery("foo", "bar"))),
+            RequestOptions.DEFAULT);
         log.info("response.getHits().totalHits = {}", response.getHits().getTotalHits().value);
-        response = client.search(new SearchRequest("test").source(
-                new SearchSourceBuilder().query(
-                        QueryBuilders.wrapperQuery("{\"match_all\":{}}")
-                )
-        ), RequestOptions.DEFAULT);
+        response = client.search(
+            new SearchRequest("test")
+                .source(
+                    new SearchSourceBuilder()
+                        .query(QueryBuilders.wrapperQuery("{\"match_all\":{}}"))),
+            RequestOptions.DEFAULT);
         log.info("response.getHits().totalHits = {}", response.getHits().getTotalHits().value);
-        response = client.search(new SearchRequest("test").source(
-                new SearchSourceBuilder().query(QueryBuilders.matchAllQuery())
-                        .trackScores(true)
-        ), RequestOptions.DEFAULT);
+        response = client.search(
+            new SearchRequest("test")
+                .source(
+                    new SearchSourceBuilder()
+                        .query(QueryBuilders.matchAllQuery())
+                        .trackScores(true)),
+            RequestOptions.DEFAULT);
         log.info("response.getHits().totalHits = {}", response.getHits().getTotalHits().value);
     }
 
@@ -265,7 +284,9 @@ class EsClientTest {
             client.indices().delete(new DeleteIndexRequest("test"), RequestOptions.DEFAULT);
         } catch (ElasticsearchStatusException ignored) {
         }
-        client.index(new IndexRequest("test").id("1").source("{\"foo\":\"bar\"}", XContentType.JSON), RequestOptions.DEFAULT);
+        client.index(
+            new IndexRequest("test").id("1").source("{\"foo\":\"bar\"}", XContentType.JSON),
+            RequestOptions.DEFAULT);
         client.indices().refresh(new RefreshRequest("test"), RequestOptions.DEFAULT);
 
         RestClient llClient = client.getLowLevelClient();
@@ -279,11 +300,11 @@ class EsClientTest {
         int size = tree.get("size").asInt(10);
         String query = tree.get("query").toString();
 
-        SearchResponse response = client.search(new SearchRequest("test").source(
-                new SearchSourceBuilder().query(
-                        QueryBuilders.wrapperQuery(query)
-                ).size(size)
-        ), RequestOptions.DEFAULT);
+        SearchResponse response = client.search(
+            new SearchRequest("test")
+                .source(
+                    new SearchSourceBuilder().query(QueryBuilders.wrapperQuery(query)).size(size)),
+            RequestOptions.DEFAULT);
         log.info("response.getHits().totalHits = {}", response.getHits().getTotalHits().value);
     }
 
@@ -293,13 +314,16 @@ class EsClientTest {
             client.indices().delete(new DeleteIndexRequest("transform-source"), RequestOptions.DEFAULT);
         } catch (ElasticsearchStatusException ignored) {
         }
-        client.index(new IndexRequest("transform-source").id("1").source("{\"foo\":\"bar\"}", XContentType.JSON), RequestOptions.DEFAULT);
+        client.index(
+            new IndexRequest("transform-source").id("1").source("{\"foo\":\"bar\"}", XContentType.JSON),
+            RequestOptions.DEFAULT);
         client.indices().refresh(new RefreshRequest("transform-source"), RequestOptions.DEFAULT);
 
         String id = "test-get";
 
-        GroupConfig groupConfig = GroupConfig.builder().groupBy("reviewer",
-                TermsGroupSource.builder().setField("user_id").build()).build();
+        GroupConfig groupConfig = GroupConfig.builder()
+            .groupBy("reviewer", TermsGroupSource.builder().setField("user_id").build())
+            .build();
         AggregatorFactories.Builder aggBuilder = new AggregatorFactories.Builder();
         aggBuilder.addAggregator(AggregationBuilders.avg("avg_rating").field("stars"));
         PivotConfig pivotConfig = PivotConfig.builder().setGroups(groupConfig).setAggregations(aggBuilder).build();
@@ -307,12 +331,16 @@ class EsClientTest {
         DestConfig destConfig = DestConfig.builder().setIndex("pivot-dest").build();
 
         TransformConfig transform = TransformConfig.builder()
-                .setId(id)
-                .setSource(SourceConfig.builder().setIndex("transform-source").setQuery(new MatchAllQueryBuilder()).build())
-                .setDest(destConfig)
-                .setPivotConfig(pivotConfig)
-                .setDescription("this is a test transform")
-                .build();
+            .setId(id)
+            .setSource(
+                SourceConfig.builder()
+                    .setIndex("transform-source")
+                    .setQuery(new MatchAllQueryBuilder())
+                    .build())
+            .setDest(destConfig)
+            .setPivotConfig(pivotConfig)
+            .setDescription("this is a test transform")
+            .build();
 
         client.transform().putTransform(new PutTransformRequest(transform), RequestOptions.DEFAULT);
 
@@ -321,7 +349,8 @@ class EsClientTest {
         try {
             GetTransformResponse response = client.transform().getTransform(new GetTransformRequest(id), RequestOptions.DEFAULT);
             log.info("response.getCount() = {}", response.getCount());
-            fail("Failing this test indicates that https://github.com/elastic/elasticsearch/issues/64602 has been fixed. The code should be reviewed");
+            fail(
+                "Failing this test indicates that https://github.com/elastic/elasticsearch/issues/64602 has been fixed. The code should be reviewed");
         } catch (IOException ignored) {
         }
     }
@@ -332,14 +361,17 @@ class EsClientTest {
             client.indices().delete(new DeleteIndexRequest("highlight"), RequestOptions.DEFAULT);
         } catch (ElasticsearchStatusException ignored) {
         }
-        client.index(new IndexRequest("highlight").source("{\"foo\":\"bar baz\"}", XContentType.JSON), RequestOptions.DEFAULT);
+        client.index(
+            new IndexRequest("highlight").source("{\"foo\":\"bar baz\"}", XContentType.JSON),
+            RequestOptions.DEFAULT);
         client.indices().refresh(new RefreshRequest("highlight"), RequestOptions.DEFAULT);
-        SearchResponse response = client.search(new SearchRequest("highlight").source(
-                new SearchSourceBuilder()
+        SearchResponse response = client.search(
+            new SearchRequest("highlight")
+                .source(
+                    new SearchSourceBuilder()
                         .query(QueryBuilders.matchQuery("foo", "bar"))
-                        .highlighter(new HighlightBuilder().field("foo").maxAnalyzedOffset(10)
-                        )
-        ), RequestOptions.DEFAULT);
+                        .highlighter(new HighlightBuilder().field("foo").maxAnalyzedOffset(10))),
+            RequestOptions.DEFAULT);
         HighlightField highlightField = response.getHits().getAt(0).getHighlightFields().get("foo");
         log.info("Highlights: {}", (Object)highlightField.fragments());
     }
@@ -350,13 +382,21 @@ class EsClientTest {
             client.indices().delete(new DeleteIndexRequest("termsagg"), RequestOptions.DEFAULT);
         } catch (ElasticsearchStatusException ignored) {
         }
-        client.index(new IndexRequest("termsagg").id("1").source("{\"foo\":\"bar\"}", XContentType.JSON), RequestOptions.DEFAULT);
-        client.index(new IndexRequest("termsagg").id("2").source("{\"foo\":\"bar\"}", XContentType.JSON), RequestOptions.DEFAULT);
+        client.index(
+            new IndexRequest("termsagg").id("1").source("{\"foo\":\"bar\"}", XContentType.JSON),
+            RequestOptions.DEFAULT);
+        client.index(
+            new IndexRequest("termsagg").id("2").source("{\"foo\":\"bar\"}", XContentType.JSON),
+            RequestOptions.DEFAULT);
         client.indices().refresh(new RefreshRequest("termsagg"), RequestOptions.DEFAULT);
-        SearchResponse response = client.search(new SearchRequest("termsagg").source(new SearchSourceBuilder()
-                .size(0)
-                .aggregation(AggregationBuilders.terms("top10foo").field("foo.keyword").size(10))
-        ), RequestOptions.DEFAULT);
+        SearchResponse response = client.search(
+            new SearchRequest("termsagg")
+                .source(
+                    new SearchSourceBuilder()
+                        .size(0)
+                        .aggregation(
+                            AggregationBuilders.terms("top10foo").field("foo.keyword").size(10))),
+            RequestOptions.DEFAULT);
         Terms top10foo = response.getAggregations().get("top10foo");
         for (Terms.Bucket bucket : top10foo.getBuckets()) {
             log.info("top10foo bucket = {}, count = {}", bucket.getKeyAsString(), bucket.getDocCount());
@@ -371,25 +411,27 @@ class EsClientTest {
         } catch (ElasticsearchStatusException | IOException ignored) {
         }
         BulkProcessor bulkProcessor = BulkProcessor.builder(
-                        (request, bulkListener) -> client.bulkAsync(request, RequestOptions.DEFAULT, bulkListener),
-                        new BulkProcessor.Listener() {
-                            @Override
-                            public void beforeBulk(long executionId, BulkRequest request) {
-                                log.debug("going to execute bulk of {} requests", request.numberOfActions());
-                            }
+            (request, bulkListener) -> client.bulkAsync(request, RequestOptions.DEFAULT, bulkListener),
+            new BulkProcessor.Listener() {
+                @Override
+                public void beforeBulk(long executionId, BulkRequest request) {
+                    log.debug("going to execute bulk of {} requests", request.numberOfActions());
+                }
 
-                            @Override
-                            public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
-                                log.debug("bulk executed {} failures", response.hasFailures() ? "with" : "without");
-                            }
+                @Override
+                public void afterBulk(
+                    long executionId, BulkRequest request, BulkResponse response) {
+                    log.debug(
+                        "bulk executed {} failures", response.hasFailures() ? "with" : "without");
+                }
 
-                            @Override
-                            public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
-                                log.warn("error while executing bulk", failure);
-                            }
-                        })
-                .setBulkActions(10)
-                .build();
+                @Override
+                public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
+                    log.warn("error while executing bulk", failure);
+                }
+            })
+            .setBulkActions(10)
+            .build();
 
         for (int i = 0; i < size; i++) {
             bulkProcessor.add(new IndexRequest("bulk").source("{\"foo\":\"bar\"}", XContentType.JSON));
@@ -399,8 +441,11 @@ class EsClientTest {
         bulkProcessor.close();
 
         client.indices().refresh(new RefreshRequest("bulk"), RequestOptions.DEFAULT);
-        SearchResponse response = client.search(new SearchRequest("bulk").source(new SearchSourceBuilder().size(0)), RequestOptions.DEFAULT);
-        log.info("Indexed {} documents. Found {} documents.", size, response.getHits().getTotalHits().value);
+        SearchResponse response = client.search(
+            new SearchRequest("bulk").source(new SearchSourceBuilder().size(0)),
+            RequestOptions.DEFAULT);
+        log.info(
+            "Indexed {} documents. Found {} documents.", size, response.getHits().getTotalHits().value);
     }
 
     @Test
@@ -409,15 +454,20 @@ class EsClientTest {
             client.indices().delete(new DeleteIndexRequest("rangequery"), RequestOptions.DEFAULT);
         } catch (ElasticsearchStatusException ignored) {
         }
-        client.index(new IndexRequest("rangequery").id("1").source("{\"foo\":1}", XContentType.JSON), RequestOptions.DEFAULT);
-        client.index(new IndexRequest("rangequery").id("2").source("{\"foo\":2}", XContentType.JSON), RequestOptions.DEFAULT);
+        client.index(
+            new IndexRequest("rangequery").id("1").source("{\"foo\":1}", XContentType.JSON),
+            RequestOptions.DEFAULT);
+        client.index(
+            new IndexRequest("rangequery").id("2").source("{\"foo\":2}", XContentType.JSON),
+            RequestOptions.DEFAULT);
         client.indices().refresh(new RefreshRequest("rangequery"), RequestOptions.DEFAULT);
-        SearchResponse response = client.search(new SearchRequest("rangequery").source(new SearchSourceBuilder()
-                .query(QueryBuilders.rangeQuery("foo").from(0).to(1))
-        ), RequestOptions.DEFAULT);
+        SearchResponse response = client.search(
+            new SearchRequest("rangequery")
+                .source(
+                    new SearchSourceBuilder().query(QueryBuilders.rangeQuery("foo").from(0).to(1))),
+            RequestOptions.DEFAULT);
         for (SearchHit hit : response.getHits()) {
             log.info("hit _id = {}, _source = {}", hit.getId(), hit.getSourceAsString());
         }
     }
-
 }

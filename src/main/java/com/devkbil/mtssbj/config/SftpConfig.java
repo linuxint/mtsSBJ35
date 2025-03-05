@@ -23,7 +23,8 @@ public class SftpConfig {
     }
 
     @Bean
-    public SftpRemoteFileTemplate sftpRemoteFileTemplate(DefaultSftpSessionFactory sftpSessionFactory) {
+    public SftpRemoteFileTemplate sftpRemoteFileTemplate(
+        DefaultSftpSessionFactory sftpSessionFactory) {
         return new SftpRemoteFileTemplate(sftpSessionFactory);
     }
 }

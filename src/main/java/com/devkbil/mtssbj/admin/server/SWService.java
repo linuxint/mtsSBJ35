@@ -10,6 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * SWService is responsible for managing server software related operations
+ * including querying, registering, updating, and logically deleting software records.
+ */
 @Service
 @RequiredArgsConstructor
 public class SWService {

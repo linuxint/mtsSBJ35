@@ -19,6 +19,5 @@ public class LocaleMessage {
 
     public String getMessage(String key, Object[] objs) {
         return messageSource.getMessage(key, objs, Locale.getDefault());
-
     }
 }

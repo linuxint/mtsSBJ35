@@ -17,10 +17,11 @@ import java.util.List;
 @Component
 public class MaskingAspect {
     @Around("@annotation(applyMasking)")
-    public Object applyMaskingAspect(ProceedingJoinPoint joinPoint, ApplyMasking applyMasking) throws Throwable {
+    public Object applyMaskingAspect(ProceedingJoinPoint joinPoint, ApplyMasking applyMasking)
+        throws Throwable {
         Object[] args = joinPoint.getArgs();
         Object response = joinPoint.proceed();
-        MaskingDto maskingOn = (MaskingDto) args[0];
+        MaskingDto maskingOn = (MaskingDto)args[0];
 
         if (maskingOn.getDisableMaskingYn() == null && response != null) {
             // 필드 누락 시
@@ -32,14 +33,18 @@ public class MaskingAspect {
         } else {
             // 마스킹 적용
             if (response != null) {
-                return applyMaskingUtil(applyMasking.typeValue(), applyMasking.genericTypeValue(), response);
+                return applyMaskingUtil(
+                    applyMasking.typeValue(), applyMasking.genericTypeValue(), response);
             }
         }
         return response;
     }
 
     private static <T> T applyMaskingUtil(Class<?> clazz, Class<?> klass, Object response)
-            throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        throws InvocationTargetException,
+        NoSuchMethodException,
+        InstantiationException,
+        IllegalAccessException {
         if (response instanceof List) {
             return applyMaskingUtilForList(klass, response); // 마스킹 적용할 데이터가 List<?> 형태인 경우
         } else {
@@ -48,10 +53,14 @@ public class MaskingAspect {
     }
 
     private static <T> T applyMaskingUtilForDto(Class<?> clazz, Object response)
-            throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        throws NoSuchMethodException,
+        InvocationTargetException,
+        InstantiationException,
+        IllegalAccessException {
         Field[] fields = clazz.getDeclaredFields();
         Object responseDto = clazz.getDeclaredConstructor().newInstance();
-        Arrays.stream(fields).forEach(
+        Arrays.stream(fields)
+            .forEach(
                 field -> {
                     field.setAccessible(true);
                     try {
@@ -59,22 +68,24 @@ public class MaskingAspect {
                         if (fieldValue instanceof String && field.isAnnotationPresent(Mask.class)) {
                             Mask mask = field.getAnnotation(Mask.class); // Mask 어노테이션을 가져옴
                             MaskingType maskingType = mask.type(); // 해당 어노테이션이 보유한 Enum 타입을 가져옴
-                            String maskedValue = MaskingUtil.maskingOf(maskingType, (String) fieldValue); // 마스킹 적용
+                            String maskedValue = MaskingUtil.maskingOf(maskingType, (String)fieldValue); // 마스킹 적용
                             field.set(responseDto, maskedValue);
                         } else {
                             field.set(responseDto, fieldValue);
                         }
                     } catch (Exception e) {
                     }
-                }
-        );
-        return (T) responseDto;
+                });
+        return (T)responseDto;
     }
 
     private static <T> T applyMaskingUtilForList(Class<?> klass, Object response)
-            throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        throws InvocationTargetException,
+        NoSuchMethodException,
+        InstantiationException,
+        IllegalAccessException {
         List<Object> responseDtoList = new ArrayList<>();
-        List<?> responseList = (List<?>) response;
+        List<?> responseList = (List<?>)response;
         for (Object responseDto : responseList) {
             if (responseDto != null && responseDto.getClass().equals(klass)) {
                 Object maskedResponseDto = applyMaskingUtilForDto(klass, responseDto);
@@ -83,6 +94,6 @@ public class MaskingAspect {
                 responseDtoList.add(responseDto);
             }
         }
-        return (T) responseDtoList;
+        return (T)responseDtoList;
     }
 }

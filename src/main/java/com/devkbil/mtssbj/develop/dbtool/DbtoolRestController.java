@@ -19,7 +19,8 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 
 /**
- * 테이블 데이터를 동적으로 처리하는 REST 컨트롤러
+ * 동적 테이블 데이터 처리를 위한 REST 컨트롤러.
+ * 지정된 테이블에 데이터를 삽입하거나 업데이트하기 위한 Excel 파일 업로드 및 처리를 담당합니다.
  */
 @RestController
 @RequestMapping("/api/dbtool")
@@ -30,6 +31,13 @@ public class DbtoolRestController {
 
     private final DbtoolService dbtoolService;
 
+    /**
+     * 엑셀 파일을 업로드하고 지정된 테이블에 데이터를 동적으로 삽입하거나 업데이트합니다.
+     *
+     * @param file 사용자가 업로드한 엑셀 파일로, 테이블명, 키, 컬럼, 데이터를 포함합니다
+     * @return 처리 성공 시 성공 메시지를 포함한 ResponseEntity,
+     *         실패 시 오류 메시지를 포함한 ResponseEntity를 반환합니다
+     */
     @PostMapping("/uploadDynamic")
     @Operation(
             summary = "엑셀 파일 업로드 및 동적 테이블 처리",

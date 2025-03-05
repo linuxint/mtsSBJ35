@@ -21,16 +21,15 @@ public class JPAConfig {
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder,
-                                                                       DataSource dataSource) {
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(
+        EntityManagerFactoryBuilder builder, DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean factoryBean = builder
-                .dataSource(dataSource)
-                .packages(MtssbjApplication.class)
-                .persistenceUnit("default")
-                .build();
+            .dataSource(dataSource)
+            .packages(MtssbjApplication.class)
+            .persistenceUnit("default")
+            .build();
         // 명시적으로 jakarta.persistence.EntityManagerFactory 사용 설정
         factoryBean.setEntityManagerFactoryInterface(EntityManagerFactory.class);
         return factoryBean;
     }
-
 }
