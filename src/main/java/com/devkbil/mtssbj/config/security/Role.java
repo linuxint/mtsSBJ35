@@ -1,9 +1,9 @@
 package com.devkbil.mtssbj.config.security;
 
+import java.util.Arrays;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.Arrays;
 
 @AllArgsConstructor
 @Getter

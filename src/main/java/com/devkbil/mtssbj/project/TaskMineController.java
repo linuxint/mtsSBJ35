@@ -1,7 +1,7 @@
 package com.devkbil.mtssbj.project;
 
 import com.devkbil.mtssbj.common.ExtFieldVO;
-import com.devkbil.mtssbj.common.util.FileUtil;
+import com.devkbil.mtssbj.common.util.FileUpload;
 import com.devkbil.mtssbj.common.util.FileVO;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
@@ -12,9 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import jakarta.validation.Valid;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.ObjectUtils;
@@ -24,6 +21,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 작업(TaskMine) 관리를 담당하는 컨트롤러.
@@ -42,6 +42,7 @@ public class TaskMineController {
     /**
      * 사용자의 작업 목록 조회.
      *
+     * @param prno 프로젝트 번호. 특정 프로젝트의 작업만 조회하고자 할 때 사용
      * @param modelMap 결과 데이터를 담을 모델맵 객체
      * @return 개인 작업(TaskMine) 페이지 경로
      */
@@ -76,6 +77,7 @@ public class TaskMineController {
     /**
      * 특정 작업의 세부 정보를 조회하고 수정 폼 제공.
      *
+     * @param tsno 조회할 작업의 고유 번호
      * @param modelMap 결과 데이터를 담을 모델맵 객체
      * @return 작업 상세보기 및 수정 폼 페이지 경로
      */
@@ -100,6 +102,7 @@ public class TaskMineController {
     /**
      * 개인 작업 저장 (수정 또는 생성).
      *
+     * @param fileno 작업과 연관된 파일 번호 배열. 작업에 첨부된 파일들의 식별자
      * @param taskInfo 저장하려는 작업 정보
      * @return 개인 작업 목록 화면으로 리다이렉트
      */
@@ -113,7 +116,7 @@ public class TaskMineController {
                                @ModelAttribute @Valid TaskVO taskInfo) {
 
         // 요청 파일 데이터 처리
-        FileUtil fs = new FileUtil();
+        FileUpload fs = new FileUpload();
         List<FileVO> filelist = fs.saveAllFiles(taskInfo.getUploadfile());
 
         taskService.insertTaskMine(taskInfo, filelist, fileno);

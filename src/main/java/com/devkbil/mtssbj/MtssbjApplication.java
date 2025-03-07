@@ -10,8 +10,6 @@ import com.devkbil.mtssbj.common.listener.ApplicationPreparedEventListener;
 import com.devkbil.mtssbj.common.listener.ApplicationReadyEventListener;
 import com.devkbil.mtssbj.common.listener.ApplicationStartingEventListener;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.boot.Banner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
@@ -23,6 +21,8 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.CrossOrigin;
+
+import lombok.extern.slf4j.Slf4j;
 
 @SpringBootApplication
 @CrossOrigin(origins = "${app.cors.allowed-origins}") // 'Access-Control-Allow-Origin' header 추가
@@ -64,29 +64,9 @@ public class MtssbjApplication implements CommandLineRunner {
             new ApplicationContextClosedEventListener(),
             new ApplicationContextRefreshedEventListener());
 
-        // custom banner of java
-        /*
-        application.setBanner(new Banner() {
-        @Override
-        public void printBanner(Environment environment, Class<?> sourceClass, PrintStream out) {
-        
-            out.println("888b     d888 88888888888 .d8888b.        d888        .d8888b.)");
-            out.println("8888b   d8888     888    d88P  Y88b      d8888       d88P  Y88b)");
-            out.println("88888b.d88888     888    Y88b.             888       888    888)");
-            out.println("888Y88888P888     888     \"Y888b.          888       888    888)");
-            out.println("888 Y888P 888     888        \"Y88b.        888       888    888)");
-            out.println("888  Y8P  888     888          \"888        888       888    888)");
-            out.println("888   \"   888     888    Y88b  d88P        888   d8b Y88b  d88P)");
-            out.println("888       888     888     \"Y8888P\"       8888888 Y8P  \"Y8888P\")");
-        
-        }
-        });
-        */
-
         // 애플리케이션 실행
         application.run(args);
-        //        int exitCode = SpringApplication.exit(application.run(args));
-        //        System.exit(exitCode);
+
     }
 
     @Override

@@ -3,8 +3,6 @@ package com.devkbil.mtssbj.common;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jxls.builder.JxlsOutputFile;
@@ -24,19 +22,41 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * Excel 파일 생성 및 다운로드를 처리하는 유틸리티 클래스.
+ * Jxls 3.0을 사용하여 템플릿 기반의 Excel 파일을 생성하고,
+ * HTTP 응답을 통해 클라이언트에게 다운로드를 제공합니다.
+ */
 @Slf4j
 public class MakeExcel {
 
+    /**
+     * MakeExcel 클래스의 기본 생성자.
+     * Excel 파일 생성 및 다운로드 기능을 초기화합니다.
+     */
     public MakeExcel() {
     }
 
-    // 파일 이름 생성: 기본 형식
+    /**
+     * 현재 시간을 기반으로 기본 파일 이름을 생성합니다.
+     * 형식: yyyyMMddHHmm (예: 202401011230)
+     *
+     * @return 생성된 파일 이름 문자열
+     */
     public String get_Filename() {
         SimpleDateFormat ft = new SimpleDateFormat("yyyyMMddHHmm");
         return ft.format(new Date());
     }
 
-    // 파일 이름 생성: 사용자 프리픽스 포함
+    /**
+     * 사용자 지정 접두사를 포함한 파일 이름을 생성합니다.
+     * 형식: [접두사]yyyyMMddHHmm (예: test202401011230)
+     *
+     * @param pre 파일 이름 앞에 추가할 접두사
+     * @return 접두사가 포함된 파일 이름 문자열
+     */
     public String get_Filename(String pre) {
         return pre + get_Filename();
     }

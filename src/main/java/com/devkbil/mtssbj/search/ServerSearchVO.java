@@ -7,10 +7,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
+import org.springframework.ui.ModelMap;
+
 import lombok.Getter;
 import lombok.Setter;
-
-import org.springframework.ui.ModelMap;
 
 /**
  * CommonSearchVO 클래스

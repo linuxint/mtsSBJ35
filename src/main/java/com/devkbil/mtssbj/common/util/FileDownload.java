@@ -1,12 +1,7 @@
 package com.devkbil.mtssbj.common.util;
 
-import com.devkbil.mtssbj.common.LocaleMessage;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -22,15 +17,25 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * A controller class responsible for handling file download requests.
+ * This class allows files to be downloaded from a specified directory.
+ */
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class FileDownload {
 
-    LocaleMessage localeMessage;
-
     /**
-     * 파일(첨부파일, 이미지등) 다운로드.
+     * Handles file download requests. Enables downloading of files from a specified directory.
+     *
+     * @param filename the name of the file to be displayed in the download dialog; optional.
+     * @param downname the actual name of the file to be downloaded; optional.
+     * @param request the HttpServletRequest object that contains the request the client has made.
+     * @param response the HttpServletResponse object used to send the file or related errors.
      */
     @GetMapping("fileDownload")
     public void fileDownload(@RequestParam(value = "filename", required = false) String filename, @RequestParam(value = "downname", required = false) String downname, HttpServletRequest request, HttpServletResponse response) {

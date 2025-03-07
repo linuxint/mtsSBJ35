@@ -9,10 +9,10 @@ import java.util.Date;
 
 /**
  * Spring Framework에서 애플리케이션 컨텍스트가 초기화 단계에 도달했을 때 발생하는 {@link ApplicationContextInitializedEvent}를 처리하는 리스너 클래스입니다.
- *
+ * <p>
  * {@link ApplicationContextInitializedEvent}는 {@code ApplicationContext}가 모든 설정 및 초기화 작업을 완료하고
  * 준비 완료 상태임을 나타냅니다. 이는 특히 애플리케이션 컨텍스트와 관련 있는 리소스가 초기화되었음을 의미합니다.
- *
+ * <p>
  * 이 구현은 이벤트 발생 시간을 비롯한 컨텍스트 초기화 정보를 기록하거나 적절한 초기 작업을 수행할 수 있도록 설계되었습니다.
  */
 public class ApplicationContextInitializedEventListener implements ApplicationListener<ApplicationContextInitializedEvent> {
@@ -29,7 +29,7 @@ public class ApplicationContextInitializedEventListener implements ApplicationLi
     public void onApplicationEvent(ApplicationContextInitializedEvent event) {
         logSystem.debug("***********************************************************");
         logSystem.debug("*                                                         *");
-        logSystem.debug("* ApplicationContextInitializedEvent " + new Date(event.getTimestamp()));
+        logSystem.debug("* ApplicationContextInitializedEvent {} ", new Date(event.getTimestamp()));
         logSystem.debug("*                                                         *");
         logSystem.debug("***********************************************************");
     }

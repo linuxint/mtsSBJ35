@@ -11,14 +11,30 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
+/**
+ * Dog API의 상태를 확인하는 HealthIndicator 클래스입니다.
+ */
 @Component
 public class DogsApiHealthIndicator implements HealthIndicator {
 
+    /**
+     * 상태 확인을 진행하며, 세부 정보를 포함할지 여부를 설정합니다.
+     *
+     * @param includeDetails 세부 정보를 포함할지 여부
+     * @return Health 상태 객체
+     */
     @Override
     public Health getHealth(boolean includeDetails) {
         return HealthIndicator.super.getHealth(includeDetails);
     }
 
+    /**
+     * Dog API의 상태를 확인합니다.
+     * API에서 200 OK 및 유효한 데이터를 반환하면 시스템 상태를 정상(UP)으로 표시합니다.
+     * 실패 시 다운(DOWN) 상태와 세부 정보가 포함됩니다.
+     *
+     * @return Health 상태 객체
+     */
     @Override
     public Health health() {
         try {

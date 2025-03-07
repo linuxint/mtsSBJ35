@@ -1,14 +1,16 @@
 package com.devkbil.mtssbj;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.HashMap;
 import java.util.Scanner;
 
-import static com.devkbil.mtssbj.common.util.OtpUtil.*;
+import lombok.extern.slf4j.Slf4j;
+
+import static com.devkbil.mtssbj.common.util.OtpUtil.checkCode;
+import static com.devkbil.mtssbj.common.util.OtpUtil.generate;
+import static com.devkbil.mtssbj.common.util.OtpUtil.generateOtp2;
 
 @Slf4j
-public class generateOtp2Test {
+public class GenerateOtp2Test {
 
     public static void main(String[] args) {
 

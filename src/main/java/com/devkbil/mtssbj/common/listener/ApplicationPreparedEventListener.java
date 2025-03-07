@@ -10,10 +10,10 @@ import java.util.Date;
 /**
  * Spring Framework에서 애플리케이션 컨텍스트 초기화가 완료된 후,
  * 하지만 아직 활성화되기 전 단계에서 발생하는 {@link ApplicationPreparedEvent}를 처리하는 리스너 클래스입니다.
- *
+ * <p>
  * {@link ApplicationPreparedEvent}는 컨텍스트 초기화가 완료되고 애플리케이션이 활성화되기 전에
  * 추가적인 설정 작업을 수행할 수 있는 마지막 단계입니다.
- *
+ * <p>
  * 이 클래스는 초기화 정보를 로깅하거나 초기 설정 작업을 추가적으로 실행하기 위해 설계되었습니다.
  */
 public class ApplicationPreparedEventListener implements ApplicationListener<ApplicationPreparedEvent> {
@@ -30,7 +30,7 @@ public class ApplicationPreparedEventListener implements ApplicationListener<App
     public void onApplicationEvent(ApplicationPreparedEvent event) {
         logSystem.debug("***********************************************************");
         logSystem.debug("*                                                         *");
-        logSystem.debug("* ApplicationPreparedEvent " + new Date(event.getTimestamp()));
+        logSystem.debug("* ApplicationPreparedEvent {}", new Date(event.getTimestamp()));
         logSystem.debug("*                                                         *");
         logSystem.debug("***********************************************************");
     }

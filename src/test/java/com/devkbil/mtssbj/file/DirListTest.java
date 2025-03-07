@@ -3,29 +3,35 @@ package com.devkbil.mtssbj.file;
 import java.io.File;
 
 public class DirListTest {
-
     public static void main(String[] args) {
-        // C:\디렉토리 아래 있는 파일 또는 디렉토리 목록을 얻어 도스 콘솔에 출력하세요.
-        // File클래스의 list(), listFiles()메소드 이용.
-
-        String dirName = "/Users/kbil/IdeaProjects/mtsSBJ35/fileupload/";
+        // 절대 경로 또는 상대 경로 사용
+        String dirName =  "./fileupload/";
         File dir = new File(dirName);
+
+        // 디렉토리 존재 여부 확인
+        if (!dir.exists()) {
+            System.out.println("디렉토리가 존재하지 않습니다: " + dirName);
+            // 디렉토리 생성 또는 기본 디렉토리로 대체
+            dir.mkdirs();
+        }
+
+        // list()와 listFiles() 메서드 호출 전 null 체크
         String[] files = dir.list();
-        // 디렉토리의 파일목록(디렉토리포함)을 String배열로 반환
-
-        /*for(String fn : files) //확상for문 ; for -each문
-        System.out.println(fn);
-        */
-
-        /*for(int i=0; i<files.length;i++){
-        System.out.println(files[i]);
-        }*/
+        if (files == null) {
+            System.out.println("디렉토리 목록을 가져올 수 없습니다.");
+            return;
+        }
 
         System.out.println("--------------------------------------");
         System.out.println("파일/DIR명\t size");
         System.out.println("--------------------------------------");
+
         File[] files2 = dir.listFiles();
-        // 디렉토리의 파일목록(디렉토리포함)을 File 배열로 반환
+        if (files2 == null) {
+            System.out.println("디렉토리 파일 목록을 가져올 수 없습니다.");
+            return;
+        }
+
         for (File f : files2) {
             String str = f.getName();
 
@@ -35,6 +41,6 @@ public class DirListTest {
             } else { // 파일인 경우 ...
                 System.out.print(str + "\t" + f.length() + "bytes\n");
             }
-        } // for-------
+        }
     }
 }

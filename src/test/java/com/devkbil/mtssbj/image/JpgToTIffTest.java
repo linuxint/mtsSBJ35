@@ -19,7 +19,7 @@ public class JpgToTIffTest {
     public static void main(String[] args) throws IOException {
 
         String compressionType = "JPEG";
-        String dirName = "/Users/kbil/IdeaProjects/module/jpg";
+        String dirName = "/module/jpg";
         String outputFileName = "result";
         boolean generated = false;
         ImageOutputStream ios = null;
@@ -91,10 +91,12 @@ public class JpgToTIffTest {
         } catch (Exception ex) {
             generated = false;
         } finally {
-            if (null != ios)
+            if (null != ios) {
                 ios.close();
-            if (null != writer)
+            }
+            if (null != writer) {
                 writer.dispose();
+            }
         }
     }
 }

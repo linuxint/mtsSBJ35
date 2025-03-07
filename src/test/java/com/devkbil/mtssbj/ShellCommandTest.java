@@ -1,6 +1,10 @@
 package com.devkbil.mtssbj;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
@@ -29,13 +33,13 @@ public class ShellCommandTest {
         // builder.redirectInput(ProcessBuilder.Redirect.INHERIT);
         // builder.redirectOutput(ProcessBuilder.Redirect.PIPE);
         builder.directory(new File(homeDirectory));
-        String[] commandAndOptions_ProcessBuilder;
+        String[] commandAndOptionsProcessBuilder;
         if (isWindows) {
-            commandAndOptions_ProcessBuilder = new String[] {"cmd.exe", "/c", "gradlew dependencies --configuration compileClasspath"};
+            commandAndOptionsProcessBuilder = new String[] {"cmd.exe", "/c", "gradlew dependencies --configuration compileClasspath"};
         } else {
-            commandAndOptions_ProcessBuilder = new String[] {"sh", "-c", "ls -l | grep P"};
+            commandAndOptionsProcessBuilder = new String[] {"sh", "-c", "ls -l | grep P"};
         }
-        builder.command(commandAndOptions_ProcessBuilder);
+        builder.command(commandAndOptionsProcessBuilder);
         builder.redirectErrorStream(true);
         Process process = builder.start();
 

@@ -19,8 +19,11 @@ import org.springframework.context.annotation.Configuration;
 public class DevelopLogbackConfig implements InitializingBean {
 
     /**
-     * Logback Appender 서비스 Bean 등록
-     * - 로그 큐를 처리하기 위한 서비스입니다.
+     * {@code DevelopLogbackAppenderService}에 대한 Spring Bean을 생성하고 등록합니다.
+     * 이 서비스는 로그 메시지를 저장하기 위해 로그 큐를 관리하며,
+     * 큐의 크기를 제한하고 가득 찼을 경우 가장 오래된 항목을 제거합니다.
+     *
+     * @return 로그 이벤트를 처리하도록 구성된 {@code DevelopLogbackAppenderService}의 새 인스턴스
      */
     @Bean
     public DevelopLogbackAppenderService<ILoggingEvent> developLogbackAppenderService() {

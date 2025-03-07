@@ -6,8 +6,8 @@ import java.util.Date;
 
 public class FormatUtilTest {
 
-    public static void assertTrue(String errMsg, boolean b) {
-        if (!b) {
+    public static void assertTrue(String errMsg, boolean condition) {
+        if (!condition) {
             throw new RuntimeException(errMsg);
         } else {
             System.out.println(errMsg);

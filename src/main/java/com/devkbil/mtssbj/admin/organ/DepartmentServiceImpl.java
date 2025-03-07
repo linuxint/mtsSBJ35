@@ -1,12 +1,12 @@
 package com.devkbil.mtssbj.admin.organ;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * DepartmentServiceImpl

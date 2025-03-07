@@ -1,7 +1,5 @@
 package com.devkbil.mtssbj.develop.naver.map;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -9,6 +7,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Naver 지도 API 서비스

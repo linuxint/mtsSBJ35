@@ -8,6 +8,27 @@ import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * This class represents a File Value Object (VO) that encapsulates the information
+ * about an attached file, including metadata such as file name, size, and path.
+ * It is used to store and manage file-related information within the application.
+ * <p>
+ * Fields:
+ * - fileno: The unique identifier for the file.
+ * - parentPK: The primary key of the associated parent entity,
+ * such as a board or project.
+ * - filename: The name of the file stored on the server.
+ * - realname: The original name of the file uploaded by the user.
+ * - filesize: The size of the file in bytes.
+ * - deleteflag: A flag indicating whether the file has been marked for deletion.
+ * - uri: The full URI of the file.
+ * - filepath: The physical path of the file in the server.
+ * - fileroot: The drive or root location where the file is stored.
+ * <p>
+ * Methods:
+ * - size2String(): Converts the file size into a human-readable string format
+ * with appropriate units (e.g., bytes, kilobytes, megabytes).
+ */
 @Schema(description = "첨부파일 : FileVO")
 @XmlRootElement(name = "첨부파일")
 @XmlType(propOrder = {"fileno", "parentPK", "filename", "realname", "filesize"})
@@ -35,7 +56,10 @@ public class FileVO {
     private String fileroot;
 
     /**
-     * 파일 크기를 정형화하기.
+     * Converts the file size into a human-readable string format with appropriate units
+     * (e.g., bytes, kilobytes, megabytes, etc.).
+     *
+     * @return a formatted string representing the file size with the appropriate unit
      */
     public String size2String() {
         Integer unit = 1024;

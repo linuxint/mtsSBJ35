@@ -4,23 +4,22 @@ import com.devkbil.mtssbj.admin.board.BoardGroupVO;
 import com.devkbil.mtssbj.common.ExtFieldVO;
 import com.devkbil.mtssbj.common.util.FileVO;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Caching;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 게시판 서비스 클래스
@@ -33,7 +32,6 @@ import java.util.Map;
 public class BoardService {
 
     private final SqlSessionTemplate sqlSession;
-    private final JpaTransactionManager txManager;
 
     /**
      * 게시판 그룹 정보 조회
@@ -98,9 +96,9 @@ public class BoardService {
     public void insertBoard(BoardVO param, List<FileVO> filelist, String[] fileno) {
         try {
             if (!StringUtils.hasText(param.getBrdno())) {
-                sqlSession.insert("insertBoard", param);// 신규 등록
+                sqlSession.insert("insertBoard", param); // 신규 등록
             } else {
-                sqlSession.update("updateBoard", param);// 업데이트
+                sqlSession.update("updateBoard", param); // 업데이트
             }
 
             // 첨부 파일 관리

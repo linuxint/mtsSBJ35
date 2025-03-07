@@ -1,7 +1,5 @@
 package com.devkbil.mtssbj.common.util;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
@@ -30,67 +28,33 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * PDF 파일 조작을 위한 유틸리티 클래스입니다.
+ * PDF 파일의 생성, 수정, 분할, 병합 및 이미지 변환 기능을 제공합니다.
+ */
 @Slf4j
 public class PdfUtil {
 
+    /**
+     * PDF 이미지 변환시 사용할 DPI 값
+     */
     static int dpi = 300;
-    static ImageType imageType = ImageType.RGB; //This can be GRAY,ARGB,BINARY, BGR
+    /**
+     * PDF 이미지 변환시 사용할 이미지 타입 (GRAY, ARGB, BINARY, BGR 중 선택)
+     */
+    static ImageType imageType = ImageType.RGB;
 
     /**
-     * 박스를 그린다.
+     * PDF 파일을 지정된 페이지 범위로 분할합니다.
      *
-     * @param content
-     * @param color
-     * @param rect
-     * @param fill
+     * @param pdfFile 분할할 PDF 파일
+     * @param numPages 각 분할된 파일에 포함될 페이지 수
+     * @param start 분할 시작 페이지 번호
+     * @param end 분할 종료 페이지 번호
+     * @return 분할 성공 시 true, 실패 시 false
      */
-    public void drawRect(PDPageContentStream content, Color color,
-                         Rectangle rect, boolean fill) throws IOException {
-        content.addRect(rect.x, rect.y, rect.width, rect.height);
-        if (fill) {
-            content.setNonStrokingColor(color);
-            content.fill();
-        } else {
-            content.setStrokingColor(color);
-            content.stroke();
-        }
-    }
-
-    /**
-     * 글씨를 쓴다.
-     *
-     * @param text
-     * @param font
-     * @param fontSize
-     * @param left
-     * @param bottom
-     * @param contentStream
-     * @throws Exception
-     */
-    public void drawText(String text, PDFont font, int fontSize, float left, float bottom, PDPageContentStream contentStream) throws Exception {
-        contentStream.beginText();
-        contentStream.setFont(font, fontSize);
-        contentStream.newLineAtOffset(left, bottom);
-        contentStream.showText(text);
-        contentStream.endText();
-    }
-
-    /**
-     * 라인을 그린다.
-     *
-     * @param contentStream
-     * @param xStart
-     * @param yStart
-     * @param xEnd
-     * @param yEnd
-     * @throws IOException
-     */
-    private void drawLine(PDPageContentStream contentStream, float xStart, float yStart, float xEnd, float yEnd) throws IOException {
-        contentStream.moveTo(xStart, yStart);
-        contentStream.lineTo(xEnd, yEnd);
-        contentStream.stroke();
-    }
-
     public static boolean separate(File pdfFile, int numPages, int start, int end) {
         try {
             //pdf 파일 로드
@@ -122,6 +86,13 @@ public class PdfUtil {
         }
     }
 
+    /**
+     * PDF 파일을 특정 페이지를 기준으로 두 개의 파일로 분할합니다.
+     *
+     * @param file 분할할 PDF 파일
+     * @param page 분할 기준이 되는 페이지 번호
+     * @return 분할 성공 시 true, 실패 시 false
+     */
     public static boolean separate(File file, int page) {
         try {
             PDDocument document = Loader.loadPDF(file);
@@ -136,16 +107,24 @@ public class PdfUtil {
         return false;
     }
 
+    /**
+     * PDF 파일을 지정된 시작 페이지부터 종료 페이지까지 분할합니다.
+     *
+     * @param file 분할할 PDF 파일
+     * @param startPage 분할 시작 페이지 번호
+     * @param endPage 분할 종료 페이지 번호
+     * @return 분할 성공 시 true, 실패 시 false
+     */
     public static boolean separate(File file, int startPage, int endPage) {
         return separate(file, endPage - startPage + 1, startPage, endPage);
     }
 
     /**
-     * pdf to images
+     * PDF 파일을 이미지 파일로 변환합니다.
      *
-     * @param pdf
-     * @param type
-     * @throws Exception
+     * @param pdf 변환할 PDF 파일
+     * @param type 생성할 이미지의 파일 형식 (예: "jpg", "png")
+     * @throws Exception PDF 파일 로드 실패 또는 이미지 변환/저장 중 오류 발생 시
      */
     public static void convertToSeparateImageFiles(File pdf, String type) throws Exception {
 //        try (PDDocument document = PDDocument.load(pdf)) { // pdfbox 2.x
@@ -160,6 +139,13 @@ public class PdfUtil {
         }
     }
 
+    /**
+     * 여러 PDF 파일들을 하나의 파일로 병합합니다.
+     *
+     * @param files 병합할 PDF 파일들의 리스트
+     * @param path 병합된 PDF 파일이 저장될 경로
+     * @return 병합 성공 시 true, 실패 시 false
+     */
     public static boolean merge(List<File> files, String path) {
         PDFMergerUtility merger = new PDFMergerUtility();
         //파일 merge 설정
@@ -182,29 +168,12 @@ public class PdfUtil {
     }
 
     /**
-     * Merges PDF files.
+     * PDF 파일을 압축된 이미지 파일로 변환합니다.
+     * 이미지 품질을 조절하여 파일 크기를 최적화합니다.
      *
-     * @param inputPdfFiles array of input files
-     * @param outputPdfFile output file
-     */
-    public static void mergePdf(File[] inputPdfFiles, File outputPdfFile) {
-        try {
-            PDFMergerUtility mergerUtility = new PDFMergerUtility();
-            mergerUtility.setDestinationFileName(outputPdfFile.getPath());
-            for (File inputPdfFile : inputPdfFiles) {
-                mergerUtility.addSource(inputPdfFile);
-            }
-            mergerUtility.mergeDocuments(null);
-        } catch (IOException ioe) {
-        }
-    }
-
-    /**
-     * pdf to image with compression
-     *
-     * @param pdf
-     * @param type
-     * @throws Exception
+     * @param pdf 변환할 PDF 파일
+     * @param type 생성할 이미지의 파일 형식 (예: "jpg", "png")
+     * @throws Exception PDF 파일 로드 실패, 이미지 변환/저장 중 오류, 또는 압축 처리 중 오류 발생 시
      */
     public static void convertToSeparateImageFilesWithCompression(File pdf, String type) throws Exception {
 //        try (PDDocument document = PDDocument.load(pdf)) { // pdfbox 2.x
@@ -237,10 +206,11 @@ public class PdfUtil {
     }
 
     /**
-     * PDF to single page tiff files
+     * PDF 파일의 각 페이지를 개별 TIFF 이미지 파일로 변환합니다.
+     * LZW 압축을 사용하여 이미지를 최적화하며, 각 페이지는 별도의 TIFF 파일로 저장됩니다.
      *
-     * @param pdf
-     * @throws Exception
+     * @param pdf 변환할 PDF 파일
+     * @throws Exception PDF 파일 로드 실패, TIFF 변환 중 오류, 또는 파일 저장 중 오류 발생 시
      */
     public static void convertToSinglePageTiffs(File pdf) throws Exception {
 //        try (PDDocument document = PDDocument.load(pdf)) { // pdfbox 2.x
@@ -275,11 +245,12 @@ public class PdfUtil {
     }
 
     /**
-     * PDF to a multi-page tiff file
+     * PDF 파일을 하나의 다중 페이지 TIFF 파일로 변환합니다.
+     * 모든 페이지가 하나의 TIFF 파일에 포함되며, LZW 압축을 사용하여 파일 크기를 최적화합니다.
      *
-     * @param pdf
-     * @param outputTiff
-     * @throws Exception
+     * @param pdf PDF 소스 파일
+     * @param outputTiff 생성될 TIFF 파일
+     * @throws Exception PDF 파일 로드 실패, TIFF 변환 중 오류, 또는 파일 저장 중 오류 발생 시
      */
     public static void convertToMultipageTiff(File pdf, File outputTiff) throws Exception {
 //        try (PDDocument document = PDDocument.load(pdf)) { // pdfbox 2.x
@@ -316,14 +287,90 @@ public class PdfUtil {
     }
 
     /**
-     * 테이블을 그린다.
+     * Merges PDF files.
      *
-     * @param page
-     * @param contentStream
-     * @param posy
-     * @param margin
-     * @param content
-     * @throws Exception
+     * @param inputPdfFiles array of input files
+     * @param outputPdfFile output file
+     */
+    public static void mergePdf(File[] inputPdfFiles, File outputPdfFile) {
+        try {
+            PDFMergerUtility mergerUtility = new PDFMergerUtility();
+            mergerUtility.setDestinationFileName(outputPdfFile.getPath());
+            for (File inputPdfFile : inputPdfFiles) {
+                mergerUtility.addSource(inputPdfFile);
+            }
+            mergerUtility.mergeDocuments(null);
+        } catch (IOException ioe) {
+        }
+    }
+
+    /**
+     * PDF 페이지에 사각형을 그립니다.
+     *
+     * @param content PDF 페이지의 콘텐츠 스트림
+     * @param color   사각형의 색상
+     * @param rect    사각형의 위치와 크기를 정의하는 Rectangle 객체
+     * @param fill    true인 경우 사각형을 채우고, false인 경우 테두리만 그림
+     * @throws IOException PDF 파일 조작 중 오류 발생 시
+     */
+    public void drawRect(PDPageContentStream content, Color color,
+        Rectangle rect, boolean fill) throws IOException {
+        content.addRect(rect.x, rect.y, rect.width, rect.height);
+        if (fill) {
+            content.setNonStrokingColor(color);
+            content.fill();
+        } else {
+            content.setStrokingColor(color);
+            content.stroke();
+        }
+    }
+
+    /**
+     * PDF 페이지에 텍스트를 작성합니다.
+     *
+     * @param text          작성할 텍스트 내용
+     * @param font          사용할 PDF 폰트
+     * @param fontSize      폰트 크기
+     * @param left          텍스트의 왼쪽 좌표
+     * @param bottom        텍스트의 하단 좌표
+     * @param contentStream PDF 페이지의 콘텐츠 스트림
+     * @throws Exception PDF 파일 조작 중 오류 발생 시
+     */
+    public void drawText(String text, PDFont font, int fontSize, float left, float bottom, PDPageContentStream contentStream) throws Exception {
+        contentStream.beginText();
+        contentStream.setFont(font, fontSize);
+        contentStream.newLineAtOffset(left, bottom);
+        contentStream.showText(text);
+        contentStream.endText();
+    }
+
+    /**
+     * PDF 페이지에 직선을 그립니다.
+     *
+     * @param contentStream PDF 페이지의 콘텐츠 스트림
+     * @param xStart        시작점의 X 좌표
+     * @param yStart        시작점의 Y 좌표
+     * @param xEnd          끝점의 X 좌표
+     * @param yEnd          끝점의 Y 좌표
+     * @throws IOException PDF 파일 조작 중 오류 발생 시
+     */
+    private void drawLine(PDPageContentStream contentStream, float xStart, float yStart, float xEnd, float yEnd) throws IOException {
+        contentStream.moveTo(xStart, yStart);
+        contentStream.lineTo(xEnd, yEnd);
+        contentStream.stroke();
+    }
+
+    /**
+     * PDF 페이지에 테이블을 그립니다.
+     * 지정된 내용을 바탕으로 테이블의 셀, 행, 열을 자동으로 계산하여 그립니다.
+     *
+     * @param page PDF 페이지 객체
+     * @param contentStream PDF 페이지의 콘텐츠 스트림
+     * @param font 테이블 내용에 사용할 폰트
+     * @param posy 테이블의 상단 Y 좌표
+     * @param margin 테이블의 좌우 여백
+     * @param content 테이블에 표시할 2차원 문자열 배열 (행과 열의 내용)
+     * @throws Exception 테이블 그리기 중 오류 발생 시 (폰트 처리, 그리기 작업 등)
      */
     public void drawTable(PDPage page, PDPageContentStream contentStream, PDFont font, float posy, float margin, String[][] content) throws Exception {
         final int rows = content.length;

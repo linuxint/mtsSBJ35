@@ -10,10 +10,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -21,10 +19,14 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -42,32 +44,13 @@ public class SchController {
     private final AuthService authService;
 
     /**
-     * 기본 날짜를 설정합니다.
+     * Retrieves a list of schedules for a specific month.
+     * Populates the model with scheduling data and related attributes.
      *
-     * @param searchVO 검색 조건
-     * @return 설정된 검색 조건
-     */
-    private MonthVO setupDefaultDates(@ModelAttribute @Valid MonthVO searchVO) {
-
-        if (!StringUtils.hasText(searchVO.getYear())) {
-            Date today = DateUtil.getToday();
-            searchVO.setYear(String.valueOf(DateUtil.getYear(today)));
-            searchVO.setMonth(String.valueOf(DateUtil.getMonth(today)));
-        }
-
-        if ("0".equals(searchVO.getMonth()) || "13".equals(searchVO.getMonth())) {
-            searchVO = DateUtil.monthValid(searchVO);
-        }
-
-        return searchVO;
-    }
-
-    /**
-     * 일정 목록 화면
-     *
-     * @param searchVO 검색 조건
-     * @param modelMap 뷰에 속성을 전달하는 ModelMap 객체
-     * @return 일정 목록 화면 (HTML)
+     * @param request Represents the HTTP request, used to retrieve session details like user number.
+     * @param searchVO Contains the search criteria such as year and month for filtering schedules.
+     * @param modelMap A map that holds attributes to be sent to the view.
+     * @return A string representing the path to the schedule list view.
      */
     @Operation(summary = "일정 목록 조회", description = "특정 달(month)의 일정 목록을 조회합니다.")
     @ApiResponses(value = {
@@ -75,28 +58,44 @@ public class SchController {
         @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     @GetMapping("/schList")
-    public String schList(@ModelAttribute @Valid MonthVO searchVO, ModelMap modelMap) {
+    @RequestMapping(value = "/schList")
+    public String schList(HttpServletRequest request, MonthVO searchVO, ModelMap modelMap) {
+        // 페이지 공통: alert
+        String userno = request.getSession().getAttribute("userno").toString();
 
-        String userno = authService.getAuthUserNo();
+        etcService.setCommonAttribute(userno, modelMap);
 
-        searchVO = setupDefaultDates(searchVO);
-        Integer dayOfWeek = DateUtil.getDayOfWeek(DateUtil.str2Date(searchVO.getYear() + "-" + searchVO.getMonth() + "-01"));
+        if (searchVO.getYear() == null || "".equals(searchVO.getYear())) {
+            Date today = DateUtil.getToday();
+            searchVO.setYear(DateUtil.getYear(today).toString());
+            searchVO.setMonth(DateUtil.getMonth(today).toString());
+        }
+        if ("0".equals(searchVO.getMonth()) || "13".equals(searchVO.getMonth())) {
+            searchVO = DateUtil.monthValid(searchVO);
+        }
 
-        List<?> scheduleList = schService.selectCalendar(searchVO, userno);
-        modelMap.addAttribute("listview", scheduleList);
+        Integer dayofweek = DateUtil.getDayOfWeek(DateUtil.str2Date(searchVO.getYear() + "-" + searchVO.getMonth() + "-01"));
+
+        List<?> listview = schService.selectCalendar(searchVO, userno);
+
+        modelMap.addAttribute("listview", listview);
         modelMap.addAttribute("searchVO", searchVO);
-        modelMap.addAttribute("dayofweek", dayOfWeek);
+        modelMap.addAttribute("dayofweek", dayofweek);
 
-        log.info("일정 목록 조회: UserNo={}, Year={}, Month={}", userno, searchVO.getYear(), searchVO.getMonth());
         return "schedule/SchList";
     }
 
     /**
-     * 일정 입력/수정 화면
+     * Retrieves the schedule input/edit screen.
+     * This method is used to display the interface for inputting or editing specific schedule information.
      *
-     * @param schInfo  일정 정보 VO
-     * @param modelMap 뷰에 속성을 전달하는 ModelMap 객체
-     * @return 일정 입력/수정 화면 (HTML)
+     * @param cddate An optional string representing the reference date for schedule initialization.
+     *               If not provided, default date settings are applied.
+     * @param schInfo A model attribute representing the schedule information. It must be valid.
+     *                If the schedule ID (ssno) is present, the existing schedule data is retrieved.
+     * @param modelMap A ModelMap object used to store attributes for rendering the view, including
+     *                 schedule information and supplementary type list data.
+     * @return A string representing the name of the view to be displayed for schedule input/edit (typically "schedule/SchForm").
      */
     @Operation(summary = "일정 입력/수정 화면 조회", description = "특정 일정 정보를 입력하거나 수정합니다.")
     @ApiResponse(responseCode = "200", description = "일정 입력/수정 화면을 반환했습니다.")
@@ -204,16 +203,18 @@ public class SchController {
         int affectedRows = schService.deleteSch(schVO);
 
         log.info("일정 삭제: Schedule Info={}", schVO);
+        log.info("일정 삭제: affectedRows Info={}", affectedRows);
+
         return "redirect:/schList";
     }
 
     /**
-     * 일정 기본 설정 초기화
+     * Initializes the default schedule settings for the provided schedule information object.
      *
-     * @param schInfo 초기화할 일정 정보
+     * @param cddate   Optional parameter representing the custom date. If not provided, the current date is used.
+     * @param schInfo  The schedule information object to be initialized. Must be valid and properly annotated.
      */
-    private void initializeDefaultSchedule(@RequestParam(value = "cddate", required = false) String cddate,
-                                           @ModelAttribute @Valid SchVO schInfo) {
+    private void initializeDefaultSchedule(@RequestParam(value = "cddate", required = false) String cddate, @ModelAttribute @Valid SchVO schInfo) {
 
         schInfo.setSstype("1");
         schInfo.setSsisopen("Y");

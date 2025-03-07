@@ -3,8 +3,6 @@ package com.devkbil.mtssbj.common.interceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -12,22 +10,24 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import java.lang.reflect.Method;
 import java.time.LocalTime;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * TradingTimeInterceptor는 HTTP 요청에 대해 거래 가능 시간을 기반으로
  * 요청을 처리할지 거부할지를 결정하는 인터셉터입니다.
- *
+ * <p>
  * ### 주요 기능 ###
  * 1. 요청이 거래 가능 시간 내에 생성되었는지 확인.
  * 2. 거래 불가 시간에 요청이 발생하면 HTTP 403 상태와 에러 메시지를 반환.
  * 3. 정상 거래 시간에는 요청을 컨트롤러로 전달.
-
+ * <p>
  * ### Spring Framework 연계 ###
  * - **Spring Framework**의 주요 기능 중 하나인 **Interceptor**를 활용하여
  *   컨트롤러에 도달하기 이전에 요청을 공통적으로 처리할 수 있는 전처리(Pre-Processing) 로직을 구현합니다.
  * - TradingTimeInterceptor는 **HandlerInterceptor** 인터페이스를 구현하며,
  *   이는 스프링의 **DispatcherServlet**이 요청을 컨트롤러로 전달하기 전에
  *   전처리(preHandle), 후처리(postHandle), 완료 후 작업(afterCompletion) 등의 로직을 지원합니다.
- *
+ * <p>
  * ### 특징 ###
  * - **로깅 및 사용자 피드백 제공**: 로그를 통해 요청 시간과 상태를 기록하며, 사용자에게 친절한 메시지를 제공.
  * - **거래 가능 시간 설정**: 거래 시간은 `START_TRADING_TIME`와 `END_TRADING_TIME`으로 지정되어 있습니다.
@@ -43,11 +43,11 @@ public class TradingTimeInterceptor implements HandlerInterceptor {
 
     /**
      * 요청이 컨트롤러로 전달되기 전에 거래 가능 시간 여부를 확인합니다.
-     *
+     * <p>
      * **Spring의 역할**
      * - Spring의 `HandlerInterceptor`를 통해 요청 처리 로직을 사전에 실행할 수 있습니다.
      * - DispatcherServlet이 컨트롤러로 요청을 전달하기 전 상호작용을 제어합니다.
-     *
+     * <p>
      * **로직 설명**
      * 1. 현재 시간을 확인하여 거래 가능 시간인지 판단.
      * 2. 거래 가능 시간이 아닐 경우, HTTP 403 상태 코드와 메시지를 클라이언트에 전달.

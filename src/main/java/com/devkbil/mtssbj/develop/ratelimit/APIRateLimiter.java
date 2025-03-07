@@ -7,8 +7,6 @@ import io.github.bucket4j.distributed.jdbc.BucketTableSettings;
 import io.github.bucket4j.distributed.jdbc.SQLProxyConfiguration;
 import io.github.bucket4j.oracle.OracleSelectForUpdateBasedProxyManager;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -17,6 +15,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * API 호출을 제어하는 레이트 리미터 클래스

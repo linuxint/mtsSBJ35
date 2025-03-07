@@ -5,12 +5,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 작업(Task) 정보를 담고 있는 VO 클래스.

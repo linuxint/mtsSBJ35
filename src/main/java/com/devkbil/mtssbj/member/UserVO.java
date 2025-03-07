@@ -13,15 +13,15 @@ import jakarta.persistence.Transient;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
 import java.util.Collections;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 사용자 정보를 나타내는 엔티티 클래스.

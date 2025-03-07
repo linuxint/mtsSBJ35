@@ -7,10 +7,10 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
+import java.util.ArrayList;
+
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.ArrayList;
 
 /**
  * 메일 데이터 요청 객체 (VO).

@@ -4,9 +4,6 @@ import com.devkbil.mtssbj.common.ExtFieldVO;
 import com.devkbil.mtssbj.common.util.DateUtil;
 import com.devkbil.mtssbj.search.SearchVO;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +11,9 @@ import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * SchService
@@ -194,10 +194,10 @@ public class SchService {
             int month = DateUtil.getMonth(startDate);
 
             // 현재 월의 반복 날짜 계산
-            Date repeatDate = DateUtil.safeStr2Date(String.format("%d-%02d-%02d", year, month, dayOfMonth));
+            Date repeatDate = DateUtil.str2Date(String.format("%d-%02d-%02d", year, month, dayOfMonth));
             if (startDate.after(repeatDate)) {
                 month++; // 다음 달로 이동
-                repeatDate = DateUtil.safeStr2Date(String.format("%d-%02d-%02d", year, month, dayOfMonth));
+                repeatDate = DateUtil.str2Date(String.format("%d-%02d-%02d", year, month, dayOfMonth));
             }
 
             // 반복 조건 확인
@@ -236,6 +236,7 @@ public class SchService {
      * 일정 삭제
      *
      * @param param 일정 정보
+     * @return 삭제된 일정의 수. 성공적으로 삭제된 경우 양수 값을 반환하며, 삭제할 일정이 없는 경우 0을 반환
      */
     public int deleteSch(SchVO param) {
         return sqlSession.delete("deleteSch", param);

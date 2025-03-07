@@ -19,7 +19,7 @@ import java.util.Set;
 public class FontLoadTest {
     public static void main(String[] args) throws IOException {
 
-        Path resourceDirectory = Paths.get("src", "test", "resources");
+        Path resourceDirectory = Paths.get("src", "main", "resources");
         String absolutePath = resourceDirectory.toFile().getAbsolutePath() + "/";
 
         // 문서 만들기
@@ -34,8 +34,8 @@ public class FontLoadTest {
         PDType0Font fontGulim = PDType0Font.load(doc, fontStream);
         String basefont = fontGulim.getBaseFont();
         Set<String> fonts = Standard14Fonts.getNames();
-        Standard14Fonts.FontName font_name_3v = Standard14Fonts.getMappedFontName("NanumGothicLight");
-        PDFont pdfFont = new PDType1Font(font_name_3v);
+        Standard14Fonts.FontName fontName3v = Standard14Fonts.getMappedFontName("NanumGothicLight");
+        PDFont pdfFont = new PDType1Font(fontName3v);
 
         // ttf
         TrueTypeCollection trueTypeCollection = new TrueTypeCollection(fontStream);

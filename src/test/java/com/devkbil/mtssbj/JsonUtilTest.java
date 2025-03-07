@@ -3,12 +3,12 @@ package com.devkbil.mtssbj;
 import com.devkbil.mtssbj.common.util.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonView;
 
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import lombok.Getter;
 
 public class JsonUtilTest {
     public static void main(String[] args) {

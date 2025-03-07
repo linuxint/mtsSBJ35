@@ -14,9 +14,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.ObjectUtils;
@@ -26,6 +23,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Task 관련 기능의 컨트롤러 - 작업, 일정, 복사 등 각종 Task 데이터를 처리합니다.
@@ -112,6 +112,10 @@ public class TaskController {
     /**
      * 작업자 중심 화면.
      * - 작업자를 기준으로 작업 데이터를 확인합니다.
+     *
+     * @param prno 프로젝트 번호
+     * @param modelMap 뷰에 전달할 데이터를 담는 Spring의 ModelMap 객체
+     * @return 작업자 중심의 작업 목록을 보여주는 뷰 페이지 경로
      */
     @Operation(summary = "작업자 중심 화면", description = "작업자를 기준으로 작업 데이터를 반환합니다.")
     @ApiResponses({
@@ -143,6 +147,9 @@ public class TaskController {
     /**
      * 작업(Task) 저장.
      * - 작업 데이터를 추가/수정 요청 처리.
+     *
+     * @param response HTTP 응답 객체. 저장된 작업의 ID를 JSON 형식으로 반환하는데 사용됨
+     * @param taskInfo 저장할 작업 정보를 담고 있는 TaskVO 객체
      */
     @Operation(summary = "작업 저장", description = "작업 데이터를 저장하거나 수정합니다.")
     @ApiResponses({
@@ -160,6 +167,9 @@ public class TaskController {
     /**
      * 작업(Task) 삭제.
      * - 작업 번호(tsno)에 맞는 데이터를 삭제합니다.
+     *
+     * @param tsno 삭제할 작업의 고유 번호
+     * @param response HTTP 응답 객체. 삭제 결과를 JSON 형식으로 반환하는데 사용됨
      */
     @Operation(summary = "작업 삭제", description = "작업 번호(tsno)에 해당하는 작업 데이터를 삭제합니다.")
     @ApiResponses({
@@ -176,6 +186,10 @@ public class TaskController {
 
     /**
      * 일정(Task) 클릭 시 호출되는 팝업.
+     *
+     * @param tsno 조회할 작업의 고유 번호
+     * @param modelMap 뷰에 전달할 데이터를 담는 Spring의 ModelMap 객체
+     * @return 작업 상세 정보를 보여주는 팝업 뷰의 경로
      */
     @Operation(summary = "일정 팝업", description = "일정을 클릭했을 때 세부 정보를 반환하는 팝업 화면입니다.")
     @ApiResponses({
@@ -195,6 +209,10 @@ public class TaskController {
     /**
      * 작업 복사.
      * - 특정 Task 데이터를 다른 프로젝트로 복사합니다.
+     *
+     * @param prno 대상 프로젝트 번호 (작업이 복사될 프로젝트)
+     * @param srcno 원본 작업 번호 (복사할 작업)
+     * @return 작업 복사 후 대상 프로젝트의 작업 목록 페이지로 리다이렉트하는 경로
      */
     @Operation(summary = "작업 복사", description = "특정 작업(Task)을 다른 프로젝트로 복사합니다.")
     @ApiResponses({

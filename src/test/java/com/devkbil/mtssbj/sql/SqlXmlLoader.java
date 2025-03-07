@@ -1,7 +1,5 @@
 package com.devkbil.mtssbj.sql;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.w3c.dom.Document;
@@ -17,6 +15,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SqlXmlLoader {

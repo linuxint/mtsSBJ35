@@ -8,7 +8,7 @@ import lombok.Setter;
 
 /**
  * 로그 이벤트를 처리하는 Custom Logback Appender
- *
+ * <p>
  * 로그 이벤트를 로컬 큐에 저장하여 추가 처리를 위해
  * {@code DevelopLogbackAppenderService}와 통합합니다.
  * 로그 이벤트를 문자열 형식으로 변환하기 위해 인코더를 사용합니다.

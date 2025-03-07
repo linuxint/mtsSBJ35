@@ -9,8 +9,6 @@ import com.devkbil.mtssbj.common.interceptor.ThemeInterceptor;
 import com.devkbil.mtssbj.common.interceptor.TradingTimeInterceptor;
 import com.devkbil.mtssbj.common.interceptor.UrlMappingInterceptor;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -37,6 +35,8 @@ import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor

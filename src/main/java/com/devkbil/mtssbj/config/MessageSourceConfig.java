@@ -2,8 +2,6 @@ package com.devkbil.mtssbj.config;
 
 import com.devkbil.mtssbj.common.ExtendReloadableResourceBundleMessageSource;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.boot.autoconfigure.context.MessageSourceProperties;
@@ -20,6 +18,8 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import java.time.Duration;
 import java.util.Locale;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Message Source Configuration

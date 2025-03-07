@@ -2,15 +2,15 @@ package com.devkbil.mtssbj.project;
 
 import com.devkbil.mtssbj.search.SearchVO;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 프로젝트 관련 비즈니스 로직 제공 서비스 클래스.
@@ -49,6 +49,8 @@ public class ProjectService {
      * - 기존 프로젝트는 UPDATE 수행.
      *
      * @param param 저장할 프로젝트 데이터를 담은 객체
+     * @return 데이터베이스에 영향을 받은 행의 수. 성공적으로 저장된 경우 1,
+     *         실패한 경우 0을 반환
      */
     public int insertProject(ProjectVO param) {
 
@@ -98,6 +100,8 @@ public class ProjectService {
      * 특정 프로젝트를 삭제합니다.
      *
      * @param param 삭제할 프로젝트 번호
+     * @return 데이터베이스에서 성공적으로 삭제된 프로젝트의 수. 성공적으로 삭제된 경우 1,
+     *         프로젝트가 존재하지 않거나 삭제에 실패한 경우 0을 반환
      */
     public int deleteProjectOne(String param) {
         return sqlSession.delete("deleteProjectOne", param);

@@ -14,6 +14,9 @@ import java.lang.annotation.Target;
 public @interface RateLimit {
     /**
      * 레이트 리미팅을 위한 고유 키
+     *
+     * @return 메서드의 호출 횟수를 제한하는데 사용될 고유한 문자열 키.
+     *         이 키를 기준으로 동일한 키를 가진 메서드들의 호출 횟수가 집계됨
      */
     String key();
 }

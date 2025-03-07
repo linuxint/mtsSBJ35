@@ -3,11 +3,11 @@ package com.devkbil.mtssbj.common.interceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * DeviceDetectorInterceptor는 요청의 User-Agent 정보를 분석하여 디바이스의 종류(모바일/태블릿/일반)를 판별합니다.

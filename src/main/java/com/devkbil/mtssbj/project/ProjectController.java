@@ -11,9 +11,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import jakarta.validation.Valid;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
@@ -24,6 +21,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 프로젝트 관리를 담당하는 컨트롤러.
@@ -91,6 +91,7 @@ public class ProjectController {
     /**
      * 프로젝트 작성 폼 조회.
      *
+     * @param prno 조회할 프로젝트 번호 (신규 작성 시 null)
      * @param modelMap 결과 데이터를 담을 모델맵 객체
      * @return 프로젝트 작성 페이지 경로
      */
@@ -119,7 +120,9 @@ public class ProjectController {
      * 프로젝트 저장.
      *
      * @param projectInfo 저장하려는 프로젝트 정보
-     * @return 프로젝트 목록 페이지로 리다이렉트
+     * @param result 유효성 검사 결과를 담고 있는 BindingResult 객체
+     * @param modelMap 뷰에 전달할 데이터를 담는 ModelMap 객체
+     * @return 성공 시 프로젝트 목록 페이지로 리다이렉트, 실패 시 작성 폼으로 이동
      */
     @Operation(summary = "프로젝트 저장", description = "신규 또는 수정된 프로젝트 정보를 저장합니다.")
     @ApiResponses(value = {
@@ -157,6 +160,7 @@ public class ProjectController {
     /**
      * 프로젝트 삭제.
      *
+     * @param prno 삭제할 프로젝트의 고유 번호. 권한 검사 후 해당 프로젝트를 삭제하는데 사용됨
      * @return 프로젝트 목록 페이지로 리다이렉트
      */
     @Operation(summary = "프로젝트 삭제", description = "지정된 프로젝트를 삭제합니다.")

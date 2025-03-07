@@ -3,13 +3,13 @@ package com.devkbil.mtssbj.admin.organ;
 import com.devkbil.mtssbj.member.UserVO;
 import com.devkbil.mtssbj.search.SearchVO;
 
-import lombok.RequiredArgsConstructor;
-
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * 사용자 관련 서비스 (UserService)
@@ -54,9 +54,9 @@ public class UserService {
      */
     public int insertUser(UserVO param) {
         if (!StringUtils.hasText(param.getUserno())) {
-            return sqlSession.insert("insertUser", param);// 신규 사용자 등록
+            return sqlSession.insert("insertUser", param); // 신규 사용자 등록
         } else {
-            return sqlSession.insert("updateUser", param);// 기존 사용자 정보 업데이트
+            return sqlSession.insert("updateUser", param); // 기존 사용자 정보 업데이트
         }
     }
 

@@ -1,12 +1,12 @@
 package com.devkbil.mtssbj.member.auth;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * AuthConfig 클래스는 Spring MVC 애플리케이션에서 웹 요청을 처리하기 위해 사용자 정의 인자 리졸버를 구성합니다.

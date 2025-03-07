@@ -6,9 +6,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -20,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 데이터베이스 도구 컨트롤러
@@ -36,8 +36,8 @@ public class DbtoolController {
     /**
      * 주어진 {@code tableName}에 따라 테이블 데이터와 레이아웃 정보를 검색하고,
      * 뷰에 결과를 표시하기 위해 모델에 데이터를 추가합니다.
-     *
-     * 빈 값 또는 잘못된 테이블 이름, 데이터가 없는 테이블, 데이터 검색 중 오류가 발생하는 
+     * <p>
+     * 빈 값 또는 잘못된 테이블 이름, 데이터가 없는 테이블, 데이터 검색 중 오류가 발생하는
      * 시나리오를 처리합니다.
      *
      * @param tableName 검색할 테이블 이름

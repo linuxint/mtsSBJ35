@@ -18,6 +18,15 @@
         .fc-day-sat a {
             color: blue;
         }
+
+        /* 평일 날짜: 검정색 */
+        .fc-day-mon a,
+        .fc-day-tue a,
+        .fc-day-wed a,
+        .fc-day-thu a,
+        .fc-day-fri a {
+            color: black;
+        }
     </style>
     <script>
 

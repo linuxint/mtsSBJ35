@@ -13,8 +13,8 @@ import java.util.Locale;
 public class DateTest {
     public static void main(String[] args) {
 
-        String[] a = new String[2];
-        System.out.println(Arrays.toString(a));
+        String[] stringArray = new String[2];
+        System.out.println(Arrays.toString(stringArray));
         // 현재 날짜/시간
         LocalDateTime now = LocalDateTime.now();
         // 현재 날짜/시간 출력

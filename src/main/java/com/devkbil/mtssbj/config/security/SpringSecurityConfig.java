@@ -10,9 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpSession;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,6 +39,9 @@ import javax.sql.DataSource;
 
 import java.io.PrintWriter;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Configuration
 @Slf4j
 @EnableMethodSecurity
@@ -53,6 +53,11 @@ public class SpringSecurityConfig {
     private final UserDetailsService userDetailsService;
     private final AuthenticationFailureHandler userLoginFailHandler;
     public final JwtRequestFilter jwtRequestFilter;
+
+    /**
+     * 로그인 페이지 URL 경로
+     */
+    public static final String URL_LOGIN = "/memberLogin";
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -97,7 +102,7 @@ public class SpringSecurityConfig {
                 exceptionConfig.authenticationEntryPoint(unauthorizedEntryPoint).accessDeniedHandler(accessDeniedHandler)
         );
         http.formLogin(login -> login
-                .loginPage(ConfigConstant.URL_LOGIN)
+            .loginPage(URL_LOGIN)
                 .loginProcessingUrl(ConfigConstant.URL_LOGIN_PROCESS) // 로그인 고정
                 .usernameParameter(ConfigConstant.PARAMETER_LOGIN_ID)
                 .passwordParameter(ConfigConstant.PARAMETER_LOGIN_PWD)
@@ -184,9 +189,9 @@ public class SpringSecurityConfig {
      * Spring Boot 2.x에서는 AuthenticationManager를 직접 정의하는 것이 필요했지만,
      * Spring Boot 3.x에서는 이를 자동으로 구성하지 않으므로 명시적으로 설정해야 합니다.
      *
-     * @param authenticationConfiguration
-     * @return
-     * @throws Exception
+     * @param authenticationConfiguration Spring Security의 인증 설정을 포함하는 구성 객체
+     * @return AuthenticationManager 인스턴스. 사용자 인증을 처리하고 관리하는 Spring Security의 핵심 인터페이스
+     * @throws Exception 인증 관리자 생성 중 오류 발생 시
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {

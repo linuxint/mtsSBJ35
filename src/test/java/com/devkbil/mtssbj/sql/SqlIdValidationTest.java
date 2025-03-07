@@ -1,7 +1,5 @@
 package com.devkbil.mtssbj.sql;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -9,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SqlIdValidationTest {

@@ -2,15 +2,15 @@ package com.devkbil.mtssbj.sign;
 
 import com.devkbil.mtssbj.search.SearchVO;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -152,9 +152,10 @@ public class SignService {
     }
 
     /**
-     * 결재 문서를 삭제합니다.
+     * Deletes a sign document entry from the database based on the provided parameters.
      *
-     * @param param 삭제할 문서 정보 (SignDocVO 객체)
+     * @param param the SignDocVO object containing the parameters for identifying the sign document to be deleted.
+     * @return the number of rows affected by the delete operation.
      */
     @Transactional(rollbackFor = Exception.class)
     public int deleteSignDoc(SignDocVO param) {
@@ -196,9 +197,10 @@ public class SignService {
     }
 
     /**
-     * 제출된 결재 문서를 회수합니다.
+     * Updates the sign document status to canceled in the database.
      *
-     * @param param 문서 번호
+     * @param param the identifier or parameter necessary to locate and update the appropriate sign document record.
+     * @return the number of records that were updated in the database.
      */
     @Transactional
     public int updateSignDocCancel(String param) {

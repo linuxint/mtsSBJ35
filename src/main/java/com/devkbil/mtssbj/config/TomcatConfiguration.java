@@ -56,9 +56,10 @@ public class TomcatConfiguration {
 
     /**
      * tomcat Multi Port
+     * HTTP/1.1 프로토콜을 사용하는 추가 커넥터를 생성합니다.
      *
-     * @param port
-     * @return
+     * @param port 커넥터가 사용할 포트 번호
+     * @return 지정된 포트에서 HTTP/1.1 NIO 프로토콜을 사용하도록 구성된 Tomcat Connector 인스턴스
      */
     private Connector createStandardConnector(int port) {
         Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");

@@ -5,11 +5,12 @@ import java.util.UUID;
 
 public class UUIDUtil {
 
-
     /**
-     * [MAC Address] MAC 주소 대신에 임의의 48비트 숫자를 생성합니다.(보안 우려로 이를 대체합니다)
+     * Generates the least significant 64 bits for a Version 1 UUID.
+     * This method creates a random 63-bit value and sets the 3 most significant bits
+     * to ensure it conforms to the UUID variant specification.
      *
-     * @return
+     * @return a long representing the least significant 64 bits for a Version 1 UUID
      */
     private static long get64LeastSignificantBitsForVersion1() {
         Random random = new Random();
@@ -18,8 +19,13 @@ public class UUIDUtil {
         return random63BitLong | variant3BitFlag;
     }
 
-    /*
-     * [TimeStamp] 타임스템프를 이용하여 64개의 최상위 비트를 생성합니다.
+    /**
+     * Generates the most significant 64 bits for a Version 1 UUID based on the current timestamp.
+     * This method uses the current time in milliseconds to construct the timestamp fields
+     * required by the UUID version 1 specification. It combines time_low, time_mid,
+     * time_hi, and version fields into a single 64-bit value.
+     *
+     * @return a long representing the most significant 64 bits for a Version 1 UUID
      */
     private static long get64MostSignificantBitsForVersion1() {
         final long currentTimeMillis = System.currentTimeMillis();
@@ -31,9 +37,12 @@ public class UUIDUtil {
     }
 
     /**
-     * UUID v1을 생성하여 반환합니다.(MAC Address, TimeStamp 조합)
+     * Generates a Version 1 UUID.
+     * This method utilizes the current timestamp for the most significant bits
+     * and a randomly generated value for the least significant bits according
+     * to the UUID version 1 specification.
      *
-     * @return
+     * @return a UUID object representing a Version 1 UUID
      */
     public static UUID generateType1UUID() {
         long most64SigBits = get64MostSignificantBitsForVersion1();
@@ -41,12 +50,26 @@ public class UUIDUtil {
         return new UUID(most64SigBits, least64SigBits); // 62dd98f0-bd8e-11ed-93ab-325096b39f47
     }
 
+    /**
+     * Generates a Version 3 UUID (name-based) using a predefined name.
+     * This method uses the UUID.nameUUIDFromBytes method to create a UUID
+     * from the byte representation of the specified name.
+     *
+     * @return a UUID object representing a Version 3 UUID
+     */
     private static UUID generateType3UUID() {
         String name = "uuid name key";
         UUID uuid3 = UUID.nameUUIDFromBytes(name.getBytes());
         return uuid3;
     }
 
+    /**
+     * Generates a random UUID of type 4 (randomly generated UUID).
+     * This method utilizes the built-in UUID.randomUUID() method
+     * to generate a universally unique identifier.
+     *
+     * @return a UUID object representing a randomly generated type 4 UUID
+     */
     private static UUID getnerateType4UUID() {
         UUID uuid4 = UUID.randomUUID();
         return uuid4;

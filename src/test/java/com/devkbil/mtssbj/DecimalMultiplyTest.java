@@ -1,98 +1,84 @@
 package com.devkbil.mtssbj;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * JAVA 소수점 곱하기 테스트
- *
  */
+@DisplayName("Decimal Multiplication Tests")
 public class DecimalMultiplyTest {
-    public static void main(String[] args) {
-        System.out.println("----TEST1----");
-        test1();
-        System.out.println("----TEST2----");
-        test2();
+
+    @Test
+    @DisplayName("Test decimal multiplication with int values")
+    public void testIntegerMultiplication() {
+        // Given
+        int intValue = 14000;
+        int multiplier = 4;
+        float floatFactor = 1.1f;
+        double doubleFactor = 1.1d;
+        BigDecimal expectedResult = new BigDecimal("61600.0");
+
+        // When
+        BigDecimal resultWithFloat = new BigDecimal(String.valueOf(intValue))
+                .multiply(new BigDecimal(String.valueOf(multiplier)))
+                .multiply(new BigDecimal(String.valueOf(floatFactor)));
+
+        BigDecimal resultWithDouble = new BigDecimal(String.valueOf(intValue))
+                .multiply(new BigDecimal(String.valueOf(multiplier)))
+                .multiply(new BigDecimal(String.valueOf(doubleFactor)));
+
+        // Then
+        assertEquals(expectedResult, resultWithFloat, "Float multiplication should give exact result when using String conversion");
+        assertEquals(expectedResult, resultWithDouble, "Double multiplication should give exact result when using String conversion");
     }
 
-    /**
-     * <pre>
-     * 결과 1 : 61600.0
-     * 결과 2 : 61600.00000000001
-     * 결과 3 : 61600.00133514404296875000000
-     * 결과 4 : 61600.000000000004973799150320701301097869873046875000000
-     * 결과 5 : 61600.0
-     * </pre>
-     */
-    private static void test1() {
-        int a = 14000;
-        int b = 4;
-        float c = 1.1f;
-        double d = 1.1d;
+    @Test
+    @DisplayName("Test decimal multiplication with larger numbers")
+    public void testLargeNumberMultiplication() {
+        // Given
+        Integer intValue = 327273;
+        Long longMultiplier = 60L;
+        float floatFactor = 1.1f;
+        double doubleFactor = 1.1d;
+        BigDecimal expectedResult = new BigDecimal("21600018.0");
 
-        System.out.println("결과 1 : " + a * b * c); // 61600.0
-        System.out.println("결과 2 : " + a * b * d); // 61600.00000000001
+        // When
+        BigDecimal resultWithFloat = new BigDecimal(String.valueOf(intValue))
+                .multiply(new BigDecimal(String.valueOf(longMultiplier)))
+                .multiply(new BigDecimal(String.valueOf(floatFactor)));
 
-        {
-            BigDecimal bigDecimal1 = new BigDecimal(a);
-            BigDecimal bigDecimal2 = new BigDecimal(b);
-            BigDecimal bigDecimal3 = new BigDecimal(c);
-            System.out.println("결과 3 : " + bigDecimal1.multiply(bigDecimal2)
-                    .multiply(bigDecimal3)); // 61600.00133514404296875000000
-        }
-        {
-            BigDecimal bigDecimal1 = new BigDecimal(a);
-            BigDecimal bigDecimal2 = new BigDecimal(b);
-            BigDecimal bigDecimal3 = new BigDecimal(d);
-            System.out.println("결과 4 : " + bigDecimal1.multiply(bigDecimal2)
-                    .multiply(bigDecimal3)); // 61600.000000000004973799150320701301097869873046875000000
-        }
+        BigDecimal resultWithDouble = new BigDecimal(String.valueOf(intValue))
+                .multiply(new BigDecimal(String.valueOf(longMultiplier)))
+                .multiply(new BigDecimal(String.valueOf(doubleFactor)));
 
-        {
-            BigDecimal bigDecimal1 = new BigDecimal(String.valueOf(a));
-            BigDecimal bigDecimal2 = new BigDecimal(String.valueOf(b));
-            BigDecimal bigDecimal3 = new BigDecimal(String.valueOf(c));
-            System.out.println("결과 5 : " + bigDecimal1.multiply(bigDecimal2).multiply(bigDecimal3)); // 61600.0
-        }
+        // Then
+        assertEquals(expectedResult, resultWithFloat, "Float multiplication with large numbers should be precise when using String conversion");
+        assertEquals(expectedResult, resultWithDouble, "Double multiplication with large numbers should be precise when using String conversion");
     }
 
-    /**
-     * <pre>
-     * 결과 1 : 2.1600018E7
-     * 결과 2 : 2.1600018E7
-     * 결과 3 : 21600018.46816778182983398437500
-     * 결과 4 : 21600018.000000001744060895703114510979503393173217773437500
-     * 결과 5 : 21600018.0
-     * </pre>
-     */
-    private static void test2() {
-        Integer a = 327273;
-        Long b = 60L;
-        float c = 1.1f;
-        double d = 1.1d;
+    @Test
+    @DisplayName("Test decimal multiplication precision differences")
+    public void testPrecisionDifferences() {
+        // Given
+        int intValue = 14000;
+        int multiplier = 4;
+        float floatFactor = 1.1f;
 
-        System.out.println("결과 1 : " + a * b * c); // 61600.0
-        System.out.println("결과 2 : " + a * b * d); // 61600.00000000001
+        // When
+        BigDecimal directBigDecimal = new BigDecimal(intValue)
+                .multiply(new BigDecimal(multiplier))
+                .multiply(new BigDecimal(floatFactor));
 
-        {
-            BigDecimal bigDecimal1 = new BigDecimal(a);
-            BigDecimal bigDecimal2 = new BigDecimal(b);
-            BigDecimal bigDecimal3 = new BigDecimal(c);
-            System.out.println("결과 3 : " + bigDecimal1.multiply(bigDecimal2)
-                    .multiply(bigDecimal3)); // 61600.00133514404296875000000
-        }
-        {
-            BigDecimal bigDecimal1 = new BigDecimal(a);
-            BigDecimal bigDecimal2 = new BigDecimal(b);
-            BigDecimal bigDecimal3 = new BigDecimal(d);
-            System.out.println("결과 4 : " + bigDecimal1.multiply(bigDecimal2)
-                    .multiply(bigDecimal3)); // 61600.000000000004973799150320701301097869873046875000000
-        }
+        BigDecimal stringBigDecimal = new BigDecimal(String.valueOf(intValue))
+                .multiply(new BigDecimal(String.valueOf(multiplier)))
+                .multiply(new BigDecimal(String.valueOf(floatFactor)));
 
-        {
-            BigDecimal bigDecimal1 = new BigDecimal(String.valueOf(a));
-            BigDecimal bigDecimal2 = new BigDecimal(String.valueOf(b));
-            BigDecimal bigDecimal3 = new BigDecimal(String.valueOf(c));
-            System.out.println("결과 5 : " + bigDecimal1.multiply(bigDecimal2).multiply(bigDecimal3)); // 61600.0
-        }
+        // Then
+        // Verify that direct BigDecimal construction produces different results than String conversion
+        assertEquals(false, directBigDecimal.equals(stringBigDecimal), 
+            "Direct BigDecimal construction should produce different results than String conversion");
     }
 }

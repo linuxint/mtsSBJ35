@@ -4,8 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import lombok.NoArgsConstructor;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,7 +61,7 @@ public class DependencyController {
             }
             int exitCode = process.waitFor(); // 처리 완료 대기
         } catch (IOException | InterruptedException e) {
-            e.getMessage();
+            //e.getMessage();
         }
 
         modelMap.put("listview", dependenciesList); // View로 데이터 전달

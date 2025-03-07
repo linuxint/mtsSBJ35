@@ -4,6 +4,8 @@
     <option name="IMPORT_LAYOUT_TABLE">
         <value>
             <emptyLine/>
+            `<package name="" withSubpackages="true" static="true"/>
+            <emptyLine/>
             <package name="ch" withSubpackages="true" static="false"/>
             <emptyLine/>
             <package name="co" withSubpackages="true" static="false"/>
@@ -14,8 +16,6 @@
             <emptyLine/>
             <package name="jakarta" withSubpackages="true" static="false"/>
             <emptyLine/>
-            <package name="lombok" withSubpackages="true" static="false"/>
-            <emptyLine/>
             <package name="net" withSubpackages="true" static="false"/>
             <emptyLine/>
             <package name="org" withSubpackages="true" static="false"/>
@@ -24,14 +24,8 @@
             <emptyLine/>
             <package name="java" withSubpackages="true" static="false"/>
             <emptyLine/>
-            <package name="com.nhncorp" withSubpackages="true" static="false"/>
-            <emptyLine/>
-            <package name="com.navercorp" withSubpackages="true" static="false"/>
-            <emptyLine/>
-            <package name="com.naver" withSubpackages="true" static="false"/>
-            <emptyLine/>
-            <package name="" withSubpackages="true" static="true"/>
-            <emptyLine/>
+            <package name="lombok" withSubpackages="true" static="false"/>
+            `<emptyLine/>
         </value>
     </option>
     <option name="RIGHT_MARGIN" value="99999"/>

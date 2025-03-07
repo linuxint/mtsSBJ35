@@ -1,7 +1,5 @@
 package com.devkbil.mtssbj.config;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.webresources.StandardRoot;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
@@ -9,6 +7,8 @@ import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Configuration;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @Slf4j

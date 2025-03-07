@@ -4,7 +4,7 @@ import com.devkbil.mtssbj.admin.board.BoardGroupService;
 import com.devkbil.mtssbj.admin.board.BoardGroupVO;
 import com.devkbil.mtssbj.common.ExtFieldVO;
 import com.devkbil.mtssbj.common.tree.TreeMaker;
-import com.devkbil.mtssbj.common.util.FileUtil;
+import com.devkbil.mtssbj.common.util.FileUpload;
 import com.devkbil.mtssbj.common.util.FileVO;
 import com.devkbil.mtssbj.common.util.UtilEtc;
 import com.devkbil.mtssbj.config.security.Role;
@@ -20,9 +20,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.ObjectUtils;
@@ -36,6 +33,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * BoardController는 게시판 관련 작업을 처리하는 API 컨트롤러입니다.
@@ -181,7 +181,7 @@ public class BoardController {
             }
         }
 
-        FileUtil fs = new FileUtil();
+        FileUpload fs = new FileUpload();
         List<FileVO> filelist = fs.saveAllFiles(boardInfo.getUploadfile());
 
         boardService.insertBoard(boardInfo, filelist, fileno);

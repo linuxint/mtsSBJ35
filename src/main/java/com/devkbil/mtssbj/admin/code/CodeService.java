@@ -2,9 +2,6 @@ package com.devkbil.mtssbj.admin.code;
 
 import com.devkbil.mtssbj.search.SearchVO;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
@@ -21,6 +18,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 이 서비스 클래스는 코드를 관리하고 엑셀 파일 작업을 수행하는 메서드를 제공합니다.
@@ -177,7 +177,7 @@ public class CodeService {
 
     /**
      * 지정된 작업 유형에 따라 데이터베이스에 코드를 삽입 또는 업데이트합니다.
-     * 작업 유형이 "U"인 경우 기존 코드를 업데이트합니다. 
+     * 작업 유형이 "U"인 경우 기존 코드를 업데이트합니다.
      * 그렇지 않으면 중복 여부를 확인한 후 새 코드를 삽입합니다.
      *
      * @param codeFormType 수행할 작업 유형. "U"는 업데이트를 나타내며,
@@ -198,11 +198,10 @@ public class CodeService {
 
         try {
             if ("U".equals(codeFormType)) {
-                // 코드 업데이트
-                affectedRows = sqlSession.update("updateCode", param);
+                affectedRows = sqlSession.update("updateCode", param); // 코드 업데이트
             } else {
-                // 코드 중복 확인 후 코드 삽입
                 if (sqlSession.selectOne("selectCodeOne", param) != null) {
+                    // 코드 중복 확인 후 코드 삽입
                     throw new IllegalArgumentException("이미 존재하는 코드입니다.");
                 }
                 affectedRows = sqlSession.insert("insertCode", param);

@@ -5,13 +5,13 @@ import com.devkbil.mtssbj.board.BoardSearchVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import lombok.RequiredArgsConstructor;
-
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * 공통 서비스, Alert 카운트, 사용자 데이터 조회 및 관련 비즈니스 로직을 관리하는 서비스 클래스입니다.

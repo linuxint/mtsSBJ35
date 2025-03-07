@@ -2,10 +2,10 @@ package com.devkbil.mtssbj.common.listener;
 
 import com.devkbil.mtssbj.common.events.CustomApplicationEvent;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * CustomApplicationEventListener는 {@link CustomApplicationEvent}를 수신하는 Spring 컴포넌트입니다.

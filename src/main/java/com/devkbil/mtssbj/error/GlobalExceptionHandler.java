@@ -2,8 +2,6 @@ package com.devkbil.mtssbj.error;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.boot.json.JsonParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +18,20 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.io.IOException;
 
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * 전역 예외 처리를 담당하는 핸들러 클래스입니다.
+ * 애플리케이션에서 발생하는 다양한 예외들을 일관된 방식으로 처리하고,
+ * 적절한 오류 응답을 생성하여 클라이언트에게 반환합니다.
+ * <p>
+ * 주요 처리 예외:
+ * - 유효성 검사 실패
+ * - 요청 파라미터 누락
+ * - JSON 처리 오류
+ * - 비즈니스 로직 예외
+ * - 시스템 내부 오류
+ */
 //@RestControllerAdvice
 @Slf4j
 @ControllerAdvice
@@ -27,6 +39,13 @@ public class GlobalExceptionHandler {
 
     private final HttpStatus httpStatusOk = HttpStatus.OK;
 
+    /**
+     * 메소드 인자의 유효성 검사 실패 시 발생하는 예외를 처리합니다.
+     * 바인딩 결과에서 필드 오류를 추출하여 상세한 오류 메시지를 구성합니다.
+     *
+     * @param ex 처리할 MethodArgumentNotValidException 예외
+     * @return 필드 오류 상세 내용을 포함한 ErrorResponse와 HTTP 상태
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         log.error("handleMethodArgumentNotValidException", ex);
@@ -75,6 +94,7 @@ public class GlobalExceptionHandler {
      * 오류를 로깅하고 적절한 {@link ErrorResponse} 객체를 생성하여 400 Bad Request HTTP 상태와 함께 반환합니다.
      *
      * @param ex 필수 요청 매개변수가 누락되어 발생한 {@link MissingServletRequestParameterException}
+     * @return 오류 세부 정보와 HTTP 400 Bad Request 상태를 포함하는 {@link ResponseEntity}
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     protected ResponseEntity<ErrorResponse> handleMissingRequestHeaderExceptionException(MissingServletRequestParameterException ex) {
@@ -97,7 +117,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 요청된 처리기를 찾을 수 없을 때 발생하는 예외를 처리합니다. 
+     * 요청된 처리기를 찾을 수 없을 때 발생하는 예외를 처리합니다.
      * 예를 들어, 요청된 URI가 정의된 경로나 처리기와 일치하지 않을 때 {@link NoHandlerFoundException}에 의해 트리거됩니다.
      *
      * @param ex 처리기를 찾을 수 없음을 나타내는 예외
@@ -138,7 +158,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * {@link JsonParseException} 유형의 예외를 처리합니다. 
+     * {@link JsonParseException} 유형의 예외를 처리합니다.
      * 이 메서드는 JSON 구문 분석 중 오류가 발생했을 때 호출됩니다.
      * 오류를 로깅하고 적절한 오류 응답을 생성합니다.
      *
@@ -182,17 +202,15 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * BusinessException에서 발생한 에러를 처리합니다.
+     * 비즈니스 로직 실행 중 발생하는 사용자 정의 예외를 처리합니다.
+     * BusinessExceptionHandler에서 발생한 예외를 처리하고 적절한 오류 응답을 생성합니다.
      *
-     * @param ex BusinessException
-     * @return ResponseEntity
+     * @param ex 처리할 BusinessExceptionHandler 예외
+     * @return 비즈니스 오류 세부 정보와 HTTP 400 Bad Request 상태를 포함하는 {@link ResponseEntity}
      */
     @ExceptionHandler(BusinessExceptionHandler.class)
     public ResponseEntity<ErrorResponse> handleCustomException(BusinessExceptionHandler ex) {
-        log.debug("===========================================================");
-        log.debug("여기로 오는가?!");
-        log.debug("===========================================================");
-
+        log.error("Business exception occurred", ex);
         final ErrorResponse response = ErrorResponse.of(ErrorCode.BUSINESS_EXCEPTION_ERROR, ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }

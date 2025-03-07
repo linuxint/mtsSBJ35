@@ -1,8 +1,8 @@
 package com.devkbil.mtssbj;
 
-import lombok.Getter;
-
 import java.util.EnumSet;
+
+import lombok.Getter;
 
 @Getter
 public enum EnumPort {
@@ -17,11 +17,14 @@ public enum EnumPort {
     private final int port;
 
     static int getBwcdOfPort(String bwcd) {
+        if (bwcd == null) {
+            return 0;
+        }
         final int[] port = {0};
         EnumSet.allOf(EnumPort.class)
             .forEach(
                 enumPort -> {
-                    if (bwcd == enumPort.getBwcd()) {
+                    if (bwcd.equals(enumPort.getBwcd())) {
                         port[0] = enumPort.getPort();
                     }
                 });

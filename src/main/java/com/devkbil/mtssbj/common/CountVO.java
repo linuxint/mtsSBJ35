@@ -9,9 +9,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * CountVO는 조회 수를 나타내는 데 사용되는 Value Object 클래스입니다.
- * 조회되는 필드와 관련된 조회 수를 캡슐화하여
- * 데이터를 간결하고 구조화된 형태로 제공합니다.
+ * CountVO는 특정 항목에 대해 조회된 데이터의 상세 정보를 나타내는 클래스입니다.
+ * 조회 대상 필드 명과 해당 조회 건수를 표현하며, 조회 통계와 관련된 데이터 전송을 수행합니다.
+ * 이 클래스는 VO (Value Object)로 사용됩니다.
  */
 @Schema(description = "조회수 : CountVO")
 @XmlRootElement(name = "CountVO")

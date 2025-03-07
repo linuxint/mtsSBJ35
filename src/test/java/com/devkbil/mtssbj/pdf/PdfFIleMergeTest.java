@@ -20,9 +20,9 @@ public class PdfFIleMergeTest {
         RandomAccessReadBufferedFile file = null; // pdfbox 3.x
 
         // Create PDFMergerUtility class object
-        PDFMergerUtility PDFmerger = new PDFMergerUtility();
+        PDFMergerUtility pdfMerger = new PDFMergerUtility();
         // Setting the destination file path
-        PDFmerger.setDestinationFileName(absolutePath + "merged.pdf");
+        pdfMerger.setDestinationFileName(absolutePath + "merged.pdf");
         PDDocument doc = null;
         String[] pdfFileList = {"Demo1.pdf", "Demo2.pdf"};
 
@@ -39,7 +39,7 @@ public class PdfFIleMergeTest {
 
                 System.out.println(pdfFile + " page " + pageCount);
                 // adding the source files
-                PDFmerger.addSource(file);
+                pdfMerger.addSource(file);
             }
 
         } catch (IOException ex) {
@@ -47,8 +47,8 @@ public class PdfFIleMergeTest {
         }
         file = null;
         // Merging the documents
-        PDFmerger.mergeDocuments(null);
-        PDFmerger = null;
+        pdfMerger.mergeDocuments(null);
+        pdfMerger = null;
         System.out.println("PDF Documents merged to a single file successfully");
     }
 }

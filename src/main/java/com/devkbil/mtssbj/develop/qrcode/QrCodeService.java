@@ -19,6 +19,6 @@ public interface QrCodeService {
      * @throws IOException     입출력 오류 발생 시 예외 처리
      * @throws WriterException QR 코드 생성을 실패할 때 발생하는 예외
      */
-    public byte[] generateQrCode(String link) throws IOException, WriterException;
+    byte[] generateQrCode(String link) throws IOException, WriterException;
 
 }

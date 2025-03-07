@@ -53,6 +53,18 @@ The following rules in the Naver coding convention cannot be checked by this con
     <module name="TreeWalker">
         <!-- Start of Naming chapter -->
 
+        <!-- 클래스 Javadoc 확인 -->
+        <module name="JavadocMethod">
+            <property name="accessModifiers" value="public"/>
+            <property name="severity" value="error"/>
+        </module>
+
+        <!-- 메서드 Javadoc 확인 -->
+        <module name="JavadocMethod">
+            <property name="allowMissingParamTags" value="false"/> <!-- @param 태그 필수 -->
+            <property name="severity" value="error"/> <!-- Javadoc 없으면 에러 -->
+        </module>
+
         <!-- [list-uppercase-abbr] -->
         <module name="AbbreviationAsWordInName">
             <property name="ignoreFinal" value="false"/>
@@ -291,8 +303,9 @@ The following rules in the Naver coding convention cannot be checked by this con
             <property name="option" value="bottom"/>
 
             <!-- Import 그룹 설정 -->
-            <property name="groups" value="ch,co,com,io,jakarta,lombok,net,org,javax,java,static"/>
+            <property name="groups" value="*, ch, co, com, io, jakarta, net, org, javax, java, lombok, #static"/>
             <property name="separated" value="true"/>
+            <property name="caseSensitive" value="true"/>
         </module>
 
         <!-- [blankline-between-methods] -->
@@ -419,7 +432,6 @@ The following rules in the Naver coding convention cannot be checked by this con
 
     <!--- Suppression -->
     <module name="SuppressionFilter">
-        <property name="file" value="${suppressionFile}"/>
         <property name="optional" value="true"/>
     </module>
 

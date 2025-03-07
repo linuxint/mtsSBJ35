@@ -12,9 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
@@ -23,6 +20,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 전자 결재 문서 관리 컨트롤러
@@ -70,10 +70,12 @@ public class SignDocController {
     }
 
     /**
-     * 문서 유형 저장 또는 업데이트를 처리합니다.
+     * 문서 유형 폼을 조회하거나 생성합니다.
      *
-     * @param signInfo 저장할 문서 유형 정보 객체
-     * @return 저장 후 리다이렉트 경로
+     * @param signInfo 문서 유형 정보 객체
+     * @param modelMap 뷰에 전달할 데이터를 담는 Spring의 ModelMap 객체.
+     *                공통 속성과 문서 유형 정보를 담아 뷰에 전달하는데 사용됨
+     * @return 문서 유형 폼 뷰의 경로
      */
     @GetMapping("/adSignDocTypeForm")
     @Operation(summary = "문서 유형 폼 조회", description = "특정 문서 유형 정보를 조회하거나, 신규 문서 유형을 위한 폼을 반환합니다.")

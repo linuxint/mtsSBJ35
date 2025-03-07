@@ -6,8 +6,6 @@ import com.devkbil.mtssbj.member.auth.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -17,9 +15,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * AdminInterceptor는 Spring MVC의 HandlerInterceptor를 구현하여
- *
+ * <p>
  * 관리자 페이지에 대한 요청을 사전에 처리하고, 권한 확인 및 페이지 접근 제어를 수행하는 클래스입니다.
  * 주요 역할:
  * 1. 요청 사용자에 대한 인증 상태 확인.

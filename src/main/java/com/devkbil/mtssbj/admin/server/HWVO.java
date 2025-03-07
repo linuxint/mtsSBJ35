@@ -8,27 +8,27 @@ import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Represents a Server Hardware Value Object (HWVO).
+ * This class is used as a Data Transfer Object (DTO) for managing hardware-related details
+ * in a server environment. It contains various properties related to server hardware,
+ * including identification information, hardware specifications, administrative details,
+ * and audit-related information.
+ * <p>
+ * The properties include:
+ * - Identification details such as hardware ID and name.
+ * - Hardware specifications such as IP address, operating system, CPU, memory, and disk information.
+ * - Administrative information including administrator ID and email.
+ * - Activation status, deletion status, and audit metadata (registration/modification details).
+ * <p>
+ * The class is annotated for both JAXB and OpenAPI integration, enabling XML serialization
+ * and compatibility with API schema documentation requirements.
+ */
 @Getter
 @Setter
 @Schema(description = "서버 하드웨어 VO")
 @XmlRootElement(name = "HWVO")
-@XmlType(
-    propOrder = {
-        "hwId",
-        "hwName",
-        "hwIp",
-        "adminUserNo",
-        "adminEmail",
-        "osInfo",
-        "cpuInfo",
-        "memoryInfo",
-        "diskInfo",
-        "etcInfo",
-        "actYn",
-        "deleteFlag",
-        "regDate",
-        "chgDate"
-    })
+@XmlType(propOrder = {"hwId", "hwName", "hwIp", "adminUserNo", "adminEmail", "osInfo", "cpuInfo", "memoryInfo", "diskInfo", "etcInfo", "actYn", "deleteFlag", "regDate", "chgDate"})
 public class HWVO {
     @Schema(description = "하드웨어 ID", example = "1")
     private String hwId;

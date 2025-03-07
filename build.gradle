@@ -13,6 +13,7 @@ plugins {
     id 'com.diffplug.spotless' version '7.0.2'
     id 'org.cyclonedx.bom' version '2.2.0'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'net.ltgt.errorprone' version '4.1.0'
 }
 
 // Project Information
@@ -24,15 +25,15 @@ description = 'mtsSBJ35'
 repositories {
     mavenCentral()
     gradlePluginPortal()
-    maven { 
+    maven {
         url = 'https://repo.spring.io/milestone'
         name = 'Spring Milestone'
     }
-    maven { 
+    maven {
         url = 'https://repo.spring.io/snapshot'
         name = 'Spring Snapshot'
     }
-    maven { 
+    maven {
         url = 'https://artifacts.elastic.co/maven'
         name = 'Elasticsearch Maven'
     }
@@ -44,6 +45,23 @@ repositories {
 
 springBoot {
     buildInfo()
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+javadoc {
+    options {
+        encoding = 'UTF-8'
+        charSet = 'UTF-8'
+        docEncoding = 'UTF-8'
+        locale = 'ko_KR'
+        // 클래스와 메서드에 대한 주석 누락만 검증
+//        addStringOption('Xdoclint:all,-missing,-syntax', '-quiet')
+        addBooleanOption('html5', true)
+    }
 }
 
 // 각 configuration에 대한 exclude 설정
@@ -153,11 +171,11 @@ dependencies {
 
     // Embedded Tomcat
     runtimeOnly 'org.springframework.boot:spring-boot-starter-tomcat'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-core:11.0.4'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-websocket:11.0.4'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-el:11.0.4'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:11.0.4'
-    implementation 'org.apache.tomcat:tomcat-annotations-api:11.0.4'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-core:11.0.5'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-websocket:11.0.5'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-el:11.0.5'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:11.0.5'
+    implementation 'org.apache.tomcat:tomcat-annotations-api:11.0.5'
 //    runtimeOnly 'org.apache.tomcat:tomcat-native:1.2.35'
 
 //    runtimeOnly 'org.springframework.boot:spring-boot-starter-jetty'        // 내장 Tomcat 런타임
@@ -288,6 +306,8 @@ dependencies {
     checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:0.0.43'
     runtimeOnly 'io.spring.javaformat:spring-javaformat-config:0.0.43'
     runtimeOnly 'io.spring.javaformat:spring-javaformat-intellij-idea-plugin:0.0.43'
+    annotationProcessor("com.google.errorprone:error_prone_core:2.36.0")
+    errorprone 'com.google.errorprone:error_prone_core:2.36.0' // Add this dependency
 
     // ======================
     // 14. Persistence & Validation
@@ -397,6 +417,15 @@ allprojects {
     }
 }
 
+tasks.withType(JavaCompile).configureEach {
+    // javac 플래그 중 --should-stop을 ErrorProne이 요구하는 값으로 설정
+    options.compilerArgs += ["--should-stop=ifError=FLOW"]
+    options.errorprone.enabled = enabled// ErrorProne 활성화
+    options.errorprone.errorproneArgs.addAll([
+            "-XepDisableWarningsInGeneratedCode"
+    ])
+}
+
 // ======================
 // Code Style Configuration
 // ======================
@@ -410,7 +439,10 @@ spotless {
         toggleOffOn() // 방식 토글 지원
 
         // Target Files
-        target 'src/**/*.java'
+        target fileTree('src/main/java') { // 검사 대상 명확히 지정
+            include '**/*.java' // `.java` 파일만 검사 대상
+        }
+        targetExclude '**/build/generated-sbom/**/*.java' // SBOM 경로를 명확히 제외
 
         // Import Management
         importOrder(
@@ -419,11 +451,11 @@ spotless {
             "", "com",
             "", "io",
             "", "jakarta",
-            "", "lombok",
             "", "net",
             "", "org",
             "", "javax",
             "", "java",
+            "", "lombok",
             "", "\\#static"
         )
 
@@ -451,7 +483,7 @@ checkstyle {
     configProperties = [
         'suppressionFile': file("$rootDir/codestyle/naver-checkstyle-suppressions.xml")
     ]
-    toolVersion = '10.21.3'
+    toolVersion = '10.21.4'
 }
 
 // Format Check
@@ -462,37 +494,66 @@ tasks.register("checkFormatMain") {
 // ======================
 // SBOM Generation
 // ======================
+// JVM CycloneDX SBOM Task
 tasks.register('jvmCyclonedxBom', CycloneDxTask) {
     group = 'reporting'
     description = 'Generates an SBOM for only JVM dependencies'
     skipConfigs = configurations.names.findAll { it != 'compileClasspath' }
     outputName.set("jvm-sbom")
-    destination.set(file("src/main/resources"))
+    destination.set(file("$buildDir/cyclonedx/sbom"))
     outputFormat.set('json')
 }
 
+// Application CycloneDX SBOM Task
 tasks.register('appCyclonedxBom', CycloneDxTask) {
     group = 'reporting'
     description = 'Generates an SBOM for the application runtime dependencies'
     skipConfigs.set(configurations.names - 'runtimeClasspath')
     outputName.set("application-sbom")
-    destination.set(file("src/main/resources"))
+    destination.set(file("$buildDir/cyclonedx/sbom"))
     outputFormat.set('json')
+}
+
+// SBOM 파일을 src/main/resources로 복사
+tasks.register('copySbomToResources') {
+    dependsOn 'jvmCyclonedxBom', 'appCyclonedxBom'
+    doLast {
+        copy {
+            from "$buildDir/generated-sbom" // CycloneDX가 생성한 빌드 출력 파일
+            include '*.json'
+            into "$projectDir/src/main/resources/" // 리소스 디렉토리 복사
+        }
+    }
+}
+
+// META-INF/sbom/ 등의 불필요 경로 제거
+tasks.register('cleanSbomPaths') {
+    doLast {
+        delete("$buildDir/resources/main/META-INF/sbom/") // 삭제
+        delete("$buildDir/BOOT-INF/classes/META-INF/sbom/") // 중첩 경로 삭제
+        delete("$buildDir/resources/main/META-INF/sbom/application.cdx.json") // 파일 삭제
+    }
+}
+
+// Gradle 빌드 과정에서 적용
+tasks.named('processResources') {
+    exclude '**/generated-sbom/**' // SBOM 파일 처리 배제
+    dependsOn 'copySbomToResources'
+    finalizedBy 'cleanSbomPaths' // 리소스 처리 후 불필요 파일 삭제
+}
+
+// JAR 빌드 시 중복 제거 보장
+tasks.named('bootJar') {
+    finalizedBy 'cleanSbomPaths' // bootJar 실행 전 경로 정리
 }
 
 // Build Dependencies
 build.dependsOn spotlessApply
 build.dependsOn jvmCyclonedxBom, appCyclonedxBom
 
-tasks.processResources {
-    // appCyclonedxBom 작업의 출력이 processResources 작업의 입력임을 정의
-    inputs.files(tasks.appCyclonedxBom.outputs.files)
-    dependsOn tasks.appCyclonedxBom
-}
-
-
 tasks.spotlessJava {
     // appCyclonedxBom 작업 이후 실행되도록 의존성 설정
     inputs.files(tasks.appCyclonedxBom.outputs.files)
-    dependsOn tasks.appCyclonedxBom
+    dependsOn tasks.named('jvmCyclonedxBom') // Spotless가 CycloneDX 작업 이후 실행되도록 설정
+    dependsOn tasks.named('appCyclonedxBom') // Spotless가 CycloneDX 작업 이후 실행되도록 설정
 }

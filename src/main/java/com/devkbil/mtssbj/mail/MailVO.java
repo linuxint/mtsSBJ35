@@ -7,10 +7,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
+import java.util.ArrayList;
+
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.ArrayList;
 
 /**
  * 메일 정보를 담는 VO 클래스.

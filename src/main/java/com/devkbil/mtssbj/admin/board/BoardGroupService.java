@@ -1,8 +1,5 @@
 package com.devkbil.mtssbj.admin.board;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +7,9 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 게시판 그룹 서비스 클래스
@@ -48,12 +48,12 @@ public class BoardGroupService {
             throw new IllegalArgumentException("BoardGroupVO는 null일 수 없습니다.");
         }
 
-        param.setBgparent(validateBgparent(param.getBgparent()));// 부모 그룹 ID 검증
+        param.setBgparent(validateBgparent(param.getBgparent())); // 부모 그룹 ID 검증
 
         if (!StringUtils.hasText(param.getBgno())) {
-            return sqlSession.insert("insertBoardGroup", param);// 신규 그룹 삽입
+            return sqlSession.insert("insertBoardGroup", param); // 신규 그룹 삽입
         } else {
-            return sqlSession.update("updateBoardGroup", param);// 기존 그룹 수정
+            return sqlSession.update("updateBoardGroup", param); // 기존 그룹 수정
         }
     }
 

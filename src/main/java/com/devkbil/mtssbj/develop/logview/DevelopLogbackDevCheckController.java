@@ -7,8 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Logback 로그 뷰어 컨트롤러
@@ -40,17 +40,15 @@ public class DevelopLogbackDevCheckController {
     @GetMapping(value = "/dvLogView", produces = MediaType.APPLICATION_JSON_VALUE)
     public String logview(Model model) {
         List<String> logView =
-                developLogbackAppenderService
-                        .getLogQueue()
-                        .stream()
-                        .map(queue -> queue
-                                .getLogMessage()
-                                .replaceAll(CoreConstants.LINE_SEPARATOR, "")
-                                .replaceAll("\t", ""))
-                        .collect(Collectors.toList());
+            developLogbackAppenderService
+                .getLogQueue()
+                .stream()
+                .map(queue -> queue
+                    .getLogMessage()
+                    .replaceAll(CoreConstants.LINE_SEPARATOR, "")
+                    .replaceAll("\t", ""))
+                .collect(Collectors.toList());
         model.addAttribute("logView", logView);
         return "thymeleaf/dvLogView";
-
     }
-
 }

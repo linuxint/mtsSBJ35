@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.IOException;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class UtilEtc {
@@ -16,6 +16,13 @@ public class UtilEtc {
     /**
      * JSON (String)을 문자열로 변환하여 클라이언트에 전송.
      * AJax 용.
+     */
+    /**
+     * Sends a JSON-formatted response to the client using the provided value.
+     * If the value is a string, it escapes HTML to prevent XSS attacks.
+     *
+     * @param response the HttpServletResponse object used to send the response
+     * @param value    the object to be serialized into JSON and written to the response
      */
     public static void responseJsonValue(HttpServletResponse response, Object value) {
         ObjectMapper mapper = new ObjectMapper();

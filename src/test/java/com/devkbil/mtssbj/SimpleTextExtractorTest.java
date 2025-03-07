@@ -1,7 +1,5 @@
 package com.devkbil.mtssbj;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -17,7 +15,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import lombok.extern.slf4j.Slf4j;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Slf4j
 public class SimpleTextExtractorTest {
@@ -79,6 +79,11 @@ public class SimpleTextExtractorTest {
 
     /**
      * 간단하게 Tika로 파일에서 텍스트 추출
+     *
+     * @param fileName 텍스트를 추출할 파일의 경로
+     * @return 파일에서 추출된 텍스트 문자열
+     * @throws TikaException Tika 파싱 중 오류 발생 시
+     * @throws IOException 파일 읽기/쓰기 오류 발생 시
      */
     private String convertSimple(String fileName) throws TikaException, IOException {
         Tika tika = new Tika();
@@ -87,6 +92,11 @@ public class SimpleTextExtractorTest {
 
     /**
      * 고급 파서를 사용한 텍스트 추출
+     * OCR을 포함한 고급 기능을 사용하여 파일에서 텍스트를 추출합니다.
+     *
+     * @param fileName 텍스트를 추출할 파일의 경로
+     * @return 파일에서 추출된 텍스트 문자열. OCR 처리가 성공적으로 완료된 경우 추출된 텍스트를 반환하며,
+     *         파일 처리 중 오류가 발생하거나 텍스트 추출에 실패한 경우 null을 반환
      */
     private String convert(String fileName) {
         InputStream stream = null;

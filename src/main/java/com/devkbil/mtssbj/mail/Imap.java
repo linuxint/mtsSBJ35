@@ -20,8 +20,6 @@ import jakarta.mail.search.ComparisonTerm;
 import jakarta.mail.search.ReceivedDateTerm;
 import jakarta.mail.search.SearchTerm;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -34,6 +32,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.IntStream;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Imap 클래스는 IMAP 이메일 서버에 연결하고, 이메일 메시지를 관리하며,

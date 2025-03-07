@@ -1,11 +1,11 @@
 package com.devkbil.mtssbj.main;
 
-import lombok.RequiredArgsConstructor;
-
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * 샘플 서비스 클래스.

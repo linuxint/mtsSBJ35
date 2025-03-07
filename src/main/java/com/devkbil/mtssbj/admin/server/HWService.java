@@ -2,13 +2,13 @@ package com.devkbil.mtssbj.admin.server;
 
 import com.devkbil.mtssbj.search.ServerSearchVO;
 
-import lombok.RequiredArgsConstructor;
-
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +40,7 @@ public class HWService {
      * 서버 하드웨어 등록
      *
      * @param hwVO 등록할 하드웨어 정보
+     * @return 데이터베이스에 성공적으로 등록된 하드웨어 레코드의 수. 성공 시 1, 실패 시 0
      */
     @Transactional
     public int insertHW(HWVO hwVO) {
@@ -50,6 +51,7 @@ public class HWService {
      * 서버 하드웨어 정보 수정
      *
      * @param hwVO 수정할 하드웨어 정보
+     * @return 데이터베이스에서 성공적으로 수정된 하드웨어 레코드의 수. 성공 시 1, 실패 시 0
      */
     @Transactional
     public int updateHW(HWVO hwVO) {
@@ -60,6 +62,8 @@ public class HWService {
      * 서버 하드웨어 삭제 (논리 삭제)
      *
      * @param hwId 삭제할 하드웨어 ID
+     * @return 논리적으로 삭제 처리된 하드웨어 레코드의 수. 성공 시 1, 실패 시 0.
+     *         실제로 레코드가 삭제되지 않고 삭제 표시만 업데이트됨
      */
     @Transactional
     public int deleteHW(String hwId) {

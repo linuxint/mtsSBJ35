@@ -8,8 +8,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -17,23 +15,25 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.UUID;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * MDCFilter는 들어오는 HTTP 요청을 가로채고 컨텍스트 로깅을 위한
  * Mapped Diagnostic Context (MDC)를 초기화하는 서블릿 필터입니다.
  * 사용자 정보, 요청 상관 ID, 클라이언트 IP 주소와 같은 특정 컨텍스트 정보를 가져와 MDC에 설정합니다.
  * 이를 통해 요청의 추적성과 디버깅 로그 항목을 개선할 수 있습니다.
- *
+ * <p>
  * 이 클래스는 `OncePerRequestFilter`를 확장하여 단일 요청 내에서 한 번만 실행되게 합니다.
- *
+ * <p>
  * 필터링 과정에서:
  * - 인증된 사용자 정보를 얻어 MDC의 USER_NAME 키에 설정합니다.
  * - 트랜잭션 ID(TRX_ID)를 생성하여 MDC에 추가하고 로그에서 사용 가능하게 합니다.
  * - 요청 헤더에서 상관 ID(CORRELATION_ID)를 가져와 MDC에 설정합니다.
  * - 사용자의 IP 주소를 가져와 MDC의 USER_IP 키에 저장합니다.
  * - 요청 처리가 완료된 후 MDC 컨텍스트를 정리하여 스레드 간 컨텍스트 누출을 방지합니다.
- *
+ * <p>
  * 필터는 또한 사용자 IP와 같은 주요 요청 세부 정보를 기록하고 가로챈 요청에 대한 감사 추적을 제공합니다.
- *
+ * <p>
  * 참고:
  * - `getUserPrincipal` 메서드는 인증 서비스(Authentication Service)를 사용하여 인증된 사용자 ID와 이름을 가져와 연결합니다.
  * - 구현에서 사용된 MDC 키는 `MDCKey` 열거형 클래스에 사전 정의되어 있습니다.
@@ -44,7 +44,14 @@ public class MDCFilter extends OncePerRequestFilter {
 
     private final AuthService authService;
 
-    // 생성자 주입 방식 사용
+    /**
+     * MDCFilter 클래스를 생성하는 생성자입니다. 이 클래스는 인증 서비스와 통합됩니다.
+     * 이 필터는 로깅 목적으로 Mapped Diagnostic Context (MDC) 값을 관리하고 설정하며,
+     * 디버깅 또는 진단 활동을 위한 문맥 정보를 로깅할 수 있도록 합니다.
+     *
+     * @param authService 사용자별 혹은 요청별 정보를 수집하여 MDC를 풍부하게
+     *                    하는 데 사용되는 인증 서비스
+     */
     public MDCFilter(AuthService authService) {
         this.authService = authService;
     }

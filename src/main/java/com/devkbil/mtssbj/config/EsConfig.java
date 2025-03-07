@@ -37,9 +37,10 @@ public class EsConfig {
     String elasticCredentilsPasswd = "manager";
 
     /**
-     * Elasticsearch Connection client
+     * Elasticsearch 연결을 위한 고수준 클라이언트를 생성합니다.
+     * 설정된 호스트, 포트, 인증 정보를 사용하여 RestHighLevelClient를 구성합니다.
      *
-     * @return
+     * @return 구성된 RestHighLevelClient 인스턴스
      */
     @Bean
     public RestHighLevelClient client() {

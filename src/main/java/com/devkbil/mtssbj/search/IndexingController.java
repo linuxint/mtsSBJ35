@@ -5,6 +5,7 @@ import com.devkbil.mtssbj.board.BoardService;
 import com.devkbil.mtssbj.board.BoardVO;
 import com.devkbil.mtssbj.common.ExtFieldVO;
 import com.devkbil.mtssbj.common.LocaleMessage;
+import com.devkbil.mtssbj.common.util.FileOperation;
 import com.devkbil.mtssbj.common.util.FileUtil;
 import com.devkbil.mtssbj.common.util.FileVO;
 import com.devkbil.mtssbj.common.util.HostUtil;
@@ -12,8 +13,6 @@ import com.devkbil.mtssbj.config.EsConfig;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import lombok.RequiredArgsConstructor;
 
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
@@ -49,20 +48,21 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.RequiredArgsConstructor;
+
 import static org.elasticsearch.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * Elasticsearch 색인을 관리하는 컨트롤러 클래스입니다.
- *
+ * <p>
  * 이 클래스는 게시판, 댓글, 첨부파일 등 데이터를 Elasticsearch에 색인 작업과 관련된 로직을 포함합니다.
  * 또한, 텍스트 추출 및 색인 파일 관리 등을 수행합니다.
- *
+ * <p>
  * 색인
  * 1. 게시판
  * 2. 댓글
  * 3. 첨부파일
  */
-
 @Controller
 @EnableAsync
 @EnableScheduling
@@ -82,6 +82,12 @@ public class IndexingController {
 
     private String lastFile;
 
+    /**
+     * Elasticsearch 구성에서 인덱스 이름을 설정합니다.
+     *
+     * @param indexName 설정할 인덱스 이름. 이 이름은 마지막으로 처리된 정보를 저장하는
+     *                  파일 경로를 결정합니다.
+     */
     @Value("${elasticsearch.clustername}")
     public void setIndexName(String indexName) {
         this.indexName = indexName;
@@ -98,14 +104,13 @@ public class IndexingController {
 
     /**
      * Elasticsearch 색인 작업을 실행합니다.
-     *
+     * <p>
      * - 게시판 데이터 색인
      * - 댓글 색인
      * - 첨부파일 색인
      *
      * @throws IOException 색인 작업 중 입출력 문제 발생 시 처리
      */
-
     @Scheduled(cron = "${batch.indexingFile.cron}")
     @Operation(summary = "색인 작업 실행", description = "게시판, 댓글, 첨부파일 등 데이터를 순차적으로 Elasticsearch에 색인")
     public void indexingFile() throws IOException {
@@ -259,7 +264,7 @@ public class IndexingController {
             fileMap.put("fileno", fileno);
 
             String realPath = FileUtil.getRealPath(filePath, el.getRealname());
-            if (!FileUtil.fileExist(realPath)) {
+            if (!FileOperation.fileExist(realPath)) {
                 isIndexing = false;
                 return;
             }
@@ -358,10 +363,11 @@ public class IndexingController {
         return text;
     }
 
-    // ---------------------------------------------------------------------------
-
     /**
-     * 마지막 색인 정보를 파일에서 읽어옵니다.
+     * 마지막으로 처리한 색인 데이터를 파일에서 읽어옵니다.
+     * 이 메서드는 {@code Properties} 객체를 초기화한 뒤,
+     * 지정된 파일에서 key-value 데이터를 로드합니다.
+     * 처리 중 {@code IOException}이 발생하면 오류 메시지를 기록합니다.
      */
     @Operation(summary = "마지막 색인 정보 읽기", description = "마지막으로 처리한 색인 데이터를 파일에서 읽어옵니다.")
     private void loadLastValue() {

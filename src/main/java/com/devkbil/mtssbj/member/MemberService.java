@@ -2,12 +2,12 @@ package com.devkbil.mtssbj.member;
 
 import com.devkbil.mtssbj.search.SearchVO;
 
-import lombok.RequiredArgsConstructor;
-
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * 사용자 관리와 관련된 서비스 클래스.
@@ -54,6 +54,7 @@ public class MemberService {
      * 로그인 로그 기록을 삽입합니다.
      *
      * @param param 사용자 ID 또는 정보
+     * @return 데이터베이스에 성공적으로 삽입된 로그 레코드의 수. 성공 시 1, 실패 시 0
      */
     public int insertLogIn(String param) {
         return sqlSession.insert("insertLogIn", param);
@@ -63,6 +64,7 @@ public class MemberService {
      * 로그아웃 로그 기록을 삽입합니다.
      *
      * @param param 사용자 ID 또는 정보
+     * @return 데이터베이스에 성공적으로 삽입된 로그 레코드의 수. 성공 시 1, 실패 시 0
      */
     public int insertLogOut(String param) {
         return sqlSession.insert("insertLogOut", param);

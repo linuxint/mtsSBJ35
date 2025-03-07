@@ -1,7 +1,5 @@
 package com.devkbil.mtssbj;
 
-import lombok.extern.slf4j.Slf4j;
-
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
@@ -29,8 +27,10 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
-public class iCalExample {
+public class ICalExample {
 
     public static void main(String[] args) {
         writeIcalendarFile();

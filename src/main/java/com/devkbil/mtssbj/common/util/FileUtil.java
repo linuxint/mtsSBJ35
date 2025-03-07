@@ -1,540 +1,53 @@
 package com.devkbil.mtssbj.common.util;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.imageio.ImageIO;
-
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.nio.channels.FileChannel;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
-
+/**
+ * 파일 관련 작업을 처리하기 위한 유틸리티 클래스입니다.
+ * 파일 이름 생성, 확장자 추출, 경로 생성, 파일 및 디렉토리 존재 여부 확인 등의 기능을 제공합니다.
+ */
 @Slf4j
 public class FileUtil {
-    static final Integer imgWidth = 100;
-    static final Integer imgHeight = 100;
-    public static int nSuccess = 1;
-    public static int nException = 0;
-    public static int nFailer = -1;
-    static int bufferSize = 1024; /** fileCopy BUFFER_SIZE **/
 
     /**
-     * 실제 파일 저장.
-     */
-    public static String saveFileOne(MultipartFile file, String basePath, String fileName) {
-        if (file == null || file.getName().equals("") || file.getSize() < 1) {
-            return "";
-        }
-
-        makeBasePath(basePath);
-        String serverFullPath = basePath + fileName;
-
-        File file1 = new File(serverFullPath);
-        try {
-            file.transferTo(file1);
-        } catch (IOException ex) {
-            log.error("IOException");
-        }
-
-        return serverFullPath;
-    }
-
-    private static BufferedImage resizeImage(BufferedImage srcImage, int type) {
-        BufferedImage resizedImage = new BufferedImage(imgWidth, imgHeight, type);
-        Graphics2D g2 = resizedImage.createGraphics();
-        g2.drawImage(srcImage, 0, 0, imgWidth, imgHeight, null);
-        g2.dispose();
-
-        return resizedImage;
-    }
-
-    /**
-     * 파일 저장 경로 생성.
-     */
-    public static void makeBasePath(String path) {
-        File dir = new File(path);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-    }
-
-    /**
-     * 날짜로 새로운 파일명 부여.
+     * 현재 날짜와 시간을 기반으로 새로운 파일 이름을 생성합니다.
+     * 결과는 "yyyyMMddhhmmssSSS" 형식의 날짜와 임의의 한 자리 숫자를 조합한 문자열입니다.
+     * 생성된 파일명은 중복 가능성을 최소화하기 위해 밀리초 단위까지 포함합니다.
+     *
+     * @return 생성된 파일 이름 문자열 (18자리)
      */
     public static String getNewName() {
         SimpleDateFormat ft = new SimpleDateFormat("yyyyMMddhhmmssSSS");
         return ft.format(new Date()) + (int)(Math.random() * 10);
     }
 
+    /**
+     * 파일 이름에서 확장자를 추출합니다.
+     * 파일명의 마지막 점(.) 이후의 문자열을 확장자로 인식합니다.
+     *
+     * @param filename 확장자를 추출할 파일 이름
+     * @return 추출된 확장자 (점 제외)
+     * @throws StringIndexOutOfBoundsException filename이 null이거나 확장자가 없는 경우 발생
+     */
     public static String getFileExtension(String filename) {
         Integer mid = filename.lastIndexOf(".");
         return filename.substring(mid + 1);
     }
 
     /**
-     * 파일존재여부 체크
+     * 문자열의 왼쪽에서 특정 문자열(trimStr)을 제거합니다.
+     * 주로 파일 경로에서 불필요한 접두어를 제거하는 데 사용됩니다.
      *
-     * @param srcFilePath 파일패스
-     * @return 존배여부
+     * @param source 원본 문자열 (null 허용)
+     * @param trimStr 제거할 문자열
+     * @return 변환된 문자열. source가 null이면 null 반환,
+     *         source가 trimStr로 시작하지 않으면 원본 문자열 그대로 반환
      */
-    public static boolean fileExist(String srcFilePath) {
-        File temp = null;
-        boolean retValue = false;
-
-        try {
-            temp = new File(srcFilePath);
-
-            retValue = temp.isFile();
-        } catch (Exception e) {
-            retValue = false;
-        }
-
-        return retValue;
-    }
-
-    /**
-     * 파일명변경
-     *
-     * @param srcFilePath  원본파일패스
-     * @param destFilePath 타켓파일패스
-     * @return 성공여부
-     */
-    public static int fileRename(String srcFilePath, String destFilePath) {
-
-        int nRtn;
-
-        if (!StringUtils.hasText(srcFilePath)) {
-            return nFailer;
-        }
-
-        //  파일명변경: ".bak" 추가
-        File srcFile = new File(srcFilePath);
-        File destFile = new File(destFilePath);
-
-        if (!srcFile.renameTo(destFile)) {
-            return nFailer;
-        } else {
-            return nSuccess;
-        }
-
-    }
-
-    /**
-     * 파일이동
-     *
-     * @param source 원본파일위치
-     * @param target 타켓파일위치
-     * @return 성공여부
-     */
-    public static boolean fileMove(String source, String target) {
-        boolean retValue = true;
-        if (source == null || target == null) {
-            return false;
-        }
-
-        File srcFile = new File(source);
-        File destFile = new File(target);
-        try {
-            retValue = srcFile.renameTo(destFile);
-        } catch (Exception e) {
-            retValue = false;
-        } finally {
-            try {
-                if (srcFile != null) {
-                    srcFile = null;
-                }
-            } catch (Exception e) {
-            }
-            try {
-                if (destFile != null) {
-                    destFile = null;
-                }
-            } catch (Exception e) {
-            }
-        }
-        return retValue;
-    }
-
-    /**
-     * file copy (alias - channelFileCopy)
-     *
-     * @param source source file
-     * @param target destination file
-     * @return true/false
-     */
-    public static int copyFile(String source, String target) {
-        return channelFileCopy(source, target);
-    }
-
-    /**
-     * file copy (method : buffer)
-     *
-     * @param source source file
-     * @param target destination file
-     * @return true/false
-     */
-    public static int bufferFileCopy(String source, String target) {
-        int retValue = nSuccess;
-        File sourceFile = new File(source);
-
-        FileInputStream inputStream = null;
-        FileOutputStream outputStream = null;
-        BufferedInputStream bin = null;
-        BufferedOutputStream bout = null;
-
-        int bytesRead;
-        byte[] buffer = new byte[bufferSize];
-
-        try {
-            inputStream = new FileInputStream(sourceFile);
-            outputStream = new FileOutputStream(target);
-
-            bin = new BufferedInputStream(inputStream);
-            bout = new BufferedOutputStream(outputStream);
-
-            while ((bytesRead = bin.read(buffer, 0, bufferSize)) != -1) {
-                bout.write(buffer, 0, bytesRead);
-            }
-        } catch (Exception e) {
-            retValue = nException;
-        } finally {
-            try {
-                outputStream.close();
-            } catch (IOException ioe) {
-            }
-            try {
-                inputStream.close();
-            } catch (IOException ioe) {
-            }
-            try {
-                bin.close();
-            } catch (IOException ioe) {
-            }
-            try {
-                bout.close();
-            } catch (IOException ioe) {
-            }
-        }
-        return retValue;
-    }
-
-    /**
-     * file copy (method : channel)
-     *
-     * @param source source file
-     * @param target destination file
-     * @return true/false
-     */
-    public static int channelFileCopy(String source, String target) {
-        int retValue = nSuccess;
-        long retSize;
-        /** source file Define **/
-        File sourceFile = new File(source);
-        /** Stream, Channel Define **/
-        FileInputStream inputStream = null;
-        FileOutputStream outputStream = null;
-        FileChannel fcin = null;
-        FileChannel fcout = null;
-
-        try {
-            /** stream create **/
-            inputStream = new FileInputStream(sourceFile);
-            outputStream = new FileOutputStream(target);
-            /** channel create **/
-            fcin = inputStream.getChannel();
-            fcout = outputStream.getChannel();
-
-            /** Stream Transfer for channel **/
-            long size = fcin.size();
-            retSize = fcin.transferTo(0, size, fcout);
-            if ((retSize - Integer.MAX_VALUE) > 0) {
-                retValue = Integer.MAX_VALUE;
-            }
-
-        } catch (Exception e) {
-            retValue = nException;
-        } finally {
-            try {
-                fcout.close();
-            } catch (IOException ioe) {
-            }
-            try {
-                fcin.close();
-            } catch (IOException ioe) {
-            }
-            try {
-                outputStream.close();
-            } catch (IOException ioe) {
-            }
-            try {
-                inputStream.close();
-            } catch (IOException ioe) {
-            }
-
-        }
-        return retValue;
-    }
-
-    /** //////////////////////////////////// FILE COPY ///////////////////////////////////////////////////// **/
-
-    /**
-     * 텍스트 포맷의 파일을 읽어 String 문자열로 반환한다.
-     *
-     * @param filePath 파일경로
-     * @return String
-     * @throws IOException
-     */
-    public static String readFileForText(String filePath) throws IOException {
-        return new String(readFileForBinary(filePath));
-    }
-
-    /**
-     * 텍스트 및 바이너리 포맷의 파일을 읽어 Bynary Data(byte array) 로 반환한다.
-     *
-     * @param filePath 파일경로
-     * @return byte[]
-     * @throws IOException
-     */
-    public static byte[] readFileForBinary(String filePath) throws IOException {
-        InputStream is = null;
-        ByteArrayOutputStream os = null;
-
-        int size = 1024;
-        byte[] buffer = new byte[size];
-        int length = -1;
-        byte[] retValue = null;
-        try {
-            is = new FileInputStream(filePath);
-            os = new ByteArrayOutputStream();
-
-            while ((length = is.read(buffer)) != -1) {
-                os.write(buffer, 0, length);
-            }
-        } catch (IOException ioe) {
-            throw ioe;
-        } finally {
-            if (is != null) {
-                is.close();
-            }
-            if (os != null) {
-                retValue = os.toByteArray();
-                os.close();
-            }
-        }
-
-        return retValue;
-    }
-
-    public static String readFile(InputStream is) throws IOException {
-        ByteArrayOutputStream os = null;
-
-        int size = 1024;
-        byte[] buffer = new byte[size];
-        int length = -1;
-        String retValue = null;
-
-        try {
-            os = new ByteArrayOutputStream();
-
-            while ((length = is.read(buffer)) != -1) {
-                os.write(buffer, 0, length);
-            }
-        } catch (IOException ioe) {
-            throw ioe;
-        } finally {
-            if (is != null) {
-                is.close();
-            }
-            if (os != null) {
-                retValue = os.toString();
-                os.close();
-            }
-        }
-
-        return retValue;
-    }
-
-    /**
-     * 하위의 모든 파일과 디렉토리를 삭제한다.
-     *
-     * @param file 삭제할 파일 또는 디렉토리
-     */
-    public static void removeDir(File file) {
-        if (file.exists()) {
-            if (file.isDirectory()) {
-                File[] list = file.listFiles();
-                for (File f : list) {
-                    removeDir(f);
-                }
-                file.delete();
-            } else {
-                file.delete();
-            }
-        }
-    }
-
-    /**
-     * 하위의 모든 파일과 디렉토리를 삭제한다.
-     *
-     * @param fileStr
-     */
-    public static void removeDir(String fileStr) {
-        removeDir(new File(fileStr));
-    }
-
-    /**
-     * 파일을 삭제한다.
-     *
-     * @param filename 전체경로를 포함하는 삭제할 파일명
-     */
-    public static void removeFile(String filename) {
-        File file = new File(filename);
-
-        if (file.exists()) {
-            file.delete();
-        }
-    }
-
-    /**
-     * 디렉토리로부터 파일목록을 가져온다. (하위 디렉터리 포함)
-     *
-     * @param path 파일을 가져올 디렉토리
-     * @return File[]
-     */
-    public static File[] getFileListFromDir(String path) {
-        File dir = new File(path);
-        File[] list = null;
-
-        if (dir.exists()) {
-            if (dir.isDirectory()) {
-                list = dir.listFiles();
-            }
-        }
-        return list;
-    }
-
-    /**
-     * 디렉토리로부터 파일목록을 가져온다. (하위 디렉터리_파일 포함)
-     *
-     * @param path 파일을 가져올 디렉토리
-     * @return File[]
-     */
-    public static List<File> getFileListFromDirWithSubFile(String path, FileFilter fileFilter) {
-        File dir = new File(path);
-        List<File> fileList = new ArrayList<File>();
-        if (dir.exists()) {
-            if (dir.isDirectory()) {
-                for (File subFile : dir.listFiles(fileFilter)) {
-                    fileList.add(subFile);
-                    if (subFile.isDirectory()) {
-                        fileList.addAll(getFileListFromDirWithSubFile(subFile.getAbsolutePath(), fileFilter));
-                    }
-                }
-            }
-        }
-        return fileList;
-    }
-
-    public static String[] getAllFileStrListFromDir(String path) {
-
-        File dir = new File(path);
-        String[] list = null;
-
-        if (dir.exists()) {
-            if (dir.isDirectory()) {
-                list = dir.list();
-            }
-        }
-        return list;
-    }
-
-    /**
-     * 디렉토리로부터 파일목록을 가져온다. (하위 디렉터리 미포함)
-     *
-     * @param path
-     * @return
-     */
-    public static String[] getFileStrListFromDir(String path) {
-        File dir = new File(path);
-        String[] lists = null;
-        List<String> files = new ArrayList<String>();
-
-        if (dir.exists()) {
-            if (dir.isDirectory()) {
-                lists = dir.list();
-            }
-        }
-
-        for (String list : lists) {
-            File file = new File(path + File.separator + list);
-            if (file.isDirectory()) {
-                continue;
-            }
-            files.add(list);
-        }
-        return files.toArray(new String[0]);
-    }
-
-    /**
-     * fromPath 하위의 모든 경로들을 basePath 를 기준으로한 상대경로로 가져온다.
-     *
-     * @param fromPath
-     * @param basePath
-     * return String[]
-     */
-    public static String[] getAllSubRelDirs(String fromPath, String basePath) {
-        String[] toPath = null;
-        ArrayList<Object> toPathArray = new ArrayList<Object>();
-
-        File folder = new File(fromPath);
-        toPathArray.add(folder.getAbsolutePath());
-
-        getAllSubDirs(fromPath, toPathArray);
-
-        toPath = new String[toPathArray.size()];
-        toPathArray.toArray(toPath);
-
-        for (int i = 0; i < toPath.length; i++) {
-            toPath[i] = ltrim(toPath[i], basePath);
-            toPath[i] = toPath[i].replace('\\', '/');
-            toPath[i] = ltrim(toPath[i], "/");
-            if (!toPath[i].endsWith("/")) {
-                toPath[i] = toPath[i] + "/";
-            }
-        }
-
-        return toPath;
-    }
-
-    private static String ltrim(String source, String trimStr) {
+    public static String ltrim(String source, String trimStr) {
         if (source != null && source.startsWith(trimStr)) {
             return source.substring(trimStr.length());
         }
@@ -542,293 +55,87 @@ public class FileUtil {
     }
 
     /**
-     * 주어진 경로로 부터 하위의 모든 경로들을 ArrayList 에 넣는다.
+     * 파일 이름을 기반으로 연/월/일 구조의 실제 경로를 생성합니다.
+     * 파일명의 앞 8자리가 날짜 형식(YYYYMMDD)이어야 합니다.
+     *
+     * @param path 기본 경로 (끝에 '/' 포함)
+     * @param filename 날짜 형식(YYYYMMDD)으로 시작하는 파일 이름
+     * @return 생성된 실제 경로 문자열 (예: "/base/path/2024/01/15/")
+     * @throws StringIndexOutOfBoundsException filename이 8자리 미만이거나 null인 경우 발생
      */
-    public static void getAllSubDirs(String fromPath, List<Object> pathArray) {
-        File folder = new File(fromPath);
-        File[] subFiles = folder.listFiles();
-
-        for (int i = 0; i < subFiles.length; i++) {
-            if (subFiles[i].isDirectory()) {
-                pathArray.add(subFiles[i].getAbsolutePath());
-
-                getAllSubDirs(subFiles[i].getAbsolutePath(), pathArray);
-            }
-        }
+    public static String getRealPath(String path, String filename) {
+        return path + filename.substring(0, 4) + "/" + filename.substring(4, 6) + "/" + filename.substring(6, 8) + "/";
     }
 
     /**
-     * 주어진 경로로 부터 하위의 모든 파일들을 상대 경로로 반환한다.
+     * 특정 디렉토리 내에 지정된 파일 이름이 존재하는지 확인합니다.
+     * 디렉토리 내의 모든 파일을 검색하여 정확히 일치하는 파일명을 찾습니다.
      *
-     * @param fromPath the directory path from which to retrieve the list of all sub-files and directories
-     * @return a list of strings, where each string represents the path of a sub-file or directory
-     * @throws Exception if an error occurs during the retrieval of file paths
+     * @param fileName 확인할 파일 이름 (대소문자 구분)
+     * @param targetDir 검색할 디렉토리의 절대 경로
+     * @return 파일이 존재하면 true, 그렇지 않으면 false. 다음의 경우 false 반환:
+     *         - targetDir이 존재하지 않는 경우
+     *         - targetDir이 디렉토리가 아닌 경우
+     *         - 파일을 찾을 수 없는 경우
+     * @throws Exception 디렉토리 접근 권한이 없거나 I/O 오류 발생 시
      */
-    public static List<String> getAllSubFiles(String fromPath) throws Exception {
-        return getAllSubFiles(fromPath, null, null);
-    }
-
-    /**
-     * 주어진 경로로 부터 하위의 특정확장자를 가진 파일들을 상대 경로로 반환한다.
-     *
-     * @param fromPath the path of the directory to search for files.
-     * @param ext a list of file extensions to filter the files. If null or empty, all files are included.
-     * @return a list of strings representing the paths of the found files.
-     * @throws Exception if an error occurs while accessing the file system.
-     */
-    public static List<String> getAllSubFiles(String fromPath, List<String> ext) throws Exception {
-        return getAllSubFiles(fromPath, null, ext);
-    }
-
-    /**
-     * 주어진 클래스패스 경로로 부터 하위의 특정확장자를 가진 파일들을 클래스패스 경로로 반환한다.
-     *
-     * @param fromPath   가져올 클래스패스 경로
-     * @param parentPath 부모 클래스패스 경로
-     * @param ext        확장자 명 List<String>
-     * @return
-     * @throws Exception
-     */
-    private static List<String> getAllSubFiles(String fromPath, String parentPath, List<String> ext) throws Exception {
-        if (parentPath == null) {
-            parentPath = "";
-        } else {
-            parentPath += "/";
-        }
-
-        String dirName = parentPath + fromPath;
-        File folder = new File(getClasspathRootAbsPath(dirName));
-        File[] subFiles = folder.listFiles();
-        List<String> fileList = new ArrayList<String>();
-
-        if (ext == null) {
-            for (int i = 0; i < subFiles.length; i++) {
-                if (subFiles[i].isDirectory()) {
-                    fileList.addAll(getAllSubFiles(subFiles[i].getName(), dirName, null));
-                } else {
-                    fileList.add(dirName + "/" + subFiles[i].getName());
-                }
-            }
-        } else {
-            for (int i = 0; i < subFiles.length; i++) {
-                if (subFiles[i].isDirectory()) {
-                    fileList.addAll(getAllSubFiles(subFiles[i].getName(), dirName, ext));
-                } else {
-                    String[] fs = subFiles[i].getName().split("\\.");
-                    if (fs.length > 0 && ext.contains(fs[1])) {
-                        fileList.add(dirName + "/" + subFiles[i].getName());
-                    }
-                }
-            }
-        }
-
-        return fileList;
-    }
-
-    /**
-     * 텍스트 포맷의 파일을 줄단위로 읽어 배열로 반환한다.
-     *
-     * @param filePath 파일경로
-     * @return String[]
-     * @throws IOException
-     */
-    public static String[] readFileByLine(String filePath) throws IOException {
-
-        ArrayList<Object> resultList = new ArrayList<Object>();
-        String[] result = null;
-
-        String line = "";
-        BufferedReader in = null;
-
-        try {
-            in = new BufferedReader(new FileReader(filePath));
-
-            while ((line = in.readLine()) != null) {
-                if (!line.trim().equals("")) {
-                    resultList.add(line.trim());
-                }
-            }
-
-        } catch (IOException ioe) {
-            throw ioe;
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-        }
-
-        result = new String[resultList.size()];
-        resultList.toArray(result);
-
-        return result;
-    }
-
-    /**
-     * 텍스트 포맷의 파일 마지막에 문자열을 추가한다.
-     *
-     * @param filePath 파일경로
-     * @param str      추가할 문자열
-     * @throws IOException
-     */
-    public static void addLineToFile(String filePath, String str) throws IOException {
-
-        PrintWriter pw = null;
-
-        try {
-            pw = new PrintWriter(new BufferedWriter(new FileWriter(filePath, true)));
-            pw.println(str);
-            pw.flush();
-
-        } catch (IOException ioe) {
-            throw ioe;
-        } finally {
-            if (pw != null) {
-                pw.close();
-            }
-        }
-    }
-
-    /**
-     * 파일을 새로 등록한다.
-     *
-     * @param filePath
-     * @param strList
-     * @throws IOException
-     */
-    public static void updateFile(String filePath, String[] strList) throws IOException {
-
-        PrintWriter pw = null;
-
-        try {
-            pw = new PrintWriter(new BufferedWriter(new FileWriter(filePath, false)));
-            for (int i = 0; i < strList.length; i++) {
-                pw.println(strList[i]);
-            }
-            pw.flush();
-
-        } catch (IOException ioe) {
-            throw ioe;
-        } finally {
-            if (pw != null) {
-                pw.close();
-            }
-        }
-    }
-
-    public static File rename(File file, String newName) throws Exception {
-
-        if (file == null || !file.exists()) {
-            return null;
-        }
-        if (newName == null || newName.equals("")) {
-            return file;
-        }
-
-        File newFile = new File(file.getParent() + File.separator + newName);
-        file.renameTo(newFile);
-
-        return newFile;
-    }
-
-    public static File copy(String src, String targetDir) throws Exception {
-
-        File srcFile = new File(src);
-        if (!srcFile.exists()) {
-            return null;
-        }
-
-        File tgtDir = new File(targetDir);
-        if (!tgtDir.exists()) {
-            throw new IOException(targetDir + " not exists");
-        }
-        if (!tgtDir.isDirectory()) {
-            throw new IOException(targetDir + " not dir");
-        }
-
-        File copied = null;
-        if (srcFile.isDirectory()) {
-            copied = new File(targetDir + File.separator + srcFile.getName());
-            copied.mkdirs();
-            String[] subs = srcFile.list();
-            for (int i = 0; i < subs.length; i++) {
-                copy(src + File.separator + subs[i], copied.getAbsolutePath());
-            }
-        } else {
-            copied = copyFile(srcFile, targetDir);
-        }
-
-        return copied;
-    }
-
-    public static File copyTree(String dir, String targetDir) throws Exception {
-        return copy(dir, targetDir);
-    }
-
-    public static File copyFile(File src, String targetDir) throws Exception {
-
-        if (!src.exists()) {
-            return null;
-        }
-
-        File tDir = new File(targetDir);
-        if (!tDir.exists()) {
-            tDir.mkdirs();
-        } else if (!tDir.isDirectory()) {
-            throw new IOException(targetDir + " not dir");
-        }
-
-        String fileName = src.getName();
-
-        if (fileName != null && !fileName.equals("") && targetDir != null && !targetDir.equals("")) {
-            while (existFile(fileName, targetDir)) {
-                fileName = renameFile(fileName);
-            }
-        }
-
-        File tFile = new File(targetDir + File.separator + fileName);
-
-        InputStream in = new FileInputStream(src);
-        OutputStream out = new FileOutputStream(tFile);
-
-        int read = 0;
-        byte[] buf = new byte[bufferSize];
-        while ((read = in.read(buf)) != -1) {
-            out.write(buf, 0, read);
-        }
-
-        in.close();
-        out.flush();
-        out.close();
-        fileName = "";
-
-        return tFile;
-    }
-
     public static boolean existFile(String fileName, String targetDir) throws Exception {
-
         boolean result = false;
-        File[] files = getFileListFromDir(targetDir);
-        for (int i = 0; files != null && i < files.length; i++) {
-            if (files[i].getName().equals(fileName)) {
-                result = true;
-                break;
+        File dir = new File(targetDir);
+        if (dir.exists() && dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            for (int i = 0; files != null && i < files.length; i++) {
+                if (files[i].getName().equals(fileName)) {
+                    result = true;
+                    break;
+                }
             }
         }
         return result;
     }
 
+    /**
+     * 지정된 전체 경로에 파일이 존재하는지 확인합니다.
+     * 파일의 전체 경로를 사용하여 직접적으로 파일의 존재 여부를 확인합니다.
+     *
+     * @param fileFullPath 확인할 파일의 전체 경로 (절대 경로)
+     * @return 파일이 존재하면 true, 그렇지 않으면 false. 다음의 경우 false 반환:
+     * - fileFullPath가 null인 경우
+     * - 파일이 존재하지 않는 경우
+     * - 경로가 디렉토리인 경우
+     */
     public static boolean existFile(String fileFullPath) {
         File file = new File(fileFullPath);
         return file.exists();
     }
 
+    /**
+     * 지정된 전체 경로에 디렉토리가 존재하는지 확인합니다.
+     * 주어진 경로가 실제로 존재하고 디렉토리인지 확인합니다.
+     *
+     * @param fullPath 확인할 디렉토리의 전체 경로 (절대 경로 권장)
+     * @return 디렉토리가 존재하면 true, 그렇지 않으면 false. 다음의 경우 false 반환:
+     *         - fullPath가 null인 경우
+     *         - 경로가 존재하지 않는 경우
+     *         - 경로가 파일인 경우
+     */
     public static boolean existDirectory(String fullPath) {
         File file = new File(fullPath);
         return file.isDirectory();
     }
 
+    /**
+     * 파일 이름 변경을 위한 유틸리티 메서드입니다.
+     * 파일 이름의 마지막에 숫자 "1"을 추가합니다. 확장자가 있는 경우 확장자 앞에 추가됩니다.
+     *
+     * @param fileName 변경할 파일 이름
+     * @return 변경된 파일 이름. 다음과 같이 처리됨:
+     *         - 확장자가 있는 경우: 확장자 앞에 "1" 추가 (예: "file.txt" -> "file1.txt")
+     *         - 확장자가 없는 경우: 끝에 "1" 추가 (예: "file" -> "file1")
+     *         - fileName이 null이거나 빈 문자열인 경우: 입력값 그대로 반환
+     * @throws Exception 파일 이름 처리 중 오류가 발생한 경우 예외를 던집니다.
+     */
     public static String renameFile(String fileName) throws Exception {
-
         if (fileName == null || fileName.equals("")) {
             return fileName;
         }
@@ -842,520 +149,4 @@ public class FileUtil {
 
         return fileName;
     }
-
-    public static void move(String src, String targetDir) throws Exception {
-
-        if (src == null || src.equals("") || targetDir == null || targetDir.equals("")) {
-            return;
-        }
-
-        File srcFile = new File(src);
-        if (!srcFile.exists()) {
-            return;
-        }
-
-        File targetPDir = new File(targetDir);
-        if (!targetPDir.exists()) {
-            throw new IOException("Destination dir not exists");
-        }
-
-        File targetFile = new File(targetDir + File.separator + srcFile.getName());
-        srcFile.renameTo(targetFile);
-    }
-
-    public static void moveTree(String src, String targetDir) throws Exception {
-        move(src, targetDir);
-    }
-
-    public static void makeAndMove(String src, String target) throws Exception {
-
-        if (src == null || src.equals("") || target == null || target.equals("")) {
-            return;
-        }
-
-        File srcFile = new File(src);
-        if (!srcFile.exists()) {
-            return;
-        }
-
-        File targetPDir = new File(target);
-        if (!targetPDir.exists()) {
-            targetPDir.mkdirs();
-        }
-
-        File targetFile = new File(target + File.separator + srcFile.getName());
-        srcFile.renameTo(targetFile);
-    }
-
-    public static void makeAndMoveTree(String src, String target) throws Exception {
-        makeAndMove(src, target);
-    }
-
-    public static void remove(String path) throws Exception {
-
-        File deleteFile = new File(path);
-
-        if (!deleteFile.exists()) {
-            return;
-        }
-
-        if (deleteFile.isDirectory()) {
-            String[] subs = deleteFile.list();
-            for (int i = 0; i < subs.length; i++) {
-                removeTree(path + File.separator + subs[i]);
-            }
-            if (!deleteFile.delete()) {
-                throw new IOException("Fail to remove " + path);
-            }
-        } else {
-            if (!deleteFile.delete()) {
-                throw new IOException("Fail to remove " + path);
-            }
-        }
-    }
-
-    public static void removeTree(String path) throws Exception {
-        remove(path);
-    }
-
-    public static void removeEmpty(String path) throws Exception {
-
-        File deleteFile = new File(path);
-
-        if (!deleteFile.exists()) {
-            return;
-        }
-
-        if (deleteFile.isDirectory()) {
-            String[] subs = deleteFile.list();
-            for (int i = 0; i < subs.length; i++) {
-                removeEmpty(path + File.separator + subs[i]);
-            }
-            if (deleteFile.list().length == 0 && !deleteFile.delete()) {
-                throw new IOException("Fail to remove " + path);
-            }
-        } else {
-            if (deleteFile.length() == 0 && !deleteFile.delete()) {
-                throw new IOException("Fail to remove " + path);
-            }
-        }
-    }
-
-    public static long size(String src) throws Exception {
-
-        long result = 0;
-
-        File file = new File(src);
-        if (!file.exists()) {
-            return 0;
-        }
-
-        if (file.isFile()) {
-            result = file.length();
-        } else {
-            File[] subs = file.listFiles();
-            for (int i = 0; i < subs.length; i++) {
-                if (subs[i].isFile()) {
-                    result += subs[i].length();
-                }
-            }
-        }
-
-        return result;
-    }
-
-    public static long sizeTree(String src) throws Exception {
-
-        long result = 0;
-
-        File file = new File(src);
-        if (!file.exists()) {
-            return 0;
-        }
-
-        if (file.isFile()) {
-            result = file.length();
-        } else if (file.isDirectory()) {
-            String[] subs = file.list();
-            for (int i = 0; subs != null && i < subs.length; i++) {
-                result += sizeTree(src + File.separator + subs[i]);
-            }
-        }
-
-        return result;
-    }
-
-    public static int countFile(String src) throws Exception {
-
-        int result = 0;
-
-        File file = new File(src);
-        if (!file.exists()) {
-            return 0;
-        }
-
-        if (file.isFile()) {
-            result = 1;
-        } else if (file.isDirectory()) {
-            File[] subs = file.listFiles();
-            for (int i = 0; i < subs.length; i++) {
-                if (subs[i].isFile()) {
-                    result++;
-                }
-            }
-        }
-
-        return result;
-    }
-
-    public static int countFileTree(String src) throws Exception {
-
-        int result = 0;
-
-        File file = new File(src);
-        if (!file.exists()) {
-            return 0;
-        }
-
-        if (file.isFile()) {
-            result = 1;
-        } else if (file.isDirectory()) {
-            String[] subs = file.list();
-            for (int i = 0; i < subs.length; i++) {
-                result += countFileTree(src + File.separator + subs[i]);
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * path에 해당되는 디렉터리 생성
-     *
-     * @param path
-     * @return
-     */
-    public static boolean makeDirectory(String path) {
-        boolean success = true;
-        File directory = new File(path);
-
-        if (!directory.exists()) {
-            success = directory.mkdirs();
-        }
-
-        return success;
-    }
-
-    /**
-     * 클래스패스 기준으로 절대경로를 가져온다.
-     *
-     * @return
-     */
-    public static String getClasspathRootAbsPath(String classpath) throws Exception {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        URL url = loader.getResource(classpath);
-        if (url == null || url.getFile() == null) {
-            throw new Exception(classpath + " is not exists.");
-        }
-
-        //logger.fine("classpath : " + classpath);
-        //logger.fine("url.getFile() : " + url.getFile());
-        File file = new File(url.getFile());
-        if (file == null || !file.exists()) {
-            throw new Exception(classpath + " is not exists.");
-        }
-        String path = file.getAbsolutePath();
-        return path;
-    }
-
-    /**
-     * 해당 클래스의 패키지내 클래스 목록을 가져온다
-     *
-     * @param clz 패키지명
-     * @return
-     */
-    public static List<String> getClassList(Class<?> clz) {
-        List<String> classNames = new ArrayList<String>();
-        //logger.fine("clz.getResource : " + clz.getResource(""));
-        File resourceFile = null;
-
-        try {
-            resourceFile = new File(clz.getResource("").getFile());
-        } catch (Exception e) {
-            //logger.severe(e.toString());
-            return null;
-        }
-
-        if (resourceFile.exists() && resourceFile.isDirectory()) {
-            //logger.fine("is Classes");
-            String packageName = FileUtil.class.getPackage().getName();
-            for (String fileName : resourceFile.list()) {
-                classNames.add(packageName + "." + fileName.replace(".class", ""));
-            }
-        } else {
-            //logger.fine("is Jar");
-            String path = resourceFile.getPath().substring(6).replace('\\', '/');
-            String[] info = path.split("!/");
-            JarFile jar = null;
-            try {
-                jar = new JarFile(info[0]);
-            } catch (IOException e1) {
-                //logger.severe(e1.toString());
-            }
-            Enumeration<JarEntry> entries = jar.entries();
-            while (entries.hasMoreElements()) {
-                String entryName = entries.nextElement().getName();
-                if (entryName.startsWith(info[1]) && entryName.length() > 16) {
-                    classNames.add(entryName.replace("/", ".").replace(".class", ""));
-                }
-            }
-        }
-
-        return classNames;
-    }
-
-    /**
-     * Jar파일을 순회하면서 지정한 확장자 파일들 이름을 키로 파일의 InputStream을 value로 담는다.
-     *
-     * @param classpath
-     * @param extList
-     * @return
-     */
-    public static Map<String, InputStream> getFileListInJar(String classpath, List<String> extList) {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        URL resourceUrl = classLoader.getResource(classpath);
-        String resourcePath = resourceUrl.getFile().substring(6).replace('\\', '/');
-        String[] resourceInfo = resourcePath.split("!/");
-        JarFile jarFile = null;
-        Map<String, InputStream> resultMap = new HashMap<>();
-        try {
-            jarFile = new JarFile(resourceInfo[0]);
-        } catch (IOException ioException) {
-        }
-        Enumeration<JarEntry> jarEntries = jarFile.entries();
-        while (jarEntries.hasMoreElements()) {
-            ZipEntry zipEntry = jarEntries.nextElement();
-            String entryName = zipEntry.getName();
-
-            if (entryName.startsWith(resourceInfo[1])) {
-                try {
-                    String[] fileSplit = entryName.split("\\.");
-                    if (fileSplit.length > 1 && extList.contains(fileSplit[1])) {
-                        // logger.fine(entryName);
-                        resultMap.put(entryName, jarFile.getInputStream(zipEntry));
-                    }
-
-                } catch (IOException ioException) {
-                    // Auto-generated catch block
-                    ioException.printStackTrace();
-                }
-            }
-        }
-
-        return resultMap;
-    }
-
-    public static JarFile getJarFile(String classpath) throws IOException {
-        // logger.fine("getJarFile - classpath - " + classpath);
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        URL url = loader.getResource(classpath);
-
-        // logger.fine("getJarFile - url.getFile() - " + url.getFile());
-        String path = url.getFile().replace('\\', '/').replaceFirst("^file:", "");
-
-        String[] info = path.split("!/");
-        JarFile jar = null;
-        try {
-            jar = new JarFile(info[0]);
-
-        } catch (IOException e1) {
-            // logger.severe(e1.toString());
-            throw e1;
-        }
-
-        return jar;
-    }
-
-    /**
-     * 파일 업로드.
-     */
-    public FileVO saveFile(MultipartFile uploadfile) {
-        if (uploadfile == null || uploadfile.getSize() == 0) {
-            return null;
-        }
-
-        String filePath = System.getProperty("user.dir") + "/fileupload/"; // localeMessage.getMessage("info.filePath");
-        String newName = getNewName();
-        filePath = getRealPath(filePath, newName);
-
-        saveFileOne(uploadfile, filePath, newName);
-
-        FileVO filedo = new FileVO();
-        filedo.setFilename(uploadfile.getOriginalFilename());
-        filedo.setRealname(newName);
-        filedo.setFilesize(uploadfile.getSize());
-
-        return filedo;
-    }
-
-    /**
-     * 멀티 파일 업로드.
-     */
-    public List<FileVO> saveAllFiles(List<MultipartFile> upfiles) {
-        List<FileVO> filelist = new ArrayList<FileVO>();
-        String filePath = System.getProperty("user.dir") + "/fileupload/"; // localeMessage.getMessage("info.filePath");
-
-        for (MultipartFile uploadfile : upfiles) {
-            if (uploadfile.getSize() == 0) {
-                continue;
-            }
-
-            String newName = getNewName();
-
-            saveFileOne(uploadfile, getRealPath(filePath, newName), newName);
-
-            FileVO filedo = new FileVO();
-            filedo.setFilename(uploadfile.getOriginalFilename());
-            filedo.setRealname(newName);
-            filedo.setFilesize(uploadfile.getSize());
-            filelist.add(filedo);
-        }
-        return filelist;
-    }
-
-    /**
-     * 이미지 파일 업로드 및 resize.
-     */
-    public FileVO saveImage(MultipartFile file) {
-        if (file == null || file.getName().equals("") || file.getSize() < 1) {
-            return null;
-        }
-
-        String filePath = System.getProperty("user.dir") + "/fileupload/"; // localeMessage.getMessage("info.filePath");
-        String newName = getNewName();
-        String basePath = getRealPath(filePath, newName);
-        String serverFullPath = basePath + newName;
-        String ext = getFileExtension(file.getOriginalFilename());
-        makeBasePath(basePath);
-
-        File file1 = new File(serverFullPath);
-        try {
-            file.transferTo(file1);
-            BufferedImage srcImage = ImageIO.read(file1);
-            int type = srcImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : srcImage.getType();
-            if (srcImage.getWidth() > imgWidth && srcImage.getHeight() > imgHeight) {
-                BufferedImage resizeImageJpg = resizeImage(srcImage, type);
-                ImageIO.write(resizeImageJpg, ext, new File(serverFullPath + "1"));
-                newName += "1";
-                file1.delete();
-            }
-        } catch (IOException ex) {
-            log.error("IOException:saveImage");
-        }
-
-        FileVO filedo = new FileVO();
-        filedo.setFilename(file.getOriginalFilename());
-        filedo.setRealname(newName);
-        filedo.setFilesize(file.getSize());
-
-        return filedo;
-    }
-
-    public static String getRealPath(String path, String filename) {
-        return path + filename.substring(0, 4) + "/" + filename.substring(4, 6) + "/" + filename.substring(6, 8) + "/";
-    }
-
-    public int getBufferSize() {
-        return bufferSize;
-    }
-
-    public void setBufferSize(int bufferSize) {
-        FileUtil.bufferSize = bufferSize;
-    }
-
-    /**
-     * file copy (method : stream)
-     *
-     * @param source source file
-     * @param target destination file
-     * @return true/false
-     */
-    public int streamFileCopy(String source, String target) {
-        if (source == null || target == null) {
-            return nFailer;
-        }
-        int retValue = nSuccess;
-
-        File sourceFile = new File(source);
-
-        FileInputStream inputStream = null;
-        FileOutputStream outputStream = null;
-
-        int bytesRead;
-        byte[] buffer = new byte[bufferSize];
-
-        try {
-            inputStream = new FileInputStream(sourceFile);
-            outputStream = new FileOutputStream(target);
-
-            while ((bytesRead = inputStream.read(buffer, 0, bufferSize)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-        } catch (Exception e) {
-            retValue = nException;
-        } finally {
-            try {
-                outputStream.close();
-            } catch (IOException ioe) {
-            }
-            try {
-                inputStream.close();
-            } catch (IOException ioe) {
-            }
-        }
-        return retValue;
-    }
-
-    /*
-    public static File write(String contents, String targetFile) {
-        return write(new ByteArrayInputStream(contents.getBytes()), targetFile);
-    }
-
-    public static File write(InputStream in, String targetFile) {
-        OutputStream out = null;
-        File tFile = null;
-        try {
-            tFile = new File(targetFile);
-            out = new FileOutputStream(tFile);
-            int read = 0;
-            byte[] buf = new byte[BUFFER_SIZE];
-            while ((read = in.read(buf)) != -1)
-                out.write(buf, 0, read);
-        } catch (FileNotFoundException e) {
-            throw new MsgException("파일을 찾을 수 없습니다.", e);
-        } catch (IOException e) {
-            throw new MsgException("파일을 쓰는 중에 오류가 발생하였습니다.", e);
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    throw new MsgException("파일을 쓰는 중에 오류가 발생하였습니다.", e);
-                }
-            }
-            if (out != null) {
-                try {
-                    out.flush();
-                    out.close();
-                } catch (IOException e) {
-                    throw new MsgException("파일을 쓰는 중에 오류가 발생하였습니다.", e);
-                }
-            }
-        }
-
-        return tFile;
-    }
- */
 }
