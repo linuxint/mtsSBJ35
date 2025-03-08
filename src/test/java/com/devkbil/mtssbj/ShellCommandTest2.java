@@ -10,13 +10,10 @@ public class ShellCommandTest2 {
         boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
         String[] linuxCmd = new String[] {"sh", "-c", "ifconfig"};
         String[] windowCmd = new String[] {"cmd.exe", "/c", "gradlew dependencies --configuration compileClasspath"};
-        String os = "Mac";
         String output = "";
-        String line = null;
+        String line;
         try {
             ProcessBuilder builder = new ProcessBuilder();
-            // builder.redirectInput(ProcessBuilder.Redirect.INHERIT);
-            // builder.redirectOutput(ProcessBuilder.Redirect.PIPE);
             if (isWindows) {
                 builder.command(windowCmd);
             } else {
