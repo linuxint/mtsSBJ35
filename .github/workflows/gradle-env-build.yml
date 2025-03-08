@@ -97,9 +97,9 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION || 'ap-northeast-2' }}
+          audience: sts.amazonaws.com
 
       # 4. Install AWS CLI
       - name: Install AWS CLI
@@ -120,7 +120,7 @@ jobs:
           docker build -t ${{ secrets.ECR_REPOSITORY }}:latest . || exit 1
 
           echo "Logging into AWS ECR..."
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }} || exit 1
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION || 'ap-northeast-2' }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }} || exit 1
 
           echo "Pushing image to ECR..."
           docker push ${{ secrets.ECR_REPOSITORY }}:latest || exit 1
