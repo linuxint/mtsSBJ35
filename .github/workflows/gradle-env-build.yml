@@ -98,17 +98,18 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          aws-region: ${{ secrets.AWS_REGION || 'ap-northeast-2' }}
-          audience: sts.amazonaws.com
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      # 4. Install AWS CLI
+      # 5. Install AWS CLI
       - name: Install AWS CLI
         run: |
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
           sudo ./aws/install
 
-      # 5. Deploy to Production
+      # 6. Deploy to Production
       - name: Deploy to Prod Environment
         env:
           SPRING_PROFILES_ACTIVE: prod
@@ -120,7 +121,7 @@ jobs:
           docker build -t ${{ secrets.ECR_REPOSITORY }}:latest . || exit 1
 
           echo "Logging into AWS ECR..."
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION || 'ap-northeast-2' }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }} || exit 1
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }} || exit 1
 
           echo "Pushing image to ECR..."
           docker push ${{ secrets.ECR_REPOSITORY }}:latest || exit 1
