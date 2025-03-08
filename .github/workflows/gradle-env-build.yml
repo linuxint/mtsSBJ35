@@ -113,24 +113,15 @@ jobs:
       - name: Deploy to Prod Environment
         env:
           SPRING_PROFILES_ACTIVE: prod
-        run: |
-          echo "Starting deployment to Production..."
-          ./gradlew clean build --no-daemon -Dspring.profiles.active=prod || exit 1
-
-          echo "Building Docker image..."
-          docker build -t ${{ secrets.ECR_REPOSITORY }}:latest . || exit 1
-
-          echo "Logging into AWS ECR..."
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }} || exit 1
-#          aws ecr get-login-password --region ${{ secrets.AWS_REGION || 'ap-northeast-2' }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }} || exit 1
-
-          echo "Pushing image to ECR..."
-          docker push ${{ secrets.ECR_REPOSITORY }}:latest || exit 1
-
-          echo "Updating ECS service..."
-          aws ecs update-service \
-            --cluster ${{ secrets.ECS_CLUSTER }} \
-            --service ${{ secrets.ECS_SERVICE }} \
-            --force-new-deployment || exit 1
-
+        run: >-
+          echo "Starting deployment to Production..." &&
+          ./gradlew clean build --no-daemon -Dspring.profiles.active=prod &&
+          echo "Building Docker image..." &&
+          docker build -t ${{ secrets.ECR_REPOSITORY }}:latest . &&
+          echo "Logging into AWS ECR..." &&
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }} &&
+          echo "Pushing image to ECR..." &&
+          docker push ${{ secrets.ECR_REPOSITORY }}:latest &&
+          echo "Updating ECS service..." &&
+          aws ecs update-service --cluster ${{ secrets.ECS_CLUSTER }} --service ${{ secrets.ECS_SERVICE }} --force-new-deployment &&
           echo "Deployment completed successfully"
