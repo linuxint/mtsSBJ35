@@ -19,6 +19,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -87,19 +90,21 @@ public class SpringSecurityConfig {
         );
         // JWT 필터 추가: 필요한 경우 주석을 해제하고 실제 구현체를 추가하세요.
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-        http.csrf(csrfConfigurer -> csrfConfigurer.disable());
-        http.cors(corsConfigurer -> corsConfigurer.disable());
+        http.csrf(CsrfConfigurer::disable);
+        http.cors(CorsConfigurer::disable);
         http.headers(headerConfig -> headerConfig
                 // iframe 참조 허용
-                .frameOptions(frameOptionsConfig -> frameOptionsConfig.disable())
+                .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
         );
         http.authorizeHttpRequests(authorize -> authorize
                 .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                 .requestMatchers(ConfigConstant.allAllowList).permitAll()
                 .anyRequest().authenticated()
         );
-        http.exceptionHandling((exceptionConfig) ->
-                exceptionConfig.authenticationEntryPoint(unauthorizedEntryPoint).accessDeniedHandler(accessDeniedHandler)
+        http.exceptionHandling(
+            exceptionConfig -> exceptionConfig
+            .authenticationEntryPoint(unauthorizedEntryPoint)
+            .accessDeniedHandler(accessDeniedHandler)
         );
         http.formLogin(login -> login
             .loginPage(URL_LOGIN)
@@ -108,7 +113,7 @@ public class SpringSecurityConfig {
                 .passwordParameter(ConfigConstant.PARAMETER_LOGIN_PWD)
                 .successHandler(new MyAuthenticationSuccessHandler(memberService))
                 //.defaultSuccessUrl("/memberLoginChk", true)
-                //.failureHandler(userLoginFailHandler)
+                .failureHandler(userLoginFailHandler)
                 //.failureUrl("/memberLoginError")
                 .permitAll()
         );
