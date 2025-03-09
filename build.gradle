@@ -442,7 +442,7 @@ spotless {
         target fileTree('src/main/java') { // 검사 대상 명확히 지정
             include '**/*.java' // `.java` 파일만 검사 대상
         }
-        targetExclude '**/build/generated-sbom/**/*.java' // SBOM 경로를 명확히 제외
+        targetExclude '**/build/cyclonedx/sbom/**/*.java' // SBOM 경로를 명확히 제외
 
         // Import Management
         importOrder(
@@ -508,6 +508,7 @@ tasks.register('jvmCyclonedxBom', CycloneDxTask) {
 tasks.register('appCyclonedxBom', CycloneDxTask) {
     group = 'reporting'
     description = 'Generates an SBOM for the application runtime dependencies'
+    dependsOn 'jvmCyclonedxBom' // Ensure jvm-sbom.json is generated first
     skipConfigs.set(configurations.names - 'runtimeClasspath')
     outputName.set("application-sbom")
     destination.set(file("$buildDir/cyclonedx/sbom"))
@@ -518,11 +519,13 @@ tasks.register('appCyclonedxBom', CycloneDxTask) {
 tasks.register('copySbomToResources') {
     dependsOn 'jvmCyclonedxBom', 'appCyclonedxBom'
     doLast {
+        println "SBOM 복사 시작: $buildDir//cyclonedx/sbom/"
         copy {
-            from "$buildDir/generated-sbom" // CycloneDX가 생성한 빌드 출력 파일
+            from "$buildDir/cyclonedx/sbom/" // CycloneDX가 생성한 빌드 출력 파일
             include '*.json'
             into "$projectDir/src/main/resources/" // 리소스 디렉토리 복사
         }
+        println "SBOM 복사 완료: $projectDir/src/main/resources/"
     }
 }
 
@@ -537,7 +540,7 @@ tasks.register('cleanSbomPaths') {
 
 // Gradle 빌드 과정에서 적용
 tasks.named('processResources') {
-    exclude '**/generated-sbom/**' // SBOM 파일 처리 배제
+    exclude '**/cyclonedx/sbom/**' // SBOM 파일 처리 배제
     dependsOn 'copySbomToResources'
     finalizedBy 'cleanSbomPaths' // 리소스 처리 후 불필요 파일 삭제
 }
