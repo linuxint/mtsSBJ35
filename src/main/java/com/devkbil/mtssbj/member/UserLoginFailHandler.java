@@ -1,7 +1,5 @@
 package com.devkbil.mtssbj.member;
 
-import com.devkbil.mtssbj.common.LocaleMessage;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,7 +34,6 @@ import lombok.RequiredArgsConstructor;
 public class UserLoginFailHandler extends SimpleUrlAuthenticationFailureHandler {
 
     private final MessageSource messageSource;
-    private final LocaleMessage localeMessage;
 
     /**
      * 로그인 실패 시 호출되는 메서드.
