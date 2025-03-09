@@ -26,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @SpringBootApplication
 @CrossOrigin(origins = "${app.cors.allowed-origins}") // 'Access-Control-Allow-Origin' header 추가
-// Spring Data JPA Repository 스캔 범위 지정
 @Slf4j
 @EnableCaching
 public class MtssbjApplication implements CommandLineRunner {
