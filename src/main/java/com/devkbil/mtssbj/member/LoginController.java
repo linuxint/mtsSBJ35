@@ -23,6 +23,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Objects;
@@ -98,7 +99,7 @@ public class LoginController {
      * @return 로그인 페이지(html 파일 이름)
      */
     @Operation(summary = "로그인 페이지", description = "회원 로그인 페이지를 렌더링합니다.")
-    @GetMapping("memberLogin")
+    @RequestMapping("memberLogin")
     public String memberLogin(@RequestParam(value = "error", required = false) String error,
                               @RequestParam(value = "exception", required = false) String exception,
                               HttpServletRequest request,
