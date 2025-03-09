@@ -1,5 +1,10 @@
 package com.devkbil.mtssbj.common.util;
 
+import com.devkbil.mtssbj.config.GitConfig;
+
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.RefNotFoundException;
+import org.springframework.stereotype.Component;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.PushCommand;
@@ -9,24 +14,29 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * JGit을 사용하여 Git 작업을 수행하는 유틸리티 클래스.
  * Git 저장소를 초기화, 관리 및 프로그래밍 방식으로 상호 작용하는 데 필요한 메서드를 제공합니다.
  * 각 메서드는 초기화, 커밋, 푸시, 풀 등 특정 Git 작업을 캡슐화합니다.
  */
+@Component
 public class JgitUtil {
 
-    private static final String userId = "";
-    private static final String userPass = "";
-    private static final String userName = "";
-    private static final String userEmail = "";
-    private static final String hash = "origin/master";
-    private static final String url = "https://github.com/xxx.git";
-    private static final CredentialsProvider cp = new UsernamePasswordCredentialsProvider(userId, userPass);
+    private final GitConfig gitConfig;
+    private final String defaultBranch = "main";
+    private final CredentialsProvider cp;
+
+    public JgitUtil(GitConfig gitConfig) {
+        this.gitConfig = gitConfig;
+        this.cp = new UsernamePasswordCredentialsProvider(gitConfig.getGithub().getToken(), "");
+    }
 
     /**
      * 지정된 디렉토리에 새로운 Git 저장소를 초기화합니다.
@@ -35,7 +45,7 @@ public class JgitUtil {
      * @return 초기화된 Git 객체
      * @throws Exception Git 저장소 초기화 중 오류가 발생한 경우
      */
-    public static Git init(File dir) throws Exception {
+    public Git init(File dir) throws Exception {
         return Git.init().setDirectory(dir).call();
     }
 
@@ -47,11 +57,11 @@ public class JgitUtil {
      * @param git 원격 저장소가 추가될 Git 인스턴스
      * @throws Exception 원격 저장소 추가 중 오류가 발생한 경우
      */
-    public static void remoteAdd(Git git) throws Exception {
+    public void remoteAdd(Git git) throws Exception {
         // 원격 저장소 추가:
         RemoteAddCommand remoteAddCommand = git.remoteAdd();
         remoteAddCommand.setName("origin");
-        remoteAddCommand.setUri(new URIish(url));
+        remoteAddCommand.setUri(new URIish(gitConfig.getGithub().getRepositoryUrl()));
         // 필요에 따라 설정 추가 가능
         remoteAddCommand.call();
     }
@@ -64,7 +74,7 @@ public class JgitUtil {
      * @param git 푸시 작업을 실행할 때 사용할 Git 인스턴스
      * @throws Exception 푸시 과정에서 오류가 발생한 경우
      */
-    public static void push(Git git) throws Exception {
+    public void push(Git git) throws Exception {
         // 원격으로 푸시:
         PushCommand pushCommand = git.push();
         pushCommand.setCredentialsProvider(cp);
@@ -80,7 +90,7 @@ public class JgitUtil {
      * @param filePattern 스테이징 영역에 추가할 파일 이름 또는 패턴
      * @throws Exception 파일을 스테이징 영역에 추가하는 동안 오류가 발생한 경우
      */
-    public static void add(Git git, String filePattern) throws Exception {
+    public void add(Git git, String filePattern) throws Exception {
         git.add().addFilepattern(filePattern).call();
     }
 
@@ -91,7 +101,7 @@ public class JgitUtil {
      * @param filePattern 저장소에서 제거할 파일 이름 또는 패턴
      * @throws Exception 파일 제거 중 오류가 발생한 경우
      */
-    public static void rm(Git git, String filePattern) throws Exception {
+    public void rm(Git git, String filePattern) throws Exception {
         git.rm().addFilepattern(filePattern).call();
     }
 
@@ -103,10 +113,10 @@ public class JgitUtil {
      * @param msg 커밋에 연결할 커밋 메시지
      * @throws Exception 커밋 과정에서 오류가 발생한 경우
      */
-    public static void commit(Git git, String msg) throws Exception {
+    public void commit(Git git, String msg) throws Exception {
         // 메시지를 포함하여 커밋 수행
         git.commit()//
-            .setAuthor(userName, userEmail)//
+            .setAuthor(gitConfig.getGit().getUsername(), gitConfig.getGit().getEmail())//
             .setMessage(msg)//
             .call();
     }
@@ -118,8 +128,9 @@ public class JgitUtil {
      * @param git 풀 작업이 수행될 저장소를 나타내는 Git 인스턴스
      * @throws Exception 풀 과정에서 오류가 발생한 경우
      */
-    public static void pull(Git git) throws Exception {
+    public void pull(Git git) throws Exception {
         PullCommand pull = git.pull();
+        pull.setCredentialsProvider(cp);
         pull.call();
     }
 
@@ -131,7 +142,7 @@ public class JgitUtil {
      * @param git 원격 참조를 나열할 로컬 저장소를 나타내는 Git 인스턴스
      * @throws Exception ls-remote 작업 도중 오류가 발생한 경우
      */
-    public static void lsRemote(Git git) throws Exception {
+    public void lsRemote(Git git) throws Exception {
         Collection<Ref> remoteRefs = git.lsRemote()
             .setCredentialsProvider(cp)
             .setRemote("origin")
@@ -151,17 +162,83 @@ public class JgitUtil {
      * @param dir 저장소가 복제되고 체크아웃될 디렉토리
      * @throws Exception 클론 또는 체크아웃 과정에서 오류가 발생한 경우
      */
-    public static void checkOut(File dir) throws Exception {
-        Git gitRepo = Git.cloneRepository().setURI(url) // 원격 주소
-            .setDirectory(dir) // 로컬 저장 위치
-            .setNoCheckout(true)//
-            .setCredentialsProvider(cp) // 인증 정보
-            .call();
-        gitRepo.checkout().setStartPoint(hash) // origin/브랜치_이름
-            // .addPath("다운받을_대상_경로") // 다운받을 경로 설정
-            .call();
+    public void checkOut(File dir) throws Exception {
+        Git gitRepo = null;
+        try {
+            // Clone repository without performing an initial checkout
+            gitRepo = Git.cloneRepository()
+                .setURI(gitConfig.getGithub().getRepositoryUrl()) // Remote repository URL
+                .setDirectory(dir) // Local directory
+                .setNoCheckout(true) // Do not checkout files yet
+                .setCredentialsProvider(cp) // Credentials provider
+                .call();
 
-        gitRepo.getRepository().close();
+            // Check if the branch exists locally
+            boolean branchExistsLocally = branchExistsLocally(gitRepo, defaultBranch);
+
+            if (branchExistsLocally) {
+                // Branch exists locally, just check it out without creating it
+                gitRepo.checkout().setName(defaultBranch).call();
+            } else {
+                // Branch does not exist locally, check if it exists remotely
+                boolean branchExistsRemotely = branchExistsRemotely(gitRepo, "origin/" + defaultBranch);
+
+                if (branchExistsRemotely) {
+                    // If the branch exists remotely, create it locally and set its start point
+                    gitRepo.checkout()
+                        .setCreateBranch(true)
+                        .setName(defaultBranch)
+                        .setStartPoint("origin/" + defaultBranch)
+                        .call();
+                } else {
+                    throw new RefNotFoundException("Branch '" + defaultBranch + "' not found locally or in the remote repository.");
+                }
+            }
+
+        } catch (GitAPIException e) {
+            throw new Exception("Error during checkout: " + e.getMessage(), e);
+        } finally {
+            if (gitRepo != null) {
+                gitRepo.getRepository().close();
+            }
+        }
+    }
+
+    /**
+     * Check if a branch exists locally.
+     *
+     * @param git the Git instance
+     * @param branchName the name of the branch to check (e.g., "main")
+     * @return true if the branch exists locally, false otherwise
+     * @throws GitAPIException if an error occurs while listing branches
+     */
+    private boolean branchExistsLocally(Git git, String branchName) throws GitAPIException {
+        List<Ref> localBranches = git.branchList().call();
+        for (Ref branch : localBranches) {
+            if (branch.getName().equals("refs/heads/" + branchName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Check if a branch exists remotely.
+     *
+     * @param git the Git instance
+     * @param remoteBranchName the name of the remote branch to check (e.g., "origin/main")
+     * @return true if the remote branch exists, false otherwise
+     * @throws GitAPIException if an error occurs while listing remote branches
+     */
+    private boolean branchExistsRemotely(Git git, String remoteBranchName) throws GitAPIException {
+        List<Ref> remoteBranches = new ArrayList<>(git.lsRemote().setHeads(true).call()); // List heads only (not tags)
+        for (Ref branch : remoteBranches) {
+            if (branch.getName().equals("refs/remotes/" + remoteBranchName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -172,12 +249,12 @@ public class JgitUtil {
      * @return 열리거나 새로 초기화된 Git 저장소를 나타내는 Git 인스턴스
      * @throws Exception Git 저장소를 열거나 초기화하는 도중 오류가 발생한 경우
      */
-    public static Git open(File dir) throws Exception {
+    public Git open(File dir) throws Exception {
         Git git;
         try {
             git = Git.open(dir);
         } catch (RepositoryNotFoundException e) {
-            git = JgitUtil.init(dir);
+            git = init(dir);
         }
         return git;
     }
