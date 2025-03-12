@@ -228,7 +228,7 @@ dependencies {
     implementation 'io.micrometer:micrometer-jakarta9'
     implementation 'io.micrometer:micrometer-observation'
     implementation 'io.micrometer:micrometer-commons'
-    implementation 'io.micrometer:micrometer-tracing:1.5.0-M2'
+    implementation 'io.micrometer:micrometer-tracing:1.5.0-M3'
 
     // Database Monitoring
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.10.0'
@@ -237,7 +237,7 @@ dependencies {
     implementation 'net.ttddyy:datasource-proxy:1.10.1'
 
     // Application Monitoring
-    implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.4'
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.5'
 
     // Distributed Tracing
     implementation 'org.springframework.cloud:spring-cloud-starter-sleuth:3.1.11'
@@ -263,7 +263,7 @@ dependencies {
     // Office Documents
     implementation 'org.apache.poi:poi-ooxml:5.4.0'
     implementation 'org.jxls:jxls-poi:3.0.0'
-    implementation 'net.sf.mpxj:mpxj:13.10.0'
+    implementation 'net.sf.mpxj:mpxj:13.11.0'
     implementation 'net.freeutils:jtnef:2.1.0'
 
     // PDF Processing
@@ -277,7 +277,7 @@ dependencies {
 
     // Other Formats
     implementation 'com.google.zxing:javase:3.5.3'
-    implementation 'org.mnode.ical4j:ical4j:4.1.0'
+    implementation 'org.mnode.ical4j:ical4j:4.1.1'
     implementation 'com.ibm.icu:icu4j:76.1'
 
     // ======================
@@ -341,8 +341,8 @@ dependencies {
     // ======================
     // JOOQ
     implementation 'org.springframework.boot:spring-boot-starter-jooq'
-    implementation 'org.jooq:jooq:3.20.1'
-    implementation 'org.jooq:jooq-codegen:3.20.1'
+    implementation 'org.jooq:jooq:3.20.2'
+    implementation 'org.jooq:jooq-codegen:3.20.2'
     // jood.sql-dialect: ORACLE // application.properties || application.yml
     // 세선 DB
 
