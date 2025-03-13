@@ -12,7 +12,7 @@ import lombok.Setter;
 
 /**
  * 검색 관련 데이터를 캡슐화하는 VO (Value Object) 클래스입니다.
- *
+ * <p>
  * 이 클래스는 페이징 기능을 포함한 검색 조건 필드와 그에 대한 추가 정보를 관리합니다.
  */
 @Schema(description = "검색 정보 모델 : SearchVO") // OpenAPI 문서 설명 추가
@@ -43,6 +43,6 @@ public class SearchVO extends PagingVO {
      * @return 검색 필드 값을 배열로 변환한 결과
      */
     public String[] getSearchTypeArr() {
-        return searchType.split(","); // "," 구분자로 문자열을 배열로 변환
+        return searchType != null ? searchType.split(",") : new String[]{}; // "," 구분자로 문자열을 배열로 변환 (null 안전 처리)
     }
 }
