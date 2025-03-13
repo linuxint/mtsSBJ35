@@ -8,16 +8,13 @@ import co.elastic.clients.elasticsearch._types.query_dsl.NestedQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 
 import com.devkbil.mtssbj.common.util.DateUtil;
-import com.devkbil.mtssbj.common.util.JsonUtil;
 import com.devkbil.mtssbj.config.EsConfig;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
@@ -25,12 +22,15 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,11 +60,8 @@ public class SearchController {
     @Value("${elasticsearch.clustername}")
     private String indexName = ""; // Elasticsearch 색인 이름
 
-    @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
-
-    @Autowired
-    private EsConfig esConfig;
+    private final ElasticsearchOperations elasticsearchOperations;
+    private final EsConfig esConfig;
 
     /**
      * 검색 페이지를 반환합니다.
@@ -84,24 +81,24 @@ public class SearchController {
     /**
      * Ajax 요청을 통해 검색 작업을 수행하고 결과를 반환합니다.
      *
-     * @param response HttpServletResponse 객체 (검색 결과 반환용).
      * @param searchVO 검색 조건을 담은 객체.
+     * @return ResponseEntity 검색 결과를 담은 ResponseEntity 객체
      */
     @GetMapping("/search4Ajax")
+    @ResponseBody
     @Operation(summary = "Ajax 기반 검색", description = "Elasticsearch를 통해 검색을 수행하고 JSON 형식으로 결과를 반환합니다.")
-    public void search4Ajax(HttpServletResponse response, @ModelAttribute @Valid FullTextSearchVO searchVO) {
+    public ResponseEntity<Map<String, Object>> search4Ajax(@ModelAttribute @Valid FullTextSearchVO searchVO) {
+        // Elasticsearch 실행 여부 확인
+        if (!esConfig.isElasticsearchRunning()) {
+            log.info("Elasticsearch 서버가 실행되지 않아 검색 작업을 중단합니다.");
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
+
+        if ("".equals(searchVO.getSearchKeyword()) && !"".equals(indexName)) {
+            return ResponseEntity.ok(Map.of());
+        }
+
         try {
-            // Elasticsearch 실행 여부 확인
-            if (!esConfig.isElasticsearchRunning()) {
-                log.info("Elasticsearch 서버가 실행되지 않아 검색 작업을 중단합니다.");
-                response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE); // 503 상태 반환
-                return;
-            }
-
-            if ("".equals(searchVO.getSearchKeyword()) && !"".equals(indexName)) {
-                return;
-            }
-
             // 검색 범위 설정
             String[] searchRange = searchVO.getSearchRange().split(",");
 
@@ -161,8 +158,9 @@ public class SearchController {
                 Map<String, Object> source = new HashMap<>(hit.getContent());
                 String[] keywords = searchVO.getSearchKeyword().split(" ");
                 for (String keyword : keywords) {
-                    if (keyword.trim().isEmpty())
+                    if (!StringUtils.hasText(keyword)) {
                         continue;
+                    }
 
                     // 제목 하이라이팅
                     if (source.containsKey("brdtitle") && source.get("brdtitle") != null) {
@@ -189,11 +187,11 @@ public class SearchController {
             hitsInfo.put("hits", hitsList);
             result.put("hits", hitsInfo);
 
-            // 검색 결과를 JSON으로 반환
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().print(JsonUtil.toJson(result));
-        } catch (IOException e) {
+            // 검색 결과를 ResponseEntity로 반환
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
             log.error("Elasticsearch 검색 작업 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -290,24 +288,4 @@ public class SearchController {
         return boolQuery.build()._toQuery();
     }
 
-    // ---------------------------------------------------------------------------
-    /*
-    // 공통 환경으로 변경
-    public RestHighLevelClient createConnection() {
-        final CredentialsProvider credentialProvider = new BasicCredentialsProvider();
-        credentialProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "manager"));
-
-        return new RestHighLevelClient(
-                RestClient.builder(
-                        new HttpHost("localhost", 9200, "http")
-                ).setHttpClientConfigCallback(
-                        httpAsyncClientBuilder -> {
-                            HttpAsyncClientBuilder httpAsyncClientBuilder1 = httpAsyncClientBuilder.setDefaultCredentialsProvider(credentialProvider);
-                            return httpAsyncClientBuilder1;
-                        }
-                )
-        );
-    }
-     */
-    // ---------------------------------------------------------------------------
 }

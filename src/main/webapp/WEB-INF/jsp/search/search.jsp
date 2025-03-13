@@ -28,6 +28,13 @@
         }
     </style>
     <script>
+        // HTML 엔티티를 디코딩하는 함수
+        function decodeHtmlEntities(text) {
+            var textArea = document.createElement('textarea');
+            textArea.innerHTML = text;
+            return textArea.value;
+        }
+
         window.onload = function () {
             $('#searchTerm1').datepicker().on('changeDate', function (ev) {
                 if (ev.viewMode == "days") {
@@ -99,11 +106,16 @@
                 var brdmemo = row.highlight && row.highlight.brdmemo ? row.highlight.brdmemo[0] : row._source.brdmemo;
 
                 var childNode = $('<div  class="panel panel-default"/>');
+                // HTML 엔티티 디코딩
+                var decodedTitle = decodeHtmlEntities(brdtitle);
+                var decodedMemo = decodeHtmlEntities(brdmemo);
+                var decodedWriter = decodeHtmlEntities(brdwriter);
+
                 var html = '<div class="panel-body">' +
-                    '        <div class="col-lg-12 title"><a href="boardRead?brdno=' + row._source.brdno + '" target="_blank">' + brdtitle + '</a></div>' +
-                    '        <div class="col-lg-12 row">...' + brdmemo.substring(0, 200) + '...</div>' +
+                    '        <div class="col-lg-12 title"><a href="boardRead?brdno=' + row._source.brdno + '" target="_blank">' + decodedTitle + '</a></div>' +
+                    '        <div class="col-lg-12 row">...' + decodedMemo.substring(0, 200) + '...</div>' +
                     '        <div class="col-lg-12 row">' +
-                    '            <div class="pull-left">등록자: ' + brdwriter + '</div>' +
+                    '            <div class="pull-left">등록자: ' + decodedWriter + '</div>' +
                     '             <div class="pull-left field1">등록일: ' + row._source.regdate + ' ' + row._source.regtime + '</div>' +
                     '             <div class="pull-left field1">조회수: ' + row._source.brdhit + '</div>' +
                     '        </div>' +

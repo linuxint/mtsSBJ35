@@ -22,7 +22,6 @@ import org.apache.tika.parser.ocr.TesseractOCRConfig;
 import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -33,6 +32,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,20 +65,13 @@ import lombok.RequiredArgsConstructor;
 @EnableScheduling
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "IndexingController", description = "Elasticsearch 색인 작업을 관리하는 컨트롤러")
 public class IndexingController {
 
-    // final LocaleMessage localeMessage;
     private final BoardService boardService;
-
-    @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
-
-    // @Autowired
-    // private ElasticsearchClient elasticsearchClient;
-
-    @Autowired
-    private EsConfig esConfig;
+    private final ElasticsearchOperations elasticsearchOperations;
+    private final EsConfig esConfig;
 
     @Value("${batch.indexing.host}")
     private String indexingHost;
@@ -120,7 +115,7 @@ public class IndexingController {
     public void indexingFile() throws IOException {
         // Elasticsearch 실행 여부 확인
         if (!esConfig.isElasticsearchRunning()) {
-            logBatch.info("Elasticsearch 서버가 실행되고 있지 않아 색인 작업을 중단합니다.");
+            log.info("Elasticsearch 서버가 실행되고 있지 않아 색인 작업을 중단합니다.");
             return;
         }
 
@@ -170,7 +165,7 @@ public class IndexingController {
 
                     elasticsearchOperations.index(indexQuery, IndexCoordinates.of(indexName));
                 } catch (Exception e) {
-                    logBatch.error("Update error: " + e.getMessage());
+                    log.error("Update error: " + e.getMessage());
                 }
             }
 
@@ -178,7 +173,7 @@ public class IndexingController {
                 // 마지막 색인 이후의 댓글/ 첨부파일 중에서 게시글이 색인 된 것만 색인 해야 함. SQL문에서 field1참조  => logtash를 쓰지 않고 개발한 이유
                 writeLastValue("brd_update", brdnoUpdate);
             }
-            logBatch.info("board indexed update : " + boardlist.size());
+            log.info("board indexed update : " + boardlist.size());
         }
 
         // ---------------------------- 게시판 신규글 --------------------------------
@@ -208,7 +203,7 @@ public class IndexingController {
 
                 elasticsearchOperations.index(indexQuery, IndexCoordinates.of(indexName));
             } catch (Exception e) {
-                logBatch.error("Indexing error: " + e.getMessage());
+                log.error("Indexing error: " + e.getMessage());
             }
         }
 
@@ -216,7 +211,7 @@ public class IndexingController {
             writeLastValue("brd", brdno);
         }
 
-        logBatch.info("board indexed : " + boardlist.size());
+        log.info("board indexed : " + boardlist.size());
 
         // ---------------------------- 댓글 --------------------------------
         ExtFieldVO lastVO = new ExtFieldVO(); // 게시판, 댓글, 파일의 마지막 색인 값
@@ -259,7 +254,7 @@ public class IndexingController {
                     elasticsearchOperations.index(indexQuery, IndexCoordinates.of(indexName));
                 }
             } catch (Exception e) {
-                logBatch.error("Reply update error: " + e.getMessage());
+                log.error("Reply update error: " + e.getMessage());
             }
         }
 

@@ -29,16 +29,16 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 @ComponentScan(basePackages = {"com.devkbil"})
 public class EsConfig extends ElasticsearchConfiguration {
 
-    @Value("${elasticsearch.host}")
-    String elasticHost = "localhost";
-    @Value("${elasticsearch.port}")
-    int elasticPort = 9200;
-    @Value("${elasticsearch.scheme}")
-    String elasticScheme = "http";
-    @Value("${elasticsearch.credentials.id}")
-    String elasticCredentialsId = "elastic";
-    @Value("${elasticsearch.credentials.passwd}")
-    String elasticCredentialsPasswd = "manager";
+    @Value("${elasticsearch.host:localhost}")
+    private String elasticHost;
+    @Value("${elasticsearch.port:9200}")
+    private int elasticPort;
+    @Value("${elasticsearch.scheme:http}")
+    private String elasticScheme;
+    @Value("${elasticsearch.credentials.id:elastic}")
+    private String elasticCredentialsId;
+    @Value("${elasticsearch.credentials.passwd:manager}")
+    private String elasticCredentialsPasswd;
 
     /**
      * Spring Data Elasticsearch 클라이언트 설정을 구성합니다.
@@ -49,7 +49,7 @@ public class EsConfig extends ElasticsearchConfiguration {
     @Override
     public ClientConfiguration clientConfiguration() {
         return ClientConfiguration.builder()
-            .connectedTo(elasticHost + ":" + elasticPort)
+            .connectedTo(String.format("%s:%d", elasticHost, elasticPort))
             .withBasicAuth(elasticCredentialsId, elasticCredentialsPasswd)
             .build();
     }
@@ -61,17 +61,17 @@ public class EsConfig extends ElasticsearchConfiguration {
      */
     @Bean
     public ElasticsearchClient elasticsearchClient() {
-        final CredentialsProvider credentialProvider = new BasicCredentialsProvider();
+        final var credentialProvider = new BasicCredentialsProvider();
         credentialProvider.setCredentials(AuthScope.ANY,
             new UsernamePasswordCredentials(elasticCredentialsId, elasticCredentialsPasswd));
 
-        RestClient restClient = RestClient.builder(
+        var restClient = RestClient.builder(
                 new HttpHost(elasticHost, elasticPort, elasticScheme))
             .setHttpClientConfigCallback(httpClientBuilder ->
                 httpClientBuilder.setDefaultCredentialsProvider(credentialProvider))
             .build();
 
-        ElasticsearchTransport transport = new RestClientTransport(
+        var transport = new RestClientTransport(
             restClient, new JacksonJsonpMapper());
 
         return new ElasticsearchClient(transport);
