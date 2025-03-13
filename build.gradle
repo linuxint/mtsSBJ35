@@ -208,9 +208,6 @@ dependencies {
     // ======================
     // Elasticsearch Core
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
-    implementation 'co.elastic.clients:elasticsearch-java:9.0.0-beta1'
-    implementation 'org.elasticsearch.client:elasticsearch-rest-client:9.0.0-beta1'
-    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.28'
 
     // HTTP Client for Elasticsearch
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.5-alpha1'

@@ -4,7 +4,6 @@ import com.devkbil.mtssbj.board.BoardReplyVO;
 import com.devkbil.mtssbj.board.BoardService;
 import com.devkbil.mtssbj.board.BoardVO;
 import com.devkbil.mtssbj.common.ExtFieldVO;
-import com.devkbil.mtssbj.common.LocaleMessage;
 import com.devkbil.mtssbj.common.util.FileOperation;
 import com.devkbil.mtssbj.common.util.FileUtil;
 import com.devkbil.mtssbj.common.util.FileVO;
@@ -21,17 +20,15 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.ocr.TesseractOCRConfig;
 import org.apache.tika.sax.BodyContentHandler;
-import org.elasticsearch.ElasticsearchStatusException;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.script.Script;
-import org.elasticsearch.script.ScriptType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.IndexQuery;
+import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -42,15 +39,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.RequiredArgsConstructor;
-
-import static org.elasticsearch.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * Elasticsearch 색인을 관리하는 컨트롤러 클래스입니다.
@@ -71,8 +66,17 @@ import static org.elasticsearch.xcontent.XContentFactory.jsonBuilder;
 @Tag(name = "IndexingController", description = "Elasticsearch 색인 작업을 관리하는 컨트롤러")
 public class IndexingController {
 
-    final LocaleMessage localeMessage;
+    // final LocaleMessage localeMessage;
     private final BoardService boardService;
+
+    @Autowired
+    private ElasticsearchOperations elasticsearchOperations;
+
+    // @Autowired
+    // private ElasticsearchClient elasticsearchClient;
+
+    @Autowired
+    private EsConfig esConfig;
 
     @Value("${batch.indexing.host}")
     private String indexingHost;
@@ -114,14 +118,10 @@ public class IndexingController {
     @Scheduled(cron = "${batch.indexingFile.cron}")
     @Operation(summary = "색인 작업 실행", description = "게시판, 댓글, 첨부파일 등 데이터를 순차적으로 Elasticsearch에 색인")
     public void indexingFile() throws IOException {
-
-        EsConfig esConfig = new EsConfig();
-        try (RestHighLevelClient client = esConfig.client()) {
-            // Elasticsearch 실행 여부 확인
-            if (!esConfig.isElasticsearchRunning(client)) {
-                logBatch.info("Elasticsearch 서버가 실행되고 있지 않아 색인 작업을 중단합니다.");
-                return;
-            }
+        // Elasticsearch 실행 여부 확인
+        if (!esConfig.isElasticsearchRunning()) {
+            logBatch.info("Elasticsearch 서버가 실행되고 있지 않아 색인 작업을 중단합니다.");
+            return;
         }
 
         // indexing host check
@@ -135,10 +135,7 @@ public class IndexingController {
         isIndexing = true;
         loadLastValue();
         // 첨부 파일 경로
-        String filePath = System.getProperty("user.dir") + "/fileupload/"; //localeMessage.getMessage("info.filePath") + "/";  //  첨부 파일 경로
-
-        // ---------------------------- elasticsearch connection --------------------------------
-        RestHighLevelClient client = esConfig.client();
+        String filePath = System.getProperty("user.dir") + "/fileupload/";
 
         // ---------------------------- 게시판 변경글 --------------------------------
         String brdnoUpdate = getLastValue("brd_update"); // 변경색인 인덱스
@@ -147,30 +144,33 @@ public class IndexingController {
         List<BoardVO> boardlist;
 
         if (!brdnoUpdate.equals(brdno)) {
-            boardlist = (List<BoardVO>) boardService.selectBoards4Indexing(brdnoUpdate);
-            UpdateRequest updateRequest;
+            boardlist = (List<BoardVO>)boardService.selectBoards4Indexing(brdnoUpdate);
+
             for (BoardVO el : boardlist) {
                 brdnoUpdate = el.getBrdno();
-                updateRequest = new UpdateRequest()
-                        .index(indexName)
-                        .id(el.getBrdno())
-                        .doc(jsonBuilder()
-                                .startObject()
-                                .field("bgno", el.getBgno())
-                                .field("brdno", brdnoUpdate)
-                                .field("brdtitle", el.getBrdtitle())
-                                .field("brdmemo", el.getBrdmemo())
-                                .field("brdwriter", el.getUsernm())
-                                .field("userno", el.getUserno())
-                                .field("regdate", el.getRegdate())
-                                .field("regtime", el.getRegtime())
-                                .field("brdhit", el.getBrdhit())
-                                .endObject());
+
+                // 문서 업데이트를 위한 맵 생성
+                Map<String, Object> document = new HashMap<>();
+                document.put("bgno", el.getBgno());
+                document.put("brdno", brdnoUpdate);
+                document.put("brdtitle", el.getBrdtitle());
+                document.put("brdmemo", el.getBrdmemo());
+                document.put("brdwriter", el.getUsernm());
+                document.put("userno", el.getUserno());
+                document.put("regdate", el.getRegdate());
+                document.put("regtime", el.getRegtime());
+                document.put("brdhit", el.getBrdhit());
 
                 try {
-                    client.update(updateRequest, RequestOptions.DEFAULT);
-                } catch (IOException | ElasticsearchStatusException e) {
-                    logBatch.error("indexRequest : " + e.getMessage());
+                    // Spring Data Elasticsearch를 사용한 문서 업데이트
+                    IndexQuery indexQuery = new IndexQueryBuilder()
+                        .withId(el.getBrdno())
+                        .withObject(document)
+                        .build();
+
+                    elasticsearchOperations.index(indexQuery, IndexCoordinates.of(indexName));
+                } catch (Exception e) {
+                    logBatch.error("Update error: " + e.getMessage());
                 }
             }
 
@@ -182,31 +182,38 @@ public class IndexingController {
         }
 
         // ---------------------------- 게시판 신규글 --------------------------------
-        boardlist = (List<BoardVO>) boardService.selectBoards4Indexing(brdno);
+        boardlist = (List<BoardVO>)boardService.selectBoards4Indexing(brdno);
+
         for (BoardVO el : boardlist) {
             brdno = el.getBrdno();
-            IndexRequest indexRequest = new IndexRequest(indexName)
-                    .id(el.getBrdno())
-                    .source("bgno", el.getBgno(),
-                            "brdno", brdno,
-                            "brdtitle", el.getBrdtitle(),
-                            "brdmemo", el.getBrdmemo(),
-                            "brdwriter", el.getUsernm(),
-                            "userno", el.getUserno(),
-                            "regdate", el.getRegdate(),
-                            "regtime", el.getRegtime(),
-                            "brdhit", el.getBrdhit()
-                    );
+
+            // 문서 색인을 위한 맵 생성
+            Map<String, Object> document = new HashMap<>();
+            document.put("bgno", el.getBgno());
+            document.put("brdno", brdno);
+            document.put("brdtitle", el.getBrdtitle());
+            document.put("brdmemo", el.getBrdmemo());
+            document.put("brdwriter", el.getUsernm());
+            document.put("userno", el.getUserno());
+            document.put("regdate", el.getRegdate());
+            document.put("regtime", el.getRegtime());
+            document.put("brdhit", el.getBrdhit());
 
             try {
-                client.index(indexRequest, RequestOptions.DEFAULT);
-            } catch (IOException | ElasticsearchStatusException e) {
-                logBatch.error("indexRequest : " + e.getMessage());
+                // Spring Data Elasticsearch를 사용한 문서 색인
+                IndexQuery indexQuery = new IndexQueryBuilder()
+                    .withId(el.getBrdno())
+                    .withObject(document)
+                    .build();
+
+                elasticsearchOperations.index(indexQuery, IndexCoordinates.of(indexName));
+            } catch (Exception e) {
+                logBatch.error("Indexing error: " + e.getMessage());
             }
         }
 
         if (!boardlist.isEmpty()) {
-            writeLastValue("brd", brdno); // 마지막 색인 이후의 댓글/ 첨부파일 중에서 게시글이 색인 된 것만 색인 해야 함. SQL문에서 field1참조  => logtash를 쓰지 않고 개발한 이유
+            writeLastValue("brd", brdno);
         }
 
         logBatch.info("board indexed : " + boardlist.size());
@@ -216,31 +223,43 @@ public class IndexingController {
         lastVO.setField1(brdno);
         lastVO.setField2(getLastValue("reply"));
 
-        List<BoardReplyVO> replylist = (List<BoardReplyVO>) boardService.selectBoardReply4Indexing(lastVO);
+        List<BoardReplyVO> replylist = (List<BoardReplyVO>)boardService.selectBoardReply4Indexing(lastVO);
 
         String reno = "";
-        Map<String, Object> replyMap = new ConcurrentHashMap<String, Object>();
+
         for (BoardReplyVO el : replylist) {
             reno = el.getReno();
+
+            Map<String, Object> replyMap = new HashMap<>();
             replyMap.put("reno", reno);
             replyMap.put("regdate", el.getRegdate());
             replyMap.put("rememo", el.getRememo());
             replyMap.put("usernm", el.getUsernm());
             replyMap.put("userno", el.getUserno());
 
-            Map<String, Object> singletonMap = Collections.singletonMap("reply", replyMap);
-
-            UpdateRequest updateRequest = new UpdateRequest()
-                    .index(indexName)
-                    .id(el.getBrdno())
-                    .script(new Script(ScriptType.INLINE, "painless",
-                            "if (ctx._source.brdreply == null) {ctx._source.brdreply=[]} ctx._source.brdreply.add(params.reply)",
-                            singletonMap));
-
             try {
-                client.update(updateRequest, RequestOptions.DEFAULT);
-            } catch (IOException | ElasticsearchStatusException e) {
-                logBatch.error("updateCommit : " + e.getMessage());
+                // 기존 문서 가져오기
+                Map<String, Object> document = elasticsearchOperations.get(el.getBrdno(), Map.class, IndexCoordinates.of(indexName));
+
+                if (document != null) {
+                    // brdreply 배열이 없으면 생성
+                    if (!document.containsKey("brdreply")) {
+                        document.put("brdreply", new ArrayList<>());
+                    }
+
+                    // brdreply 배열에 새 댓글 추가
+                    ((List<Map<String, Object>>)document.get("brdreply")).add(replyMap);
+
+                    // 문서 업데이트
+                    IndexQuery indexQuery = new IndexQueryBuilder()
+                        .withId(el.getBrdno())
+                        .withObject(document)
+                        .build();
+
+                    elasticsearchOperations.index(indexQuery, IndexCoordinates.of(indexName));
+                }
+            } catch (Exception e) {
+                logBatch.error("Reply update error: " + e.getMessage());
             }
         }
 
@@ -252,15 +271,18 @@ public class IndexingController {
 
         // ---------------------------- 첨부파일 --------------------------------
         lastVO.setField2(getLastValue("file"));
-        List<FileVO> filelist = (List<FileVO>) boardService.selectBoardFiles4Indexing(lastVO);
+        List<FileVO> filelist = (List<FileVO>)boardService.selectBoardFiles4Indexing(lastVO);
 
         String fileno = "";
-        Map<String, Object> fileMap = new ConcurrentHashMap<String, Object>();
+
         for (FileVO el : filelist) {
             if (!fileExtention.contains(FileUtil.getFileExtension(el.getFilename()))) {
                 continue; // 지정된 파일 형식만 색인
             }
+
             fileno = el.getFileno().toString();
+
+            Map<String, Object> fileMap = new HashMap<>();
             fileMap.put("fileno", fileno);
 
             String realPath = FileUtil.getRealPath(filePath, el.getRealname());
@@ -272,31 +294,38 @@ public class IndexingController {
             realPath += el.getRealname();
             fileMap.put("filememo", convert(realPath));
 
-            Map<String, Object> singletonMap = Collections.singletonMap("file", fileMap);
-
-            UpdateRequest updateRequest = new UpdateRequest()
-                    .index(indexName)
-                    .id(el.getParentPK())
-                    .script(new Script(ScriptType.INLINE, "painless",
-                            "if (ctx._source.brdfiles == null) {ctx._source.brdfiles=[]} ctx._source.brdfiles.add(params.file)",
-                            singletonMap));
             try {
-                client.update(updateRequest, RequestOptions.DEFAULT);
-            } catch (IOException | ElasticsearchStatusException e) {
-                logBatch.error("updateCommit : " + e.getMessage());
+                // 기존 문서 가져오기
+                Map<String, Object> document = elasticsearchOperations.get(el.getParentPK(), Map.class, IndexCoordinates.of(indexName));
+
+                if (document != null) {
+                    // brdfiles 배열이 없으면 생성
+                    if (!document.containsKey("brdfiles")) {
+                        document.put("brdfiles", new ArrayList<>());
+                    }
+
+                    // brdfiles 배열에 새 파일 추가
+                    ((List<Map<String, Object>>)document.get("brdfiles")).add(fileMap);
+
+                    // 문서 업데이트
+                    IndexQuery indexQuery = new IndexQueryBuilder()
+                        .withId(el.getParentPK())
+                        .withObject(document)
+                        .build();
+
+                    elasticsearchOperations.index(indexQuery, IndexCoordinates.of(indexName));
+                }
+            } catch (Exception e) {
+                logBatch.error("File update error: " + e.getMessage());
             }
         }
+
         if (!filelist.isEmpty()) {
-            writeLastValue("file", fileno); // 마지막 색인  정보 저장 - 댓글
+            writeLastValue("file", fileno); // 마지막 색인 정보 저장 - 파일
         }
 
         logBatch.info("board files indexed : " + filelist.size());
 
-        try {
-            client.close();
-        } catch (IOException e) {
-            logBatch.error(e.getMessage());
-        }
         isIndexing = false;
     }
 
@@ -413,24 +442,4 @@ public class IndexingController {
         return value;
     }
 
-    // ---------------------------------------------------------------------------
-    /*
-    // 공통 환경으로 변경
-    public RestHighLevelClient createConnection() {
-        final CredentialsProvider credentialProvider = new BasicCredentialsProvider();
-        credentialProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "manager"));
-
-        return new RestHighLevelClient(
-                RestClient.builder(
-                        new HttpHost("localhost", 9200, "http")
-                ).setHttpClientConfigCallback(
-                        httpAsyncClientBuilder -> {
-                            HttpAsyncClientBuilder httpAsyncClientBuilder1 = httpAsyncClientBuilder.setDefaultCredentialsProvider(credentialProvider);
-                            return httpAsyncClientBuilder1;
-                        }
-                )
-        );
-    }
-     */
-    // ---------------------------------------------------------------------------
 }

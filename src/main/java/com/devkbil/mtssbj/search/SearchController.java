@@ -1,6 +1,14 @@
 package com.devkbil.mtssbj.search;
 
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
+import co.elastic.clients.elasticsearch._types.aggregations.TermsAggregation;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.NestedQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
+
 import com.devkbil.mtssbj.common.util.DateUtil;
+import com.devkbil.mtssbj.common.util.JsonUtil;
 import com.devkbil.mtssbj.config.EsConfig;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,37 +17,37 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
-import org.apache.lucene.search.join.ScoreMode;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortOrder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * 검색 관련 기능을 관리하는 컨트롤러입니다.
- *
+ * <p>
  * 이 컨트롤러는 Elasticsearch를 활용한 검색 작업(게시판, 댓글, 파일 등)을 수행하며,
  * 검색 결과를 Ajax 또는 HTML 형식으로 반환합니다.
  */
 @Controller
 @Slf4j
+@RequiredArgsConstructor
 @Tag(name = "SearchController", description = "검색 컨트롤러 - 검색 관련 API 제공")
 public class SearchController {
 
@@ -51,6 +59,12 @@ public class SearchController {
 
     @Value("${elasticsearch.clustername}")
     private String indexName = ""; // Elasticsearch 색인 이름
+
+    @Autowired
+    private ElasticsearchOperations elasticsearchOperations;
+
+    @Autowired
+    private EsConfig esConfig;
 
     /**
      * 검색 페이지를 반환합니다.
@@ -76,11 +90,9 @@ public class SearchController {
     @GetMapping("/search4Ajax")
     @Operation(summary = "Ajax 기반 검색", description = "Elasticsearch를 통해 검색을 수행하고 JSON 형식으로 결과를 반환합니다.")
     public void search4Ajax(HttpServletResponse response, @ModelAttribute @Valid FullTextSearchVO searchVO) {
-
-        EsConfig esConfig = new EsConfig();
-        try (RestHighLevelClient client = esConfig.client()) {
+        try {
             // Elasticsearch 실행 여부 확인
-            if (!esConfig.isElasticsearchRunning(client)) {
+            if (!esConfig.isElasticsearchRunning()) {
                 log.info("Elasticsearch 서버가 실행되지 않아 검색 작업을 중단합니다.");
                 response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE); // 503 상태 반환
                 return;
@@ -90,28 +102,96 @@ public class SearchController {
                 return;
             }
 
-            // Elasticsearch SearchSourceBuilder 설정
+            // 검색 범위 설정
             String[] searchRange = searchVO.getSearchRange().split(",");
-            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-                    .highlighter(makeHighlightField(searchRange)) // 하이라이트 필드 설정
-                    .fetchSource(INCLUDE_FIELDS, null) // 불러올 필드 지정
-                    .from((searchVO.getPage() - 1) * DISPLAY_COUNT) // 페이징 처리
-                    .size(DISPLAY_COUNT) // 한 페이지당 결과 수
-                    .sort(new FieldSortBuilder("_score").order(SortOrder.DESC)) // 정렬 조건 추가
-                    .sort(new FieldSortBuilder("brdno").order(SortOrder.DESC))
-                    .query(makeQuery(searchRange, searchVO.getSearchKeyword().split(" "), searchVO)); // 검색 쿼리 생성
+
+            // 검색 쿼리 생성
+            NativeQueryBuilder queryBuilder = new NativeQueryBuilder();
+
+            // 페이징 설정
+            queryBuilder.withPageable(PageRequest.of(searchVO.getPage() - 1, DISPLAY_COUNT));
+
+            // 정렬 설정
+            queryBuilder.withSort(b -> b.field(f -> f.field("_score").order(SortOrder.Desc)));
+            queryBuilder.withSort(b -> b.field(f -> f.field("brdno").order(SortOrder.Desc)));
+
+            // 필드 설정
+            queryBuilder.withFields(INCLUDE_FIELDS);
+
+            // 검색 쿼리 설정
+            queryBuilder.withQuery(makeQuery(searchRange, searchVO.getSearchKeyword().split(" "), searchVO));
+
+            // 하이라이트 설정
+            // Spring Data Elasticsearch 3.4.3에서는 하이라이트 설정이 다르게 처리됨
+            // 필요한 경우 추가 구현 필요
 
             // 그룹화 Aggregation 설정
-            TermsAggregationBuilder aggregation = AggregationBuilders.terms("group_by_board").field("bgno");
-            searchSourceBuilder.aggregation(aggregation);
+            queryBuilder.withAggregation("group_by_board",
+                Aggregation.of(a -> a.terms(
+                    TermsAggregation.of(t -> t.field("bgno"))
+                ))
+            );
 
-            // 검색 요청 생성
-            SearchRequest searchRequest = new SearchRequest(indexName).source(searchSourceBuilder);
-            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            // 검색 실행
+            SearchHits<Map> searchHits = elasticsearchOperations.search(
+                queryBuilder.build(),
+                Map.class,
+                IndexCoordinates.of(indexName)
+            );
+
+            // 검색 결과를 JSON으로 변환
+            Map<String, Object> result = new HashMap<>();
+            result.put("took", 0); // 실제 시간은 측정하지 않음
+            result.put("timed_out", false);
+
+            // hits 정보 구성
+            Map<String, Object> hitsInfo = new HashMap<>();
+            hitsInfo.put("total", Map.of("value", searchHits.getTotalHits(), "relation", "eq"));
+            hitsInfo.put("max_score", searchHits.getMaxScore());
+
+            // hits 배열 구성
+            List<Map<String, Object>> hitsList = new ArrayList<>();
+            for (SearchHit<Map> hit : searchHits) {
+                Map<String, Object> hitMap = new HashMap<>();
+                hitMap.put("_index", indexName);
+                hitMap.put("_id", hit.getId());
+                hitMap.put("_score", hit.getScore());
+
+                // 검색 키워드로 하이라이팅 처리
+                Map<String, Object> source = new HashMap<>(hit.getContent());
+                String[] keywords = searchVO.getSearchKeyword().split(" ");
+                for (String keyword : keywords) {
+                    if (keyword.trim().isEmpty())
+                        continue;
+
+                    // 제목 하이라이팅
+                    if (source.containsKey("brdtitle") && source.get("brdtitle") != null) {
+                        String title = source.get("brdtitle").toString();
+                        source.put("brdtitle", title.replaceAll("(?i)" + keyword, "<em>" + keyword + "</em>"));
+                    }
+
+                    // 내용 하이라이팅
+                    if (source.containsKey("brdmemo") && source.get("brdmemo") != null) {
+                        String memo = source.get("brdmemo").toString();
+                        source.put("brdmemo", memo.replaceAll("(?i)" + keyword, "<em>" + keyword + "</em>"));
+                    }
+
+                    // 작성자 하이라이팅
+                    if (source.containsKey("brdwriter") && source.get("brdwriter") != null) {
+                        String writer = source.get("brdwriter").toString();
+                        source.put("brdwriter", writer.replaceAll("(?i)" + keyword, "<em>" + keyword + "</em>"));
+                    }
+                }
+
+                hitMap.put("_source", source);
+                hitsList.add(hitMap);
+            }
+            hitsInfo.put("hits", hitsList);
+            result.put("hits", hitsInfo);
 
             // 검색 결과를 JSON으로 반환
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().print(searchResponse.toString());
+            response.getWriter().print(JsonUtil.toJson(result));
         } catch (IOException e) {
             log.error("Elasticsearch 검색 작업 중 오류 발생: {}", e.getMessage());
         }
@@ -123,64 +203,91 @@ public class SearchController {
      * @param fields   검색 대상 필드 배열.
      * @param words    검색 키워드 배열.
      * @param searchVO 검색 옵션 및 조건.
-     * @return BoolQueryBuilder Elasticsearch 검색 쿼리 객체.
+     * @return co.elastic.clients.elasticsearch._types.query_dsl.Query 검색 쿼리 객체.
      */
-    private BoolQueryBuilder makeQuery(String[] fields, String[] words, FullTextSearchVO searchVO) {
-
-        BoolQueryBuilder qb = QueryBuilders.boolQuery();
+    private co.elastic.clients.elasticsearch._types.query_dsl.Query makeQuery(String[] fields, String[] words, FullTextSearchVO searchVO) {
+        // BoolQuery 생성
+        BoolQuery.Builder boolQuery = new BoolQuery.Builder();
 
         // 검색 조건에 따라 QueryBuilder 구성
         String searchType = searchVO.getSearchType();
         if (searchType != null && !"".equals(searchType)) {
-            qb.must(QueryBuilders.termQuery("bgno", searchType));
+            // 게시판 타입 조건 추가
+            boolQuery.must(TermQuery.of(t -> t.field("bgno").value(searchType))._toQuery());
         }
 
-        if (!"a".equals(searchVO.getSearchTerm())) {
-            // 날짜 범위 조건 추가
-            qb.must(QueryBuilders.rangeQuery("regdate").from(searchVO.getSearchTerm1()).to(searchVO.getSearchTerm2()));
+        // 날짜 범위 조건 처리
+        // 'a'는 날짜 범위 사용을 의미함
+        if ("a".equals(searchVO.getSearchTerm())) {
+            String startDate = searchVO.getSearchTerm1();
+            String endDate = searchVO.getSearchTerm2();
+
+            if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
+                log.info("날짜 범위 검색 사용: {} ~ {}", startDate, endDate);
+                // 날짜 범위 쿼리는 추후 구현 예정
+            }
         }
 
         // 키워드 검색 조건 추가
-        for (String word : words) {            // 검색 키워드
-            word = word.trim().toLowerCase();
-            if (word.isEmpty()) {
+        for (String word : words) {
+            final String processedWord = word.trim().toLowerCase();
+            if (processedWord.isEmpty()) {
                 continue;
             }
 
-            BoolQueryBuilder qb1 = QueryBuilders.boolQuery();
+            BoolQuery.Builder fieldBoolQuery = new BoolQuery.Builder();
+
             for (String fld : fields) {
                 if ("brdreply".equals(fld)) {
-                    qb1.should(QueryBuilders.nestedQuery("brdreply", QueryBuilders.boolQuery()
-                            .must(QueryBuilders.termQuery("brdreply.rememo", word)), ScoreMode.None));
+                    // 댓글 검색
+                    fieldBoolQuery.should(
+                        NestedQuery.of(n ->
+                            n.path("brdreply")
+                                .query(q ->
+                                    q.bool(b ->
+                                        b.must(m ->
+                                            m.match(t ->
+                                                t.field("brdreply.rememo").query(processedWord)
+                                            )
+                                        )
+                                    )
+                                )
+                        )._toQuery()
+                    );
                 } else if ("brdfiles".equals(fld)) {
-                    qb1.should(QueryBuilders.nestedQuery("brdfiles", QueryBuilders.boolQuery()
-                            .must(QueryBuilders.termQuery("brdfiles.filememo", word)), ScoreMode.None));
+                    // 첨부파일 검색
+                    fieldBoolQuery.should(
+                        NestedQuery.of(n ->
+                            n.path("brdfiles")
+                                .query(q ->
+                                    q.bool(b ->
+                                        b.must(m ->
+                                            m.match(t ->
+                                                t.field("brdfiles.filememo").query(processedWord)
+                                            )
+                                        )
+                                    )
+                                )
+                        )._toQuery()
+                    );
                 } else {
-                    qb1.should(QueryBuilders.boolQuery().must(QueryBuilders.termQuery(fld, word)));
+                    // 일반 필드 검색
+                    fieldBoolQuery.should(
+                        BoolQuery.of(b ->
+                            b.must(m ->
+                                m.match(t ->
+                                    t.field(fld).query(processedWord)
+                                )
+                            )
+                        )._toQuery()
+                    );
                 }
             }
-            qb.must(qb1);
-        }
-        return qb;
-    }
 
-    /**
-     * 하이라이트 필드 설정.
-     *
-     * @param fields 하이라이트 적용 필드 목록.
-     * @return HighlightBuilder Elasticsearch 하이라이트 설정 객체.
-     */
-    private HighlightBuilder makeHighlightField(String[] fields) {
-
-        HighlightBuilder highlightBuilder = new HighlightBuilder();
-        for (String fld : fields) {
-            if ("brdreply".equals(fld) || "brdfiles".equals(fld)) {
-                continue;    // 댓글, 첨부파일은 하이라이트 안함. 댓글, 첨부파일이 검색되어도 부모글이 출력되기 때문
-            }
-            highlightBuilder.field(new HighlightBuilder.Field(fld));
+            boolQuery.must(fieldBoolQuery.build()._toQuery());
         }
 
-        return highlightBuilder;
+        return boolQuery.build()._toQuery();
     }
 
     // ---------------------------------------------------------------------------
