@@ -118,12 +118,16 @@
                 });
 
                 var agg = data.aggregations;
-                var buckets = agg[Object.keys(agg)].buckets;     // "lterms#gujc"로 "lterms#"가 자동으로 생겨서 사용한 편넙;
-                console.log(buckets);
+                if (agg && Object.keys(agg).length > 0) {
+                    var buckets = agg[Object.keys(agg)[0]].buckets;     // "lterms#gujc"로 "lterms#"가 자동으로 생겨서 사용한 편넙;
+                    console.log(buckets);
 
-                buckets.forEach(function (row) {
-                    $("#cnt" + row.key).html(row.doc_count);
-                });
+                    if (buckets) {
+                        buckets.forEach(function (row) {
+                            $("#cnt" + row.key).html(row.doc_count);
+                        });
+                    }
+                }
 
                 $("#cnt").html(data.hits.total.value);
             }
