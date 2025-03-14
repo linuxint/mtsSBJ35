@@ -1,215 +1,262 @@
 package com.devkbil.mtssbj.manager;
 
+import lombok.Getter;
+
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * GradleDependencyChecker 클래스는 Gradle 빌드 파일을 분석하여 의존성 버전을 식별하고
- * Maven Central Repository에서 사용 가능한 최신 버전과 지정된 버전을 비교합니다.
+ * Gradle 빌드 파일에서 의존성을 파싱하고,
+ * Maven Central에서 최신 버전을 확인하여
+ * 의존성이 최신인지 아니면 구버전인지 결과를 표시하는 기능을 제공합니다.
  * <p>
- * 프로젝트 주요 기능:
- * - Gradle 빌드 파일을 파싱해 선언된 의존성을 찾는다.
- * - Maven Central에서 의존성의 최신 메타 데이터를 가져온다.
- * - 현재 선언된 버전과 최신 버전을 비교하고 오래된 의존성을 찾아낸다.
- * - 버전을 Semantic Versioning 규칙에 따라 정렬한다.
+ * 이 유틸리티는 병렬 처리를 위해 스레드 풀을 사용하며,
+ * 네트워크 실패를 처리하기 위해 Maven 메타데이터 요청을 반복 실행하고
+ * 중복 확인을 방지하기 위해 캐싱을 활용합니다.
  */
 public class GradleDependencyChecker {
 
     private static final String MAVEN_METADATA_URL = "https://repo1.maven.org/maven2/%s/%s/maven-metadata.xml";
 
-    /**
-     * 프로그램 진입점. `build.gradle` 파일을 파싱하여 의존성을 확인하고
-     * Maven Central에 사용 가능한 최신 버전과 비교합니다.
-     *
-     * @param args 명령줄 인수; 이 구현에서는 사용되지 않음.
-     */
+    // ANSI 컬러 코드 (콘솔 출력을 위한 색상 설정)
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String ANSI_RED = "\u001B[31m";
+
+    // 프로세스 병렬화를 위한 스레드 풀 구성
+    private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+    // 의존성 버전에 대한 캐시를 저장 (이미 확인된 의존성이 저장될 맵)
+    private static final Map<String, String> CACHE = new ConcurrentHashMap<>();
+
     public static void main(String[] args) {
-        String gradleFilePath = "build.gradle"; // Gradle 파일 경로
-        try {
-            // build.gradle 파일 읽기
-            String gradleContent = new String(Files.readAllBytes(Paths.get(gradleFilePath)));
+        long startTime = System.currentTimeMillis(); // 프로그램 시작 시간 기록
 
-            // dependencies 구문 파싱
-            Pattern dependencyPattern = Pattern.compile("implementation\\s+'(.+?):(.+?):(.+?)'");
-            Matcher matcher = dependencyPattern.matcher(gradleContent);
+        String gradleFilePath = "build.gradle"; // 대상 Gradle 파일 경로
 
-            System.out.println("Dependencies와 최신 버전 비교:");
-            while (matcher.find()) {
-                String groupId = matcher.group(1); // groupId 추출
-                String artifactId = matcher.group(2); // artifactId 추출
-                String currentVersion = matcher.group(3); // 현재 버전 추출
+        // 1. Gradle 파일에서 의존성 목록 추출
+        List<String> dependencies = parseDependencies(gradleFilePath);
 
-                // Maven Central에서 최신 버전 가져오기
-                String latestVersion = fetchLatestVersion(groupId, artifactId);
+        // 2. 의존성 검사 수행 (병렬로 처리)
+        List<DependencyCheckResult> results = checkDependenciesInParallel(dependencies);
 
-                // 최신 버전과 현재 버전 비교
-                if (latestVersion != null && !currentVersion.equals(latestVersion)) {
-                    System.out.printf(
-                        "Dependency: %s:%s:%s -> 마지막 버전: %s%n",
-                        groupId, artifactId, currentVersion, latestVersion);
+        // 3. 검사 결과를 출력
+        printResults(results);
+
+        // 스레드 풀 종료 (자원 반환)
+        THREAD_POOL.shutdown();
+
+        long endTime = System.currentTimeMillis(); // 프로그램 종료 시간 기록
+        long elapsedTime = endTime - startTime; // 작업 시간 계산
+
+        // 프로그램 실행 시간 출력
+        System.out.println("\n=== 프로그램 수행 시간 ===");
+        System.out.printf("전체 작업 소요 시간: %d ms (%.2f초)%n", elapsedTime, elapsedTime / 1000.0);
+    }
+
+    /**
+     * build.gradle 파일에서 의존성을 파싱해 리스트로 반환
+     *
+     * @param gradleFilePath build.gradle 파일의 경로
+     * @return 파싱된 의존성 정보 리스트
+     */
+    private static List<String> parseDependencies(String gradleFilePath) {
+        List<String> dependencies = new ArrayList<>();
+
+        // 의존성을 추출하기 위한 정규표현식 패턴
+        Pattern dependencyPattern = Pattern.compile("(implementation|api|runtimeOnly)\\s+'([\\w.-]+):([\\w.-]+):([\\w.-]+)'");
+        try (BufferedReader reader = new BufferedReader(new FileReader(gradleFilePath))) {
+            String line;
+
+            // 파일에서 한 줄씩 읽어 의존성 추출
+            while ((line = reader.readLine()) != null) {
+                Matcher matcher = dependencyPattern.matcher(line);
+
+                if (matcher.find()) {
+                    String groupId = matcher.group(2);
+                    String artifactId = matcher.group(3);
+                    String version = matcher.group(4);
+
+                    // 추출된 의존성을 리스트에 추가
+                    dependencies.add(String.format("%s:%s:%s", groupId, artifactId, version));
                 }
             }
-
         } catch (Exception e) {
-            System.err.println("파일 읽기 중 오류 발생: " + e.getMessage());
+            // 파일 읽기 및 파싱 중 오류가 발생하면 로그 출력
+            System.err.println("Failed to parse dependencies: " + e.getMessage());
+        }
+        return dependencies;
+    }
+
+    /**
+     * 의존성을 병렬로 검사하여 검사 결과 리스트 반환
+     *
+     * @param dependencies 검사할 의존성 목록
+     * @return 의존성 검사 결과 리스트
+     */
+    private static List<DependencyCheckResult> checkDependenciesInParallel(List<String> dependencies) {
+        // CompletableFuture를 사용해 비동기 병렬 처리
+        List<CompletableFuture<DependencyCheckResult>> futures = dependencies.stream()
+            .map(dependency -> CompletableFuture.supplyAsync(() -> checkDependency(dependency), THREAD_POOL))
+            .toList();
+
+        // 모든 CompletableFuture가 완료될 때까지 대기하고 결과 수집
+        return futures.stream()
+            .map(CompletableFuture::join)
+            .toList();
+    }
+
+    /**
+     * 특정 의존성의 버전을 검사하고 결과를 반환
+     *
+     * @param dependency 검사할 의존성 (groupId:artifactId:version 형식)
+     * @return 검사 결과 객체 (DependencyCheckResult)
+     */
+    private static DependencyCheckResult checkDependency(String dependency) {
+        String[] parts = dependency.split(":");
+
+        // 의존성 형식이 올바르지 않은 경우
+        if (parts.length != 3) {
+            return new DependencyCheckResult(dependency, null, "error");
+        }
+
+        String groupId = parts[0];
+        String artifactId = parts[1];
+        String declaredVersion = parts[2];
+
+        // 캐시에 이미 결과가 있는 경우 캐시 결과 반환
+        if (CACHE.containsKey(dependency)) {
+            String cachedVersion = CACHE.get(dependency);
+            String status = declaredVersion.equals(cachedVersion) ? "latest" : "outdated";
+            return new DependencyCheckResult(dependency, cachedVersion, status);
+        }
+
+        // 최신 버전 가져오기
+        String latestVersion = fetchLatestVersion(groupId, artifactId);
+
+        // 최신 버전 정보가 없는 경우 오류 처리
+        if (latestVersion == null) {
+            return new DependencyCheckResult(dependency, null, "error");
+        }
+
+        // 결과를 캐시에 저장
+        CACHE.put(dependency, latestVersion);
+
+        // 버전 비교 및 상태 결정
+        if (declaredVersion.equals(latestVersion)) {
+            return new DependencyCheckResult(dependency, latestVersion, "latest");
+        } else {
+            return new DependencyCheckResult(dependency, latestVersion, "outdated");
         }
     }
 
     /**
-     * Maven Central 메타 데이터 저장소에서 Maven 아티팩트의 최신 버전을 가져온다.
-     * <p>
-     * groupId 및 artifactId를 기반으로 Maven 메타 데이터 URL을 생성하고,
-     * 사용 가능한 모든 버전을 가져온 후 최신 버전을 반환한다.
-     * 과정에서 오류가 발생하거나 버전을 찾지 못하는 경우 null을 반환한다.
+     * Maven Central에서 최신 버전 정보를 가져옴
      *
-     * @param groupId    Maven 아티팩트의 groupId
-     * @param artifactId Maven 아티팩트의 artifactId
-     * @return 아티팩트의 최신 버전 문자열 또는 없을 경우 null
+     * @param groupId    의존성의 groupId
+     * @param artifactId 의존성의 artifactId
+     * @return 최신 버전 (문자열) 또는 null
      */
     private static String fetchLatestVersion(String groupId, String artifactId) {
-        try {
-            // Maven Metadata URL 생성
-            String groupPath = groupId.replace(".", "/");
-            String metadataUrl = String.format(MAVEN_METADATA_URL, groupPath, artifactId);
+        String metadataUrl = String.format(MAVEN_METADATA_URL, groupId.replace('.', '/'), artifactId);
 
-            // 버전 목록 가져오기
-            List<String> allVersions = fetchAllVersions(metadataUrl);
-
-            if (!allVersions.isEmpty()) {
-                // 최신 버전 반환
-                return allVersions.get(allVersions.size() - 1);
+        // 최대 3회 재시도 실행
+        for (int i = 0; i < 3; i++) {
+            try {
+                // 모든 버전 리스트를 가져온 후 최신 버전 선택
+                List<String> versions = fetchAllVersions(metadataUrl);
+                if (!versions.isEmpty()) {
+                    return versions.get(versions.size() - 1); // 최신 버전 반환
+                }
+            } catch (Exception e) {
+                // 요청 실패 시 재시도
+                System.err.println("Attempt " + (i + 1) + " failed for URL: " + metadataUrl);
             }
-        } catch (Exception e) {
-            System.err.println("Maven Metadata 조회 중 오류: " + e.getMessage());
         }
-
-        return null; // 조회 실패 시 null 반환
+        // 재시도 후 실패한 경우
+        return null;
     }
 
     /**
-     * 제공된 메타 데이터 URL에서 Maven 아티팩트의 모든 사용 가능한 버전을 가져온다.
-     * <p>
-     * 지정된 URL에서 Maven 메타 데이터 XML 파일을 가져와
-     * <version> 태그에 포함된 모든 버전을 추출하고,
-     * Semantic Versioning에 따라 정렬된 버전 목록을 반환한다.
-     * 오류가 발생하면 빈 목록 반환.
+     * Maven 메타데이터에서 버전 정보를 추출
      *
-     * @param metadataUrl 버전 정보를 담고 있는 Maven 메타 데이터 파일의 URL
-     * @return 버전 문자열 리스트 (오름차순 정렬), 오류가 발생할 경우 빈 리스트 반환
+     * @param metadataUrl Maven 메타데이터 파일 URL
+     * @return 버전 리스트
      */
-    private static List<String> fetchAllVersions(String metadataUrl) {
+    private static List<String> fetchAllVersions(String metadataUrl) throws Exception {
         List<String> versions = new ArrayList<>();
-        try {
-            // Metadata XML 파일 읽기
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(metadataUrl).openStream()));
-            String content = reader.lines().reduce("", (acc, line) -> acc + line); // XML 내용을 하나의 문자열로 연결
+        HttpURLConnection connection = (HttpURLConnection)URI.create(metadataUrl).toURL().openConnection();
+        connection.setConnectTimeout(5000);
+        connection.setReadTimeout(5000);
 
-            // <version> 태그로 나열된 값 추출
-            Pattern versionPattern = Pattern.compile("<version>(.*?)</version>");
-            versionPattern.matcher(content).results().map(match -> match.group(1)).forEach(versions::add);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            String line;
 
-            // 버전 정렬 (오름차순, Semantic Versioning 기반)
-            versions.sort(
-                new Comparator<String>() {
-                    @Override
-                    public int compare(String v1, String v2) {
-                        return compareVersions(v1, v2);
-                    }
-                });
-
-        } catch (Exception e) {
-            System.err.println("모든 버전 목록을 가져오는 중 오류: " + e.getMessage());
+            // "<version>" 태그에서 버전 추출
+            Pattern pattern = Pattern.compile("<version>(.*?)</version>");
+            while ((line = reader.readLine()) != null) {
+                Matcher matcher = pattern.matcher(line);
+                if (matcher.find()) {
+                    versions.add(matcher.group(1));
+                }
+            }
+        } finally {
+            connection.disconnect();
         }
         return versions;
     }
 
-    // 필요한 경우 문자열 버전을 숫자 및 프리릴리스 기반으로 비교 (Semantic Versioning)
-
     /**
-     * 두 개의 semantic version 문자열을 비교하여 순서를 결정한다.
-     * Major, Minor, Patch, 그리고 프리릴리스 요소를 기준으로 비교한다.
+     * 검사 결과를 콘솔에 출력
      *
-     * @param version1 비교할 첫 번째 버전 문자열
-     * @param version2 비교할 두 번째 버전 문자열
-     * @return 첫 번째가 두 번째보다 작으면 음수, 크면 양수, 같으면 0.
+     * @param results 의존성 검사 결과 목록
      */
-    private static int compareVersions(String version1, String version2) {
-        Version v1 = new Version(version1); // 첫 번째 버전 파싱
-        Version v2 = new Version(version2); // 두 번째 버전 파싱
-        return v1.compareTo(v2);
+    private static void printResults(List<DependencyCheckResult> results) {
+        System.out.println("\n=== 최신 상태 의존성 ===");
+        results.stream()
+            .filter(result -> "latest".equals(result.getStatus()))
+            .forEach(System.out::println);
+
+        System.out.println("\n=== 업데이트가 필요한 의존성 ===");
+        results.stream()
+            .filter(result -> "outdated".equals(result.status()))
+            .forEach(result -> {
+                // "OUTDATED" 상태를 붉은 색으로 강조
+                String output = result.toString().replace("[outdated]", ANSI_RED + "[outdated]" + ANSI_RESET);
+                System.out.println(output);
+            });
+
+        // 의존성 확인 실패 항목 출력
+        System.out.println("\n=== 확인 실패한 의존성 ===");
+        results.stream()
+            .filter(result -> "error".equals(result.getStatus()))
+            .forEach(System.out::println);
     }
 
-    // Version 클래스: Semantic Versioning 구현
-
     /**
-     * Semantic Version을 표현하며 파싱, 비교, 관리 기능을 제공한다.
-     * 이 클래스는 일반적인 semantic version과 프리릴리스 컴포넌트를 지원한다.
+     * 특정 의존성에 대한 버전 확인 결과를 나타내며,
+     * 의존성, 최신 버전 정보, 버전 상태를 포함합니다.
      * <p>
-     * Version 클래스의 인스턴스는 immutable하며
-     * Comparable 인터페이스를 사용하여 비교 가능하다.
+     * 이 record는 특정 의존성에 대한 정보와
+     * 최신 상태인지, 구버전인지, 또는 오류가 발생했는지 여부를 나타내는 데 사용됩니다.
      */
-    private static class Version implements Comparable<Version> {
-        private final List<Integer> majorMinorPatch = new ArrayList<>(); // 주요 버전, 부 버전, 패치 버전
-        private final String preRelease; // 프리릴리스 정보 포함
+    private record DependencyCheckResult(String dependency, String latestVersion, @Getter String status) {
 
-        public Version(String version) {
-            String[] parts = version.split("-", 2); // 프리릴리스 분리
-            String[] versionNumbers = parts[0].split("\\."); // major.minor.patch 구분
-
-            // 버전 번호 파싱
-            for (String num : versionNumbers) {
-                try {
-                    majorMinorPatch.add(Integer.parseInt(num));
-                } catch (NumberFormatException e) {
-                    majorMinorPatch.add(0); // 형식이 잘못된 경우 기본값 0 설정
-                }
-            }
-
-            // 프리릴리스 정보 설정
-            preRelease = parts.length > 1 ? parts[1] : null;
-        }
-
-        /**
-         * 현재 버전 객체와 다른 버전 객체를 비교하여
-         * 순서를 정한다. Semantic Versioning 규칙을 따름.
-         * Major, Minor, Patch, 그리고 프리릴리스 정보를 고려한다.
-         *
-         * @param other 비교 대상 버전 객체
-         * @return 현재 버전 < other이면 음수, > other이면 양수, 동일하면 0 반환
-         */
         @Override
-        public int compareTo(Version other) {
-            // Major, Minor, Patch 비교
-            for (int i = 0; i < Math.max(this.majorMinorPatch.size(), other.majorMinorPatch.size()); i++) {
-                int thisPart = i < this.majorMinorPatch.size() ? this.majorMinorPatch.get(i) : 0;
-                int otherPart = i < other.majorMinorPatch.size() ? other.majorMinorPatch.get(i) : 0;
-
-                if (thisPart != otherPart) {
-                    return Integer.compare(thisPart, otherPart);
-                }
+        public String toString() {
+            if ("latest".equals(status)) {
+                return String.format("Dependency: %s -> %s [latest]", dependency, latestVersion);
+            } else if ("outdated".equals(status)) {
+                return String.format("Dependency: %s -> %s [outdated]", dependency, latestVersion);
+            } else {
+                return String.format("Dependency: %s [error]", dependency);
             }
-
-            // 프리릴리스 정보 비교 (null > alpha > beta > RC 등)
-            if (this.preRelease == null && other.preRelease == null) {
-                return 0; // 동일
-            }
-            if (this.preRelease == null) {
-                return 1; // null (릴리스) > 프리릴리스
-            }
-            if (other.preRelease == null) {
-                return -1; // 릴리스 < 프리릴리스
-            }
-
-            // 프리릴리스 정보 사전순 정렬
-            return this.preRelease.compareTo(other.preRelease);
         }
     }
 }
