@@ -72,7 +72,7 @@ configurations.configureEach {
 dependencyManagement {
     imports {
         mavenBom('org.springframework.boot:spring-boot-dependencies:3.5.0-M2') {
-//            bomProperty 'spring-framework.version', '7.0.0-M2'
+//            bomProperty 'spring-framework.version', '7.0.0-M3'
 //            bomProperty 'spring-security.version', '6.5.0-M2'
 //            bomProperty 'spring-session.version', '3.4.2'
 //            bomProperty 'spring-integration.version', '6.5.0-M2'
@@ -176,7 +176,6 @@ dependencies {
     implementation 'org.apache.tomcat.embed:tomcat-embed-el:11.0.5'
     implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:11.0.5'
     implementation 'org.apache.tomcat:tomcat-annotations-api:11.0.5'
-//    runtimeOnly 'org.apache.tomcat:tomcat-native:1.2.35'
 
 //    runtimeOnly 'org.springframework.boot:spring-boot-starter-jetty'        // 내장 Tomcat 런타임
 //    implementation 'org.eclipse.jetty.http3:jetty-http3:12.0.16' // Jetty HTTP/3 의존성 추가
@@ -275,7 +274,7 @@ dependencies {
     // Other Formats
     implementation 'com.google.zxing:javase:3.5.3'
     implementation 'org.mnode.ical4j:ical4j:4.1.1'
-    implementation 'com.ibm.icu:icu4j:76.1'
+    implementation 'com.ibm.icu:icu4j:77.1'
 
     // ======================
     // 11. API Documentation
@@ -303,8 +302,8 @@ dependencies {
     checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:0.0.43'
     runtimeOnly 'io.spring.javaformat:spring-javaformat-config:0.0.43'
     runtimeOnly 'io.spring.javaformat:spring-javaformat-intellij-idea-plugin:0.0.43'
-    annotationProcessor("com.google.errorprone:error_prone_core:2.36.0")
-    errorprone 'com.google.errorprone:error_prone_core:2.36.0' // Add this dependency
+    annotationProcessor 'com.google.errorprone:error_prone_core:2.36.0'
+    errorprone 'com.google.errorprone:error_prone_core:2.36.0'
 
     // ======================
     // 14. Persistence & Validation
@@ -350,7 +349,7 @@ dependencies {
     // 17. Miscellaneous
     // ======================
     // Network
-    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.0.RC3'
+    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.0.RC4'
 
     // Version Control
     implementation 'org.eclipse.jgit:org.eclipse.jgit:7.1.0.202411261347-r'
