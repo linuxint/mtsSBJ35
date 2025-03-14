@@ -164,8 +164,8 @@ public class MailService {
             // 메일 DB에 삽입
             insertMailOne(param);
 
-            // SMTP 전송
-            SendMail mailSender = new SendMail(
+            // SMTP 전송 (Spring Integration Mail 사용)
+            SpringIntegrationSendMail mailSender = new SpringIntegrationSendMail(
                 fromVO.getEmismtp(),
                 fromVO.getEmismtpport(),
                 fromVO.getEmiuser(),

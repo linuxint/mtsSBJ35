@@ -68,7 +68,7 @@ public class ImportMail implements Runnable {
 
     private void processMailAccount(MailInfoVO mivo) {
         String chgdate = mailService.selectLastMail(mivo.getEmino());
-        Imap mail = new Imap();
+        SpringIntegrationImap mail = new SpringIntegrationImap();
 
         try {
             mail.connect(mivo.getEmiimap(), mivo.getEmiuser(), mivo.getEmipw());
