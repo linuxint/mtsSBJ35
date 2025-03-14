@@ -57,6 +57,15 @@ public class SearchController {
     // 검색 시 데이터를 가져올 필드 목록
     static final String[] INCLUDE_FIELDS = {"brdno", "userno", "regdate", "regtime", "brdtitle", "brdwriter", "brdmemo", "brdhit"};
 
+    // 검색 결과 캐시를 위한 맵 (키: 검색 조건의 해시코드, 값: 검색 결과)
+    private final Map<String, Map<String, Object>> searchCache = new HashMap<>();
+
+    // 캐시 만료 시간 (밀리초)
+    private static final long CACHE_EXPIRY_TIME = 60000; // 1분
+
+    // 캐시 타임스탬프를 저장하는 맵
+    private final Map<String, Long> cacheTimestamps = new HashMap<>();
+
     @Value("${elasticsearch.clustername}")
     private String indexName = ""; // Elasticsearch 색인 이름
 
@@ -79,7 +88,25 @@ public class SearchController {
     }
 
     /**
-     * Ajax 요청을 통해 검색 작업을 수행하고 결과를 반환합니다.
+     * 검색 조건에 대한 캐시 키를 생성합니다.
+     *
+     * @param searchVO 검색 조건을 담은 객체
+     * @return 캐시 키 문자열
+     */
+    private String generateCacheKey(FullTextSearchVO searchVO) {
+        StringBuilder keyBuilder = new StringBuilder();
+        keyBuilder.append(searchVO.getSearchKeyword())
+                 .append("_").append(searchVO.getSearchRange())
+                 .append("_").append(searchVO.getSearchType())
+                 .append("_").append(searchVO.getSearchTerm())
+                 .append("_").append(searchVO.getSearchTerm1())
+                 .append("_").append(searchVO.getSearchTerm2())
+                 .append("_").append(searchVO.getPage());
+        return keyBuilder.toString();
+    }
+
+    /**
+     * 캐시에서 검색 결과를 가져오거나, 캐시가 없으면 검색을 수행합니다.
      *
      * @param searchVO 검색 조건을 담은 객체.
      * @return ResponseEntity 검색 결과를 담은 ResponseEntity 객체
@@ -96,6 +123,25 @@ public class SearchController {
 
         if ("".equals(searchVO.getSearchKeyword()) && !"".equals(indexName)) {
             return ResponseEntity.ok(Map.of());
+        }
+
+        // 캐시 키 생성
+        String cacheKey = generateCacheKey(searchVO);
+
+        // 캐시에서 결과 확인
+        if (searchCache.containsKey(cacheKey)) {
+            Long timestamp = cacheTimestamps.get(cacheKey);
+            long currentTime = System.currentTimeMillis();
+
+            // 캐시가 유효한지 확인 (만료 시간 이내인지)
+            if (timestamp != null && (currentTime - timestamp) < CACHE_EXPIRY_TIME) {
+                log.info("캐시에서 검색 결과 반환: {}", cacheKey);
+                return ResponseEntity.ok(searchCache.get(cacheKey));
+            } else {
+                // 만료된 캐시 항목 제거
+                searchCache.remove(cacheKey);
+                cacheTimestamps.remove(cacheKey);
+            }
         }
 
         try {
@@ -118,16 +164,15 @@ public class SearchController {
             // 검색 쿼리 설정
             queryBuilder.withQuery(makeQuery(searchRange, searchVO.getSearchKeyword().split(" "), searchVO));
 
-            // 하이라이트 설정
-            // Spring Data Elasticsearch 3.4.3에서는 하이라이트 설정이 다르게 처리됨
-            // 필요한 경우 추가 구현 필요
-
             // 그룹화 Aggregation 설정
             queryBuilder.withAggregation("group_by_board",
                 Aggregation.of(a -> a.terms(
                     TermsAggregation.of(t -> t.field("bgno"))
                 ))
             );
+
+            // 검색 시작 시간 기록
+            long startTime = System.currentTimeMillis();
 
             // 검색 실행
             SearchHits<Map> searchHits = elasticsearchOperations.search(
@@ -136,9 +181,12 @@ public class SearchController {
                 IndexCoordinates.of(indexName)
             );
 
+            // 검색 소요 시간 계산
+            long searchTime = System.currentTimeMillis() - startTime;
+
             // 검색 결과를 JSON으로 변환
             Map<String, Object> result = new HashMap<>();
-            result.put("took", 0); // 실제 시간은 측정하지 않음
+            result.put("took", searchTime);
             result.put("timed_out", false);
 
             // hits 정보 구성
@@ -186,6 +234,11 @@ public class SearchController {
             }
             hitsInfo.put("hits", hitsList);
             result.put("hits", hitsInfo);
+
+            // 결과를 캐시에 저장
+            searchCache.put(cacheKey, result);
+            cacheTimestamps.put(cacheKey, System.currentTimeMillis());
+            log.info("검색 결과를 캐시에 저장: {}", cacheKey);
 
             // 검색 결과를 ResponseEntity로 반환
             return ResponseEntity.ok(result);

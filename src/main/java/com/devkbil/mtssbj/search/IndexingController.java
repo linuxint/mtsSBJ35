@@ -141,6 +141,9 @@ public class IndexingController {
         if (!brdnoUpdate.equals(brdno)) {
             boardlist = (List<BoardVO>)boardService.selectBoards4Indexing(brdnoUpdate);
 
+            // 배치 처리를 위한 리스트
+            List<IndexQuery> indexQueries = new ArrayList<>();
+
             for (BoardVO el : boardlist) {
                 brdnoUpdate = el.getBrdno();
 
@@ -156,16 +159,21 @@ public class IndexingController {
                 document.put("regtime", el.getRegtime());
                 document.put("brdhit", el.getBrdhit());
 
-                try {
-                    // Spring Data Elasticsearch를 사용한 문서 업데이트
-                    IndexQuery indexQuery = new IndexQueryBuilder()
-                        .withId(el.getBrdno())
-                        .withObject(document)
-                        .build();
+                // 인덱스 쿼리 생성 및 리스트에 추가
+                IndexQuery indexQuery = new IndexQueryBuilder()
+                    .withId(el.getBrdno())
+                    .withObject(document)
+                    .build();
 
-                    elasticsearchOperations.index(indexQuery, IndexCoordinates.of(indexName));
+                indexQueries.add(indexQuery);
+            }
+
+            // 배치 처리로 한 번에 색인
+            if (!indexQueries.isEmpty()) {
+                try {
+                    elasticsearchOperations.bulkIndex(indexQueries, IndexCoordinates.of(indexName));
                 } catch (Exception e) {
-                    log.error("Update error: " + e.getMessage());
+                    log.error("Bulk update error: " + e.getMessage());
                 }
             }
 
@@ -178,6 +186,9 @@ public class IndexingController {
 
         // ---------------------------- 게시판 신규글 --------------------------------
         boardlist = (List<BoardVO>)boardService.selectBoards4Indexing(brdno);
+
+        // 배치 처리를 위한 리스트
+        List<IndexQuery> indexQueries = new ArrayList<>();
 
         for (BoardVO el : boardlist) {
             brdno = el.getBrdno();
@@ -194,16 +205,21 @@ public class IndexingController {
             document.put("regtime", el.getRegtime());
             document.put("brdhit", el.getBrdhit());
 
-            try {
-                // Spring Data Elasticsearch를 사용한 문서 색인
-                IndexQuery indexQuery = new IndexQueryBuilder()
-                    .withId(el.getBrdno())
-                    .withObject(document)
-                    .build();
+            // 인덱스 쿼리 생성 및 리스트에 추가
+            IndexQuery indexQuery = new IndexQueryBuilder()
+                .withId(el.getBrdno())
+                .withObject(document)
+                .build();
 
-                elasticsearchOperations.index(indexQuery, IndexCoordinates.of(indexName));
+            indexQueries.add(indexQuery);
+        }
+
+        // 배치 처리로 한 번에 색인
+        if (!indexQueries.isEmpty()) {
+            try {
+                elasticsearchOperations.bulkIndex(indexQueries, IndexCoordinates.of(indexName));
             } catch (Exception e) {
-                log.error("Indexing error: " + e.getMessage());
+                log.error("Bulk indexing error: " + e.getMessage());
             }
         }
 
@@ -222,6 +238,10 @@ public class IndexingController {
 
         String reno = "";
 
+        // 게시글별로 댓글을 그룹화
+        Map<String, List<Map<String, Object>>> replyGroups = new HashMap<>();
+
+        // 댓글 데이터 준비 및 그룹화
         for (BoardReplyVO el : replylist) {
             reno = el.getReno();
 
@@ -232,9 +252,24 @@ public class IndexingController {
             replyMap.put("usernm", el.getUsernm());
             replyMap.put("userno", el.getUserno());
 
+            // 게시글 ID별로 댓글 그룹화
+            if (!replyGroups.containsKey(el.getBrdno())) {
+                replyGroups.put(el.getBrdno(), new ArrayList<>());
+            }
+            replyGroups.get(el.getBrdno()).add(replyMap);
+        }
+
+        // 배치 처리를 위한 리스트
+        List<IndexQuery> replyIndexQueries = new ArrayList<>();
+
+        // 게시글별로 처리
+        for (Map.Entry<String, List<Map<String, Object>>> entry : replyGroups.entrySet()) {
+            String boardId = entry.getKey();
+            List<Map<String, Object>> replies = entry.getValue();
+
             try {
                 // 기존 문서 가져오기
-                Map<String, Object> document = elasticsearchOperations.get(el.getBrdno(), Map.class, IndexCoordinates.of(indexName));
+                Map<String, Object> document = elasticsearchOperations.get(boardId, Map.class, IndexCoordinates.of(indexName));
 
                 if (document != null) {
                     // brdreply 배열이 없으면 생성
@@ -242,24 +277,34 @@ public class IndexingController {
                         document.put("brdreply", new ArrayList<>());
                     }
 
-                    // brdreply 배열에 새 댓글 추가
-                    ((List<Map<String, Object>>)document.get("brdreply")).add(replyMap);
+                    // 기존 배열에 새 댓글들 추가
+                    List<Map<String, Object>> existingReplies = (List<Map<String, Object>>)document.get("brdreply");
+                    existingReplies.addAll(replies);
 
-                    // 문서 업데이트
+                    // 인덱스 쿼리 생성 및 리스트에 추가
                     IndexQuery indexQuery = new IndexQueryBuilder()
-                        .withId(el.getBrdno())
+                        .withId(boardId)
                         .withObject(document)
                         .build();
 
-                    elasticsearchOperations.index(indexQuery, IndexCoordinates.of(indexName));
+                    replyIndexQueries.add(indexQuery);
                 }
             } catch (Exception e) {
-                log.error("Reply update error: " + e.getMessage());
+                log.error("Reply preparation error for board " + boardId + ": " + e.getMessage());
+            }
+        }
+
+        // 배치 처리로 한 번에 색인
+        if (!replyIndexQueries.isEmpty()) {
+            try {
+                elasticsearchOperations.bulkIndex(replyIndexQueries, IndexCoordinates.of(indexName));
+            } catch (Exception e) {
+                log.error("Bulk reply indexing error: " + e.getMessage());
             }
         }
 
         if (!replylist.isEmpty()) {
-            writeLastValue("reply", reno); // 마지막 색인  정보 저장 - 댓글
+            writeLastValue("reply", reno); // 마지막 색인 정보 저장 - 댓글
         }
 
         logBatch.info("board reply indexed : " + replylist.size());
@@ -270,6 +315,10 @@ public class IndexingController {
 
         String fileno = "";
 
+        // 게시글별로 파일을 그룹화
+        Map<String, List<Map<String, Object>>> fileGroups = new HashMap<>();
+
+        // 파일 데이터 준비 및 그룹화
         for (FileVO el : filelist) {
             if (!fileExtention.contains(FileUtil.getFileExtension(el.getFilename()))) {
                 continue; // 지정된 파일 형식만 색인
@@ -287,11 +336,29 @@ public class IndexingController {
             }
 
             realPath += el.getRealname();
-            fileMap.put("filememo", convert(realPath));
+
+            // 텍스트 추출 작업 수행
+            String extractedText = convert(realPath);
+            fileMap.put("filememo", extractedText);
+
+            // 게시글 ID별로 파일 그룹화
+            if (!fileGroups.containsKey(el.getParentPK())) {
+                fileGroups.put(el.getParentPK(), new ArrayList<>());
+            }
+            fileGroups.get(el.getParentPK()).add(fileMap);
+        }
+
+        // 배치 처리를 위한 리스트
+        List<IndexQuery> fileIndexQueries = new ArrayList<>();
+
+        // 게시글별로 처리
+        for (Map.Entry<String, List<Map<String, Object>>> entry : fileGroups.entrySet()) {
+            String parentId = entry.getKey();
+            List<Map<String, Object>> files = entry.getValue();
 
             try {
                 // 기존 문서 가져오기
-                Map<String, Object> document = elasticsearchOperations.get(el.getParentPK(), Map.class, IndexCoordinates.of(indexName));
+                Map<String, Object> document = elasticsearchOperations.get(parentId, Map.class, IndexCoordinates.of(indexName));
 
                 if (document != null) {
                     // brdfiles 배열이 없으면 생성
@@ -299,19 +366,29 @@ public class IndexingController {
                         document.put("brdfiles", new ArrayList<>());
                     }
 
-                    // brdfiles 배열에 새 파일 추가
-                    ((List<Map<String, Object>>)document.get("brdfiles")).add(fileMap);
+                    // 기존 배열에 새 파일들 추가
+                    List<Map<String, Object>> existingFiles = (List<Map<String, Object>>)document.get("brdfiles");
+                    existingFiles.addAll(files);
 
-                    // 문서 업데이트
+                    // 인덱스 쿼리 생성 및 리스트에 추가
                     IndexQuery indexQuery = new IndexQueryBuilder()
-                        .withId(el.getParentPK())
+                        .withId(parentId)
                         .withObject(document)
                         .build();
 
-                    elasticsearchOperations.index(indexQuery, IndexCoordinates.of(indexName));
+                    fileIndexQueries.add(indexQuery);
                 }
             } catch (Exception e) {
-                logBatch.error("File update error: " + e.getMessage());
+                logBatch.error("File preparation error for parent " + parentId + ": " + e.getMessage());
+            }
+        }
+
+        // 배치 처리로 한 번에 색인
+        if (!fileIndexQueries.isEmpty()) {
+            try {
+                elasticsearchOperations.bulkIndex(fileIndexQueries, IndexCoordinates.of(indexName));
+            } catch (Exception e) {
+                logBatch.error("Bulk file indexing error: " + e.getMessage());
             }
         }
 
