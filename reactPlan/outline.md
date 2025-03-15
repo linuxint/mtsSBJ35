@@ -1,7 +1,7 @@
 # 프로젝트 마이그레이션 계획
 
 ## 1. 개요
-- Spring + JSP 기반 시스템을 React + Spring Boot REST API로 전환
+- Spring + JSP 기반 시스템을 React.JS + Spring Boot REST API로 전환
 - Oracle Database를 PostgreSQL로 마이그레이션
 - 모놀리식 아키텍처를 프론트엔드/백엔드 분리
 
@@ -17,6 +17,7 @@
    - JSP 뷰 → JSON 응답
    - MyBatis 최적화
    - JWT 기반 인증
+   - JPA 삭제
 
 3. 데이터베이스
    - Oracle → PostgreSQL
