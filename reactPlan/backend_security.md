@@ -320,4 +320,48 @@ public class RolePermission {
         this.permission = permission;
     }
 }
-``` 
+```
+
+## 인증
+### LoginInterceptor
+- JWT 기반 인증으로 전환
+- 토큰 검증 로직 추가
+- 세션 관리 제거
+
+### AdminInterceptor
+- 권한 체크 강화
+- 역할 기반 접근 제어
+- 감사 로깅 추가
+
+### CommonInterceptor
+- CORS 설정 통합
+- XSS 방지
+- CSRF 보호
+
+## 권한 관리
+### RoleBasedMapping
+- 세분화된 권한 체계
+- 동적 권한 할당
+- 캐시 적용
+
+### RoleMappingLoader
+- 설정 기반 권한 로딩
+- 실시간 권한 갱신
+- 감사 추적
+
+## 보안 필터
+### JwtRequestFilter
+- 토큰 생명주기 관리
+- 리프레시 토큰 처리
+- 블랙리스트 관리
+
+### DeviceDetectorInterceptor
+- 디바이스 인증
+- 접근 제어
+- 보안 로깅
+
+## 모니터링
+### MonitorSecurityConfig
+- 보안 메트릭 수집
+- 접근 로그 분석
+- 알림 설정 

@@ -374,4 +374,114 @@ public class SpringDocConfig {
                 .pathsToMatch("/api/admin/**")
                 .build();
     }
+}
+```
+
+## Rate Limiting Config
+### 변경 전
+```java
+// 별도의 속도 제한 설정 없음
+```
+
+### 변경 후
+```java
+@Configuration
+@EnableAspectJAutoProxy
+public class RateLimitConfig {
+    
+    @Bean
+    public RateLimitingAspect rateLimitingAspect() {
+        return new RateLimitingAspect();
+    }
+    
+    @Bean
+    public RateLimitingService rateLimitingService() {
+        return new RateLimitingService();
+    }
+}
+
+@Aspect
+@Component
+@RequiredArgsConstructor
+public class RateLimitingAspect {
+    private final RateLimitingService rateLimitingService;
+    
+    @Around("@annotation(rateLimit)")
+    public Object limitRate(ProceedingJoinPoint joinPoint, RateLimit rateLimit) throws Throwable {
+        String key = generateKey(joinPoint);
+        if (!rateLimitingService.tryAcquire(key, rateLimit.value(), rateLimit.timeUnit())) {
+            throw new TooManyRequestsException("API 호출 횟수가 초과되었습니다.");
+        }
+        return joinPoint.proceed();
+    }
+    
+    private String generateKey(ProceedingJoinPoint joinPoint) {
+        // 키 생성 로직
+        return joinPoint.getSignature().toLongString();
+    }
+}
+
+@Service
+@RequiredArgsConstructor
+public class RateLimitingService {
+    private final LoadingCache<String, RateLimiter> rateLimiters = CacheBuilder.newBuilder()
+        .expireAfterAccess(1, TimeUnit.HOURS)
+        .build(new CacheLoader<String, RateLimiter>() {
+            @Override
+            public RateLimiter load(String key) {
+                return RateLimiter.create(1.0);
+            }
+        });
+    
+    public boolean tryAcquire(String key, int permits, TimeUnit timeUnit) {
+        try {
+            RateLimiter limiter = rateLimiters.get(key);
+            return limiter.tryAcquire(permits, 1, timeUnit);
+        } catch (ExecutionException e) {
+            return false;
+        }
+    }
+}
+
+## Application Event Listeners
+### 변경 전
+```java
+// 개별 이벤트 리스너 클래스들
+```
+
+### 변경 후
+```java
+@Component
+@Slf4j
+public class ApplicationEventListeners {
+    
+    @EventListener
+    public void handleContextRefreshed(ContextRefreshedEvent event) {
+        log.info("애플리케이션 컨텍스트가 초기화되었습니다.");
+    }
+    
+    @EventListener
+    public void handleContextStarted(ContextStartedEvent event) {
+        log.info("애플리케이션 컨텍스트가 시작되었습니다.");
+    }
+    
+    @EventListener
+    public void handleContextStopped(ContextStoppedEvent event) {
+        log.info("애플리케이션 컨텍스트가 중지되었습니다.");
+    }
+    
+    @EventListener
+    public void handleContextClosed(ContextClosedEvent event) {
+        log.info("애플리케이션 컨텍스트가 종료되었습니다.");
+    }
+    
+    @EventListener
+    public void handleApplicationFailed(ApplicationFailedEvent event) {
+        log.error("애플리케이션 시작 실패: {}", event.getException().getMessage());
+    }
+    
+    @EventListener
+    public void handleApplicationReady(ApplicationReadyEvent event) {
+        log.info("애플리케이션이 요청을 처리할 준비가 되었습니다.");
+    }
 } 

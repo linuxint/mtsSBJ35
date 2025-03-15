@@ -131,26 +131,78 @@
 | 16.2 | common/MakeExcel.java | 엑셀 생성 | [변경사항](backend_common.md#excel-util) |
 | 16.3 | common/code/CodeCacheService.java | 코드 캐시 서비스 | [변경사항](backend_service.md#code-cache) |
 
+## 17. 메인 및 CRUD
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 17.1 | main/IndexController.java | 메인 컨트롤러 | [변경사항](backend_controller.md#index-controller) |
+| 17.2 | main/SampleController.java | 샘플 컨트롤러 | [변경사항](backend_controller.md#sample-controller) |
+| 17.3 | crud/CrudController.java | CRUD 컨트롤러 | [변경사항](backend_controller.md#crud-controller) |
+| 17.4 | crud/ChkController.java | 체크 컨트롤러 | [변경사항](backend_controller.md#check-controller) |
+
+## 18. 파일 처리
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 18.1 | common/FileDownload.java | 파일 다운로드 | [변경사항](backend_common.md#file-download) |
+| 18.2 | common/Upload4ckeditor.java | CKEditor 업로드 | [변경사항](backend_common.md#ckeditor-upload) |
+
+## 19. 프로파일링
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 19.1 | common/TransactionProfiler.java | 트랜잭션 프로파일러 | [변경사항](backend_common.md#transaction-profiler) |
+| 19.2 | common/RepositoryProfiler.java | 리포지토리 프로파일러 | [변경사항](backend_common.md#repository-profiler) |
+
+## 20. 보안 및 권한
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 20.1 | common/interceptor/RoleBasedMapping.java | 역할 기반 매핑 | [변경사항](backend_security.md#role-mapping) |
+| 20.2 | common/interceptor/RoleMappingLoader.java | 역할 매핑 로더 | [변경사항](backend_security.md#role-loader) |
+| 20.3 | common/JwtRequestFilter.java | JWT 필터 | [변경사항](backend_security.md#jwt-filter) |
+
+## 21. 국제화 및 메시지
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 21.1 | common/LocaleMessage.java | 국제화 메시지 | [변경사항](backend_common.md#locale-message) |
+| 21.2 | common/LocalDateFormatter.java | 날짜 포맷터 | [변경사항](backend_common.md#date-formatter) |
+
 # 변경 불필요 파일 목록
 다음 파일들은 현재 구조에서 그대로 사용 가능합니다:
 
 1. 개발 도구 관련
    - develop/logview/* (로그 뷰어 관련 파일들)
-   - develop/filesearch/* (파일 검색 관련 파일들)
-   - develop/qrcode/QrCodeMapper.java
-   - develop/qrcode/QrConstant.java
+   - develop/ratelimit/RateLimit.java (어노테이션 정의)
+   - develop/ratelimit/APIRateLimiter.java (속도 제한 구현체)
 
 2. 공통 유틸리티
-   - common/util/* (기본 유틸리티 클래스들)
-   - common/masking/* (마스킹 처리 관련 클래스들)
-   - common/log/* (로깅 관련 클래스들)
+   - common/interceptor/ModifiableHttpServletRequest.java (HTTP 요청 래퍼 클래스)
 
 3. 기타 VO 클래스들
-   - */vo/* (값 객체 클래스들)
-   - */dto/* (데이터 전송 객체 클래스들)
+   - etc/ClassCodeVO.java (상수 정의)
+   - etc/List4User.java (유틸리티 클래스)
 
-이러한 파일들은 Spring Boot로의 마이그레이션에서 큰 변경 없이 재사용할 수 있습니다.
-
+# 아직 문서화가 필요한 파일 목록
+./com/devkbil/mtssbj/develop/logview/DevelopLogbackDevCheckController.java
+./com/devkbil/mtssbj/develop/ratelimit/RateLimitingAspect.java
+./com/devkbil/mtssbj/develop/ratelimit/RateLimit.java
+./com/devkbil/mtssbj/develop/ratelimit/RateLimitingService.java
+./com/devkbil/mtssbj/etc/ClassCodeVO.java
+./com/devkbil/mtssbj/etc/PopUserController.java
+./com/devkbil/mtssbj/etc/List4User.java
+./com/devkbil/mtssbj/etc/AlertMsgController.java
+./com/devkbil/mtssbj/etc/EtcService.java
+./com/devkbil/mtssbj/admin/organ/DepartmentRepository.java
+./com/devkbil/mtssbj/admin/organ/DepartmentServiceImpl.java
+./com/devkbil/mtssbj/admin/organ/DepartmentService.java
+./com/devkbil/mtssbj/admin/server/SrvEtcController.java
+./com/devkbil/mtssbj/admin/server/ConnController.java
+./com/devkbil/mtssbj/admin/server/ConnService.java
+./com/devkbil/mtssbj/common/listener/ApplicationFailedEventListener.java
+./com/devkbil/mtssbj/common/listener/ApplicationPreparedEventListener.java
+./com/devkbil/mtssbj/common/listener/ApplicationContextInitializedEventListener.java
+./com/devkbil/mtssbj/common/listener/ApplicationContextClosedEventListener.java
+./com/devkbil/mtssbj/common/listener/CustomApplicationEventListener.java
+./com/devkbil/mtssbj/common/listener/ApplicationEnvironmentPreparedEventListener.java
+./com/devkbil/mtssbj/common/listener/ApplicationContextRefreshedEventListener.java
+./com/devkbil/mtssbj/common/interceptor/ModifiableHttpServletRequest.java
 
 # 전체파일목록
 ./com/devkbil/mtssbj/develop/moutain/SherpaController.java

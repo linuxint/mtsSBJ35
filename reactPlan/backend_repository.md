@@ -1,22 +1,70 @@
 # 리포지토리 계층 변경사항
 
-## 공통 사항
-1. 동적 쿼리 처리를 위한 MyBatis 동적 SQL 활용
-2. 페이징 처리를 위한 RowBounds 사용
-3. 캐시 적용을 위한 MyBatis 캐시 설정
-4. 일관된 명명 규칙 적용
-5. 결과 매핑 최적화
+## JPA에서 MyBatis로의 전환
+### 주요 변경사항
+1. **어노테이션 변경**
+   - JPA: `@Repository`, `@Entity` → MyBatis: `@Mapper`
+   - JPA 엔티티 매핑 → MyBatis `@Results` 매핑
+
+2. **메서드 명명 규칙 변경**
+   - findById → selectById
+   - save → insert/update
+   - delete → delete
+   - findAll → selectList
+
+3. **쿼리 처리 방식**
+   - JPQL → MyBatis XML/어노테이션 기반 SQL
+   - Criteria API → 동적 SQL
+   - 페이징: Page<T> → RowBounds
+
+4. **엔티티 관계 처리**
+   - JPA 연관관계 매핑 → 명시적 조인 쿼리
+   - 지연로딩/즉시로딩 → 필요한 데이터만 조회
+
+5. **트랜잭션 처리**
+   - JPA 영속성 컨텍스트 제거
+   - MyBatis 세션 기반 처리
+
+## 공통 구현 사항
+1. **동적 쿼리 처리**
+   ```xml
+   <select id="selectList">
+     SELECT * FROM table
+     <where>
+       <if test="condition != null">
+         AND column = #{condition}
+       </if>
+     </where>
+   </select>
+   ```
+
+2. **페이징 처리**
+   ```java
+   List<T> selectList(@Param("search") SearchVO search, 
+                     @Param("rowBounds") RowBounds rowBounds);
+   ```
+
+3. **결과 매핑**
+   ```java
+   @Results({
+       @Result(property = "entityId", column = "entity_id"),
+       @Result(property = "name", column = "name")
+   })
+   ```
+
+4. **일괄 처리**
+   ```java
+   int insertList(@Param("list") List<T> list);
+   ```
 
 ## Code Mapper
 ### 변경 전
 ```java
-@Mapper
-public interface CodeMapper {
-    List<CodeVO> selectCodeList();
-    CodeVO selectCode(String codeId);
-    void insertCode(CodeVO code);
-    void updateCode(CodeVO code);
-    void deleteCode(String codeId);
+@Repository
+public interface CodeRepository extends JpaRepository<CodeEntity, String> {
+    List<CodeEntity> findByGroupCode(String groupCode);
+    Optional<CodeEntity> findById(String id);
+    boolean existsByGroupCodeAndCode(String groupCode, String code);
 }
 ```
 
@@ -44,20 +92,21 @@ public interface CodeMapper {
     
     int deleteCode(String codeId);
     
-    boolean existsByGroupCodeAndCode(@Param("groupCode") String groupCode, @Param("code") String code);
+    boolean existsByGroupCodeAndCode(@Param("groupCode") String groupCode, 
+                                   @Param("code") String code);
 }
 ```
 
 ## Board Mapper
 ### 변경 전
 ```java
-@Mapper
-public interface BoardMapper {
-    List<BoardVO> selectBoardList(BoardSearchVO search);
-    BoardVO selectBoard(Long boardId);
-    void insertBoard(BoardVO board);
-    void updateBoard(BoardVO board);
-    void deleteBoard(Long boardId);
+@Repository
+public interface BoardRepository extends JpaRepository<BoardEntity, Long> {
+    Page<BoardEntity> findAll(Specification<BoardEntity> spec, Pageable pageable);
+    Optional<BoardEntity> findById(Long id);
+    
+    @Query("SELECT b FROM BoardEntity b LEFT JOIN FETCH b.files WHERE b.id = :id")
+    Optional<BoardEntity> findByIdWithFiles(@Param("id") Long id);
 }
 ```
 
@@ -65,7 +114,8 @@ public interface BoardMapper {
 ```java
 @Mapper
 public interface BoardMapper {
-    List<BoardVO> selectBoardList(@Param("search") BoardSearchVO search, @Param("rowBounds") RowBounds rowBounds);
+    List<BoardVO> selectBoardList(@Param("search") BoardSearchVO search, 
+                                 @Param("rowBounds") RowBounds rowBounds);
     
     int selectBoardListCount(@Param("search") BoardSearchVO search);
     
@@ -73,7 +123,8 @@ public interface BoardMapper {
     
     BoardVO selectBoardWithFiles(Long boardId);
     
-    List<BoardVO> selectBoardsByCategory(@Param("category") String category, @Param("rowBounds") RowBounds rowBounds);
+    List<BoardVO> selectBoardsByCategory(@Param("category") String category, 
+                                       @Param("rowBounds") RowBounds rowBounds);
     
     int selectBoardsByCategoryCount(String category);
     
@@ -90,12 +141,13 @@ public interface BoardMapper {
 ## Member Mapper
 ### 변경 전
 ```java
-@Mapper
-public interface MemberMapper {
-    MemberVO selectMemberById(String id);
-    void insertMember(MemberVO member);
-    void updateMember(MemberVO member);
-    void deleteMember(String id);
+@Repository
+public interface MemberRepository extends JpaRepository<MemberEntity, String> {
+    Optional<MemberEntity> findById(String id);
+    Optional<MemberEntity> findByEmail(String email);
+    
+    @Query("SELECT m FROM MemberEntity m LEFT JOIN FETCH m.roles WHERE m.id = :id")
+    Optional<MemberEntity> findByIdWithRoles(@Param("id") String id);
 }
 ```
 
@@ -128,7 +180,8 @@ public interface MemberMapper {
     
     int deleteMember(String id);
     
-    int updateLastLoginAt(@Param("id") String id, @Param("lastLoginAt") LocalDateTime lastLoginAt);
+    int updateLastLoginAt(@Param("id") String id, 
+                         @Param("lastLoginAt") LocalDateTime lastLoginAt);
     
     List<MemberVO> selectInactiveMembers(@Param("date") LocalDateTime date);
     
@@ -199,4 +252,90 @@ public interface ReplyMapper {
     int deleteReply(Long replyId);
     
     int deleteRepliesByBoardId(Long boardId);
+}
+
+## Department Mapper
+### 변경 전
+```java
+@Repository
+public interface DepartmentRepository {
+    List<DepartmentVO> findAll();
+    DepartmentVO findById(String id);
+    void save(DepartmentVO department);
+    void delete(String id);
+}
+```
+
+### 변경 후
+```java
+@Mapper
+public interface DepartmentMapper {
+    
+    @Select("SELECT * FROM tb_department ORDER BY sort_order")
+    @Results({
+        @Result(property = "departmentId", column = "department_id"),
+        @Result(property = "parentId", column = "parent_id"),
+        @Result(property = "departmentName", column = "department_name"),
+        @Result(property = "sortOrder", column = "sort_order"),
+        @Result(property = "useYn", column = "use_yn")
+    })
+    List<DepartmentVO> selectDepartmentList();
+    
+    @Select("SELECT * FROM tb_department WHERE department_id = #{departmentId}")
+    DepartmentVO selectDepartment(String departmentId);
+    
+    List<DepartmentVO> selectDepartmentsByParentId(String parentId);
+    
+    int insertDepartment(DepartmentVO department);
+    
+    int updateDepartment(DepartmentVO department);
+    
+    int deleteDepartment(String departmentId);
+    
+    @Select("SELECT COUNT(*) FROM tb_department WHERE parent_id = #{departmentId}")
+    int countChildDepartments(String departmentId);
+    
+    @Select("SELECT COUNT(*) FROM tb_member WHERE department_id = #{departmentId}")
+    int countDepartmentMembers(String departmentId);
+    
+    List<DepartmentVO> selectDepartmentTree();
+    
+    int updateDepartmentOrder(@Param("departments") List<DepartmentOrderVO> departments);
+}
+
+## Connection Mapper
+### 변경 전
+```java
+// 별도의 매퍼 인터페이스 없이 직접 SQL 실행
+```
+
+### 변경 후
+```java
+@Mapper
+public interface ConnectionMapper {
+    
+    @Select("SELECT * FROM tb_connection WHERE server_id = #{serverId}")
+    @Results({
+        @Result(property = "connectionId", column = "connection_id"),
+        @Result(property = "serverId", column = "server_id"),
+        @Result(property = "connectionType", column = "connection_type"),
+        @Result(property = "connectionString", column = "connection_string"),
+        @Result(property = "username", column = "username"),
+        @Result(property = "status", column = "status")
+    })
+    List<ConnectionVO> selectConnectionsByServerId(String serverId);
+    
+    ConnectionVO selectConnection(String connectionId);
+    
+    int insertConnection(ConnectionVO connection);
+    
+    int updateConnection(ConnectionVO connection);
+    
+    int deleteConnection(String connectionId);
+    
+    @Update("UPDATE tb_connection SET status = #{status} WHERE connection_id = #{connectionId}")
+    int updateConnectionStatus(@Param("connectionId") String connectionId, @Param("status") String status);
+    
+    @Select("SELECT COUNT(*) FROM tb_connection WHERE server_id = #{serverId} AND status = 'ACTIVE'")
+    int countActiveConnections(String serverId);
 } 

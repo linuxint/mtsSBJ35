@@ -7,6 +7,56 @@
 4. 예외 처리 방식 통일화
 5. API 문서화를 위한 SpringDoc 어노테이션 추가
 
+## 메인 컨트롤러
+### IndexController
+- JSP 뷰 반환을 JSON 응답으로 변경
+- React 라우팅을 위한 API 엔드포인트 구성
+- 세션 기반 인증을 JWT 기반으로 변경
+
+### SampleController
+- REST API 형식으로 변경
+- Swagger/OpenAPI 문서화 추가
+- 응답 형식 표준화
+
+## CRUD 컨트롤러
+### CrudController
+- REST API 엔드포인트로 재구성
+- 페이징 처리 최적화
+- 검색 조건 처리 개선
+
+### ChkController
+- 상태 체크 API로 변경
+- 헬스 체크 엔드포인트 추가
+- 모니터링 통합
+
+## 개발 도구 컨트롤러
+### DbtoolController
+- API 인터페이스 표준화
+- 보안 강화
+- 응답 형식 통일
+
+### NaverApiController
+- API 키 관리 개선
+- 에러 처리 강화
+- 캐시 적용
+
+## 서버 관리 컨트롤러
+### SvcController, HWController, SWController
+- REST API 형식으로 통일
+- 권한 체크 강화
+- 모니터링 API 통합
+
+## 기타 컨트롤러
+### AlertMsgController
+- 웹소켓 통합
+- 실시간 알림 처리
+- 클라이언트 상태 관리
+
+### PopUserController
+- REST API로 변경
+- 사용자 정보 처리 개선
+- 세션 관리 제거
+
 ## Code Controller
 ### 변경 전
 ```java
@@ -380,6 +430,306 @@ public class MemberController {
     public ResponseEntity<Void> changePassword(
             @Parameter(description = "비밀번호 정보") @RequestBody @Valid PasswordChangeRequest request) {
         memberService.changePassword(request);
+        return ResponseEntity.ok().build();
+    }
+}
+```
+
+## 로그 뷰어 컨트롤러
+### 변경 전
+```java
+@Controller
+@RequestMapping("/develop/logview")
+public class DevelopLogbackDevCheckController {
+    @RequestMapping("/list")
+    public String list(Model model) {
+        // 로그 파일 목록 조회
+        return "develop/logview/list";
+    }
+}
+```
+
+### 변경 후
+```java
+@RestController
+@RequestMapping("/api/develop/logs")
+@Tag(name = "로그 뷰어", description = "로그 파일 조회 API")
+@RequiredArgsConstructor
+public class LogViewController {
+    
+    @GetMapping
+    @Operation(summary = "로그 파일 목록 조회")
+    public ResponseEntity<List<LogFileResponse>> getLogFiles() {
+        // 로그 파일 목록 조회 로직
+        return ResponseEntity.ok(logFiles);
+    }
+    
+    @GetMapping("/{fileName}")
+    @Operation(summary = "로그 파일 내용 조회")
+    public ResponseEntity<LogContentResponse> getLogContent(
+            @Parameter(description = "로그 파일명") @PathVariable String fileName,
+            @Parameter(description = "페이지 정보") Pageable pageable) {
+        // 로그 파일 내용 조회 로직
+        return ResponseEntity.ok(content);
+    }
+    
+    @GetMapping("/download/{fileName}")
+    @Operation(summary = "로그 파일 다운로드")
+    public ResponseEntity<Resource> downloadLogFile(
+            @Parameter(description = "로그 파일명") @PathVariable String fileName) {
+        // 로그 파일 다운로드 로직
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+            .body(resource);
+    }
+}
+```
+
+## 팝업 사용자 컨트롤러
+### 변경 전
+```java
+@Controller
+@RequestMapping("/popup/user")
+public class PopUserController {
+    @RequestMapping("/list")
+    public String list(Model model) {
+        return "popup/user/list";
+    }
+}
+```
+
+### 변경 후
+```java
+@RestController
+@RequestMapping("/api/users/popup")
+@Tag(name = "사용자 팝업", description = "사용자 선택 팝업 API")
+@RequiredArgsConstructor
+public class UserPopupController {
+    private final UserService userService;
+    
+    @GetMapping
+    @Operation(summary = "사용자 목록 조회")
+    public ResponseEntity<Page<UserResponse>> getUsers(
+            @Parameter(description = "검색 조건") UserSearchRequest search,
+            @Parameter(description = "페이지 정보") Pageable pageable) {
+        Page<UserResponse> users = userService.getUsers(search, pageable);
+        return ResponseEntity.ok(users);
+    }
+    
+    @GetMapping("/departments")
+    @Operation(summary = "부서별 사용자 목록 조회")
+    public ResponseEntity<List<DepartmentUserResponse>> getUsersByDepartment(
+            @Parameter(description = "부서 ID") @RequestParam String departmentId) {
+        List<DepartmentUserResponse> users = userService.getUsersByDepartment(departmentId);
+        return ResponseEntity.ok(users);
+    }
+}
+```
+
+## 알림 메시지 컨트롤러
+### 변경 전
+```java
+@Controller
+@RequestMapping("/alert")
+public class AlertMsgController {
+    @RequestMapping("/send")
+    public String send(String message) {
+        return "alert/send";
+    }
+}
+```
+
+### 변경 후
+```java
+@RestController
+@RequestMapping("/api/alerts")
+@Tag(name = "알림", description = "알림 메시지 API")
+@RequiredArgsConstructor
+public class AlertController {
+    private final AlertService alertService;
+    private final SimpMessagingTemplate messagingTemplate;
+    
+    @PostMapping
+    @Operation(summary = "알림 전송")
+    public ResponseEntity<AlertResponse> sendAlert(
+            @Parameter(description = "알림 정보") @RequestBody @Valid AlertRequest request) {
+        AlertResponse alert = alertService.sendAlert(request);
+        messagingTemplate.convertAndSend("/topic/alerts", alert);
+        return ResponseEntity.ok(alert);
+    }
+    
+    @GetMapping
+    @Operation(summary = "알림 목록 조회")
+    public ResponseEntity<Page<AlertResponse>> getAlerts(
+            @Parameter(description = "페이지 정보") Pageable pageable) {
+        Page<AlertResponse> alerts = alertService.getAlerts(pageable);
+        return ResponseEntity.ok(alerts);
+    }
+    
+    @PutMapping("/{alertId}/read")
+    @Operation(summary = "알림 읽음 처리")
+    public ResponseEntity<Void> markAsRead(
+            @Parameter(description = "알림 ID") @PathVariable Long alertId) {
+        alertService.markAsRead(alertId);
+        return ResponseEntity.ok().build();
+    }
+}
+```
+
+## 서버 관리 컨트롤러
+### 변경 전
+```java
+@Controller
+@RequestMapping("/srv")
+public class SrvEtcController {
+    
+    @GetMapping("/list")
+    public String list(Model model) {
+        // 서버 목록 조회 및 뷰로 전달
+        return "srv/list";
+    }
+    
+    @GetMapping("/detail/{id}")
+    public String detail(@PathVariable String id, Model model) {
+        // 서버 상세 정보 조회 및 뷰로 전달
+        return "srv/detail";
+    }
+    
+    @PostMapping("/save")
+    public String save(ServerVO server) {
+        // 서버 정보 저장
+        return "redirect:/srv/list";
+    }
+}
+
+@Controller
+@RequestMapping("/conn")
+public class ConnController {
+    
+    @GetMapping("/list/{serverId}")
+    public String list(@PathVariable String serverId, Model model) {
+        // 연결 목록 조회 및 뷰로 전달
+        return "conn/list";
+    }
+    
+    @PostMapping("/save")
+    public String save(ConnectionVO connection) {
+        // 연결 정보 저장
+        return "redirect:/conn/list/" + connection.getServerId();
+    }
+}
+```
+
+### 변경 후
+```java
+@RestController
+@RequestMapping("/api/servers")
+@RequiredArgsConstructor
+@Tag(name = "Server Management", description = "서버 관리 API")
+public class ServerController {
+    
+    private final ServerService serverService;
+    
+    @GetMapping
+    @Operation(summary = "서버 목록 조회")
+    public ResponseEntity<List<ServerDTO>> getServers(
+            @Parameter(description = "서버 유형") @RequestParam(required = false) String type,
+            @Parameter(description = "페이지 번호") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지 크기") @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(serverService.getServers(type, page, size));
+    }
+    
+    @GetMapping("/{serverId}")
+    @Operation(summary = "서버 상세 정보 조회")
+    public ResponseEntity<ServerDTO> getServer(
+            @Parameter(description = "서버 ID") @PathVariable String serverId) {
+        return ResponseEntity.ok(serverService.getServer(serverId));
+    }
+    
+    @PostMapping
+    @Operation(summary = "서버 생성")
+    public ResponseEntity<ServerDTO> createServer(
+            @Parameter(description = "서버 정보") @Valid @RequestBody ServerDTO serverDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(serverService.createServer(serverDTO));
+    }
+    
+    @PutMapping("/{serverId}")
+    @Operation(summary = "서버 정보 수정")
+    public ResponseEntity<ServerDTO> updateServer(
+            @Parameter(description = "서버 ID") @PathVariable String serverId,
+            @Parameter(description = "서버 정보") @Valid @RequestBody ServerDTO serverDTO) {
+        return ResponseEntity.ok(serverService.updateServer(serverId, serverDTO));
+    }
+    
+    @DeleteMapping("/{serverId}")
+    @Operation(summary = "서버 삭제")
+    public ResponseEntity<Void> deleteServer(
+            @Parameter(description = "서버 ID") @PathVariable String serverId) {
+        serverService.deleteServer(serverId);
+        return ResponseEntity.noContent().build();
+    }
+    
+    @GetMapping("/{serverId}/status")
+    @Operation(summary = "서버 상태 조회")
+    public ResponseEntity<ServerStatusDTO> getServerStatus(
+            @Parameter(description = "서버 ID") @PathVariable String serverId) {
+        return ResponseEntity.ok(serverService.getServerStatus(serverId));
+    }
+}
+
+@RestController
+@RequestMapping("/api/connections")
+@RequiredArgsConstructor
+@Tag(name = "Connection Management", description = "연결 관리 API")
+public class ConnectionController {
+    
+    private final ConnectionService connectionService;
+    
+    @GetMapping("/server/{serverId}")
+    @Operation(summary = "서버별 연결 목록 조회")
+    public ResponseEntity<List<ConnectionDTO>> getConnectionsByServer(
+            @Parameter(description = "서버 ID") @PathVariable String serverId) {
+        return ResponseEntity.ok(connectionService.getConnectionsByServer(serverId));
+    }
+    
+    @GetMapping("/{connectionId}")
+    @Operation(summary = "연결 상세 정보 조회")
+    public ResponseEntity<ConnectionDTO> getConnection(
+            @Parameter(description = "연결 ID") @PathVariable String connectionId) {
+        return ResponseEntity.ok(connectionService.getConnection(connectionId));
+    }
+    
+    @PostMapping
+    @Operation(summary = "연결 생성")
+    public ResponseEntity<ConnectionDTO> createConnection(
+            @Parameter(description = "연결 정보") @Valid @RequestBody ConnectionDTO connectionDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(connectionService.createConnection(connectionDTO));
+    }
+    
+    @PutMapping("/{connectionId}")
+    @Operation(summary = "연결 정보 수정")
+    public ResponseEntity<ConnectionDTO> updateConnection(
+            @Parameter(description = "연결 ID") @PathVariable String connectionId,
+            @Parameter(description = "연결 정보") @Valid @RequestBody ConnectionDTO connectionDTO) {
+        return ResponseEntity.ok(connectionService.updateConnection(connectionId, connectionDTO));
+    }
+    
+    @DeleteMapping("/{connectionId}")
+    @Operation(summary = "연결 삭제")
+    public ResponseEntity<Void> deleteConnection(
+            @Parameter(description = "연결 ID") @PathVariable String connectionId) {
+        connectionService.deleteConnection(connectionId);
+        return ResponseEntity.noContent().build();
+    }
+    
+    @PatchMapping("/{connectionId}/status")
+    @Operation(summary = "연결 상태 변경")
+    public ResponseEntity<Void> updateConnectionStatus(
+            @Parameter(description = "연결 ID") @PathVariable String connectionId,
+            @Parameter(description = "상태") @RequestParam String status) {
+        connectionService.updateConnectionStatus(connectionId, status);
         return ResponseEntity.ok().build();
     }
 } 
