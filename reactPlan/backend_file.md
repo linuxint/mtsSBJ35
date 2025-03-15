@@ -1,3 +1,93 @@
+# 백엔드 파일 목록 및 변경 사항
+
+## 1. 공통 모듈
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 1.1 | common/HtmlCharacterEscapes.java | HTML 문자 이스케이프 처리 | [변경사항](backend_common.md#html-character-escapes) |
+| 1.2 | common/util/DateUtil.java | 날짜 관련 유틸리티 | [변경사항](backend_common.md#date-util) |
+| 1.3 | common/util/FileUtil.java | 파일 처리 유틸리티 | [변경사항](backend_common.md#file-util) |
+| 1.4 | common/util/NewStringUtil.java | 문자열 처리 유틸리티 | [변경사항](backend_common.md#string-util) |
+| 1.5 | common/tree/TreeMaker.java | 트리 구조 처리 | [변경사항](backend_common.md#tree-maker) |
+| 1.6 | common/util/JsonUtil.java | JSON 처리 유틸리티 | [변경사항](backend_common.md#json-util) |
+| 1.7 | common/util/JwtUtil.java | JWT 토큰 처리 | [변경사항](backend_common.md#jwt-util) |
+| 1.8 | common/masking/MaskingUtil.java | 데이터 마스킹 처리 | [변경사항](backend_common.md#masking-util) |
+
+## 2. 설정
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 2.1 | MtssbjApplication.java | 애플리케이션 메인 클래스 | [변경사항](backend_config.md#application) |
+| 2.2 | config/WebMvcConfig.java | 웹 MVC 설정 | [변경사항](backend_config.md#web-mvc) |
+| 2.3 | config/security/SpringSecurityConfig.java | 스프링 시큐리티 설정 | [변경사항](backend_config.md#security) |
+| 2.4 | config/MyBatisConfig.java | MyBatis 설정 | [변경사항](backend_config.md#mybatis) |
+| 2.5 | config/JPAConfig.java | JPA 설정 | [변경사항](backend_config.md#jpa) |
+| 2.6 | config/CorsConfig.java | CORS 설정 | [변경사항](backend_config.md#cors) |
+| 2.7 | config/SpringDocConfig.java | API 문서 설정 | [변경사항](backend_config.md#springdoc) |
+
+## 3. 관리자 기능
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 3.1 | admin/code/CodeController.java | 코드 관리 컨트롤러 | [변경사항](backend_controller.md#code-controller) |
+| 3.2 | admin/menu/MenuController.java | 메뉴 관리 컨트롤러 | [변경사항](backend_controller.md#menu-controller) |
+| 3.3 | admin/organ/DepartmentController.java | 조직 관리 컨트롤러 | [변경사항](backend_controller.md#department-controller) |
+| 3.4 | admin/board/BoardGroupController.java | 게시판 그룹 관리 컨트롤러 | [변경사항](backend_controller.md#board-group-controller) |
+
+## 4. 게시판
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 4.1 | board/BoardController.java | 게시판 컨트롤러 | [변경사항](backend_controller.md#board-controller) |
+| 4.2 | board/BoardService.java | 게시판 서비스 | [변경사항](backend_service.md#board-service) |
+| 4.3 | board/BoardVO.java | 게시판 VO | [변경사항](backend_entity.md#board-entity) |
+| 4.4 | board/BoardReplyVO.java | 게시판 댓글 VO | [변경사항](backend_entity.md#board-reply-entity) |
+
+## 5. 회원
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 5.1 | member/MemberController.java | 회원 컨트롤러 | [변경사항](backend_controller.md#member-controller) |
+| 5.2 | member/MemberService.java | 회원 서비스 | [변경사항](backend_service.md#member-service) |
+| 5.3 | member/auth/AuthController.java | 인증 컨트롤러 | [변경사항](backend_controller.md#auth-controller) |
+| 5.4 | member/auth/AuthService.java | 인증 서비스 | [변경사항](backend_service.md#auth-service) |
+
+## 6. 일정
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 6.1 | schedule/SchController.java | 일정 컨트롤러 | [변경사항](backend_controller.md#schedule-controller) |
+| 6.2 | schedule/SchService.java | 일정 서비스 | [변경사항](backend_service.md#schedule-service) |
+| 6.3 | schedule/SchVO.java | 일정 VO | [변경사항](backend_entity.md#schedule-entity) |
+| 6.4 | schedule/CalendarVO.java | 캘린더 VO | [변경사항](backend_entity.md#calendar-entity) |
+
+## 7. 메일
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 7.1 | mail/MailController.java | 메일 컨트롤러 | [변경사항](backend_controller.md#mail-controller) |
+| 7.2 | mail/MailService.java | 메일 서비스 | [변경사항](backend_service.md#mail-service) |
+| 7.3 | mail/MailVO.java | 메일 VO | [변경사항](backend_entity.md#mail-entity) |
+| 7.4 | mail/ImportMail.java | 메일 가져오기 | [변경사항](backend_service.md#import-mail) |
+
+## 8. 검색
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 8.1 | search/SearchController.java | 검색 컨트롤러 | [변경사항](backend_controller.md#search-controller) |
+| 8.2 | search/IndexingController.java | 인덱싱 컨트롤러 | [변경사항](backend_controller.md#indexing-controller) |
+| 8.3 | search/SearchVO.java | 검색 VO | [변경사항](backend_entity.md#search-entity) |
+
+## 9. 프로젝트
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 9.1 | project/ProjectController.java | 프로젝트 컨트롤러 | [변경사항](backend_controller.md#project-controller) |
+| 9.2 | project/ProjectService.java | 프로젝트 서비스 | [변경사항](backend_service.md#project-service) |
+| 9.3 | project/TaskController.java | 작업 컨트롤러 | [변경사항](backend_controller.md#task-controller) |
+| 9.4 | project/TaskService.java | 작업 서비스 | [변경사항](backend_service.md#task-service) |
+
+## 10. 에러 처리
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 10.1 | error/GlobalExceptionHandler.java | 전역 예외 처리 | [변경사항](backend_error.md#global-exception) |
+| 10.2 | error/BusinessExceptionHandler.java | 비즈니스 예외 처리 | [변경사항](backend_error.md#business-exception) |
+| 10.3 | error/ErrorResponse.java | 에러 응답 | [변경사항](backend_error.md#error-response) |
+| 10.4 | error/ApiResponse.java | API 응답 | [변경사항](backend_error.md#api-response) |
+
+
+# 전체파일목록
 ./com/devkbil/mtssbj/schedule/MonthVO.java
 ./com/devkbil/mtssbj/schedule/SchController.java
 ./com/devkbil/mtssbj/schedule/SchVO.java
