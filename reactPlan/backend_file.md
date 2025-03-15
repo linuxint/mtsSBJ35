@@ -164,45 +164,128 @@
 | 21.1 | common/LocaleMessage.java | 국제화 메시지 | [변경사항](backend_common.md#locale-message) |
 | 21.2 | common/LocalDateFormatter.java | 날짜 포맷터 | [변경사항](backend_common.md#date-formatter) |
 
-# 변경 불필요 파일 목록
-다음 파일들은 현재 구조에서 그대로 사용 가능합니다:
+## 22. 캐시 설정
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 22.1 | config/CacheConfig.java | 캐시 설정 | [변경사항](backend_config.md#cache-설정) |
+| 22.2 | config/CacheWarmupService.java | 캐시 예열 서비스 | [변경사항](backend_config.md#캐시-예열-서비스) |
+| 22.3 | config/RedisConfig.java | Redis 설정 | [변경사항](backend_config.md#redis-설정) |
 
-1. 개발 도구 관련
-   - develop/logview/* (로그 뷰어 관련 파일들)
-   - develop/ratelimit/RateLimit.java (어노테이션 정의)
-   - develop/ratelimit/APIRateLimiter.java (속도 제한 구현체)
+## 23. 검색 통합
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 23.1 | config/EsConfig.java | Elasticsearch 설정 | [변경사항](backend_config.md#elasticsearch-설정) |
 
-2. 공통 유틸리티
-   - common/interceptor/ModifiableHttpServletRequest.java (HTTP 요청 래퍼 클래스)
+## 24. 환경 설정
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 24.1 | config/environment/EnvConfiguration.java | 환경 설정 | [변경사항](backend_config.md#환경별-설정) |
+| 24.2 | config/environment/SpecificConfigurationDev.java | 개발 환경 설정 | [변경사항](backend_config.md#환경별-설정) |
+| 24.3 | config/environment/SpecificConfigurationLocal.java | 로컬 환경 설정 | [변경사항](backend_config.md#환경별-설정) |
+| 24.4 | config/environment/SpecificConfigurationStag.java | 스테이징 환경 설정 | [변경사항](backend_config.md#환경별-설정) |
+| 24.5 | config/environment/SpecificConfigurationProd.java | 운영 환경 설정 | [변경사항](backend_config.md#환경별-설정) |
 
-3. 기타 VO 클래스들
-   - etc/ClassCodeVO.java (상수 정의)
-   - etc/List4User.java (유틸리티 클래스)
+## 25. 보안 확장
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 25.1 | config/security/CustomSessionExpiredStrategy.java | 세션 만료 처리 | [변경사항](backend_security.md#세션-만료-처리) |
+| 25.2 | config/security/MyAuthenticationSuccessHandler.java | 인증 성공 핸들러 | [변경사항](backend_security.md#인증-성공-핸들러) |
+| 25.3 | config/security/Role.java | 역할 상수 정의 | [변경사항](backend_security.md#역할-상수-정의) |
+| 25.4 | config/security/AdminAuthorize.java | 관리자 권한 어노테이션 | [변경사항](backend_security.md#권한-어노테이션-설정) |
+| 25.5 | config/security/AdminAuthorizeWithUser.java | 관리자+사용자 권한 어노테이션 | [변경사항](backend_security.md#권한-어노테이션-설정) |
+| 25.6 | config/security/UserAuthorize.java | 사용자 권한 어노테이션 | [변경사항](backend_security.md#권한-어노테이션-설정) |
+| 25.7 | config/security/GuestAuthorize.java | 게스트 권한 어노테이션 | [변경사항](backend_security.md#권한-어노테이션-설정) |
+
+## 26. 애플리케이션 이벤트 리스너
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 26.1 | common/listener/ApplicationStartingEventListener.java | 앱 시작 리스너 | [변경사항](backend_config.md#애플리케이션-생명주기-이벤트-리스너) |
+| 26.2 | common/listener/ApplicationEnvironmentPreparedEventListener.java | 환경 준비 리스너 | [변경사항](backend_config.md#애플리케이션-생명주기-이벤트-리스너) |
+| 26.3 | common/listener/ApplicationContextInitializedEventListener.java | 컨텍스트 초기화 리스너 | [변경사항](backend_config.md#애플리케이션-생명주기-이벤트-리스너) |
+| 26.4 | common/listener/ApplicationPreparedEventListener.java | 앱 준비 리스너 | [변경사항](backend_config.md#애플리케이션-생명주기-이벤트-리스너) |
+| 26.5 | common/listener/ApplicationReadyEventListener.java | 앱 준비 완료 리스너 | [변경사항](backend_config.md#애플리케이션-생명주기-이벤트-리스너) |
+| 26.6 | common/listener/ApplicationContextRefreshedEventListener.java | 컨텍스트 새로고침 리스너 | [변경사항](backend_config.md#애플리케이션-생명주기-이벤트-리스너) |
+| 26.7 | common/listener/ApplicationContextClosedEventListener.java | 컨텍스트 종료 리스너 | [변경사항](backend_config.md#애플리케이션-생명주기-이벤트-리스너) |
+| 26.8 | common/listener/ApplicationFailedEventListener.java | 앱 실패 리스너 | [변경사항](backend_config.md#애플리케이션-생명주기-이벤트-리스너) |
+| 26.9 | common/listener/TransactionEventListener.java | 트랜잭션 이벤트 리스너 | [변경사항](backend_config.md#트랜잭션-이벤트-리스너) |
+| 26.10 | common/listener/CustomApplicationEventListener.java | 커스텀 이벤트 리스너 | [변경사항](backend_config.md#커스텀-애플리케이션-이벤트) |
+
+## 27. 메일 모듈 확장
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 27.1 | mail/config/MailIntegrationConfig.java | 메일 통합 설정 | [변경사항](backend_service.md#메일-통합-설정) |
+| 27.2 | mail/SpringIntegrationSendMail.java | 통합 메일 송신 | [변경사항](backend_service.md#spring-integration-메일-송신) |
+| 27.3 | mail/SpringIntegrationImap.java | 통합 IMAP | [변경사항](backend_service.md#spring-integration-imap) |
+| 27.4 | mail/ImportMail.java | 메일 가져오기 | [변경사항](backend_service.md#importmail) |
+
+## 28. QR코드 기능
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 28.1 | develop/qrcode/QRCodeGenerator.java | QR코드 생성기 | [변경사항](backend_service.md#qrcodegenerator) |
+| 28.2 | develop/qrcode/QrCodeService.java | QR코드 서비스 | [변경사항](backend_service.md#qrcodeservice) |
+| 28.3 | develop/qrcode/QrCodeRepository.java | QR코드 저장소 | [변경사항](backend_service.md#qrcoderepository) |
+| 28.4 | develop/qrcode/QrCodeServiceImpl.java | QR코드 서비스 구현체 | [변경사항](backend_service.md#qrcodeserviceimpl) |
+| 28.5 | develop/qrcode/QrCodeMapper.java | QR코드 매퍼 | [변경사항](backend_service.md#qrcodemapper) |
+
+## 29. 추가 설정
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 29.1 | config/ThymeleafViewResolverConfig.java | Thymeleaf 설정 | [변경사항](backend_config.md#thymeleaf-설정) |
+| 29.2 | config/XssConfig.java | XSS 방지 설정 | [변경사항](backend_config.md#xss-방지-설정) |
+| 29.3 | config/GitConfig.java | Git 연동 설정 | [변경사항](backend_config.md#git-연동-설정) |
 
 # 아직 문서화가 필요한 파일 목록
-./com/devkbil/mtssbj/develop/logview/DevelopLogbackDevCheckController.java
-./com/devkbil/mtssbj/develop/ratelimit/RateLimitingAspect.java
-./com/devkbil/mtssbj/develop/ratelimit/RateLimit.java
-./com/devkbil/mtssbj/develop/ratelimit/RateLimitingService.java
-./com/devkbil/mtssbj/etc/ClassCodeVO.java
-./com/devkbil/mtssbj/etc/PopUserController.java
-./com/devkbil/mtssbj/etc/List4User.java
-./com/devkbil/mtssbj/etc/AlertMsgController.java
-./com/devkbil/mtssbj/etc/EtcService.java
-./com/devkbil/mtssbj/admin/organ/DepartmentRepository.java
-./com/devkbil/mtssbj/admin/organ/DepartmentServiceImpl.java
-./com/devkbil/mtssbj/admin/organ/DepartmentService.java
-./com/devkbil/mtssbj/admin/server/SrvEtcController.java
-./com/devkbil/mtssbj/admin/server/ConnController.java
-./com/devkbil/mtssbj/admin/server/ConnService.java
-./com/devkbil/mtssbj/common/listener/ApplicationFailedEventListener.java
-./com/devkbil/mtssbj/common/listener/ApplicationPreparedEventListener.java
-./com/devkbil/mtssbj/common/listener/ApplicationContextInitializedEventListener.java
-./com/devkbil/mtssbj/common/listener/ApplicationContextClosedEventListener.java
-./com/devkbil/mtssbj/common/listener/CustomApplicationEventListener.java
-./com/devkbil/mtssbj/common/listener/ApplicationEnvironmentPreparedEventListener.java
-./com/devkbil/mtssbj/common/listener/ApplicationContextRefreshedEventListener.java
-./com/devkbil/mtssbj/common/interceptor/ModifiableHttpServletRequest.java
+
+다음 파일들은 아직 문서화가 필요합니다:
+
+## 1. Admin 관련 파일
+- ./com/devkbil/mtssbj/admin/organ/DeptVO.java
+- ./com/devkbil/mtssbj/admin/organ/DeptServiceImpl.java
+- ./com/devkbil/mtssbj/admin/organ/DeptMapper.java
+- ./com/devkbil/mtssbj/admin/organ/DeptService.java
+- ./com/devkbil/mtssbj/admin/organ/DeptController.java
+- ./com/devkbil/mtssbj/admin/organ/UserController.java
+- ./com/devkbil/mtssbj/admin/organ/UserService.java
+- ./com/devkbil/mtssbj/admin/server/SrvEtcService.java
+- ./com/devkbil/mtssbj/admin/server/SWService.java
+- ./com/devkbil/mtssbj/admin/server/HWService.java
+- ./com/devkbil/mtssbj/admin/server/SvcVO.java
+- ./com/devkbil/mtssbj/admin/server/ConnService.java
+- ./com/devkbil/mtssbj/admin/server/SWVO.java
+- ./com/devkbil/mtssbj/admin/server/SrvEtcVO.java
+- ./com/devkbil/mtssbj/admin/server/ConnVO.java
+- ./com/devkbil/mtssbj/admin/server/HWVO.java
+
+## 2. 회원 관련 파일
+- ./com/devkbil/mtssbj/member/UserVO.java
+- ./com/devkbil/mtssbj/member/auth/AuthArguResolver.java
+- ./com/devkbil/mtssbj/member/auth/AuthConfig.java
+- ./com/devkbil/mtssbj/member/auth/AuthEventListener.java
+- ./com/devkbil/mtssbj/member/auth/AuthPrincipal.java
+- ./com/devkbil/mtssbj/member/auth/AuthRequest.java
+- ./com/devkbil/mtssbj/member/MyUserDetailService.java
+- ./com/devkbil/mtssbj/member/UserLoginFailHandler.java
+- ./com/devkbil/mtssbj/member/CustomSessionHandler.java
+- ./com/devkbil/mtssbj/member/MemberRepository.java
+- ./com/devkbil/mtssbj/member/UserInfoAdvice.java
+- ./com/devkbil/mtssbj/member/MemberConstant.java
+- ./com/devkbil/mtssbj/member/LoginController.java
+
+## 3. 인터셉터 관련 파일
+- ./com/devkbil/mtssbj/common/interceptor/ThemeInterceptor.java
+- ./com/devkbil/mtssbj/common/interceptor/TradingTimeInterceptor.java
+- ./com/devkbil/mtssbj/common/interceptor/UrlMappingInterceptor.java
+- ./com/devkbil/mtssbj/common/interceptor/RoleMappingsJson.java
+- ./com/devkbil/mtssbj/common/interceptor/DeviceDetectorInterceptor.java
+
+## 4. 기타 로깅/모니터링 파일
+- ./com/devkbil/mtssbj/common/log/MDCFilter.java
+- ./com/devkbil/mtssbj/common/log/MyStructuredLoggingFormatter.java
+- ./com/devkbil/mtssbj/common/log/MDCKey.java
+- ./com/devkbil/mtssbj/common/log/AccessLogConfig.java
+- ./com/devkbil/mtssbj/health/DogsApiHealthIndicator.java
+- ./com/devkbil/mtssbj/health/CheckController.java
+
 
 # 전체파일목록
 ./com/devkbil/mtssbj/develop/moutain/SherpaController.java

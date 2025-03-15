@@ -365,3 +365,199 @@ public class RolePermission {
 - 보안 메트릭 수집
 - 접근 로그 분석
 - 알림 설정 
+
+## 권한 어노테이션 설정
+### 변경 전
+레거시 시스템에서는 Custom Interceptor로 권한을 체크했습니다.
+
+### 변경 후
+
+#### AdminAuthorize 어노테이션
+```java
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@PreAuthorize("hasRole('ROLE_ADMIN')")
+public @interface AdminAuthorize {
+}
+```
+
+#### AdminAuthorizeWithUser 어노테이션
+```java
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@PreAuthorize("hasRole('ROLE_ADMIN') and authentication.principal.username == #username")
+public @interface AdminAuthorizeWithUser {
+}
+```
+
+#### UserAuthorize 어노테이션
+```java
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@PreAuthorize("hasRole('ROLE_USER')")
+public @interface UserAuthorize {
+}
+```
+
+#### GuestAuthorize 어노테이션
+```java
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@PreAuthorize("permitAll()")
+public @interface GuestAuthorize {
+}
+```
+
+## 세션 만료 처리
+### 변경 전
+레거시 시스템에서는 세션 만료 시 로그인 페이지로 리다이렉트되었습니다.
+
+### 변경 후
+```java
+@Component
+public class CustomSessionExpiredStrategy implements SessionInformationExpiredStrategy {
+    
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    
+    @Override
+    public void onExpiredSessionDetected(SessionInformationExpiredEvent event) throws IOException {
+        HttpServletResponse response = event.getResponse();
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        
+        Map<String, Object> body = new HashMap<>();
+        body.put("status", HttpStatus.UNAUTHORIZED.value());
+        body.put("error", "Unauthorized");
+        body.put("message", "Session expired");
+        body.put("timestamp", System.currentTimeMillis());
+        
+        response.getWriter().write(objectMapper.writeValueAsString(body));
+    }
+}
+```
+
+## 인증 성공 핸들러
+### 변경 전
+레거시 시스템에서는 로그인 성공 시 메인 페이지로 리다이렉트되었습니다.
+
+### 변경 후
+```java
+@Component
+public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+    
+    private final JwtTokenProvider jwtTokenProvider;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    
+    @Autowired
+    public MyAuthenticationSuccessHandler(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
+    
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+                                      Authentication authentication) throws IOException {
+        
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String token = jwtTokenProvider.generateToken(userDetails);
+        
+        response.setStatus(HttpStatus.OK.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        
+        Map<String, Object> body = new HashMap<>();
+        body.put("status", HttpStatus.OK.value());
+        body.put("message", "로그인 성공");
+        body.put("token", token);
+        
+        response.getWriter().write(objectMapper.writeValueAsString(body));
+    }
+}
+```
+
+## 역할 상수 정의
+### 변경 전
+레거시 시스템에서는 권한 정보가 데이터베이스에만 저장되었습니다.
+
+### 변경 후
+```java
+public class Role {
+    public static final String USER = "ROLE_USER";
+    public static final String ADMIN = "ROLE_ADMIN";
+    public static final String MANAGER = "ROLE_MANAGER";
+    public static final String GUEST = "ROLE_GUEST";
+    
+    private Role() {
+        // 유틸리티 클래스 생성자 방지
+    }
+}
+```
+
+## 역할 기반 매핑
+### 변경 전
+레거시 시스템에서는 사용자 역할과 URL 매핑이 코드에 하드코딩되어 있었습니다.
+
+### 변경 후
+```java
+@Component
+public class RoleBasedMapping {
+    
+    private Map<String, List<String>> roleUrlMap = new HashMap<>();
+    
+    public void addMapping(String role, String url) {
+        List<String> urls = roleUrlMap.getOrDefault(role, new ArrayList<>());
+        urls.add(url);
+        roleUrlMap.put(role, urls);
+    }
+    
+    public List<String> getUrlsByRole(String role) {
+        return roleUrlMap.getOrDefault(role, Collections.emptyList());
+    }
+    
+    public boolean isAllowed(String role, String url) {
+        List<String> allowedUrls = getUrlsByRole(role);
+        return allowedUrls.stream()
+                .anyMatch(pattern -> antPathMatcher.match(pattern, url));
+    }
+    
+    private final AntPathMatcher antPathMatcher = new AntPathMatcher();
+}
+```
+
+## 역할 매핑 로더
+### 변경 전
+레거시 시스템에서는 역할과 URL 매핑이 정적으로 관리되었습니다.
+
+### 변경 후
+```java
+@Component
+public class RoleMappingLoader {
+    
+    private final RoleBasedMapping roleBasedMapping;
+    private final ResourceLoader resourceLoader;
+    private final ObjectMapper objectMapper;
+    
+    @Autowired
+    public RoleMappingLoader(RoleBasedMapping roleBasedMapping, ResourceLoader resourceLoader) {
+        this.roleBasedMapping = roleBasedMapping;
+        this.resourceLoader = resourceLoader;
+        this.objectMapper = new ObjectMapper();
+    }
+    
+    @PostConstruct
+    public void init() throws IOException {
+        loadMappings();
+    }
+    
+    private void loadMappings() throws IOException {
+        Resource resource = resourceLoader.getResource("classpath:role-mappings.json");
+        RoleMappingsJson mappings = objectMapper.readValue(resource.getInputStream(), RoleMappingsJson.class);
+        
+        for (Map.Entry<String, List<String>> entry : mappings.getRoleMappings().entrySet()) {
+            String role = entry.getKey();
+            List<String> urls = entry.getValue();
+            
+            for (String url : urls) {
+                roleBasedMapping.addMapping(role, url);
+            }
+        }
+    }
+} 

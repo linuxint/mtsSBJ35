@@ -621,4 +621,728 @@ public class ConnectionServiceImpl implements ConnectionService {
             throw new RuntimeException("연결 상태 변경에 실패했습니다");
         }
     }
+}
+
+## 메일 모듈 확장
+
+### 메일 통합 설정
+#### 변경 전
+레거시 시스템에서는 JavaMail API를 직접 사용했습니다.
+
+#### 변경 후
+```java
+@Configuration
+@EnableIntegration
+public class MailIntegrationConfig {
+
+    @Value("${mail.imap.host}")
+    private String imapHost;
+    
+    @Value("${mail.imap.port}")
+    private int imapPort;
+    
+    @Value("${mail.smtp.host}")
+    private String smtpHost;
+    
+    @Value("${mail.smtp.port}")
+    private int smtpPort;
+    
+    @Bean
+    public ImapIdleChannelAdapter imapIdleChannelAdapter() {
+        ImapMailReceiver mailReceiver = new ImapMailReceiver("imaps://" + imapHost + ":" + imapPort + "/INBOX");
+        mailReceiver.setShouldMarkMessagesAsRead(true);
+        mailReceiver.setShouldDeleteMessages(false);
+        
+        ImapIdleChannelAdapter adapter = new ImapIdleChannelAdapter(mailReceiver);
+        adapter.setAutoStartup(true);
+        adapter.setOutputChannelName("imapChannel");
+        
+        return adapter;
+    }
+    
+    @Bean
+    public MessageChannel imapChannel() {
+        return new DirectChannel();
+    }
+    
+    @Bean
+    @ServiceActivator(inputChannel = "imapChannel")
+    public MessageHandler handleIncomingMail() {
+        return message -> {
+            Object payload = message.getPayload();
+            if (payload instanceof MimeMessage) {
+                // 메일 처리 로직
+            }
+        };
+    }
+    
+    @Bean
+    public JavaMailSender mailSender() {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost(smtpHost);
+        mailSender.setPort(smtpPort);
+        
+        Properties props = mailSender.getJavaMailProperties();
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        
+        return mailSender;
+    }
+}
+```
+
+### Spring Integration 메일 송신
+#### 변경 전
+```java
+public void sendMail(String to, String subject, String text) {
+    Properties props = new Properties();
+    props.put("mail.smtp.host", "smtp.example.com");
+    props.put("mail.smtp.port", "587");
+    props.put("mail.smtp.auth", "true");
+    props.put("mail.smtp.starttls.enable", "true");
+    
+    Session session = Session.getInstance(props, new Authenticator() {
+        protected PasswordAuthentication getPasswordAuthentication() {
+            return new PasswordAuthentication(username, password);
+        }
+    });
+    
+    try {
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress("from@example.com"));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+        message.setSubject(subject);
+        message.setText(text);
+        
+        Transport.send(message);
+    } catch (MessagingException e) {
+        throw new RuntimeException(e);
+    }
+}
+```
+
+#### 변경 후
+```java
+@Service
+public class SpringIntegrationSendMail {
+    
+    private final JavaMailSender mailSender;
+    private final MessageChannel mailChannel;
+    
+    @Autowired
+    public SpringIntegrationSendMail(JavaMailSender mailSender, 
+                                    @Qualifier("mailChannel") MessageChannel mailChannel) {
+        this.mailSender = mailSender;
+        this.mailChannel = mailChannel;
+    }
+    
+    @Bean
+    public MessageChannel mailChannel() {
+        return new DirectChannel();
+    }
+    
+    @Bean
+    @ServiceActivator(inputChannel = "mailChannel")
+    public MessageHandler mailMessageHandler() {
+        MailSendingMessageHandler handler = new MailSendingMessageHandler(mailSender);
+        handler.setAsync(true);
+        return handler;
+    }
+    
+    public void sendEmail(String to, String subject, String text) {
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(MailHeaders.SUBJECT, subject);
+        headers.put(MailHeaders.TO, to);
+        
+        Message<String> message = MessageBuilder
+                .withPayload(text)
+                .copyHeaders(headers)
+                .build();
+        
+        mailChannel.send(message);
+    }
+}
+```
+
+### Spring Integration IMAP
+#### 변경 전
+```java
+public List<MailVO> readMail(String username, String password) {
+    Properties props = new Properties();
+    props.put("mail.store.protocol", "imaps");
+    props.put("mail.imaps.host", "imap.example.com");
+    props.put("mail.imaps.port", "993");
+    
+    List<MailVO> mails = new ArrayList<>();
+    
+    try {
+        Session session = Session.getDefaultInstance(props, null);
+        Store store = session.getStore("imaps");
+        store.connect("imap.example.com", username, password);
+        
+        Folder inbox = store.getFolder("INBOX");
+        inbox.open(Folder.READ_ONLY);
+        
+        Message[] messages = inbox.getMessages();
+        for (Message message : messages) {
+            MailVO mail = new MailVO();
+            mail.setSubject(message.getSubject());
+            mail.setFrom(message.getFrom()[0].toString());
+            mail.setSentDate(message.getSentDate());
+            mail.setContent(message.getContent().toString());
+            mails.add(mail);
+        }
+        
+        inbox.close(false);
+        store.close();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    
+    return mails;
+}
+```
+
+#### 변경 후
+```java
+@Service
+public class SpringIntegrationImap {
+    
+    private final ImapIdleChannelAdapter imapAdapter;
+    private final MailRepository mailRepository;
+    
+    @Autowired
+    public SpringIntegrationImap(ImapIdleChannelAdapter imapAdapter, MailRepository mailRepository) {
+        this.imapAdapter = imapAdapter;
+        this.mailRepository = mailRepository;
+    }
+    
+    @ServiceActivator(inputChannel = "imapChannel")
+    public void processNewEmail(Message<?> message) {
+        if (message.getPayload() instanceof MimeMessage) {
+            MimeMessage email = (MimeMessage) message.getPayload();
+            try {
+                MailVO mail = new MailVO();
+                mail.setSubject(email.getSubject());
+                mail.setFrom(email.getFrom()[0].toString());
+                mail.setSentDate(email.getSentDate());
+                
+                // 메일 내용 추출
+                Object content = email.getContent();
+                if (content instanceof String) {
+                    mail.setContent((String) content);
+                } else if (content instanceof Multipart) {
+                    // 멀티파트 메일 처리
+                    processMultipart((Multipart) content, mail);
+                }
+                
+                // 메일 저장
+                mailRepository.save(mail);
+            } catch (Exception e) {
+                throw new RuntimeException("메일 처리 중 오류 발생", e);
+            }
+        }
+    }
+    
+    private void processMultipart(Multipart multipart, MailVO mail) throws Exception {
+        for (int i = 0; i < multipart.getCount(); i++) {
+            BodyPart bodyPart = multipart.getBodyPart(i);
+            
+            if (bodyPart.getContentType().toLowerCase().contains("text/plain")) {
+                mail.setContent((String) bodyPart.getContent());
+            } else if (bodyPart.getContentType().toLowerCase().contains("text/html")) {
+                mail.setHtmlContent((String) bodyPart.getContent());
+            } else if (bodyPart.getDisposition() != null && 
+                      bodyPart.getDisposition().equalsIgnoreCase(Part.ATTACHMENT)) {
+                saveAttachment(bodyPart, mail);
+            }
+        }
+    }
+    
+    private void saveAttachment(BodyPart bodyPart, MailVO mail) throws Exception {
+        String fileName = bodyPart.getFileName();
+        InputStream is = bodyPart.getInputStream();
+        
+        // 첨부 파일 저장 로직
+        byte[] bytes = IOUtils.toByteArray(is);
+        
+        MailAttachmentVO attachment = new MailAttachmentVO();
+        attachment.setFileName(fileName);
+        attachment.setFileSize(bytes.length);
+        attachment.setFilePath(saveFile(fileName, bytes));
+        attachment.setMailId(mail.getId());
+        
+        mail.getAttachments().add(attachment);
+    }
+    
+    private String saveFile(String fileName, byte[] data) {
+        // 파일 저장 처리
+        String path = "mail_attachments/" + UUID.randomUUID() + "_" + fileName;
+        try {
+            FileUtils.writeByteArrayToFile(new File(path), data);
+        } catch (IOException e) {
+            throw new FileStorageException("첨부 파일 저장 실패", e);
+        }
+        return path;
+    }
+}
+```
+
+### ImportMail
+#### 변경 전
+레거시 시스템에서는 메일 가져오기가 동기식으로 처리되었습니다.
+
+#### 변경 후
+```java
+@Service
+public class ImportMail {
+    
+    private final MailRepository mailRepository;
+    private final JavaMailSender mailSender;
+    
+    @Autowired
+    public ImportMail(MailRepository mailRepository, JavaMailSender mailSender) {
+        this.mailRepository = mailRepository;
+        this.mailSender = mailSender;
+    }
+    
+    @Async
+    public CompletableFuture<List<MailVO>> importMailsAsync(String username, String password) {
+        return CompletableFuture.supplyAsync(() -> {
+            return importMails(username, password);
+        });
+    }
+    
+    public List<MailVO> importMails(String username, String password) {
+        List<MailVO> importedMails = new ArrayList<>();
+        
+        Properties props = new Properties();
+        props.put("mail.store.protocol", "imaps");
+        
+        try {
+            Session session = Session.getInstance(props);
+            Store store = session.getStore("imaps");
+            store.connect("imap.example.com", username, password);
+            
+            Folder inbox = store.getFolder("INBOX");
+            inbox.open(Folder.READ_ONLY);
+            
+            // 최근 30일 이내의 메일만 가져오기
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, -30);
+            Date thirtyDaysAgo = cal.getTime();
+            
+            SearchTerm newerThan = new ReceivedDateTerm(ComparisonTerm.GT, thirtyDaysAgo);
+            Message[] messages = inbox.search(newerThan);
+            
+            for (Message message : messages) {
+                MailVO mail = convertMessageToMailVO(message);
+                importedMails.add(mail);
+                mailRepository.save(mail);
+            }
+            
+            inbox.close(false);
+            store.close();
+        } catch (Exception e) {
+            throw new MailProcessingException("메일 가져오기 실패", e);
+        }
+        
+        return importedMails;
+    }
+    
+    private MailVO convertMessageToMailVO(Message message) throws Exception {
+        MailVO mail = new MailVO();
+        mail.setSubject(message.getSubject());
+        mail.setFrom(Arrays.toString(message.getFrom()));
+        mail.setTo(Arrays.toString(message.getRecipients(Message.RecipientType.TO)));
+        mail.setSentDate(message.getSentDate());
+        
+        // 메일 내용 추출
+        Object content = message.getContent();
+        if (content instanceof String) {
+            mail.setContent((String) content);
+        } else if (content instanceof Multipart) {
+            extractMultipartContent((Multipart) content, mail);
+        }
+        
+        return mail;
+    }
+    
+    private void extractMultipartContent(Multipart multipart, MailVO mail) throws Exception {
+        for (int i = 0; i < multipart.getCount(); i++) {
+            BodyPart bodyPart = multipart.getBodyPart(i);
+            
+            if (bodyPart.getContentType().toLowerCase().contains("text/plain")) {
+                mail.setContent((String) bodyPart.getContent());
+            } else if (bodyPart.getContentType().toLowerCase().contains("text/html")) {
+                mail.setHtmlContent((String) bodyPart.getContent());
+            } else if (bodyPart.getDisposition() != null && 
+                      bodyPart.getDisposition().equalsIgnoreCase(Part.ATTACHMENT)) {
+                saveAttachment(bodyPart, mail);
+            }
+        }
+    }
+    
+    private void saveAttachment(BodyPart bodyPart, MailVO mail) throws Exception {
+        String fileName = bodyPart.getFileName();
+        InputStream is = bodyPart.getInputStream();
+        
+        // 첨부 파일 저장 로직
+        byte[] bytes = IOUtils.toByteArray(is);
+        
+        MailAttachmentVO attachment = new MailAttachmentVO();
+        attachment.setFileName(fileName);
+        attachment.setFileSize(bytes.length);
+        attachment.setFilePath(saveFile(fileName, bytes));
+        attachment.setMailId(mail.getId());
+        
+        mail.getAttachments().add(attachment);
+    }
+    
+    private String saveFile(String fileName, byte[] data) {
+        // 파일 저장 처리
+        String path = "mail_attachments/" + UUID.randomUUID() + "_" + fileName;
+        try {
+            FileUtils.writeByteArrayToFile(new File(path), data);
+        } catch (IOException e) {
+            throw new FileStorageException("첨부 파일 저장 실패", e);
+        }
+        return path;
+    }
+}
+```
+
+## QR코드 기능
+
+### QRCodeGenerator
+#### 변경 전
+레거시 시스템에서는 단순한 QR코드 생성 방식이 사용되었습니다.
+
+#### 변경 후
+```java
+@Component
+public class QRCodeGenerator {
+    
+    private static final int DEFAULT_WIDTH = 300;
+    private static final int DEFAULT_HEIGHT = 300;
+    private static final String DEFAULT_FORMAT = "PNG";
+    
+    public byte[] generateQRCode(String content) throws Exception {
+        return generateQRCode(content, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    }
+    
+    public byte[] generateQRCode(String content, int width, int height) throws Exception {
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height);
+        
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        MatrixToImageWriter.writeToStream(bitMatrix, DEFAULT_FORMAT, outputStream);
+        
+        return outputStream.toByteArray();
+    }
+    
+    public String generateQRCodeBase64(String content) throws Exception {
+        byte[] qrCode = generateQRCode(content);
+        return Base64.getEncoder().encodeToString(qrCode);
+    }
+    
+    public void saveQRCodeToFile(String content, String filePath) throws Exception {
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, 
+                                DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        
+        Path path = FileSystems.getDefault().getPath(filePath);
+        MatrixToImageWriter.writeToPath(bitMatrix, DEFAULT_FORMAT, path);
+    }
+    
+    public BufferedImage generateQRCodeImage(String content) throws Exception {
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, 
+                                DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        
+        return MatrixToImageWriter.toBufferedImage(bitMatrix);
+    }
+}
+```
+
+### QrCodeService
+#### 변경 전
+레거시 시스템에서는 QR코드의 통합 서비스가 제공되지 않았습니다.
+
+#### 변경 후
+```java
+@Service
+public class QrCodeService {
+    
+    private final QRCodeGenerator qrCodeGenerator;
+    private final QrCodeRepository qrCodeRepository;
+    
+    @Autowired
+    public QrCodeService(QRCodeGenerator qrCodeGenerator, QrCodeRepository qrCodeRepository) {
+        this.qrCodeGenerator = qrCodeGenerator;
+        this.qrCodeRepository = qrCodeRepository;
+    }
+    
+    @Transactional
+    public QrCodeDTO generateAndSaveQrCode(String content, String description) throws Exception {
+        // QR 코드 생성
+        byte[] qrCodeImage = qrCodeGenerator.generateQRCode(content);
+        String base64Image = Base64.getEncoder().encodeToString(qrCodeImage);
+        
+        // QR 코드 정보 저장
+        QrCodeEntity qrCode = new QrCodeEntity();
+        qrCode.setContent(content);
+        qrCode.setDescription(description);
+        qrCode.setCreatedDate(new Date());
+        qrCode.setBase64Image(base64Image);
+        
+        qrCodeRepository.save(qrCode);
+        
+        // DTO 변환하여 반환
+        QrCodeDTO dto = new QrCodeDTO();
+        dto.setId(qrCode.getId());
+        dto.setContent(qrCode.getContent());
+        dto.setDescription(qrCode.getDescription());
+        dto.setCreatedDate(qrCode.getCreatedDate());
+        dto.setBase64Image(qrCode.getBase64Image());
+        
+        return dto;
+    }
+    
+    public QrCodeDTO getQrCodeById(Long id) {
+        Optional<QrCodeEntity> qrCodeOptional = qrCodeRepository.findById(id);
+        
+        if (qrCodeOptional.isPresent()) {
+            QrCodeEntity qrCode = qrCodeOptional.get();
+            
+            QrCodeDTO dto = new QrCodeDTO();
+            dto.setId(qrCode.getId());
+            dto.setContent(qrCode.getContent());
+            dto.setDescription(qrCode.getDescription());
+            dto.setCreatedDate(qrCode.getCreatedDate());
+            dto.setBase64Image(qrCode.getBase64Image());
+            
+            return dto;
+        } else {
+            throw new EntityNotFoundException("QR 코드를 찾을 수 없습니다: " + id);
+        }
+    }
+    
+    public List<QrCodeDTO> getAllQrCodes() {
+        List<QrCodeEntity> qrCodes = qrCodeRepository.findAll();
+        
+        return qrCodes.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    
+    public ResponseEntity<byte[]> getQrCodeImageById(Long id) throws Exception {
+        Optional<QrCodeEntity> qrCodeOptional = qrCodeRepository.findById(id);
+        
+        if (qrCodeOptional.isPresent()) {
+            QrCodeEntity qrCode = qrCodeOptional.get();
+            byte[] imageBytes = Base64.getDecoder().decode(qrCode.getBase64Image());
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_PNG);
+            
+            return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+        } else {
+            throw new EntityNotFoundException("QR 코드를 찾을 수 없습니다: " + id);
+        }
+    }
+    
+    @Transactional
+    public void deleteQrCode(Long id) {
+        if (qrCodeRepository.existsById(id)) {
+            qrCodeRepository.deleteById(id);
+        } else {
+            throw new EntityNotFoundException("QR 코드를 찾을 수 없습니다: " + id);
+        }
+    }
+    
+    private QrCodeDTO convertToDTO(QrCodeEntity entity) {
+        QrCodeDTO dto = new QrCodeDTO();
+        dto.setId(entity.getId());
+        dto.setContent(entity.getContent());
+        dto.setDescription(entity.getDescription());
+        dto.setCreatedDate(entity.getCreatedDate());
+        dto.setBase64Image(entity.getBase64Image());
+        return dto;
+    }
+}
+```
+
+### QrCodeRepository
+#### 변경 전
+레거시 시스템에서는 QR코드 저장소가 구현되지 않았습니다.
+
+#### 변경 후
+```java
+@Repository
+public interface QrCodeRepository extends JpaRepository<QrCodeEntity, Long> {
+    
+    List<QrCodeEntity> findByContentContaining(String content);
+    
+    List<QrCodeEntity> findByCreatedDateBetween(Date startDate, Date endDate);
+    
+    @Query("SELECT q FROM QrCodeEntity q WHERE q.description LIKE %:keyword%")
+    List<QrCodeEntity> searchByDescription(@Param("keyword") String keyword);
+    
+    @Query(value = "SELECT * FROM qr_code WHERE created_date > :date", nativeQuery = true)
+    List<QrCodeEntity> findRecentQrCodes(@Param("date") Date date);
+    
+    Optional<QrCodeEntity> findByContent(String content);
+}
+```
+
+### QrCodeServiceImpl
+#### 변경 전
+레거시 시스템에서는 서비스 구현체가 분리되지 않았습니다.
+
+#### 변경 후
+```java
+@Service
+public class QrCodeServiceImpl implements QrCodeService {
+    
+    private final QRCodeGenerator qrCodeGenerator;
+    private final QrCodeRepository qrCodeRepository;
+    private final QrCodeMapper qrCodeMapper;
+    
+    @Autowired
+    public QrCodeServiceImpl(QRCodeGenerator qrCodeGenerator, 
+                            QrCodeRepository qrCodeRepository,
+                            QrCodeMapper qrCodeMapper) {
+        this.qrCodeGenerator = qrCodeGenerator;
+        this.qrCodeRepository = qrCodeRepository;
+        this.qrCodeMapper = qrCodeMapper;
+    }
+    
+    @Override
+    @Transactional
+    public QrCodeDTO generateAndSaveQrCode(String content, String description) throws Exception {
+        // QR 코드 생성
+        byte[] qrCodeImage = qrCodeGenerator.generateQRCode(content);
+        String base64Image = Base64.getEncoder().encodeToString(qrCodeImage);
+        
+        // QR 코드 정보 저장
+        QrCodeEntity qrCode = new QrCodeEntity();
+        qrCode.setContent(content);
+        qrCode.setDescription(description);
+        qrCode.setCreatedDate(new Date());
+        qrCode.setBase64Image(base64Image);
+        
+        qrCodeRepository.save(qrCode);
+        
+        // DTO 변환하여 반환
+        return qrCodeMapper.entityToDto(qrCode);
+    }
+    
+    @Override
+    public QrCodeDTO getQrCodeById(Long id) {
+        Optional<QrCodeEntity> qrCodeOptional = qrCodeRepository.findById(id);
+        
+        if (qrCodeOptional.isPresent()) {
+            QrCodeEntity qrCode = qrCodeOptional.get();
+            return qrCodeMapper.entityToDto(qrCode);
+        } else {
+            throw new EntityNotFoundException("QR 코드를 찾을 수 없습니다: " + id);
+        }
+    }
+    
+    @Override
+    public List<QrCodeDTO> getAllQrCodes() {
+        List<QrCodeEntity> qrCodes = qrCodeRepository.findAll();
+        
+        return qrCodes.stream()
+                .map(qrCodeMapper::entityToDto)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public ResponseEntity<byte[]> getQrCodeImageById(Long id) throws Exception {
+        Optional<QrCodeEntity> qrCodeOptional = qrCodeRepository.findById(id);
+        
+        if (qrCodeOptional.isPresent()) {
+            QrCodeEntity qrCode = qrCodeOptional.get();
+            byte[] imageBytes = Base64.getDecoder().decode(qrCode.getBase64Image());
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_PNG);
+            
+            return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+        } else {
+            throw new EntityNotFoundException("QR 코드를 찾을 수 없습니다: " + id);
+        }
+    }
+    
+    @Override
+    @Transactional
+    public void deleteQrCode(Long id) {
+        if (qrCodeRepository.existsById(id)) {
+            qrCodeRepository.deleteById(id);
+        } else {
+            throw new EntityNotFoundException("QR 코드를 찾을 수 없습니다: " + id);
+        }
+    }
+    
+    @Override
+    public List<QrCodeDTO> searchQrCodes(String keyword) {
+        List<QrCodeEntity> results = qrCodeRepository.searchByDescription(keyword);
+        
+        return results.stream()
+                .map(qrCodeMapper::entityToDto)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<QrCodeDTO> getRecentQrCodes(int days) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, -days);
+        Date date = calendar.getTime();
+        
+        List<QrCodeEntity> recentQrCodes = qrCodeRepository.findRecentQrCodes(date);
+        
+        return recentQrCodes.stream()
+                .map(qrCodeMapper::entityToDto)
+                .collect(Collectors.toList());
+    }
+}
+```
+
+### QrCodeMapper
+#### 변경 전
+레거시 시스템에서는 매퍼 클래스가 사용되지 않았습니다.
+
+#### 변경 후
+```java
+@Component
+public class QrCodeMapper {
+    
+    public QrCodeDTO entityToDto(QrCodeEntity entity) {
+        QrCodeDTO dto = new QrCodeDTO();
+        dto.setId(entity.getId());
+        dto.setContent(entity.getContent());
+        dto.setDescription(entity.getDescription());
+        dto.setCreatedDate(entity.getCreatedDate());
+        dto.setBase64Image(entity.getBase64Image());
+        return dto;
+    }
+    
+    public QrCodeEntity dtoToEntity(QrCodeDTO dto) {
+        QrCodeEntity entity = new QrCodeEntity();
+        entity.setId(dto.getId());
+        entity.setContent(dto.getContent());
+        entity.setDescription(dto.getDescription());
+        entity.setCreatedDate(dto.getCreatedDate());
+        entity.setBase64Image(dto.getBase64Image());
+        return entity;
+    }
+    
+    public List<QrCodeDTO> entitiesToDtos(List<QrCodeEntity> entities) {
+        return entities.stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
+    }
 } 
