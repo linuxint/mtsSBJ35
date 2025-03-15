@@ -86,6 +86,71 @@
 | 10.3 | error/ErrorResponse.java | 에러 응답 | [변경사항](backend_error.md#error-response) |
 | 10.4 | error/ApiResponse.java | API 응답 | [변경사항](backend_error.md#api-response) |
 
+# 추가 변경 필요 파일 목록
+
+## 11. 개발 도구
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 11.1 | develop/dbtool/DbtoolController.java | DB 도구 컨트롤러 | [변경사항](backend_controller.md#dbtool-controller) |
+| 11.2 | develop/dbtool/DbtoolService.java | DB 도구 서비스 | [변경사항](backend_service.md#dbtool-service) |
+| 11.3 | develop/naver/map/NaverApiController.java | 네이버 지도 API | [변경사항](backend_controller.md#naver-api) |
+| 11.4 | develop/qrcode/QrCodeController.java | QR코드 컨트롤러 | [변경사항](backend_controller.md#qrcode-controller) |
+| 11.5 | develop/ratelimit/RateLimitingController.java | 속도 제한 컨트롤러 | [변경사항](backend_controller.md#ratelimit-controller) |
+
+## 12. 모니터링
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 12.1 | monitor/CacheMonitorController.java | 캐시 모니터링 | [변경사항](backend_controller.md#cache-monitor) |
+| 12.2 | monitor/MonitorSecurityConfig.java | 모니터링 보안 설정 | [변경사항](backend_config.md#monitor-security) |
+
+## 13. 서버 관리
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 13.1 | admin/server/SvcController.java | 서비스 관리 | [변경사항](backend_controller.md#service-management) |
+| 13.2 | admin/server/HWController.java | 하드웨어 관리 | [변경사항](backend_controller.md#hardware-management) |
+| 13.3 | admin/server/SWController.java | 소프트웨어 관리 | [변경사항](backend_controller.md#software-management) |
+
+## 14. 공통 인터셉터
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 14.1 | common/interceptor/LoginInterceptor.java | 로그인 인터셉터 | [변경사항](backend_security.md#login-interceptor) |
+| 14.2 | common/interceptor/AdminInterceptor.java | 관리자 인터셉터 | [변경사항](backend_security.md#admin-interceptor) |
+| 14.3 | common/interceptor/CommonInterceptor.java | 공통 인터셉터 | [변경사항](backend_security.md#common-interceptor) |
+
+## 15. 이벤트 리스너
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 15.1 | common/listener/ApplicationStartingEventListener.java | 앱 시작 리스너 | [변경사항](backend_config.md#app-lifecycle) |
+| 15.2 | common/listener/ApplicationReadyEventListener.java | 앱 준비 리스너 | [변경사항](backend_config.md#app-lifecycle) |
+| 15.3 | common/listener/TransactionEventListener.java | 트랜잭션 리스너 | [변경사항](backend_config.md#transaction-events) |
+
+## 16. 기타 유틸리티
+| 번호 | 파일명 | 파일설명 | 변경사항 |
+|------|--------|----------|-----------|
+| 16.1 | common/Upload4ckeditor.java | CKEditor 업로드 | [변경사항](backend_common.md#file-upload) |
+| 16.2 | common/MakeExcel.java | 엑셀 생성 | [변경사항](backend_common.md#excel-util) |
+| 16.3 | common/code/CodeCacheService.java | 코드 캐시 서비스 | [변경사항](backend_service.md#code-cache) |
+
+# 변경 불필요 파일 목록
+다음 파일들은 현재 구조에서 그대로 사용 가능합니다:
+
+1. 개발 도구 관련
+   - develop/logview/* (로그 뷰어 관련 파일들)
+   - develop/filesearch/* (파일 검색 관련 파일들)
+   - develop/qrcode/QrCodeMapper.java
+   - develop/qrcode/QrConstant.java
+
+2. 공통 유틸리티
+   - common/util/* (기본 유틸리티 클래스들)
+   - common/masking/* (마스킹 처리 관련 클래스들)
+   - common/log/* (로깅 관련 클래스들)
+
+3. 기타 VO 클래스들
+   - */vo/* (값 객체 클래스들)
+   - */dto/* (데이터 전송 객체 클래스들)
+
+이러한 파일들은 Spring Boot로의 마이그레이션에서 큰 변경 없이 재사용할 수 있습니다.
+
 
 # 전체파일목록
 ./com/devkbil/mtssbj/monitor/MonitorSecurityConfig.java
