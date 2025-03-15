@@ -128,9 +128,6 @@ public class MenuController {
      */
     private void setCommonAttributes(ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
 
     }
 

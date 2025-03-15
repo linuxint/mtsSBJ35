@@ -56,10 +56,6 @@ public class DeptController {
     @Operation(summary = "부서 트리 조회", description = "부서의 계층 트리 구조를 반환합니다.")
     public String dept(ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        // 공통 속성 설정
-        etcService.setCommonAttribute(userno, modelMap);
 
         // 부서 트리 데이터 설정
         List<?> listview = deptService.selectDept();

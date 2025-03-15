@@ -55,10 +55,6 @@ public class ConnController {
     public String serverConnList(ModelMap modelMap) {
 
         // 현재 사용자 정보 가져오기
-        String userno = authService.getAuthUserNo();
-
-        // 공통 속성 설정
-        etcService.setCommonAttribute(userno, modelMap);
 
         // 검색 조건 설정 및 리스트 조회
         ServerSearchVO searchVO = new ServerSearchVO();

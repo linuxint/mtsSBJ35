@@ -6,18 +6,22 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 공통 서비스, Alert 카운트, 사용자 데이터 조회 및 관련 비즈니스 로직을 관리하는 서비스 클래스입니다.
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "EtcService", description = "공통 서비스와 Alert 및 사용자 조회 관련 비즈니스 로직 처리")
 public class EtcService {
 
@@ -31,19 +35,36 @@ public class EtcService {
      */
     @Operation(summary = "공통 속성 설정", description = "Alert 카운트를 포함한 공통 속성을 설정합니다.")
     public void setCommonAttribute(String param, ModelMap modelMap) {
-        Integer alertcount = sqlSession.selectOne("selectAlertCount", param);
+        // 캐시된 메서드를 호출하여 알림 카운트를 가져옴
+        Integer alertcount = selectAlertCount(param);
+        log.debug("사용자 [{}]의 알림 카운트: {}", param, alertcount);
         modelMap.addAttribute("alertcount", alertcount);
     }
 
     /**
      * Alert 카운트를 조회합니다.
+     * 결과는 'alertCount' 캐시에 저장되며, 키는 사용자 ID입니다.
      *
      * @param param 사용자 ID
      * @return Alert 카운트
      */
+    @Cacheable(value = "alertCount", key = "#param")
     @Operation(summary = "Alert 카운트 조회", description = "사용자 ID를 기준으로 Alert 카운트를 조회합니다.")
     public Integer selectAlertCount(String param) {
+        log.debug("캐시에서 찾을 수 없어 DB에서 알림 카운트 조회: 사용자 [{}]", param);
         return sqlSession.selectOne("selectAlertCount", param);
+    }
+
+    /**
+     * 특정 사용자의 알림 카운트 캐시를 갱신합니다.
+     * 이 메서드는 알림 데이터가 변경될 때 호출되어야 합니다.
+     *
+     * @param param 사용자 ID
+     */
+    @CacheEvict(value = "alertCount", key = "#param")
+    @Operation(summary = "알림 카운트 캐시 갱신", description = "사용자 ID에 대한 알림 카운트 캐시를 갱신합니다.")
+    public void refreshAlertCount(String param) {
+        log.debug("사용자 [{}]의 알림 카운트 캐시 갱신", param);
     }
 
     /**

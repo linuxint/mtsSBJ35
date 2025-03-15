@@ -58,10 +58,6 @@ public class ChkController {
     @GetMapping("/chkList")
     public String chkList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        // 공통 속성 설정 (예: 사용자 정보)
-        etcService.setCommonAttribute(userno, modelMap);
 
         // CRUD 관련 작업: 페이징 계산 및 리스트 생성
         searchVO.pageCalculate(crudService.selectCrudCount(searchVO)); // startRow, endRow 계산

@@ -47,9 +47,6 @@ public class SampleController {
     @GetMapping("/sample1")
     public String sample1(ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
 
         return "main/sample1";
     }
@@ -64,9 +61,6 @@ public class SampleController {
     @GetMapping("/sample2")
     public String sample2(ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
         // -----------------------------------------
 
         String today = DateUtil.date2Str(DateUtil.getToday());
@@ -85,9 +79,6 @@ public class SampleController {
     @GetMapping("/sample3")
     public String sample3(ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
         // -----------------------------------------
 
         List<?> listview = sampleService.selectBoardGroupCount4Statistic();
@@ -107,9 +98,6 @@ public class SampleController {
     @GetMapping("/sample4")
     public String sample4(@ModelAttribute @Valid BoardSearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
         // -----------------------------------------
 
         searchVO.pageCalculate(boardService.selectBoardCount(searchVO)); // startRow, endRow

@@ -3,6 +3,7 @@ package com.devkbil.mtssbj.board;
 import com.devkbil.mtssbj.admin.board.BoardGroupVO;
 import com.devkbil.mtssbj.common.ExtFieldVO;
 import com.devkbil.mtssbj.common.FileVO;
+import com.devkbil.mtssbj.etc.EtcService;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.cache.annotation.CacheEvict;
@@ -32,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BoardService {
 
     private final SqlSessionTemplate sqlSession;
+    private final EtcService etcService;
 
     /**
      * 게시판 그룹 정보 조회
@@ -177,8 +179,17 @@ public class BoardService {
     @CacheEvict(value = "boardList", allEntries = true)
     public void insertBoardLike(ExtFieldVO param) {
         try {
+            // 게시글 정보 조회하여 작성자 ID 가져오기
+            BoardVO board = sqlSession.selectOne("selectBoardOne", new ExtFieldVO(param.getField1(), null, null));
+
             sqlSession.insert("insertBoardLike", param);
             sqlSession.update("updateBoard4Like", param);
+
+            // 게시글 작성자의 알림 카운트 캐시 갱신
+            if (board != null && board.getUserno() != null) {
+                log.debug("좋아요 추가로 인한 알림 카운트 캐시 갱신: 사용자 [{}]", board.getUserno());
+                etcService.refreshAlertCount(board.getUserno());
+            }
         } catch (TransactionException ex) {
             log.error("insertBoardLike: 좋아요 저장 중 오류 발생", ex);
         }
@@ -216,23 +227,52 @@ public class BoardService {
      */
     @Transactional(rollbackFor = Exception.class)
     public BoardReplyVO insertBoardReply(BoardReplyVO param) {
-        if (!StringUtils.hasText(param.getReno())) {
-            // 신규 댓글 추가
-            if (StringUtils.hasText(param.getReparent())) {
-                BoardReplyVO parentReply = sqlSession.selectOne("selectBoardReplyParent", param.getReparent());
-                param.setRedepth(parentReply.getRedepth());
-                param.setReorder(parentReply.getReorder() + 1);
-                sqlSession.selectOne("updateBoardReplyOrder", parentReply);
+        try {
+            // 게시글 정보 조회하여 작성자 ID 가져오기
+            BoardVO board = sqlSession.selectOne("selectBoardOne", new ExtFieldVO(param.getBrdno(), null, null));
+            String parentReplyUserno = null;
+
+            if (!StringUtils.hasText(param.getReno())) {
+                // 신규 댓글 추가
+                if (StringUtils.hasText(param.getReparent())) {
+                    // 부모 댓글이 있는 경우 (대댓글)
+                    BoardReplyVO parentReply = sqlSession.selectOne("selectBoardReplyParent", param.getReparent());
+                    param.setRedepth(parentReply.getRedepth());
+                    param.setReorder(parentReply.getReorder() + 1);
+                    sqlSession.selectOne("updateBoardReplyOrder", parentReply);
+
+                    // 부모 댓글 정보 조회하여 작성자 ID 가져오기
+                    BoardReplyVO parentReplyInfo = sqlSession.selectOne("selectBoardReplyOne", param.getReparent());
+                    if (parentReplyInfo != null) {
+                        parentReplyUserno = parentReplyInfo.getUserno();
+                    }
+                } else {
+                    Integer reorder = sqlSession.selectOne("selectBoardReplyMaxOrder", param.getBrdno());
+                    param.setReorder(reorder);
+                }
+                sqlSession.insert("insertBoardReply", param);
             } else {
-                Integer reorder = sqlSession.selectOne("selectBoardReplyMaxOrder", param.getBrdno());
-                param.setReorder(reorder);
+                // 댓글 수정
+                sqlSession.update("updateBoardReply", param);
             }
-            sqlSession.insert("insertBoardReply", param);
-        } else {
-            // 댓글 수정
-            sqlSession.update("updateBoardReply", param);
+
+            // 게시글 작성자의 알림 카운트 캐시 갱신
+            if (board != null && board.getUserno() != null) {
+                log.debug("댓글 추가로 인한 알림 카운트 캐시 갱신: 게시글 작성자 [{}]", board.getUserno());
+                etcService.refreshAlertCount(board.getUserno());
+            }
+
+            // 부모 댓글 작성자의 알림 카운트 캐시 갱신 (대댓글인 경우)
+            if (parentReplyUserno != null && !parentReplyUserno.equals(board.getUserno())) {
+                log.debug("대댓글 추가로 인한 알림 카운트 캐시 갱신: 부모 댓글 작성자 [{}]", parentReplyUserno);
+                etcService.refreshAlertCount(parentReplyUserno);
+            }
+
+            return sqlSession.selectOne("selectBoardReplyOne", param.getReno());
+        } catch (Exception ex) {
+            log.error("insertBoardReply: 댓글 저장 중 오류 발생", ex);
+            throw ex;
         }
-        return sqlSession.selectOne("selectBoardReplyOne", param.getReno());
     }
 
     /**
@@ -255,27 +295,71 @@ public class BoardService {
      */
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteBoardReply(BoardReplyVO boardReplyInfo) {
-        Integer childCount = sqlSession.selectOne("selectBoardReplyChild", boardReplyInfo);
+        try {
+            Integer childCount = sqlSession.selectOne("selectBoardReplyChild", boardReplyInfo);
 
-        if (childCount > 0) {
-            return false; // 자식 댓글이 있는 경우 삭제 불가
+            if (childCount > 0) {
+                return false; // 자식 댓글이 있는 경우 삭제 불가
+            }
+
+            // 삭제 전에 게시글 정보와 댓글 정보 조회
+            BoardReplyVO replyInfo = sqlSession.selectOne("selectBoardReplyOne", boardReplyInfo.getReno());
+            if (replyInfo != null) {
+                BoardVO board = sqlSession.selectOne("selectBoardOne", new ExtFieldVO(replyInfo.getBrdno(), null, null));
+
+                sqlSession.update("updateBoardReplyOrder4Delete", boardReplyInfo);
+                sqlSession.delete("deleteBoardReply", boardReplyInfo);
+
+                // 게시글 작성자의 알림 카운트 캐시 갱신
+                if (board != null && board.getUserno() != null) {
+                    log.debug("댓글 삭제로 인한 알림 카운트 캐시 갱신: 게시글 작성자 [{}]", board.getUserno());
+                    etcService.refreshAlertCount(board.getUserno());
+                }
+
+                return true;
+            } else {
+                // 댓글 정보를 찾을 수 없는 경우
+                sqlSession.update("updateBoardReplyOrder4Delete", boardReplyInfo);
+                sqlSession.delete("deleteBoardReply", boardReplyInfo);
+                return true;
+            }
+        } catch (Exception ex) {
+            log.error("deleteBoardReply: 댓글 삭제 중 오류 발생", ex);
+            throw ex;
         }
-
-        sqlSession.update("updateBoardReplyOrder4Delete", boardReplyInfo);
-        sqlSession.delete("deleteBoardReply", boardReplyInfo);
-
-        return true;
     }
 
     /**
      * 댓글 전체 삭제
      * - 특정 게시글의 모든 댓글을 삭제합니다.
      *
-     * @param map 삭제 조건
-     * @return boolean 삭제 성공 여부
+     * @param map 삭제 조건 (brdno: 게시글 ID, userno: 사용자 ID)
+     * @return int 삭제된 행(row) 개수
      */
-    public int deleteBoardReplyAll(Map map) {
-        return sqlSession.delete("deleteBoardReplyAll", map);
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteBoardReplyAll(Map<String, String> map) {
+        try {
+            String brdno = map.get("brdno");
+            if (StringUtils.hasText(brdno)) {
+                // 게시글 정보 조회하여 작성자 ID 가져오기
+                BoardVO board = sqlSession.selectOne("selectBoardOne", new ExtFieldVO(brdno, null, null));
+
+                int result = sqlSession.delete("deleteBoardReplyAll", map);
+
+                // 게시글 작성자의 알림 카운트 캐시 갱신
+                if (board != null && board.getUserno() != null) {
+                    log.debug("모든 댓글 삭제로 인한 알림 카운트 캐시 갱신: 게시글 작성자 [{}]", board.getUserno());
+                    etcService.refreshAlertCount(board.getUserno());
+                }
+
+                return result;
+            } else {
+                return 0;
+            }
+        } catch (Exception ex) {
+            log.error("deleteBoardReplyAll: 모든 댓글 삭제 중 오류 발생", ex);
+            throw ex;
+        }
     }
 
     /**

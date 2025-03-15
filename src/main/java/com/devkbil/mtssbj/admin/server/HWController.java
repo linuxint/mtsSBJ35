@@ -55,10 +55,6 @@ public class HWController {
     public String serverHWList(ModelMap modelMap) {
 
         // 현재 사용자 정보 가져오기
-        String userno = authService.getAuthUserNo();
-
-        // 공통 속성 설정
-        etcService.setCommonAttribute(userno, modelMap);
 
         ServerSearchVO searchVO = new ServerSearchVO();
         searchVO.setSearchParamsFromModelMap(modelMap);

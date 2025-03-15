@@ -41,6 +41,7 @@ public class CacheConfig {
         cacheManager.setCacheNames(Arrays.asList("boardNotices",  // 게시판 공지사항 캐시
             "boardList",     // 게시판 목록 캐시
             "boardDetail",   // 개별 게시판 게시물 캐시
+            "alertCount",    // 알림 카운트 캐시
             "exampleCache"   // 레거시 캐시
         ));
 

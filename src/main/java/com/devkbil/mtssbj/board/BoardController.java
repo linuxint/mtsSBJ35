@@ -8,7 +8,6 @@ import com.devkbil.mtssbj.admin.board.BoardGroupVO;
 import com.devkbil.mtssbj.common.ExtFieldVO;
 import com.devkbil.mtssbj.common.FileVO;
 import com.devkbil.mtssbj.config.security.Role;
-import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -49,7 +48,6 @@ public class BoardController {
 
     private final BoardService boardService;
     private final BoardGroupService boardGroupService;
-    private final EtcService etcService;
     private final AuthService authService;
 
     /**
@@ -74,12 +72,9 @@ public class BoardController {
                             @ModelAttribute @Valid BoardSearchVO searchVO,
                             ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
         if (StringUtils.hasText(globalKeyword)) {
             searchVO.setSearchKeyword(globalKeyword);
         }
-        etcService.setCommonAttribute(userno, modelMap);
 
         if (StringUtils.hasText(searchVO.getBgno())) {
             BoardGroupVO bgInfo = boardService.selectBoardGroupOne4Used(searchVO.getBgno());
@@ -126,8 +121,6 @@ public class BoardController {
                             ModelMap modelMap) {
 
         String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
 
         if (brdno != null) {
             BoardVO boardInfo = boardService.selectBoardOne(new ExtFieldVO(brdno, userno, null));
@@ -208,8 +201,6 @@ public class BoardController {
                             @RequestParam(value = "brdno", required = false) String brdno, ModelMap modelMap) {
 
         String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
 
         ExtFieldVO f3 = new ExtFieldVO(brdno, userno, null);
 

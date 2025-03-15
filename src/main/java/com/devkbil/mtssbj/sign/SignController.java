@@ -54,9 +54,6 @@ public class SignController {
 
         String userno = authService.getAuthUserNo();
 
-        etcService.setCommonAttribute(userno, modelMap);
-
-        //
         searchVO.setUserno(userno);
         searchVO.pageCalculate(signService.selectSignDocTobeCount(searchVO)); // startRow, endRow
         List<?> listview = signService.selectSignDocTobeList(searchVO);
@@ -80,9 +77,6 @@ public class SignController {
 
         String userno = authService.getAuthUserNo();
 
-        etcService.setCommonAttribute(userno, modelMap);
-
-        //
         if (!StringUtils.hasText(searchVO.getSearchExt1())) {
             searchVO.setSearchExt1("sign");
         }
@@ -107,10 +101,6 @@ public class SignController {
     @Operation(summary = "기안 문서 타입 리스트 조회", description = "사용자가 선택할 수 있는 기안 문서 타입 리스트를 조회합니다.")
     public String signDocTypeList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
-
         List<?> listview = signDocService.selectSignDocTypeList(searchVO);
 
         modelMap.addAttribute("listview", listview);
@@ -130,8 +120,6 @@ public class SignController {
     public String signDocForm(@ModelAttribute @Valid SignDocVO signDocInfo, ModelMap modelMap) {
 
         String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
 
         // 개별 작업
         List<?> signlist;
@@ -188,10 +176,6 @@ public class SignController {
     @GetMapping("/signDocRead")
     @Operation(summary = "결재 문서 읽기", description = "결재 문서를 읽는 세부 화면을 반환합니다.")
     public String signDocRead(@ModelAttribute @Valid SignDocVO signDocVO, ModelMap modelMap) {
-
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
 
         // 개별 작업
         SignDocVO signDocInfo = signService.selectSignDocOne(signDocVO);

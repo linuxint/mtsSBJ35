@@ -61,9 +61,6 @@ public class SchController {
     @RequestMapping(value = "/schList")
     public String schList(HttpServletRequest request, MonthVO searchVO, ModelMap modelMap) {
         // 페이지 공통: alert
-        String userno = request.getSession().getAttribute("userno").toString();
-
-        etcService.setCommonAttribute(userno, modelMap);
 
         if (searchVO.getYear() == null || "".equals(searchVO.getYear())) {
             Date today = DateUtil.getToday();
@@ -75,6 +72,8 @@ public class SchController {
         }
 
         Integer dayofweek = DateUtil.getDayOfWeek(DateUtil.str2Date(searchVO.getYear() + "-" + searchVO.getMonth() + "-01"));
+
+        String userno = request.getAttribute("userno").toString();
 
         List<?> listview = schService.selectCalendar(searchVO, userno);
 

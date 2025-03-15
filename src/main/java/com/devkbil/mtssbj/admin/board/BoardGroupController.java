@@ -54,9 +54,6 @@ public class BoardGroupController {
     })
     public String boardGroupList(ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
 
         List<?> listview = boardGroupService.selectBoardGroupList();
 

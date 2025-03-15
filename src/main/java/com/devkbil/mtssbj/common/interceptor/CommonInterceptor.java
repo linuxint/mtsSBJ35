@@ -1,8 +1,12 @@
 package com.devkbil.mtssbj.common.interceptor;
 
+import com.devkbil.mtssbj.etc.EtcService;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -16,7 +20,11 @@ import lombok.extern.slf4j.Slf4j;
  * 3. 요청 이후 클린업 작업 또는 예외 처리.
  */
 @Slf4j
+@Component
 public class CommonInterceptor implements HandlerInterceptor {
+
+    @Autowired
+    private EtcService etcService;
 
     /**
      * 컨트롤러 호출 전에 요청을 사전 처리합니다.
@@ -28,6 +36,13 @@ public class CommonInterceptor implements HandlerInterceptor {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        String userno;
+        try {
+            userno = request.getAttribute("userno").toString();
+        } catch (Exception e) {
+            userno = "";
+        }
+        request.setAttribute("userno", userno);
         // 요청 파라미터 변경 처리
         modifyRequestParameters(request);
         return true;
@@ -43,6 +58,16 @@ public class CommonInterceptor implements HandlerInterceptor {
      */
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
+        if (modelAndView != null) {
+            String userno;
+            try {
+                userno = (String)request.getAttribute("userno");
+                etcService.setCommonAttribute(userno, modelAndView.getModelMap());
+            } catch (Exception e) {
+                userno = "";
+            }
+            modelAndView.addObject("userno", userno);
+        }
         // 현재는 구현 필요 없음 (확장 가능)
         log.debug("postHandle: 컨트롤러 작업 완료 후 처리");
     }

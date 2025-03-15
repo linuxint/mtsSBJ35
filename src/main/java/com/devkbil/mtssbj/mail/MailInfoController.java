@@ -1,6 +1,5 @@
 package com.devkbil.mtssbj.mail;
 
-import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
 
@@ -29,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 public class MailInfoController {
 
     private final MailService mailService;
-    private final EtcService etcService;
     private final AuthService authService;
 
     /**
@@ -37,15 +35,14 @@ public class MailInfoController {
      *
      * @param searchVO 검색 조건
      * @param modelMap 뷰에 전달할 데이터
+     * @param request  HttpServletRequest 객체
      * @return 메일 설정 리스트 화면
      */
     @Operation(summary = "메일 설정 리스트 조회", description = "사용자 메일 설정 리스트를 조회합니다.")
     @GetMapping("/mailInfoList")
-    public String mailInfoList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
+    public String mailInfoList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap, HttpServletRequest request) {
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
+        String userno = request.getAttribute("userno").toString();
 
         List<?> listview = mailService.selectMailInfoList(userno);
 
@@ -66,11 +63,6 @@ public class MailInfoController {
     @GetMapping("/mailInfoForm")
     public String mailInfoForm(@ModelAttribute @Valid MailInfoVO mailInfoInfo, ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
-
-        //
         if (mailInfoInfo.getEmino() != null) {
             mailInfoInfo = mailService.selectMailInfoOne(mailInfoInfo);
 
@@ -99,7 +91,7 @@ public class MailInfoController {
             return "common/message";
         }
 
-        String userno = authService.getAuthUserNo();
+        String userno = request.getAttribute("userno").toString();
 
         mailInfoInfo.setUserno(userno);
 

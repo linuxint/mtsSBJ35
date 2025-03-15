@@ -63,6 +63,7 @@ public class MemberController {
      * 프로필 사진이 업로드된 경우 이미지를 저장하고, 사용자 정보를 업데이트합니다.
      *
      * @param userInfo 저장할 사용자 정보 ({@link UserVO})
+     * @param modelMap 뷰에 전달할 데이터를 담는 모델 객체
      * @return 저장 완료 후 리다이렉트할 URL
      */
     @PostMapping("/userSave")

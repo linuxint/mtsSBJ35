@@ -47,9 +47,6 @@ public class IndexService {
             searchVO = new SearchVO();
         }
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap); // 공통 속성 설정
 
         Date today = DateUtil.getToday();
         modelMap.putAll(calculateCalendarData(today)); // 캘린더 데이터 계산

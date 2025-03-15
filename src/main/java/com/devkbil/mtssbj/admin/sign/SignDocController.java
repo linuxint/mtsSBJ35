@@ -55,9 +55,6 @@ public class SignDocController {
     })
     public String signDocTypeList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);              // 공통 속성 설정
 
         // 문서 유형 리스트 및 페이징 처리
         searchVO.pageCalculate(signDocService.selectSignDocTypeCount(searchVO));
@@ -86,9 +83,6 @@ public class SignDocController {
     })
     public String signDocTypeForm(@ModelAttribute SignDocTypeVO signInfo, ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
 
         // 문서 유형 정보 조회
         if (StringUtils.hasText(signInfo.getDtno())) {

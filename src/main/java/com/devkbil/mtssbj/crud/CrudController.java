@@ -51,9 +51,6 @@ public class CrudController {
     @GetMapping("/crudList")
     public String crudList(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
 
         // CRUD 관련
         searchVO.pageCalculate(crudService.selectCrudCount(searchVO)); // startRow, endRow
@@ -78,9 +75,6 @@ public class CrudController {
     @GetMapping("/crudForm")
     public String crudForm(@ModelAttribute @Valid CrudVO crudInfo, ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
 
         // CRUD 관련
         if (crudInfo.getCrno() != null) {
@@ -126,9 +120,6 @@ public class CrudController {
     @GetMapping("/crudRead")
     public String crudRead(@ModelAttribute @Valid CrudVO crudVO, ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
 
         // CRUD 관련
 

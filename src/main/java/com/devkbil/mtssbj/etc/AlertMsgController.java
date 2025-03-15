@@ -36,7 +36,7 @@ public class AlertMsgController {
     @GetMapping("/alertList")
     public String alertList(ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
+        String userno = (String)modelMap.get("userno");
 
         List<?> listview = etcService.selectAlertList(userno);
 
@@ -55,7 +55,7 @@ public class AlertMsgController {
     @PostMapping("/alertList4Ajax")
     public String alertList4Ajax(ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
+        String userno = (String)modelMap.get("userno");
 
         List<?> listview = etcService.selectAlertList4Ajax(userno);
 

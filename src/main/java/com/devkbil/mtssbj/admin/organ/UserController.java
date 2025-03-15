@@ -59,10 +59,6 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "요청 성공, 사용자 관리 화면 반환")
     public String user(ModelMap modelMap) {
 
-        String userno = authService.getAuthUserNo();
-
-        etcService.setCommonAttribute(userno, modelMap);
-
         // 부서 데이터를 트리 형태로 전달
         List<?> deptList = deptService.selectDept();
         String treeStr = treeMaker.makeTreeByHierarchy(deptList);
