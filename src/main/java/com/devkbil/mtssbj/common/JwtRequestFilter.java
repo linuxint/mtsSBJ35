@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.common;
 
-import com.devkbil.mtssbj.common.util.JwtUtil;
+import com.devkbil.common.util.JwtUtil;
 
 import io.jsonwebtoken.io.IOException;
 

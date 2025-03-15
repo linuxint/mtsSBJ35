@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.develop.filesearch;
 
-import com.devkbil.mtssbj.common.util.FileSearchUtil;
+import com.devkbil.common.util.FileSearchUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

@@ -1,7 +1,7 @@
 package com.devkbil.mtssbj.common;
 
-import com.devkbil.mtssbj.common.util.FileUpload;
-import com.devkbil.mtssbj.common.util.FileUtil;
+import com.devkbil.common.util.FileUpload;
+import com.devkbil.common.util.FileUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

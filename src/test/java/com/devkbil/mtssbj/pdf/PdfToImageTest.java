@@ -4,10 +4,10 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static com.devkbil.mtssbj.common.util.PdfUtil.convertToMultipageTiff;
-import static com.devkbil.mtssbj.common.util.PdfUtil.convertToSeparateImageFiles;
-import static com.devkbil.mtssbj.common.util.PdfUtil.convertToSeparateImageFilesWithCompression;
-import static com.devkbil.mtssbj.common.util.PdfUtil.convertToSinglePageTiffs;
+import static com.devkbil.common.util.PdfUtil.convertToMultipageTiff;
+import static com.devkbil.common.util.PdfUtil.convertToSeparateImageFiles;
+import static com.devkbil.common.util.PdfUtil.convertToSeparateImageFilesWithCompression;
+import static com.devkbil.common.util.PdfUtil.convertToSinglePageTiffs;
 
 public class PdfToImageTest {
 

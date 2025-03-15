@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.main;
 
-import com.devkbil.mtssbj.common.util.DateUtil;
+import com.devkbil.common.util.DateUtil;
 import com.devkbil.mtssbj.search.SearchVO;
 
 import io.swagger.v3.oas.annotations.Operation;

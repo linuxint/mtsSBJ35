@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj;
 
-import com.devkbil.mtssbj.common.util.JsonUtil;
+import com.devkbil.common.util.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import java.util.ArrayList;

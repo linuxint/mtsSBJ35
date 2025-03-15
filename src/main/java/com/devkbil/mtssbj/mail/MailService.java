@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.mail;
 
-import com.devkbil.mtssbj.common.util.FileVO;
+import com.devkbil.mtssbj.common.FileVO;
 import com.devkbil.mtssbj.search.SearchVO;
 
 import jakarta.mail.MessagingException;

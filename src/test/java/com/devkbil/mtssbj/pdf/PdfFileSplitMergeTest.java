@@ -6,8 +6,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static com.devkbil.mtssbj.common.util.PdfUtil.merge;
-import static com.devkbil.mtssbj.common.util.PdfUtil.separate;
+import static com.devkbil.common.util.PdfUtil.merge;
+import static com.devkbil.common.util.PdfUtil.separate;
 
 public class PdfFileSplitMergeTest {
     public static void main(String[] args) throws IOException {

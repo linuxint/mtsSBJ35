@@ -2,7 +2,7 @@ package com.devkbil.mtssbj.board;
 
 import com.devkbil.mtssbj.admin.board.BoardGroupVO;
 import com.devkbil.mtssbj.common.ExtFieldVO;
-import com.devkbil.mtssbj.common.util.FileVO;
+import com.devkbil.mtssbj.common.FileVO;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.cache.annotation.CacheEvict;

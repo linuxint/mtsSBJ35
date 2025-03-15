@@ -7,7 +7,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.NestedQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 
-import com.devkbil.mtssbj.common.util.DateUtil;
+import com.devkbil.common.util.DateUtil;
 import com.devkbil.mtssbj.config.EsConfig;
 
 import io.swagger.v3.oas.annotations.Operation;

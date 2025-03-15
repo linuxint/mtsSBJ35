@@ -2,7 +2,7 @@ package com.devkbil.mtssbj;
 
 import jodd.util.StringUtil;
 
-import com.devkbil.mtssbj.common.util.TimeUtil;
+import com.devkbil.common.util.TimeUtil;
 
 import org.springframework.util.StringUtils;
 

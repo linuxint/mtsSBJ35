@@ -11,27 +11,27 @@
             <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
                  ${item} LIKE CONCAT('%', #{searchKeyword},'%' )
             </foreach>
-        </if>               
+        </if>
     </sql>
 
     <select id="selectReceiveMailCount" resultType="Integer" parameterType="com.devkbil.mtssbj.search.SearchVO">
         SELECT COUNT(*)
           FROM EML_MAIL EM
          <include refid="includeMail"/>
-    </select> 
-    
+    </select>
+
     <select id="selectReceiveMailList" resultType="com.devkbil.mtssbj.mail.MailVO" parameterType="com.devkbil.mtssbj.search.SearchVO">
         SELECT EMNO, EMTYPE, EMSUBJECT, EMFROM, DATE_FORMAT(EM.REGDATE,'%y-%m-%d %h:%s') as REGDATE, EM.USERNO, USERNM
              , (SELECT EAADDRESS FROM EML_ADDRESS ADDR WHERE ADDR.EMNO = EMNO AND EATYPE='T' ORDER BY EASEQ LIMIT 1) STRTO
           FROM EML_MAIL EM
          INNER JOIN COM_USER CU ON EM.USERNO=CU.USERNO
-         <include refid="includeMail"/> 
-         ORDER BY EMNO DESC 
+         <include refid="includeMail"/>
+         ORDER BY EMNO DESC
          <if test="rowStart != null">
              LIMIT ${rowStart-1}, 10
          </if>
-    </select> 
-        
+    </select>
+
     <insert id="insertMail" parameterType="com.devkbil.mtssbj.mail.MailVO" useGeneratedKeys="true" keyProperty="emno">
         INSERT INTO EML_MAIL(EMTYPE, EMSUBJECT, EMFROM, EMCONTENTS, USERNO, EMINO, DELETEFLAG, REGDATE)
         VALUES (#{emtype}, #{emsubject}, #{emfrom}, #{emcontents}, #{userno}, #{emino}, 'N',
@@ -44,9 +44,9 @@
     <update id="updateMail" parameterType="com.devkbil.mtssbj.mail.MailVO">
         UPDATE EML_MAIL
            SET EMSUBJECT=#{emsubject}, EMCONTENTS=#{emcontents}
-         WHERE EMNO=#{emno} 
-    </update> 
-        
+         WHERE EMNO=#{emno}
+    </update>
+
 
     <insert id="insertMailAddress" parameterType="com.devkbil.mtssbj.mail.MailAddressVO" >
         INSERT INTO EML_ADDRESS(EMNO, EATYPE, EASEQ, EAADDRESS)
@@ -59,49 +59,48 @@
          WHERE EMINO=#{emino} AND EMTYPE='R'
     </select>
 
-    <insert id="insertMailFile" parameterType="com.devkbil.mtssbj.common.util.FileVO" >
+    <insert id="insertMailFile" parameterType="com.devkbil.mtssbj.common.FileVO" >
         INSERT INTO EML_MAILFILE (EMNO, FILENAME, REALNAME, FILESIZE)
         VALUES (#{parentPK}, #{filename}, #{realname}, #{filesize})
         <selectKey keyProperty="fileno" resultType="int" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
     </insert>
-            
+
     <select id="selectReceiveMailOne" parameterType="com.devkbil.mtssbj.mail.MailVO" resultType="com.devkbil.mtssbj.mail.MailVO">
         SELECT EMNO, EMTYPE, EMSUBJECT, EMFROM, EMCONTENTS, DATE_FORMAT(EM.REGDATE,'%y-%m-%d %h:%s') as REGDATE, EM.USERNO, USERNM
           FROM EML_MAIL EM
          INNER JOIN COM_USER CU ON EM.USERNO=CU.USERNO
          WHERE EM.DELETEFLAG='N' AND EMNO=#{emno}
-    </select> 
+    </select>
 
     <select id="selectMailAddressList" parameterType="com.devkbil.mtssbj.mail.MailAddressVO" resultType="java.lang.String">
         SELECT EAADDRESS
           FROM EML_ADDRESS
          WHERE EMNO=#{emno} AND EATYPE=#{eatype}
          ORDER BY EASEQ
-    </select> 
-    
-    <select id="selectMailFileList" parameterType="String" resultType="com.devkbil.mtssbj.common.util.FileVO">
+    </select>
+
+    <select id="selectMailFileList" parameterType="String" resultType="com.devkbil.mtssbj.common.FileVO">
         SELECT FILENO, FILENAME, REALNAME, FILESIZE
           FROM EML_MAILFILE
          WHERE EMNO=#{emno}
-         ORDER BY FILENO DESC 
-    </select> 
-            
+         ORDER BY FILENO DESC
+    </select>
+
     <delete id="deleteMail" parameterType="com.devkbil.mtssbj.mail.MailVO">
         UPDATE EML_MAIL
            SET DELETEFLAG='Y'
-         WHERE EMNO=#{emno} 
-    </delete>  
+         WHERE EMNO=#{emno}
+    </delete>
 
     <delete id="deleteMails" parameterType="java.util.Map">
         UPDATE EML_MAIL
            SET DELETEFLAG='Y'
-         WHERE EMNO IN 
+         WHERE EMNO IN
             <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
                 #{item}
-            </foreach>         
+            </foreach>
     </delete>
 
 </mapper>
-

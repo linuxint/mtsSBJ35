@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.datetime;
 
-import com.devkbil.mtssbj.common.util.FormatUtil;
+import com.devkbil.common.util.FormatUtil;
 
 import java.util.Date;
 

@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.schedule;
 
-import com.devkbil.mtssbj.common.util.DateUtil;
+import com.devkbil.common.util.DateUtil;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 

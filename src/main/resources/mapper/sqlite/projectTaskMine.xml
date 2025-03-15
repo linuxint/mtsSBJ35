@@ -10,18 +10,18 @@
              , GETCOLOR4ALERT (TSSTARTDATE, TSENDDATE, TSENDREAL, TSRATE) STATUSCOLOR
              , (SELECT GROUP_CONCAT(USERNM, ',') FROM PRJ_TASKUSER PTU JOIN COM_USER CU ON PTU.USERNO=CU.USERNO WHERE TSNO=PT.TSNO) USERNM
           FROM PRJ_TASK PT
-         INNER JOIN PRJ_TASKUSER PTU ON PTU.TSNO=PT.TSNO 
+         INNER JOIN PRJ_TASKUSER PTU ON PTU.TSNO=PT.TSNO
          WHERE PT.DELETEFLAG='N' AND PRNO=#{field1} AND PTU.USERNO=#{field2}
-         ORDER BY TSNO 
-    </select> 
-        
+         ORDER BY TSNO
+    </select>
+
     <update id="updateTaskMine" parameterType="com.devkbil.mtssbj.project.TaskVO">
         UPDATE PRJ_TASK
            SET TSRATE=#{tsrate}
          WHERE DELETEFLAG='N'
            AND TSNO=#{tsno}
-    </update> 
-    
+    </update>
+
     <select id="selectTaskMineOne" resultType="com.devkbil.mtssbj.project.TaskVO" parameterType="String">
         SELECT PRNO, TSNO, TSPARENT, TSSORT, TSTITLE
              , TSSTARTDATE
@@ -35,17 +35,17 @@
              , (SELECT GROUP_CONCAT(USERNM, ',') FROM PRJ_TASKUSER PTU JOIN COM_USER CU ON PTU.USERNO=CU.USERNO WHERE TSNO=PT.TSNO) AS USERNM
           FROM PRJ_TASK PT
          WHERE PT.DELETEFLAG='N' AND TSNO=#{tsno}
-    </select> 
+    </select>
 
     <!-- =============================================================================== -->
-    <select id="selectTaskFileList" resultType="com.devkbil.mtssbj.common.util.FileVO" parameterType="String">
+    <select id="selectTaskFileList" resultType="com.devkbil.mtssbj.common.FileVO" parameterType="String">
         SELECT FILENO, FILENAME, REALNAME, FILESIZE
          FROM PRJ_TASKFILE
         WHERE TSNO=#{brdno}
-         ORDER BY FILENO DESC 
-    </select> 
+         ORDER BY FILENO DESC
+    </select>
 
-    <insert id="insertTaskFile" parameterType="com.devkbil.mtssbj.common.util.FileVO" >
+    <insert id="insertTaskFile" parameterType="com.devkbil.mtssbj.common.FileVO" >
         INSERT INTO PRJ_TASKFILE (TSNO, FILENAME, REALNAME, FILESIZE)
         VALUES (#{parentPK}, #{filename}, #{realname}, #{filesize})
         <selectKey keyProperty="fileno" resultType="int" order="AFTER">
@@ -62,15 +62,14 @@
         )
     </update>
 
-    <delete id="deleteTaskFile" parameterType="hashmap"> 
-        DELETE 
+    <delete id="deleteTaskFile" parameterType="hashmap">
+        DELETE
           FROM PRJ_TASKFILE
          WHERE FILENO IN (
               <foreach item="item" index="index" collection="fileno" separator=",">
                      #{item}
-              </foreach>  
-        )             
-    </delete> 
-                
-</mapper>
+              </foreach>
+        )
+    </delete>
 
+</mapper>

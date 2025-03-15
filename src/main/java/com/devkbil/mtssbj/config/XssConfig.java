@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.config;
 
-import com.devkbil.mtssbj.common.HtmlCharacterEscapes;
+import com.devkbil.common.HtmlCharacterEscapes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.navercorp.lucy.security.xss.servletfilter.XssEscapeServletFilter;
 

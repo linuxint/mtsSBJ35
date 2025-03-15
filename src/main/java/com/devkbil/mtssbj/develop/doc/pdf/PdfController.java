@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.develop.doc.pdf;
 
-import com.devkbil.mtssbj.common.util.PdfUtil;
+import com.devkbil.common.util.PdfUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

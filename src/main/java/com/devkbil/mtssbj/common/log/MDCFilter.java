@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.common.log;
 
-import com.devkbil.mtssbj.common.util.RequestUtil;
+import com.devkbil.common.util.RequestUtil;
 import com.devkbil.mtssbj.member.auth.AuthService;
 
 import jakarta.servlet.FilterChain;

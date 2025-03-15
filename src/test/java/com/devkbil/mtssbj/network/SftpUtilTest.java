@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.network;
 
-import com.devkbil.mtssbj.common.util.SftpUtil;
+import com.devkbil.common.util.SftpUtil;
 
 import java.util.ArrayList;
 

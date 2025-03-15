@@ -1,17 +1,17 @@
 package com.devkbil.mtssbj.mail;
 
-import com.devkbil.mtssbj.common.util.DateUtil;
-import com.devkbil.mtssbj.common.util.FileUtil;
-import com.devkbil.mtssbj.common.util.FileVO;
-
-import org.springframework.integration.mail.ImapMailReceiver;
-import org.springframework.messaging.MessagingException;
+import com.devkbil.common.util.DateUtil;
+import com.devkbil.common.util.FileUtil;
+import com.devkbil.mtssbj.common.FileVO;
 
 import jakarta.mail.Message;
 import jakarta.mail.Multipart;
 import jakarta.mail.Part;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeUtility;
+
+import org.springframework.integration.mail.ImapMailReceiver;
+import org.springframework.messaging.MessagingException;
 
 import java.io.File;
 import java.io.FileOutputStream;

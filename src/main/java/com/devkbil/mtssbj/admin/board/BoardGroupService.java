@@ -1,5 +1,8 @@
 package com.devkbil.mtssbj.admin.board;
 
+import com.devkbil.mtssbj.error.BusinessExceptionHandler;
+import com.devkbil.mtssbj.error.ErrorCode;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +33,9 @@ public class BoardGroupService {
      * @return List 게시판 그룹 리스트
      */
     public List<?> selectBoardGroupList() {
+
         return sqlSession.selectList("selectBoardGroupList");
+
     }
 
     /**
@@ -63,14 +68,12 @@ public class BoardGroupService {
      *
      * @param bgno 게시판 그룹 ID
      * @return BoardGroupVO 조회된 게시판 그룹 정보
-     * @throws BoardGroupNotFoundException 그룹을 찾지 못한 경우 발생
+     * @throws BusinessExceptionHandler 그룹을 찾지 못한 경우 발생
      */
     public BoardGroupVO selectBoardGroupOne(String bgno) {
 
         BoardGroupVO boardGroupVO = sqlSession.selectOne("selectBoardGroupOne", bgno);
-        if (ObjectUtils.isEmpty(boardGroupVO)) {
-            throw new BoardGroupNotFoundException("bgno " + bgno + "에 해당하는 게시판 그룹을 찾을 수 없습니다.");
-        }
+
         return boardGroupVO;
     }
 
@@ -80,15 +83,13 @@ public class BoardGroupService {
      *
      * @param bgno 삭제할 게시판 그룹 ID
      * @return int 삭제된 행(row) 수
-     * @throws BoardGroupNotFoundException 그룹 삭제 실패 시 발생
+     * @throws BusinessExceptionHandler 그룹 삭제 실패 시 발생
      */
     @Transactional
     public int deleteBoardGroup(String bgno) {
 
         int affectedRows = sqlSession.delete("deleteBoardGroup", bgno);
-        if (affectedRows == 0) {
-            throw new BoardGroupNotFoundException("bgno " + bgno + "에 해당하는 게시판 그룹 삭제 실패");
-        }
+
         return affectedRows;
     }
 

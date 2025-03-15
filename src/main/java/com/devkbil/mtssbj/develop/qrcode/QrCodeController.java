@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.develop.qrcode;
 
-import com.devkbil.mtssbj.common.util.PdfUtil;
+import com.devkbil.common.util.PdfUtil;
 import com.google.zxing.WriterException;
 
 import io.swagger.v3.oas.annotations.Operation;

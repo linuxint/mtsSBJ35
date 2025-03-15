@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.board;
 
-import com.devkbil.mtssbj.common.util.UtilEtc;
+import com.devkbil.common.util.UtilEtc;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

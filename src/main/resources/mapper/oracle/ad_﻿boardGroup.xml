@@ -4,7 +4,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="ad_boardGroup">
-    <select id="selectBoardGroupList" resultType="com.devkbil.mtssbj.common.tree.TreeVO">
+
+    <select id="selectBoardGroupList" resultType="com.devkbil.mtssbj.common.TreeVO">
         SELECT BGNO as KEY, BGNAME as TITLE, BGPARENT as PARENT
           FROM TBL_BOARDGROUP
          WHERE DELETEFLAG='N'
@@ -43,4 +44,3 @@
     </delete>
 
 </mapper>
-

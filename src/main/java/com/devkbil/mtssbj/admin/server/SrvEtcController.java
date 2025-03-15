@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.admin.server;
 
-import com.devkbil.mtssbj.common.util.UtilEtc;
+import com.devkbil.common.util.UtilEtc;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;

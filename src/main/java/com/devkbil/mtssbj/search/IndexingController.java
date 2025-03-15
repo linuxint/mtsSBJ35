@@ -1,13 +1,13 @@
 package com.devkbil.mtssbj.search;
 
+import com.devkbil.common.util.FileOperation;
+import com.devkbil.common.util.FileUtil;
+import com.devkbil.common.util.HostUtil;
 import com.devkbil.mtssbj.board.BoardReplyVO;
 import com.devkbil.mtssbj.board.BoardService;
 import com.devkbil.mtssbj.board.BoardVO;
 import com.devkbil.mtssbj.common.ExtFieldVO;
-import com.devkbil.mtssbj.common.util.FileOperation;
-import com.devkbil.mtssbj.common.util.FileUtil;
-import com.devkbil.mtssbj.common.util.FileVO;
-import com.devkbil.mtssbj.common.util.HostUtil;
+import com.devkbil.mtssbj.common.FileVO;
 import com.devkbil.mtssbj.config.EsConfig;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,9 +33,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -48,6 +45,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Elasticsearch 색인을 관리하는 컨트롤러 클래스입니다.

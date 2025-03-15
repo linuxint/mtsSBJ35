@@ -11,15 +11,15 @@
             <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
                  ${item} LIKE '%' || #{searchKeyword} || '%'
             </foreach>
-        </if>               
+        </if>
     </sql>
 
     <select id="selectReceiveMailCount" resultType="Integer" parameterType="com.devkbil.mtssbj.search.SearchVO">
         SELECT COUNT(*)
           FROM EML_MAIL EM
          <include refid="includeMail"/>
-    </select> 
-    
+    </select>
+
     <select id="selectReceiveMailList" resultType="com.devkbil.mtssbj.mail.MailVO" parameterType="com.devkbil.mtssbj.search.SearchVO">
         SELECT * FROM (
             SELECT ROW_NUMBER() OVER (ORDER BY EMNO DESC) AS RNUM
@@ -39,8 +39,8 @@
             WHERE RNUM BETWEEN ${rowStart} AND ${rowStart-1}+${displayRowCount}
             -- OFFSET ${rowStart-1} ROWS FETCH FIRST ${displayRowCount} ROWS ONLY -- oracle12c
         </if>
-    </select> 
-        
+    </select>
+
     <insert id="insertMail" parameterType="com.devkbil.mtssbj.mail.MailVO">
         <selectKey resultType="String" keyProperty="emno" order="BEFORE">
             SELECT EMNO_SEQ.NEXTVAL FROM DUAL
@@ -53,9 +53,9 @@
     <update id="updateMail" parameterType="com.devkbil.mtssbj.mail.MailVO">
         UPDATE EML_MAIL
            SET EMSUBJECT=#{emsubject}, EMCONTENTS=#{emcontents}
-         WHERE EMNO=#{emno} 
-    </update> 
-        
+         WHERE EMNO=#{emno}
+    </update>
+
 
     <insert id="insertMailAddress" parameterType="com.devkbil.mtssbj.mail.MailAddressVO" >
         INSERT INTO EML_ADDRESS(EMNO, EATYPE, EASEQ, EAADDRESS)
@@ -68,49 +68,48 @@
          WHERE EMINO=#{emino} AND EMTYPE='R'
     </select>
 
-    <insert id="insertMailFile" parameterType="com.devkbil.mtssbj.common.util.FileVO" >
+    <insert id="insertMailFile" parameterType="com.devkbil.mtssbj.common.FileVO" >
         <selectKey resultType="int" keyProperty="fileno" order="BEFORE">
             SELECT FILENO_EML_SEQ.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO EML_MAILFILE (FILENO, EMNO, FILENAME, REALNAME, FILESIZE)
         VALUES (#{fileno}, #{parentPK}, #{filename}, #{realname}, #{filesize})
     </insert>
-            
+
     <select id="selectReceiveMailOne" parameterType="com.devkbil.mtssbj.mail.MailVO" resultType="com.devkbil.mtssbj.mail.MailVO">
         SELECT EMNO, EMTYPE, EMSUBJECT, EMFROM, EMCONTENTS, TO_DATE(EM.REGDATE,'YYYY-MM-DD HH24:MI') as REGDATE, EM.USERNO, USERNM
           FROM EML_MAIL EM
          INNER JOIN COM_USER CU ON EM.USERNO=CU.USERNO
          WHERE EM.DELETEFLAG='N' AND EMNO=#{emno}
-    </select> 
+    </select>
 
     <select id="selectMailAddressList" parameterType="com.devkbil.mtssbj.mail.MailAddressVO" resultType="java.lang.String">
         SELECT EAADDRESS
           FROM EML_ADDRESS
          WHERE EMNO=#{emno} AND EATYPE=#{eatype}
          ORDER BY EASEQ
-    </select> 
-    
-    <select id="selectMailFileList" parameterType="String" resultType="com.devkbil.mtssbj.common.util.FileVO">
+    </select>
+
+    <select id="selectMailFileList" parameterType="String" resultType="com.devkbil.mtssbj.common.FileVO">
         SELECT FILENO, FILENAME, REALNAME, FILESIZE
           FROM EML_MAILFILE
          WHERE EMNO=#{emno}
-         ORDER BY FILENO DESC 
-    </select> 
-            
+         ORDER BY FILENO DESC
+    </select>
+
     <delete id="deleteMail" parameterType="com.devkbil.mtssbj.mail.MailVO">
         UPDATE EML_MAIL
            SET DELETEFLAG='Y'
-         WHERE EMNO=#{emno} 
-    </delete>  
+         WHERE EMNO=#{emno}
+    </delete>
 
     <delete id="deleteMails" parameterType="java.util.Map">
         UPDATE EML_MAIL
            SET DELETEFLAG='Y'
-         WHERE EMNO IN 
+         WHERE EMNO IN
             <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
                 #{item}
-            </foreach>         
+            </foreach>
     </delete>
 
 </mapper>
-

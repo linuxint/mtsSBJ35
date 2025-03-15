@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj;
 
-import com.devkbil.mtssbj.common.util.IfUtil;
+import com.devkbil.common.util.IfUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,23 +14,23 @@ public class IfUtilTest {
     @DisplayName("Test decode method with various argument combinations")
     public void testDecode() {
         // Test with two arguments
-        assertEquals("X", IfUtil.decode("A", "X"), 
+        assertEquals("X", IfUtil.decode("A", "X"),
             "Two arguments should return second argument");
 
         // Test with three arguments
-        assertEquals("A", IfUtil.decode("A", "B", "X"), 
+        assertEquals("A", IfUtil.decode("A", "B", "X"),
             "Three arguments should return first argument if not equal to second");
 
         // Test with four arguments
-        assertEquals("Y", IfUtil.decode("A", "B", "X", "Y"), 
+        assertEquals("Y", IfUtil.decode("A", "B", "X", "Y"),
             "Four arguments should return fourth argument if first != second");
 
         // Test with five arguments
-        assertEquals("Y", IfUtil.decode("A", "B", "X", "A", "Y"), 
+        assertEquals("Y", IfUtil.decode("A", "B", "X", "A", "Y"),
             "Five arguments should return fifth argument if first matches fourth");
 
         // Test with null values
-        assertEquals("Y", IfUtil.decode(null, "B", "X", null, "Y"), 
+        assertEquals("Y", IfUtil.decode(null, "B", "X", null, "Y"),
             "Should handle null values correctly");
     }
 

@@ -9,19 +9,19 @@
         SELECT BGNO, BGNAME, BGUSED, BGREPLY, BGREADONLY, BGNOTICE
           FROM TBL_BOARDGROUP
          WHERE DELETEFLAG='N' AND BGNO=#{bgno} AND BGUSED='Y'
-    </select> 
+    </select>
 
 
     <sql id="includeBoard">
         WHERE TB.DELETEFLAG='N' AND TBG.DELETEFLAG='N'
         <if test="bgno!=null and bgno!=''">
             AND TB.BGNO=#{bgno}
-        </if>  
+        </if>
         <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
             <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
                  ${item} LIKE CONCAT('%', #{searchKeyword},'%' )
             </foreach>
-        </if>               
+        </if>
     </sql>
 
     <select id="selectBoardCount" resultType="Integer" parameterType="com.devkbil.mtssbj.board.BoardSearchVO">
@@ -30,8 +30,8 @@
          INNER JOIN TBL_BOARDGROUP TBG ON TBG.BGNO=TB.BGNO
          INNER JOIN COM_USER CU ON TB.USERNO=CU.USERNO
          <include refid="includeBoard"/>
-    </select> 
-    
+    </select>
+
     <select id="selectBoardList" parameterType="com.devkbil.mtssbj.board.BoardSearchVO" resultType="com.devkbil.mtssbj.board.BoardVO">
         SELECT TBG.BGNAME
              , TB.BRDNO
@@ -54,11 +54,11 @@
          INNER JOIN COM_USER CU ON TB.USERNO=CU.USERNO
          INNER JOIN TBL_BOARDGROUP TBG ON TBG.BGNO=TB.BGNO
          <include refid="includeBoard"/>
-         ORDER BY BRDNO DESC 
+         ORDER BY BRDNO DESC
          <if test="rowStart != null">
              LIMIT ${rowStart-1}, 10
          </if>
-    </select> 
+    </select>
 
     <select id="selectNoticeList" parameterType="com.devkbil.mtssbj.board.BoardSearchVO" resultType="com.devkbil.mtssbj.board.BoardVO">
         SELECT BRDNO, BRDTITLE, DATE_FORMAT(TB.REGDATE,'%Y-%m-%d') as REGDATE, BRDNOTICE, BRDLIKE
@@ -73,10 +73,10 @@
         <if test="bgno!=null and bgno!=''">
             AND TB.BGNO=#{bgno}
         </if>
-         ORDER BY BRDNO DESC 
+         ORDER BY BRDNO DESC
          LIMIT 3
     </select>
-        
+
     <insert id="insertBoard" parameterType="com.devkbil.mtssbj.board.BoardVO" >
         INSERT INTO TBL_BOARD(BGNO, BRDTITLE, USERNO, BRDMEMO, BRDNOTICE, REGDATE, DELETEFLAG, CHGDATE, CHGUSERNO)
         VALUES (#{bgno}, #{brdtitle}, #{userno}, #{brdmemo}, #{brdnotice}, NOW(), 'N', NOW(), #{userno} )
@@ -84,11 +84,11 @@
             SELECT LAST_INSERT_ID()
         </selectKey>
     </insert>
-    
+
     <update id="updateBoard" parameterType="com.devkbil.mtssbj.board.BoardVO">
         UPDATE TBL_BOARD
            SET BRDTITLE=#{brdtitle}
-             , BRDMEMO=#{brdmemo} 
+             , BRDMEMO=#{brdmemo}
              , BRDNOTICE=#{brdnotice}
              , CHGDATE=NOW()
              , CHGUSERNO=#{userno}
@@ -99,8 +99,8 @@
              , ETC5=#{etc5, jdbcType=VARCHAR}
          WHERE DELETEFLAG='N'
            AND BRDNO=#{brdno}
-    </update> 
-        
+    </update>
+
     <select id="selectBoardOne" parameterType="com.devkbil.mtssbj.common.ExtFieldVO" resultType="com.devkbil.mtssbj.board.BoardVO">
         SELECT BGNO
              , BRDNO
@@ -122,20 +122,20 @@
          INNER JOIN COM_USER CU ON TB.USERNO=CU.USERNO
          WHERE TB.DELETEFLAG='N'
            AND BRDNO=#{field1}
-    </select> 
-    
+    </select>
+
     <select id="selectBoardAuthChk" parameterType="com.devkbil.mtssbj.board.BoardVO" resultType="String">
         SELECT BRDNO
           FROM TBL_BOARD
          WHERE DELETEFLAG='N'
            AND BRDNO=#{brdno} AND USERNO=#{userno}
-    </select> 
+    </select>
 
     <update id="updateBoardRead" parameterType="com.devkbil.mtssbj.common.ExtFieldVO">
         INSERT INTO TBL_BOARDREAD(BRDNO, USERNO, REGDATE)
              VALUES (#{field1}, #{field2}, NOW())
                  ON DUPLICATE KEY UPDATE REGDATE=NOW()
-    </update> 
+    </update>
 
     <insert id="insertBoardLike" parameterType="com.devkbil.mtssbj.common.ExtFieldVO">
         INSERT INTO TBL_BOARDLIKE(BRDNO, USERNO, REGDATE)
@@ -143,13 +143,13 @@
         <selectKey keyProperty="field3" resultType="String" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-    </insert> 
+    </insert>
 
     <insert id="updateBoard4Like" parameterType="com.devkbil.mtssbj.common.ExtFieldVO">
         UPDATE TBL_BOARD
-           SET BRDLIKE = BRDLIKE + 1 
+           SET BRDLIKE = BRDLIKE + 1
          WHERE BRDNO=#{field1}
-    </insert> 
+    </insert>
 
     <delete id="deleteBoardOne" parameterType="String">
         UPDATE TBL_BOARD
@@ -157,17 +157,17 @@
              , CHGDATE=NOW()
              , CHGUSERNO=#{userno}
          WHERE BRDNO=#{brdno}
-    </delete> 
-    
+    </delete>
+
     <!-- =============================================================================== -->
-    <select id="selectBoardFileList" parameterType="String" resultType="com.devkbil.mtssbj.common.util.FileVO">
+    <select id="selectBoardFileList" parameterType="String" resultType="com.devkbil.mtssbj.common.FileVO">
         SELECT FILENO, FILENAME, REALNAME, FILESIZE
           FROM TBL_BOARDFILE
          WHERE BRDNO=#{brdno} AND DELETEFLAG = 'N'
-         ORDER BY FILENO DESC 
-    </select> 
+         ORDER BY FILENO DESC
+    </select>
 
-    <insert id="insertBoardFile" parameterType="com.devkbil.mtssbj.common.util.FileVO" >
+    <insert id="insertBoardFile" parameterType="com.devkbil.mtssbj.common.FileVO" >
         INSERT INTO TBL_BOARDFILE (BRDNO, FILENAME, REALNAME, FILESIZE)
         VALUES (#{parentPK}, #{filename}, #{realname}, #{filesize})
         <selectKey keyProperty="fileno" resultType="int" order="AFTER">
@@ -203,7 +203,7 @@
          WHERE BRDNO=#{brdno} AND REDELETEFLAG='N'
          ORDER BY REORDER
     </select>
-        
+
     <insert id="insertBoardReply" parameterType="com.devkbil.mtssbj.board.BoardReplyVO" >
         INSERT INTO TBL_BOARDREPLY(BRDNO, USERNO, REDELETEFLAG, REMEMO, REGDATE, CHGDATE, CHGUSERNO, REORDER, REPARENT, REDEPTH)
         VALUES (#{brdno}, #{userno}, 'N', #{rememo}, NOW(), NOW(), #{userno}, #{reorder},
@@ -222,7 +222,7 @@
              , REPARENT, REDEPTH, REORDER, TBR.USERNO, CU.PHOTO
           FROM TBL_BOARDREPLY TBR
          INNER JOIN COM_USER CU ON TBR.USERNO=CU.USERNO
-         WHERE REDELETEFLAG='N' AND RENO=#{reno}  
+         WHERE REDELETEFLAG='N' AND RENO=#{reno}
     </select>
 
     <select id="selectBoardReplyParent" parameterType="String" resultType="com.devkbil.mtssbj.board.BoardReplyVO">
@@ -231,7 +231,7 @@
           FROM TBL_BOARDREPLY TB
          WHERE RENO=#{reparent}
     </select>
- 
+
     <update id="updateBoardReplyOrder" parameterType="com.devkbil.mtssbj.board.BoardReplyVO">
         <![CDATA[
         UPDATE TBL_BOARDREPLY
@@ -244,7 +244,7 @@
         SELECT IFNULL(MAX(REORDER),0)+1
           FROM TBL_BOARDREPLY
          WHERE BRDNO=#{brdno}
-    </select> 
+    </select>
 
     <select id="selectBoardReplyChild" parameterType="com.devkbil.mtssbj.board.BoardReplyVO" resultType="Integer">
         SELECT COUNT(*)
@@ -257,14 +257,14 @@
           FROM TBL_BOARDREPLY
          WHERE REDELETEFLAG='N'
            AND RENO=#{reno} AND USERNO=#{userno}
-    </select> 
-    
+    </select>
+
     <update id="deleteBoardReply" parameterType="com.devkbil.mtssbj.board.BoardReplyVO">
         UPDATE TBL_BOARDREPLY
-           SET REDELETEFLAG='Y' 
+           SET REDELETEFLAG='Y'
              , CHGDATE=NOW()
              , CHGUSERNO=#{userno}
-         WHERE RENO=#{reno}       
+         WHERE RENO=#{reno}
     </update>
 
     <update id="deleteBoardReplyAll" parameterType="hashmap">
@@ -279,18 +279,18 @@
         <![CDATA[
         UPDATE TBL_BOARDREPLY TBR1
          INNER JOIN TBL_BOARDREPLY TBR2 ON TBR2.BRDNO=TBR1.BRDNO AND TBR1.REORDER >TBR2.REORDER AND TBR1.REDELETEFLAG='N'
-           SET TBR1.REORDER = TBR1.REORDER - 1 
+           SET TBR1.REORDER = TBR1.REORDER - 1
          WHERE TBR2.RENO=#{reno}
         ]]>
     </update>
-     
+
     <update id="updateBoardReply" parameterType="com.devkbil.mtssbj.board.BoardReplyVO">
         UPDATE TBL_BOARDREPLY
-           SET REMEMO=#{rememo} 
+           SET REMEMO=#{rememo}
              , CHGDATE=NOW()
              , CHGUSERNO=#{userno}
          WHERE RENO=#{reno}
-    </update> 
+    </update>
 
     <!-- ===============================================================================-->
     <select id="selectBoards4Indexing" parameterType="String" resultType="com.devkbil.mtssbj.board.BoardVO">
@@ -303,11 +303,11 @@
          INNER JOIN COM_USER CU ON CU.USERNO=TB.USERNO
          WHERE TB.DELETEFLAG='N'
            AND BRDNO > #{brdno}
-         ORDER BY BRDNO 
+         ORDER BY BRDNO
          limit 20
         ]]>
     </select>
-    
+
     <select id="selectBoardReply4Indexing" parameterType="com.devkbil.mtssbj.common.ExtFieldVO" resultType="com.devkbil.mtssbj.board.BoardReplyVO">
         <![CDATA[
         SELECT BRDNO, RENO, USERNM, TBR.USERNO, REMEMO, REGDATE
@@ -318,8 +318,8 @@
          ORDER BY RENO
         ]]>
     </select>
-            
-    <select id="selectBoardFiles4Indexing" parameterType="com.devkbil.mtssbj.common.ExtFieldVO" resultType="com.devkbil.mtssbj.common.util.FileVO">
+
+    <select id="selectBoardFiles4Indexing" parameterType="com.devkbil.mtssbj.common.ExtFieldVO" resultType="com.devkbil.mtssbj.common.FileVO">
         <![CDATA[
         SELECT BRDNO as parentPK, FILENO, FILENAME, REALNAME, FILESIZE
           FROM TBL_BOARDFILE

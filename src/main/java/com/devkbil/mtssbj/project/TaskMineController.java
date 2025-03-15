@@ -1,8 +1,8 @@
 package com.devkbil.mtssbj.project;
 
+import com.devkbil.common.util.FileUpload;
 import com.devkbil.mtssbj.common.ExtFieldVO;
-import com.devkbil.mtssbj.common.util.FileUpload;
-import com.devkbil.mtssbj.common.util.FileVO;
+import com.devkbil.mtssbj.common.FileVO;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 

@@ -1,8 +1,8 @@
 package com.devkbil.mtssbj.mail;
 
-import com.devkbil.mtssbj.common.util.DateUtil;
-import com.devkbil.mtssbj.common.util.FileUtil;
-import com.devkbil.mtssbj.common.util.FileVO;
+import com.devkbil.common.util.DateUtil;
+import com.devkbil.common.util.FileUtil;
+import com.devkbil.mtssbj.common.FileVO;
 
 import jakarta.mail.Address;
 import jakarta.mail.Authenticator;

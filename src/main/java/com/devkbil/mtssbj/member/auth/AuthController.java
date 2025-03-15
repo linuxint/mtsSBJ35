@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.member.auth;
 
-import com.devkbil.mtssbj.common.util.JwtUtil;
+import com.devkbil.common.util.JwtUtil;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;

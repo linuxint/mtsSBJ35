@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.mail;
 
-import com.devkbil.mtssbj.common.util.FileVO;
+import com.devkbil.mtssbj.common.FileVO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

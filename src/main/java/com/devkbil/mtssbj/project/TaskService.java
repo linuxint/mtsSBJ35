@@ -1,7 +1,7 @@
 package com.devkbil.mtssbj.project;
 
 import com.devkbil.mtssbj.common.ExtFieldVO;
-import com.devkbil.mtssbj.common.util.FileVO;
+import com.devkbil.mtssbj.common.FileVO;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;

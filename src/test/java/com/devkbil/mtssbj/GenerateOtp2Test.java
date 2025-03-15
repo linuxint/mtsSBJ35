@@ -5,9 +5,9 @@ import java.util.Scanner;
 
 import lombok.extern.slf4j.Slf4j;
 
-import static com.devkbil.mtssbj.common.util.OtpUtil.checkCode;
-import static com.devkbil.mtssbj.common.util.OtpUtil.generate;
-import static com.devkbil.mtssbj.common.util.OtpUtil.generateOtp2;
+import static com.devkbil.common.util.OtpUtil.checkCode;
+import static com.devkbil.common.util.OtpUtil.generate;
+import static com.devkbil.common.util.OtpUtil.generateOtp2;
 
 @Slf4j
 public class GenerateOtp2Test {
