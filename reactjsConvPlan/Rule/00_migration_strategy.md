@@ -110,7 +110,7 @@
 ### 3.3 프론트엔드 마이그레이션
 
 #### 3.3.1 React.js 프로젝트 설정
-- Create React App 또는 Next.js 사용
+- Create React App 
 - 프로젝트 구조 설계
 - 라우팅 설정 (react-router-dom)
 - 상태 관리 설정 (Zustand 및 React Query)
