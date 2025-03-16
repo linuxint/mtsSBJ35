@@ -548,11 +548,12 @@ tasks.named('bootJar') {
 
 // Build Dependencies
 build.dependsOn spotlessApply
-build.dependsOn jvmCyclonedxBom, appCyclonedxBom
+build.dependsOn jvmCyclonedxBom, appCyclonedxBom, copySbomToResources
 
 tasks.spotlessJava {
     // appCyclonedxBom 작업 이후 실행되도록 의존성 설정
     inputs.files(tasks.appCyclonedxBom.outputs.files)
     dependsOn tasks.named('jvmCyclonedxBom') // Spotless가 CycloneDX 작업 이후 실행되도록 설정
     dependsOn tasks.named('appCyclonedxBom') // Spotless가 CycloneDX 작업 이후 실행되도록 설정
+    dependsOn tasks.named('copySbomToResources') // Spotless가 CycloneDX 작업 이후 실행되도록 설정
 }
