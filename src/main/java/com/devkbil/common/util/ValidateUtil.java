@@ -493,8 +493,6 @@ public class ValidateUtil {
     @Getter
     public static class ValidateException extends RuntimeException {
 
-        private static final long serialVersionUID = -594115403693602549L;
-
         /**
          * 유효성 검사 실패의 원인에 대한 추가 컨텍스트 정보
          */

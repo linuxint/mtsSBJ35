@@ -13,7 +13,6 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import java.util.List;
  * Git 저장소를 초기화, 관리 및 프로그래밍 방식으로 상호 작용하는 데 필요한 메서드를 제공합니다.
  * 각 메서드는 초기화, 커밋, 푸시, 풀 등 특정 Git 작업을 캡슐화합니다.
  */
-@Component
 public class JgitUtil {
 
     private final GitConfig gitConfig;

@@ -16,6 +16,12 @@ import java.util.TimeZone;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 날짜 관련 유틸리티 클래스입니다.
+ * 이 클래스는 하위 호환성을 위해 유지되며, 새로운 코드에서는 ModernDateUtil 클래스를 사용하는 것이 권장됩니다.
+ * 
+ * @see ModernDateUtil
+ */
 @Slf4j
 public class DateUtil {
     /**
@@ -89,9 +95,8 @@ public class DateUtil {
      * @return 현재 시스템 날짜
      */
     public static Date getToday() {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        return cal.getTime();
+        // 최신 구현으로 위임
+        return ModernDateUtil.getToday();
     }
 
     /**
@@ -101,9 +106,8 @@ public class DateUtil {
      * @return 변환된 Date 객체
      */
     public static Date stringToDate(String date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(str2Date(date));
-        return cal.getTime();
+        // 최신 구현으로 위임
+        return ModernDateUtil.stringToDate(date);
     }
 
     /**
@@ -1446,23 +1450,4 @@ public class DateUtil {
             return null; // 에러 발생 시 null 반환
         }
     }
-
-    /**
-     * 날짜에 월 추가
-     *
-     * @param date   원본 날짜
-     * @param months 추가할 월 (음수 값으로 전달하면 월을 뺌)
-     * @return 결과 날짜
-     */
-    public static Date dateAddMonth(Date date, int months) {
-        if (date == null) {
-            return null;
-        }
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.MONTH, months);
-        return calendar.getTime();
-    }
-
 }

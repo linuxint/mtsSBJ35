@@ -208,7 +208,7 @@ public class SchService {
             }
 
             // 다음 월로 이동
-            startDate = DateUtil.dateAddMonth(startDate, 1);
+            startDate = DateUtil.monthAdd(startDate, 1);
         }
     }
 
