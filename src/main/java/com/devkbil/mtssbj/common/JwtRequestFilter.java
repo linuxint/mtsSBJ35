@@ -1,7 +1,5 @@
 package com.devkbil.mtssbj.common;
 
-import com.devkbil.common.util.JwtUtil;
-
 import io.jsonwebtoken.io.IOException;
 
 import jakarta.servlet.FilterChain;

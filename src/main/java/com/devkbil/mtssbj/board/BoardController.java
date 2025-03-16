@@ -1,14 +1,15 @@
 package com.devkbil.mtssbj.board;
 
-import com.devkbil.common.tree.TreeMaker;
 import com.devkbil.common.util.FileUpload;
 import com.devkbil.common.util.UtilEtc;
 import com.devkbil.mtssbj.admin.board.BoardGroupService;
 import com.devkbil.mtssbj.admin.board.BoardGroupVO;
 import com.devkbil.mtssbj.common.ExtFieldVO;
 import com.devkbil.mtssbj.common.FileVO;
+import com.devkbil.mtssbj.common.TreeMaker;
 import com.devkbil.mtssbj.config.security.Role;
 import com.devkbil.mtssbj.member.auth.AuthService;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,11 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;

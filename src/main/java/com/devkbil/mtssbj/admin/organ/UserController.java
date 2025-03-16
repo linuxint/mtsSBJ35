@@ -1,7 +1,7 @@
 package com.devkbil.mtssbj.admin.organ;
 
-import com.devkbil.common.tree.TreeMaker;
 import com.devkbil.common.util.UtilEtc;
+import com.devkbil.mtssbj.common.TreeMaker;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
 import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.UserVO;

@@ -71,37 +71,33 @@ public class NewStringUtil {
      * @return 이스케이프 처리된 문자열
      */
     public static Object escapeXml(String str) {
-        str = str.replaceAll("&", "&amp;");
-        str = str.replaceAll("<", "&lt;");
-        str = str.replaceAll(">", "&gt;");
-        str = str.replaceAll("\"", "&quot;");
-        str = str.replaceAll("'", "&apos;");
-        return str;
-    }
+        if (str == null) {
+            return "";
+        }
 
-    /**
-     * 문자열 내의 특정 패턴을 다른 문자열로 모두 치환합니다.
-     *
-     * @param str 원본 문자열
-     * @param src 검색할 패턴
-     * @param des 대체할 문자열
-     * @return 치환이 완료된 문자열
-     */
-    public static String replaceAll(String str, String src, String des) {
-        StringBuffer sb = new StringBuffer(str.length());
-        int startIdx = 0;
-        int oldIdx = 0;
-        for (; ; ) {
-            startIdx = str.indexOf(src, startIdx);
-            if (startIdx == -1) {
-                sb.append(str.substring(oldIdx));
-                break;
+        // Use StringBuilder for better performance in JDK 17
+        StringBuilder sb = new StringBuilder(str.length() * 2);
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            switch (c) {
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                case '\'':
+                    sb.append("&apos;");
+                    break;
+                default:
+                    sb.append(c);
             }
-            sb.append(str, oldIdx, startIdx);
-            sb.append(des);
-
-            startIdx += src.length();
-            oldIdx = startIdx;
         }
         return sb.toString();
     }
@@ -122,30 +118,28 @@ public class NewStringUtil {
         if (isEmpty(sourceText)) {
             return "";
         }
-        if (replacementText == null) {
-            replacementText = "";
+
+        // Handle null replacement text
+        String replacement = replacementText;
+        if (replacement == null) {
+            replacement = "";
         }
 
-        int currentIndex = 0;
-        int foundIndex = 0;
-        int patternLength = searchPattern.length();
+        // Use Java's built-in replace method which is optimized in JDK 17
+        return sourceText.replace(searchPattern, replacement);
+    }
 
-        StringBuilder resultBuffer = new StringBuilder();
-        String resultString = sourceText;
-        while ((foundIndex = sourceText.indexOf(searchPattern, currentIndex)) >= 0) {
-            if (resultBuffer == null) {
-                resultBuffer = new StringBuilder(sourceText.length() * 2);
-            }
-            resultBuffer.append(sourceText, currentIndex, foundIndex);
-            resultBuffer.append(replacementText);
-
-            currentIndex = foundIndex + patternLength;
-        }
-
-        if (currentIndex != 0) {
-            resultBuffer.append(sourceText.substring(currentIndex));
-            resultString = resultBuffer.toString();
-        }
-        return resultString;
+    /**
+     * 문자열 내의 특정 패턴을 다른 문자열로 모두 치환합니다.
+     * 이 메서드는 {@link #replace(String, String, String)} 메서드의 별칭입니다.
+     *
+     * @param str 원본 문자열
+     * @param src 검색할 패턴
+     * @param des 대체할 문자열
+     * @return 치환이 완료된 문자열
+     * @see #replace(String, String, String)
+     */
+    public static String replaceAll(String str, String src, String des) {
+        return replace(str, src, des);
     }
 }
