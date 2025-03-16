@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class DevelopLogbackAppenderService<E> {
+public class DevLogbackAppenderService<E> {
 
     private static final int queueSize = 1000; // 저장할 로그 최대 개수
 

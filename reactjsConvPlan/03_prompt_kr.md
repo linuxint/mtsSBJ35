@@ -11,39 +11,12 @@ Spring MVC + JSP 애플리케이션을 React + Spring Boot REST API 아키텍처
 ## backend 기술 구현 전략
 마이그레이션에는 다음과 같은 상세 전략이 포함됩니다:
 - JDK 17 기준
-- spring modulith 적용
-- spring boot 버전 유지
+- Spring Boot 버전 유지
 - Spring MVC → Spring Boot REST API
 - JSP 뷰 → JSON 응답
 - MyBatis 최적화
 - JWT 기반 인증
 - JPA는 인증 이외에는 삭제
-
-### 서버 아키텍처 개요
-서버 프로그램은 다음과 같은 계층 구조로 설계합니다:
-
-1. **API 계층**: 클라이언트 요청을 처리하는 REST 컨트롤러
-2. **서비스 계층**: 비즈니스 로직을 구현하는 서비스 컴포넌트
-3. **데이터 접근 계층**: 데이터베이스와의 상호작용을 담당하는 리포지토리
-4. **도메인 계층**: 비즈니스 엔티티와 규칙을 정의하는 도메인 모델
-5. **공통 계층**: 여러 계층에서 사용되는 공통 컴포넌트, 유틸리티, 설정
-
-### 패키지 구조
-```
-com.devkbil.mtssbj
-├── api                  # API 계층 (컨트롤러)
-│   ├── v1               # API 버전 1
-│   │   ├── auth         # 인증 관련 API
-│   │   ├── board        # 게시판 관련 API
-│   │   ├── member       # 회원 관련 API
-│   │   ├── schedule     # 일정 관련 API
-│   │   └── admin        # 관리자 관련 API
-│   └── common           # API 공통 컴포넌트
-├── service              # 서비스 계층
-├── domain               # 도메인 계층
-├── common               # 공통 계층
-└── infrastructure       # 인프라스트럭처 계층
-```
 
 ### REST API 표준화
 - **리소스 중심 설계**: URL은 명사 형태의 리소스를 표현
@@ -290,30 +263,63 @@ src/
 ### 주요 고려사항
 - **기술적 도전 과제**: 데이터베이스 스키마 변경 관리
 
-<!-- AI에게 지시: 
-backend_filelist.md, frontend_filelist.md, db_filelist.md의 대상 파일을 분석해서 파일별로 변경할 내용을 기록해죠.
-backend_filelist.md 의 파일별 변경할 내용을 backend_common.md ,backend_config.md ,backend_controller.md ,backend_dto.md ,backend_entity.md ,backend_exception.md ,backend_repository.md ,backend_security.md ,backend_service.md 에 기록해죠.
-backend_filelist_chklist.md에 backend_filelist.md를 기준으로 변경내용이 있는 여부를 작성해죠.
+<!-- AI 작업 지시: 
+1. backend_filelist.md, frontend_filelist.md, db_filelist.md를 분석하여 파일별 변경 내용을 파악합니다. 
+2. backend_filelist.md의 파일을 다음과 같은 카테고리로 구분해서 변경할 내용을 정리합니다:
+   - `backend_common.md` : 공통 모듈 관련 변경 사항
+   - `backend_config.md` : 설정 관련 변경 사항
+   - `backend_controller.md` : Controller 관련 변경 사항
+   - `backend_dto.md` : DTO 관련 변경 사항
+   - `backend_entity.md` : Entity 관련 변경 사항
+   - `backend_exception.md` : 예외 처리 관련 변경 사항
+   - `backend_repository.md` : Repository(Data Access) 관련 변경 사항
+   - `backend_security.md` : 보안(Security) 관련 변경 사항
+   - `backend_service.md` : Service 관련 변경 사항
+
+3. 분석 결과로 각 파일 변경 여부를 `backend_filelist_chklist.md`에 기록합니다. 
+   - 변경사항이 있을 경우 `Yes | 변경 이유 요약`으로 표현합니다.
+   - 변경사항이 없을 경우 `No`로 표현합니다.
+4. 파일 분석 기준:
+   - 기능 추가/제거, 메서드 변경, 주석 변경 등 명시적 변경.
+   - 비즈니스 요구사항에 따른 코드 수정 여부.
+   - 리팩토링(가독성 또는 성능 개선)의 필요성 여부.
+-->
+
+<!-- AI 작업 지시: 
+1. frontend_filelist.md를 분석하여 파일별 변경 사항을 파악합니다.
+2. 변경 사항을 다음 파일로 나누어 기록합니다:
+   - `frontend_layout.md`: 레이아웃 관련 (헤더/푸터 컴포넌트, 관리자 헤더 컴포넌트, 메인 레이아웃 컴포넌트)
+   - `frontend_paging.md`: 페이징 관련 (페이지네이션 UI 컴포넌트, 페이지네이션 로직을 위한 커스텀 훅)
+   - `frontend_message.md`: 메시지 관련 (알림(Alert) 컴포넌트, 토스트(Toast) 컴포넌트 및 컨테이너)
+   - `frontend_navigation.md`: 네비게이션 관련 (메뉴 아이템 인터페이스 정의, 권한 기반 메뉴 필터링, 중첩 메뉴 구조 지원)
+   - `frontend_auth.md`: 인증 및 권한 관련 (권한 없음 페이지, 권한 검사 HOC)
+   - `frontend_role.md`: 권한 및 역할 설정 관련.
+   - `frontend_etc.md`: 기타 공통 컴포넌트 (로딩 컴포넌트, 모달 컴포넌트 등).
+
+3. 각각 파일에 다음 항목을 기록합니다:
+   - **변경 파일**: 파일명이 변경된 경우.
+   - **작업 내용**: 코드 수정, 기능 추가/제거, 주석 수정, 리팩토링 등.
+   - **변경 이유**: 왜 이 부분이 변경되었는지 작성 (버그 수정, 신규 기능 추가, 성능 개선 등).
+   - **예상 영향도**: 수정 사항이 코드나 시스템에 미칠 잠재적인 영향 (추가 확인, 테스트 필요 여부 등).
 -->
 
 <!-- AI에게 지시: 
-frontend_filelist.md 의 변경할 내용을 
-frontend_layout.md ,frontend_paging.md ,frontend_message.md ,frontend_navigation.md ,frontend_auth.md ,frontend_role.md ,frontend_etc.md 에 기록해죠.
-파일의 내용은 아래와 같다.
-레이아웃 컴포넌트: 헤더/푸터 컴포넌트 ,관리자 헤더 컴포넌트 ,메인 레이아웃 컴포넌트
-페이징 컴포넌트: 페이지네이션 UI 컴포넌트 ,페이지네이션 로직을 위한 커스텀 훅
-메시지 컴포넌트: 알림(Alert) 컴포넌트 ,토스트(Toast) 컴포넌트 및 컨테이너
-네비게이션 컴포넌트: 메뉴 아이템 인터페이스 정의 ,권한 기반 메뉴 필터링 ,중첩 메뉴 구조 지원
-인증/권한 관련 컴포넌트: 권한 없음 페이지 ,권한 검사 HOC(Higher Order Component)
-기타 공통 컴포넌트: 로딩 컴포넌트, 모달 컴포넌트로 구성해죠.
+1. db_filelist.md 파일에 나열된 데이터베이스 관련 파일을 분석하여 각 파일의 변경 사항을 파악합니다.
+2. 변경된 내용을 db_속성.md 파일에 다음 형식으로 기록해 주세요:
+   - **파일 이름**: 변경한 데이터베이스 파일 이름
+   - **변경 내용**: 추가, 수정, 삭제된 데이터베이스 테이블, 뷰, 속성 등 요약
+   - **변경 이유**: 변경의 배경 및 목적, 예를 들어 "테이블 최적화" 또는 "새로운 비즈니스 요구 사항 반영" 등을 기재
 -->
 
 <!-- AI에게 지시: 
-db_filelist.md 의 변경할 내용을 db_속성.md 에 기록해죠.
--->
+1. frontend_filelist.md, db_filelist.md, backend_filelist.md를 분석하여 파일별로 소스 수정 내용을 각각 다음 파일들에 기록해 주세요:
+   - 프런트엔드 변경 기록: frontend_codechg.md
+   - 데이터베이스 변경 기록: db_codechg.md
+   - 백엔드 변경 기록: backend_codechg.md
 
-<!-- AI에게 지시: 
-frontend_filelist.md 의 소스 수정할 내용을 frontend_codechg.md에 기록해죠.
-db_filelist.md의 소스 수정할 내용을 db_codechg.md에 기록해죠.
-backend_filelist.md의 소스 수정할 내용을 backend_codechg.md에 기록해죠.
+2. 각 변경 내용 파일에는 다음 형식으로 내용을 기록해 주세요:
+   - **파일 이름**: 소스 코드가 수정된 파일의 이름.
+   - **수정 내용 요약**: 어떤 부분이 수정되었는지 기능/로직/구조 관점에서 설명 (추가, 수정, 삭제 등).
+   - **수정 이유**: 왜 이 부분이 변경되었는지 작성 (버그 수정, 신규 기능 추가, 성능 개선 등).
+   - **예상 영향도**: 수정 사항이 코드나 시스템에 미칠 잠재적인 영향 (추가 확인, 테스트 필요 여부 등).
 -->

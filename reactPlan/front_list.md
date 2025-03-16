@@ -144,7 +144,7 @@
 ./WEB-INF/jsp/dbtool/TableLayoutList.jsp
 src/main/resources/static/js/mts.js
 src/main/resources/templates/thymeleaf/dependencySearch.html
-src/main/resources/templates/thymeleaf/dvLogView.html
+src/main/resources/templates/thymeleaf/devLogView.html
 src/main/resources/templates/thymeleaf/index.html
 src/main/resources/templates/thymeleaf/jqtemplate.html
 src/main/resources/templates/thymeleaf/mapaddr.html

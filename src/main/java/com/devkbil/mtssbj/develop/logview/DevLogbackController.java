@@ -24,9 +24,9 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @Tag(name = "Logback Dev Check Controller", description = "Logback 로그 메시지를 가져오기 위한 API")
 @RequiredArgsConstructor
-public class DevelopLogbackDevCheckController {
+public class DevLogbackController {
 
-    private final DevelopLogbackAppenderService<ILoggingEvent> developLogbackAppenderService;
+    private final DevLogbackAppenderService<ILoggingEvent> devLogbackAppenderService;
 
     /**
      * 로그 뷰어
@@ -37,10 +37,10 @@ public class DevelopLogbackDevCheckController {
      */
     @Operation(summary = "로그 뷰어", description = "큐에 저장된 로그 메시지를 반환합니다.")
     @ApiResponse(responseCode = "200", description = "정상적으로 로그 메시지가 반환되었습니다.")
-    @GetMapping(value = "/dvLogView", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/devLogView", produces = MediaType.APPLICATION_JSON_VALUE)
     public String logview(Model model) {
         List<String> logView =
-            developLogbackAppenderService
+            devLogbackAppenderService
                 .getLogQueue()
                 .stream()
                 .map(queue -> queue
@@ -49,6 +49,6 @@ public class DevelopLogbackDevCheckController {
                     .replaceAll("\t", ""))
                 .collect(Collectors.toList());
         model.addAttribute("logView", logView);
-        return "thymeleaf/dvLogView";
+        return "thymeleaf/devLogView";
     }
 }

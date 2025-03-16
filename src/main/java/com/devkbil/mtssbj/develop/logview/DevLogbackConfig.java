@@ -16,18 +16,18 @@ import org.springframework.context.annotation.Configuration;
  * - Logback Appender를 추가하여 로그를 처리하는 커스텀 Appender를 설정합니다.
  */
 @Configuration
-public class DevelopLogbackConfig implements InitializingBean {
+public class DevLogbackConfig implements InitializingBean {
 
     /**
-     * {@code DevelopLogbackAppenderService}에 대한 Spring Bean을 생성하고 등록합니다.
+     * {@code DevLogbackAppenderService}에 대한 Spring Bean을 생성하고 등록합니다.
      * 이 서비스는 로그 메시지를 저장하기 위해 로그 큐를 관리하며,
      * 큐의 크기를 제한하고 가득 찼을 경우 가장 오래된 항목을 제거합니다.
      *
-     * @return 로그 이벤트를 처리하도록 구성된 {@code DevelopLogbackAppenderService}의 새 인스턴스
+     * @return 로그 이벤트를 처리하도록 구성된 {@code DevLogbackAppenderService}의 새 인스턴스
      */
     @Bean
-    public DevelopLogbackAppenderService<ILoggingEvent> developLogbackAppenderService() {
-        return new DevelopLogbackAppenderService<ILoggingEvent>();
+    public DevLogbackAppenderService<ILoggingEvent> devLogbackAppenderService() {
+        return new DevLogbackAppenderService<ILoggingEvent>();
     }
 
     /**
@@ -38,15 +38,15 @@ public class DevelopLogbackConfig implements InitializingBean {
     public void afterPropertiesSet() {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 
-        DevelopLogbackAppender<ILoggingEvent> developLogbackAppender = new DevelopLogbackAppender<>(developLogbackAppenderService());
+        DevLogbackAppender<ILoggingEvent> devLogbackAppender = new DevLogbackAppender<>(devLogbackAppenderService());
 
-        developLogbackAppender.setContext(loggerContext);
-        developLogbackAppender.setName("developLogbackAppender");
+        devLogbackAppender.setContext(loggerContext);
+        devLogbackAppender.setName("devLogbackAppender");
         RollingFileAppender<ILoggingEvent> appender = (RollingFileAppender<ILoggingEvent>) loggerContext.getLogger("ROOT").getAppender("FILE_APPENDER");
-        developLogbackAppender.setEncoder(appender == null ? new PatternLayoutEncoder() : appender.getEncoder());
+        devLogbackAppender.setEncoder(appender == null ? new PatternLayoutEncoder() : appender.getEncoder());
 
-        developLogbackAppender.start();
-        loggerContext.getLogger("ROOT").addAppender(developLogbackAppender);
+        devLogbackAppender.start();
+        loggerContext.getLogger("ROOT").addAppender(devLogbackAppender);
 
     }
 

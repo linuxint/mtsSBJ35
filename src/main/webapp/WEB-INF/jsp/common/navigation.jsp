@@ -183,7 +183,7 @@
                         <a href="#"><i class="fa fa-sitemap fa-fw"></i> <s:message code="develop.title"/><span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                             <li>
-                                <a href="dvLogView" target="_blank"><s:message code="develop.title1"/></a>
+                                <a href="devLogView" target="_blank"><s:message code="develop.title1"/></a>
                             </li>
                             <li>
                                 <a href="/apidoc/index.html" target="_blank"><s:message code="develop.title2"/></a>
@@ -224,4 +224,3 @@
     </div>
     <!-- /.navbar-static-side -->
 </nav>
-
