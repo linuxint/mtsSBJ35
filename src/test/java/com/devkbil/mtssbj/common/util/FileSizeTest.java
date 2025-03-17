@@ -36,6 +36,9 @@ class FileSizeTest {
         subDir.mkdir();
         createTestFile(subDir, "subfile1.txt", testContent);
         createTestFile(subDir, "subfile2.txt", testContent);
+
+        // Initialize the FileSize object
+        fileSize = new FileSize();
     }
 
     private File createTestFile(File dir, String name, String content) throws IOException {
