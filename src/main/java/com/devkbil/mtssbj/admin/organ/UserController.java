@@ -151,9 +151,10 @@ public class UserController {
     }
 
     /**
-     * 특정 사용자 번호(userno)에 해당하는 사용자 데이터를 조회하여 반환합니다.
+     * 특정 사용자 번호(userno)에 해당하는 사용자 데이터를 반환합니다.
      *
-     * @param response HttpServletResponse 객체로 조회된 사용자 데이터를 JSON 형식으로 반환합니다.
+     * @param userno 사용자 번호. 조회할 사용자를 식별하는 고유 문자열.
+     * @param response HTTP 응답 객체. 사용자 데이터를 JSON 형태로 반환하기 위해 사용됩니다.
      */
     @PostMapping(value = "/adUserRead")
     @Operation(summary = "사용자 상세 조회", description = "특정 사용자 번호(userno)에 해당하는 사용자 데이터를 반환합니다.")
@@ -161,9 +162,7 @@ public class UserController {
         @ApiResponse(responseCode = "200", description = "요청 성공, 사용자 데이터 반환"),
         @ApiResponse(responseCode = "404", description = "해당 사용자를 찾을 수 없음")
     })
-    public void userRead(HttpServletResponse response) {
-
-        String userno = authService.getAuthUserNo();
+    public void userRead(@RequestParam(value = "userno") String userno, HttpServletResponse response) {
 
         // 사용자 정보 조회 후 JSON 형태로 반환
         UserVO userInfo = userService.selectUserOne(userno);
