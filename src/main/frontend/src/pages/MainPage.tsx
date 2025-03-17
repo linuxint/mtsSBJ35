@@ -73,6 +73,62 @@ const MainPage = () => {
     handleMenuClose();
   };
 
+  // 데이터 매핑 함수: API 응답 데이터를 프론트엔드 컴포넌트가 기대하는 형식으로 변환
+  const mapApiDataToComponentData = (apiData: any) => {
+    if (!apiData) return null;
+
+    const mappedData = { ...apiData };
+
+    // 프로젝트 목록 매핑
+    if (apiData.projectlistview) {
+      mappedData.projectlistview = apiData.projectlistview.map((project: any) => ({
+        id: project.prno || project.id || 0,
+        title: project.prtitle || project.title || '',
+        description: `${project.usernm || ''} (${project.prstatus || ''}) ${project.prstartdate || ''} ~ ${project.prenddate || ''}`,
+        ...project
+      }));
+    }
+
+    // 뉴스 목록 매핑
+    if (apiData.listview) {
+      mappedData.listview = apiData.listview.map((news: any) => ({
+        id: news.brdno || news.id || 0,
+        title: news.brdtitle || news.title || '',
+        brdtitle: news.brdtitle || news.title || '',
+        usernm: news.brdwriter || news.usernm || '',
+        regdate: news.regdate || '',
+        bgname: news.bgname || '',
+        ...news
+      }));
+    }
+
+    // 공지사항 목록 매핑
+    if (apiData.noticeList) {
+      mappedData.noticeList = apiData.noticeList.map((notice: any) => ({
+        id: notice.brdno || notice.id || 0,
+        title: notice.brdtitle || notice.title || '',
+        brdtitle: notice.brdtitle || notice.title || '',
+        usernm: notice.brdwriter || notice.usernm || '',
+        regdate: notice.regdate || '',
+        bgname: notice.bgname || '',
+        ...notice
+      }));
+    }
+
+    // 타임라인 목록 매핑
+    if (apiData.listtime) {
+      mappedData.listtime = apiData.listtime.map((item: any, index: number) => ({
+        id: item.reno || item.id || index, // Use index as fallback to ensure unique IDs
+        content: item.rememo || item.content || '',
+        writer: item.rewriter || '',
+        date: item.regdate || '',
+        ...item
+      }));
+    }
+
+    return mappedData;
+  };
+
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -84,7 +140,19 @@ const MainPage = () => {
           fetchCalendarData()
         ]);
 
-        setMainData(mainPageData);
+        // 디버그 로깅 추가
+        console.log('Main page data received:', mainPageData);
+        console.log('Project list data:', mainPageData?.projectlistview);
+        console.log('News list data:', mainPageData?.listview);
+        console.log('Notice list data:', mainPageData?.noticeList);
+        console.log('Timeline data:', mainPageData?.listtime);
+        console.log('Calendar data received:', calendarPageData);
+
+        // API 데이터를 컴포넌트에 맞게 변환
+        const mappedMainData = mapApiDataToComponentData(mainPageData);
+        console.log('Mapped main page data:', mappedMainData);
+
+        setMainData(mappedMainData);
         setCalendarData(calendarPageData);
       } catch (err) {
         console.error('Error loading main page data:', err);
@@ -103,7 +171,15 @@ const MainPage = () => {
 
     try {
       const mainPageData = await fetchMainPageData(searchKeyword);
-      setMainData(mainPageData);
+
+      // 디버그 로깅 추가
+      console.log('Search results received:', mainPageData);
+
+      // API 데이터를 컴포넌트에 맞게 변환
+      const mappedMainData = mapApiDataToComponentData(mainPageData);
+      console.log('Mapped search results:', mappedMainData);
+
+      setMainData(mappedMainData);
     } catch (err) {
       console.error('Error searching:', err);
       setError('검색 중 오류가 발생했습니다.');

@@ -45,6 +45,9 @@ public class MainRestController {
 
         log.info("Main page data request received");
 
+        // 검색 키워드 추출
+        String searchKeyword = searchVO != null ? searchVO.getSearchKeyword() : null;
+
         // ModelMap 객체 생성
         ModelMap modelMap = new ModelMap();
 

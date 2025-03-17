@@ -15,6 +15,21 @@ import {
 import { CalendarData } from '../services/mainService';
 import { fetchCalendarData } from '../services/mainService';
 
+// 날짜 형식 변환 함수: "2025-06-23" -> "6월 23일 (일)"
+const formatDate = (dateString: string) => {
+  if (!dateString) return '';
+
+  const date = new Date(dateString);
+  const month = date.getMonth() + 1; // 월 (0-11이므로 +1)
+  const day = date.getDate(); // 일
+
+  // 요일 배열 (한국어)
+  const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+  const weekday = weekdays[date.getDay()]; // 요일
+
+  return `${month}월 ${day}일 (${weekday})`;
+};
+
 interface CalendarProps {
   initialData: CalendarData;
 }
@@ -42,19 +57,29 @@ const Calendar = ({ initialData }: CalendarProps) => {
 
     return (
       <List dense disablePadding>
-        {day.list.map((event: any, index: number) => (
-          <Box key={event.id || index}>
-            {index > 0 && <Divider component="li" />}
-            <ListItem disablePadding sx={{ py: 0.5 }}>
-              <ListItemText
-                primary={event.title}
-                secondary={event.time}
-                primaryTypographyProps={{ variant: 'body2' }}
-                secondaryTypographyProps={{ variant: 'caption' }}
-              />
-            </ListItem>
-          </Box>
-        ))}
+        {day.list.map((event: any, index: number) => {
+          // Format time if hour and minute are available
+          const time = event.sdhour && event.sdminute 
+            ? `${event.sdhour}:${event.sdminute}` 
+            : '';
+
+          return (
+            <Box key={event.id || index}>
+              {index > 0 && <Divider component="li" />}
+              <ListItem disablePadding sx={{ py: 0.5 }}>
+                <ListItemText
+                  primary={event.sstitle}
+                  secondary={time}
+                  primaryTypographyProps={{ 
+                    variant: 'body2',
+                    style: { color: event.fontcolor || 'inherit' }
+                  }}
+                  secondaryTypographyProps={{ variant: 'caption' }}
+                />
+              </ListItem>
+            </Box>
+          );
+        })}
       </List>
     );
   };
@@ -64,7 +89,7 @@ const Calendar = ({ initialData }: CalendarProps) => {
       <CardContent>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h6" component="h2">
-            캘린더 ({calendarData.month}월)
+            캘린더 (2025년 {calendarData.month}월 {calendarData.week}째주)
           </Typography>
           <Box>
             <Button 
@@ -97,7 +122,7 @@ const Calendar = ({ initialData }: CalendarProps) => {
                 }}
               >
                 <Typography variant="subtitle2" gutterBottom>
-                  {day.date}
+                  {formatDate(day.date)}
                 </Typography>
                 {renderDayEvents(day)}
               </Paper>

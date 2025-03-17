@@ -29,12 +29,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       if (response.data.success) {
         const { accessToken, refreshToken, username, role } = response.data.data;
-        
+
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         localStorage.setItem('username', username);
         localStorage.setItem('role', role);
-        
+
+        // Set up axios to use the token for all requests
+        axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
         set({
           accessToken,
           refreshToken,
@@ -42,7 +45,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           role,
           isAuthenticated: true,
         });
-        
+
         return true;
       }
       return false;
@@ -57,7 +60,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('username');
     localStorage.removeItem('role');
-    
+
+    // Clear the Authorization header
+    delete axios.defaults.headers.common['Authorization'];
+
     set({
       accessToken: null,
       refreshToken: null,
@@ -69,14 +75,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   checkAuth: async () => {
     const { accessToken, refreshToken, refreshAccessToken } = get();
-    
+
     if (!accessToken) {
       if (refreshToken) {
         return await refreshAccessToken();
       }
       return false;
     }
-    
+
     try {
       // Set up axios to use the token for all requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
@@ -91,33 +97,33 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   refreshAccessToken: async () => {
     const { refreshToken } = get();
-    
+
     if (!refreshToken) {
       return false;
     }
-    
+
     try {
       const response = await axios.post('/api/v1/auth/refresh', {
         refreshToken,
       });
-      
+
       if (response.data.success) {
         const { accessToken, username, role } = response.data.data;
-        
+
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('username', username);
         localStorage.setItem('role', role);
-        
+
         set({
           accessToken,
           username,
           role,
           isAuthenticated: true,
         });
-        
+
         // Set up axios to use the new token for all requests
         axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-        
+
         return true;
       }
       return false;
@@ -129,25 +135,31 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 }));
 
+// Initialize axios headers with token from localStorage if available
+const accessToken = localStorage.getItem('accessToken');
+if (accessToken) {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+}
+
 // Set up axios interceptor to handle token expiration
 axios.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
+
     // If the error is 401 (Unauthorized) and we haven't already tried to refresh the token
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
+
       const refreshed = await useAuthStore.getState().refreshAccessToken();
-      
+
       if (refreshed) {
         // Retry the original request with the new token
         originalRequest.headers['Authorization'] = `Bearer ${useAuthStore.getState().accessToken}`;
         return axios(originalRequest);
       }
     }
-    
+
     return Promise.reject(error);
   }
 );

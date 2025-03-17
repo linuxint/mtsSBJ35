@@ -43,7 +43,7 @@ const Timeline = ({ items }: TimelineProps) => {
                 <ListItemText
                   primary={item.content}
                   secondary={
-                    <React.Fragment key={`${item.id}-secondary`}>
+                    <React.Fragment>
                       {item.date && <span>{item.date} </span>}
                       {item.time && <span>{item.time}</span>}
                     </React.Fragment>
