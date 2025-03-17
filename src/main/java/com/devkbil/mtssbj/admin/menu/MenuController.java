@@ -54,7 +54,7 @@ public class MenuController {
     public String menuList(ModelMap modelMap) {
         setCommonAttributes(modelMap);
         List<?> menuList = menuService.selectMenu();
-        String treeStr = new TreeMaker().makeTreeByHierarchy(menuList);
+        String treeStr = menuList.isEmpty() ? "" : new TreeMaker().makeTreeByHierarchy(menuList);
 
         modelMap.addAttribute("treeStr", treeStr);
         return "admin/menu/MenuList";

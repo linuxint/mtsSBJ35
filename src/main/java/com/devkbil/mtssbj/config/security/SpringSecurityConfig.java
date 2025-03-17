@@ -2,6 +2,7 @@ package com.devkbil.mtssbj.config.security;
 
 import com.devkbil.mtssbj.common.JwtRequestFilter;
 import com.devkbil.mtssbj.config.ConfigConstant;
+import com.devkbil.mtssbj.config.CorsConfig;
 import com.devkbil.mtssbj.error.ErrorCode;
 import com.devkbil.mtssbj.error.ErrorResponse;
 import com.devkbil.mtssbj.member.MemberService;
@@ -56,6 +57,7 @@ public class SpringSecurityConfig {
     private final UserDetailsService userDetailsService;
     private final AuthenticationFailureHandler userLoginFailHandler;
     public final JwtRequestFilter jwtRequestFilter;
+    private final CorsConfig corsConfig;
 
     /**
      * 로그인 페이지 URL 경로
@@ -91,7 +93,14 @@ public class SpringSecurityConfig {
         // JWT 필터 추가: 필요한 경우 주석을 해제하고 실제 구현체를 추가하세요.
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         http.csrf(CsrfConfigurer::disable);
-        http.cors(CorsConfigurer::disable);
+        http.cors(cors -> cors.configurationSource(request -> {
+            var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
+            corsConfiguration.setAllowedOrigins(java.util.Arrays.asList(corsConfig.corsAllowedOrigins.split(",")));
+            corsConfiguration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+            corsConfiguration.setAllowedHeaders(java.util.Collections.singletonList("*"));
+            corsConfiguration.setAllowCredentials(true);
+            return corsConfiguration;
+        }));
         http.headers(headerConfig -> headerConfig
                 // iframe 참조 허용
                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)

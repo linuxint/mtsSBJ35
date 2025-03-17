@@ -17,12 +17,12 @@
             SELECT MNU_NO_SEQ.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO COM_MENU (
-            MNU_NO , MNU_PARENT , MNU_TYPE , MNU_NM , MNU_DESC
+            MNU_NO , MNU_PARENT , MNU_TYPE , MNU_NM , MNU_MSG_CD , MNU_DESC
             , MNU_TARGET , MNU_FILENM , MNU_IMGPATH , MNU_CUSTOM , MNU_DESKTOP
             , MNU_MOBILE , MNU_ORDER , MNU_CERT_TYPE , MNU_EXTN_CONN_YN , MNU_START_HOUR
             , MNU_END_HOUR , REGUSERNO , CHGUSERNO , DELETEFLAG
         ) VALUES (
-            #{mnuNo}, #{mnuParent}, #{mnuType}, #{mnuNm}, #{mnuDesc}
+            #{mnuNo}, #{mnuParent}, #{mnuType}, #{mnuNm}, #{mnuMsgCd}, #{mnuDesc}
             , #{mnuTarget}, #{mnuFilenm}, #{mnuImgpath}, #{mnuCustom}, #{mnuDesktop}
             , #{mnuMobile}, #{mnuOrder}, #{mnuCertType}, #{mnuExtnConnYn}, #{mnuStartHour}
             , #{mnuEndHour}, #{reguserno}, #{chguserno}, 'N')
@@ -31,6 +31,7 @@
     <update id="updateMenu" parameterType="com.devkbil.mtssbj.admin.menu.MenuVO">
         UPDATE COM_MENU
            SET MNU_NM=#{mnuNm}
+            , MNU_MSG_CD=#{mnuMsgCd}
             , MNU_PARENT=#{mnuParent}
             , MNU_TYPE=#{mnuType}
             , MNU_TARGET=#{mnuTarget}
@@ -52,6 +53,7 @@
                MNU_PARENT as mnuParent,
                MNU_TYPE as mnuType,
                MNU_NM as mnuNm,
+               MNU_MSG_CD as mnuMsgCd,
                MNU_DESC as mnuDesc,
                MNU_TARGET as mnuTarget,
                MNU_FILENM as mnuFilenm,

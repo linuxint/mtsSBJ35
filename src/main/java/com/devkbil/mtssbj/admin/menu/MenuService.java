@@ -1,6 +1,8 @@
 package com.devkbil.mtssbj.admin.menu;
 
 import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,23 +29,29 @@ public class MenuService {
     /**
      * 메뉴 리스트 조회
      * - 모든 메뉴 데이터를 조회합니다.
+     * - 결과는 menuList에 캐싱됩니다.
      *
      * @return List 메뉴 리스트
      */
+    @Cacheable(value = "menuList", key = "'allMenus'")
     public List<?> selectMenu() {
+        log.debug("메뉴 리스트 조회 - 캐시에서 조회되지 않아 DB에서 로드합니다.");
         return sqlSession.selectList("selectMenu");
     }
 
     /**
      * 메뉴 삽입 및 업데이트
      * - 신규 메뉴를 삽입하거나 기존 메뉴를 업데이트합니다.
+     * - 작업 후 menuList의 모든 항목을 제거합니다.
      *
      * @param menuVO 메뉴 정보 객체
      * @return boolean 작업 성공 여부 (true: 성공, false: 실패)
      */
     @Transactional
+    @CacheEvict(value = "menuList", allEntries = true)
     public int insertMenu(MenuVO menuVO) {
         try {
+            log.debug("메뉴 저장/수정 - menuList의 모든 항목을 제거합니다.");
             // 부모 메뉴 값 검증 (값이 없을 경우 null로 설정)
             validateMenuParent(menuVO);
 
@@ -67,13 +75,16 @@ public class MenuService {
     /**
      * 단일 메뉴 조회
      * - 특정 메뉴 번호에 해당하는 메뉴를 조회합니다.
+     * - 결과는 menuList에 캐싱됩니다.
      *
      * @param mnuNo 메뉴 번호
      * @return MenuVO 메뉴 정보 객체
      * @throws IllegalArgumentException 메뉴가 존재하지 않을 경우 예외를 발생시킵니다.
      */
+    @Cacheable(value = "menuList", key = "#mnuNo")
     public MenuVO selectMenuOne(String mnuNo) {
         try {
+            log.debug("단일 메뉴 조회 - 캐시에서 조회되지 않아 DB에서 로드합니다. 메뉴 번호: {}", mnuNo);
             MenuVO menu = sqlSession.selectOne("selectMenuOne", mnuNo);
             if (ObjectUtils.isEmpty(menu)) {
                 throw new IllegalArgumentException("selectMenuOne: 해당 번호로 메뉴를 찾을 수 없습니다: " + mnuNo);
@@ -88,13 +99,16 @@ public class MenuService {
     /**
      * 메뉴 삭제
      * - 특정 메뉴 번호에 해당하는 메뉴를 삭제합니다.
+     * - 작업 후 menuList의 모든 항목을 제거합니다.
      *
      * @param mnuNo 메뉴 번호
      * @return boolean 삭제 성공 여부 (true: 삭제 성공, false: 삭제 실패)
      */
     @Transactional
+    @CacheEvict(value = "menuList", allEntries = true)
     public boolean deleteMenu(String mnuNo) {
         try {
+            log.debug("메뉴 삭제 - menuList의 모든 항목을 제거합니다. 메뉴 번호: {}", mnuNo);
             int rowsDeleted = sqlSession.delete("deleteMenu", mnuNo);
             if (rowsDeleted > 0) {
                 log.info("deleteMenu: 메뉴가 성공적으로 삭제되었습니다: {}", mnuNo);

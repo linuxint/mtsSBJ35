@@ -27,12 +27,12 @@ import lombok.extern.slf4j.Slf4j;
  * <p>
  * 이 컨트롤러에서 사용된 애노테이션:
  * - {@code @RestController}: 클래스를 RESTful 웹 서비스 컨트롤러로 표시합니다.
- * - {@code @RequestMapping("/api/v1/auth")}: 이 컨트롤러의 모든 엔드포인트에 대한 기본 URL을 지정합니다.
+ * - {@code @RequestMapping("/api/v1/member/auth")}: 이 컨트롤러의 모든 엔드포인트에 대한 기본 URL을 지정합니다.
  * - {@code @Slf4j}: 컨트롤러에서 로깅 기능을 제공합니다.
  * - {@code @RequiredArgsConstructor}: 필요한 종속성을 주입하기 위한 생성자를 생성합니다.
  */
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1/member/auth")
 @Slf4j
 @RequiredArgsConstructor
 public class AuthController {

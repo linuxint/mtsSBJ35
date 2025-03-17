@@ -24,46 +24,45 @@ import java.util.TreeMap;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * The SpringCalendarExtractorTxt class is responsible for downloading, parsing, and processing iCalendar (.ics) file data.
- * It groups events by date, extracts relevant information such as program names and versions, and outputs
- * the results to the console and a file.
+ * SpringCalendarExtractorTxt 클래스는 iCalendar (.ics) 파일 데이터를 다운로드, 파싱 및 처리하는 작업을 수행합니다.
+ * 이 클래스는 이벤트를 날짜별로 그룹화하고, 프로그램 이름 및 버전과 같은 유용한 정보를 추출하며,
+ * 결과를 콘솔과 파일에 출력합니다.
  * <p>
- * The workflow includes:
- * - Downloading the .ics file from a provided URL.
- * - Parsing the iCalendar data to extract event components like DTSTART, UID, and SUMMARY.
- * - Grouping events by date based on their DTSTART value.
- * - Extracting and processing event names and version details from the event SUMMARY property.
- * - Filtering events within a specific date range and outputting them in a formatted way.
+ * 주요 기능:
+ * - 제공된 URL의 .ics 파일 다운로드
+ * - iCalendar 데이터를 파싱하여 DTSTART, UID, SUMMARY 같은 이벤트 구성 요소 추출
+ * - DTSTART 값 기준으로 이벤트를 날짜별로 그룹화
+ * - SUMMARY 속성에서 프로그램 이름 및 버전을 추출하고 처리
+ * - 특정 날짜 범위 내 이벤트 필터링 및 서식화된 출력
  */
 @Slf4j
 public class SpringCalendarExtractorTxt {
 
-
     // URL
     public static final String CALENDAR_URL = "https://calendar.spring.io/ical";
 
-    // Date formats
+    // 날짜 포맷
     public static final String FULL_DATE_TIME_FORMAT = "yyyyMMdd'T'HHmmss'Z'";
     public static final String DATE_ONLY_FORMAT = "yyyyMMdd";
 
-    // Output templates (순서 정렬: UID, 날짜, 프로그램명, 버전, 기타 정보, 이벤트 제목)
+    // 출력 템플릿 (순서 정렬: UID, 날짜, 프로그램명, 버전, 기타 정보, 이벤트 제목)
     public static final String OUTPUT_TEMPLATE = "%-40s %-12s %-40s %-30s %-40s\n";
     public static final String HEADER_TEMPLATE = "%-40s %-12s %-40s %-30s %-40s";
 
-    // Headers
+    // 헤더
     public static final String HEADER_UID = "UID";
     public static final String HEADER_DATE = "Date";
     public static final String HEADER_PROGRAM = "Program";
     public static final String HEADER_VERSION = "Version";
     public static final String HEADER_TOPIC_TITLE = "Topic Title";
 
-    // Default values (기본 출력 값)
+    // 기본값 (기본 출력 값)
     public static final String DEFAULT_PROGRAM_NAME = " ";
     public static final String DEFAULT_VERSION = " ";
     public static final String DEFAULT_EXTRA = " ";
 
-    // Line separator
-    public static final String LINE_SEPARATOR = "-".repeat(140); // 뷰 정리
+    // 선 구분
+    public static final String LINE_SEPARATOR = "-".repeat(140); // 보기 정리
 
     public static final char topLeft = '\u250C'; // ┌
     public static final char topRight = '\u2510'; // ┐
@@ -97,7 +96,7 @@ public class SpringCalendarExtractorTxt {
     }
 
     /**
-     * VEVENT 데이터를 날짜별로 그룹화
+     * VEVENT 데이터를 날짜별로 그룹화합니다.
      *
      * @param calendar iCalendar 객체
      * @return Map (날짜별로 그룹화된 이벤트)
@@ -105,7 +104,7 @@ public class SpringCalendarExtractorTxt {
     private static Map<LocalDate, StringBuilder> groupEventsByDate(Calendar calendar) {
         Map<LocalDate, StringBuilder> eventsByDate = new TreeMap<>();
 
-        // Date formatters
+        // 날짜 형식 지정
         DateTimeFormatter fullDateTimeFormatter = DateTimeFormatter.ofPattern(FULL_DATE_TIME_FORMAT);
         DateTimeFormatter dateOnlyFormatter = DateTimeFormatter.ofPattern(DATE_ONLY_FORMAT);
 
@@ -142,7 +141,7 @@ public class SpringCalendarExtractorTxt {
     }
 
     /**
-     * InputStream으로부터 iCalendar 데이터를 파싱
+     * InputStream으로부터 iCalendar 데이터를 파싱합니다.
      *
      * @param inputStream .ics 파일 스트림
      * @return Calendar 객체
@@ -155,15 +154,12 @@ public class SpringCalendarExtractorTxt {
     }
 
     /**
-     * Parses an event summary string to extract the program name and version.
-     * The method identifies the version token (e.g., semantic version number or similar patterns)
-     * and separates it from the program name. If the information is formatted with "Enterprise" details,
-     * it adjusts accordingly.
+     * 이벤트 SUMMARY 문자열에서 프로그램 이름과 버전을 추출합니다.
+     * 버전 정보(예: 서머틱 버전 번호 또는 유사한 패턴)를 식별하고 프로그램 이름과 분리합니다.
+     * 'Enterprise' 형식으로 제공된 경우 이를 조정합니다.
      *
-     * @param eventSummary The input string summarizing the event, likely containing program name
-     *                     and version information.
-     * @return An array of strings where the first element is the program name and the second element
-     * is the version.
+     * @param eventSummary 이벤트 요약 문자열로, 프로그램 이름 및 버전 정보를 포함할 가능성이 높습니다.
+     * @return 첫 번째 요소는 프로그램 이름이고, 두 번째 요소는 버전인 문자열 배열
      */
     private static String[] parseEventDetails(String eventSummary) {
         String programName = DEFAULT_PROGRAM_NAME;   // 기본값: 프로그램 이름
@@ -213,12 +209,12 @@ public class SpringCalendarExtractorTxt {
     }
 
     /**
-     * Validates if the given text matches the versioning pattern.
-     * The pattern supports numeric versions separated by dots (e.g., X.Y.Z),
-     * with optional suffixes such as RELEASE, BETA, ALPHA, or enclosed within parentheses.
+     * 주어진 텍스트가 버전 패턴과 일치하는지 확인합니다.
+     * 패턴은 점으로 구분된 숫자 버전(예: X.Y.Z)을 지원하며,
+     * RELEASE, BETA, ALPHA와 같은 접미사나 괄호로 둘러싸인 버전도 허용합니다.
      *
-     * @param text The string to be checked against the versioning pattern.
-     * @return {@code true} if the text matches the version pattern; {@code false} otherwise.
+     * @param text 버전 패턴과 비교할 문자열
+     * @return {@code true} 텍스트가 버전 패턴과 일치하면; {@code false} 그렇지 않으면
      */
     private static boolean isVersion(String text) {
     /*
@@ -229,15 +225,15 @@ public class SpringCalendarExtractorTxt {
     }
 
     /**
-     * 결과를 화면과 result.txf 파일로 출력
+     * 결과를 콘솔과 result.txf 파일로 출력합니다.
      *
      * @param eventsByDate 날짜별로 그룹화된 이벤트 Map
-     * @param startDate    시작 기준 날짜 (오늘 - 5일)
+     * @param startDate    기준 시작 날짜 (오늘 - 5일)
      */
     private static void printGroupedEventsByDate(Map<LocalDate, StringBuilder> eventsByDate, LocalDate startDate) {
         StringBuilder outputBuilder = new StringBuilder();
 
-        // Header 추가
+        // 헤더 추가
         outputBuilder.append(String.format(HEADER_TEMPLATE, HEADER_UID, HEADER_DATE, HEADER_PROGRAM, HEADER_VERSION, HEADER_TOPIC_TITLE))
             .append(System.lineSeparator())
             .append(LINE_SEPARATOR)
@@ -248,7 +244,7 @@ public class SpringCalendarExtractorTxt {
             .filter(entry -> !entry.getKey().isBefore(startDate))
             .forEach(entry -> outputBuilder.append(entry.getValue()).append(System.lineSeparator()));
 
-        // 화면에 출력
+        // 콘솔에 출력
         System.out.println(outputBuilder.toString());
 
         // 파일에 저장
@@ -262,34 +258,34 @@ public class SpringCalendarExtractorTxt {
     }
 
     /**
-     * Main method to process iCalendar events. The method executes the following steps:
-     * 1. Downloads an iCalendar (.ics) file from a specified URL.
-     * 2. Parses the downloaded iCalendar file to extract calendar events.
-     * 3. Groups the events by their date, organizing them in a structured format.
-     * 4. Filters and prints events that occurred within the last five days from the current date.
+     * Main 메서드는 iCalendar 이벤트를 처리합니다. 다음 단계를 실행합니다:
+     * 1. 지정된 URL에서 iCalendar (.ics) 파일 다운로드
+     * 2. 다운로드된 iCalendar 파일을 파싱하여 캘린더 이벤트 추출
+     * 3. 이벤트를 날짜별로 그룹화하고 구조화된 형식으로 정리
+     * 4. 현재 날짜를 기준으로 최근 5일 동안의 이벤트 필터링 후 출력
      * <p>
-     * The method handles any exceptions during the process, logging error messages in case of failures.
+     * 이 과정에서 발생하는 예외 처리 및 로그 출력 수행.
      * <p>
-     * Preconditions:
-     * - The URL to the iCalendar file must be valid.
-     * - The iCalendar file should adhere to standard iCalendar format.
+     * 전제 조건:
+     * - 유효한 iCalendar 파일의 URL 필요
+     * - iCalendar 파일은 표준 형식이어야 함
      * <p>
-     * Postconditions:
-     * - Events are printed to the console grouped by date (if parsing and filtering succeed).
+     * 후제 조건:
+     * - 이벤트는 날짜별로 콘솔 출력 및 (파싱/필터링 성공 시) 저장됩니다.
      */
     @Test
     public void main() {
         try {
-            // Step 1: URL에서 .ics 파일 다운로드
+            // 1단계: URL에서 .ics 파일 다운로드
             InputStream inputStream = downloadICalFile(CALENDAR_URL);
 
-            // Step 2: iCalendar 파싱
+            // 2단계: iCalendar 파싱
             Calendar calendar = parseICalFile(inputStream);
 
-            // Step 3: 날짜별로 이벤트를 그룹화
+            // 3단계: 날짜별로 이벤트를 그룹화
             Map<LocalDate, StringBuilder> eventsByDate = groupEventsByDate(calendar);
 
-            // Step 4: 오늘 기준 5일 전 이후 일정만 출력
+            // 4단계: 오늘 기준 5일 전 이후 일정만 출력
             printGroupedEventsByDate(eventsByDate, LocalDate.now().minusDays(5));
 
         } catch (Exception e) {

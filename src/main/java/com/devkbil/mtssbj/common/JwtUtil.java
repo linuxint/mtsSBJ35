@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 /**
@@ -33,6 +35,14 @@ public class JwtUtil {
         Base64.getEncoder()
             .encodeToString("N8smKe2pXyZCd3Rsv7nNni0gfZsl7J7MfinPxaO2Bgk=".getBytes())
             .getBytes());
+
+    // 액세스 토큰 만료 시간 (기본값: 1시간)
+    @Value("${jwt.access-token.expiration:3600000}")
+    private long accessTokenExpiration;
+
+    // 리프레시 토큰 만료 시간 (기본값: 7일)
+    @Value("${jwt.refresh-token.expiration:604800000}")
+    private long refreshTokenExpiration;
 
     /**
      * 토큰에서 사용자 이름을 추출합니다.
@@ -88,30 +98,55 @@ public class JwtUtil {
     }
 
     /**
-     * 사용자 정보를 기반으로 JWT 토큰을 생성합니다.
+     * 사용자 정보를 기반으로 액세스 토큰을 생성합니다.
+     *
+     * @param userDetails 사용자 정보
+     * @return 생성된 액세스 토큰
+     */
+    public String generateAccessToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", userDetails.getAuthorities()); // 역할 정보 추가
+        claims.put("type", "access"); // 토큰 타입 설정
+        return createToken(claims, userDetails.getUsername(), accessTokenExpiration);
+    }
+
+    /**
+     * 사용자 정보를 기반으로 리프레시 토큰을 생성합니다.
+     *
+     * @param userDetails 사용자 정보
+     * @return 생성된 리프레시 토큰
+     */
+    public String generateRefreshToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "refresh"); // 토큰 타입 설정
+        claims.put("tokenId", UUID.randomUUID().toString()); // 고유 ID 추가
+        return createToken(claims, userDetails.getUsername(), refreshTokenExpiration);
+    }
+
+    /**
+     * 기존 호환성을 위한 메서드 (액세스 토큰 생성)
      *
      * @param userDetails 사용자 정보
      * @return 생성된 JWT 토큰
      */
     public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("role", userDetails.getAuthorities()); // 역할 정보 추가
-        return createToken(claims, userDetails.getUsername());
+        return generateAccessToken(userDetails);
     }
 
     /**
      * 클레임과 서브젝트를 사용하여 JWT 토큰을 생성합니다.
      *
-     * @param claims  클레임 정보
-     * @param subject 서브젝트 (사용자 이름)
+     * @param claims     클레임 정보
+     * @param subject    서브젝트 (사용자 이름)
+     * @param expiration 만료 시간 (밀리초)
      * @return 생성된 JWT 토큰
      */
-    private String createToken(Map<String, Object> claims, String subject) {
+    private String createToken(Map<String, Object> claims, String subject, long expiration) {
         return Jwts.builder()
             .setClaims(claims) // 클레임 정보 설정
             .setSubject(subject) // 서브젝트 설정
             .setIssuedAt(new Date(System.currentTimeMillis())) // 생성 시점 설정
-            .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 만료 시간 설정
+            .setExpiration(new Date(System.currentTimeMillis() + expiration)) // 만료 시간 설정
             .signWith(secretKey) // 비밀 키로 서명
             .compact(); // 직렬화된 토큰 반환
     }
@@ -126,5 +161,41 @@ public class JwtUtil {
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    /**
+     * 리프레시 토큰이 유효한지 확인합니다.
+     *
+     * @param token 리프레시 토큰
+     * @return 유효 여부 (true: 유효함)
+     */
+    public Boolean validateRefreshToken(String token) {
+        try {
+            // 토큰이 만료되지 않았는지 확인
+            if (isTokenExpired(token)) {
+                return false;
+            }
+
+            // 토큰 타입이 리프레시인지 확인
+            final Claims claims = extractAllClaims(token);
+            return "refresh".equals(claims.get("type"));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 리프레시 토큰을 사용하여 새 액세스 토큰을 생성합니다.
+     *
+     * @param refreshToken 리프레시 토큰
+     * @param userDetails  사용자 정보
+     * @return 새로 생성된 액세스 토큰
+     */
+    public String generateNewAccessToken(String refreshToken, UserDetails userDetails) {
+        if (!validateRefreshToken(refreshToken)) {
+            throw new IllegalArgumentException("Invalid refresh token");
+        }
+
+        return generateAccessToken(userDetails);
     }
 }

@@ -16,7 +16,7 @@ import lombok.Setter;
  */
 @Schema(description = "메뉴 데이터 모델 : MenuVO") // Swagger에서 모델 설명 정의
 @XmlRootElement(name = "MenuVO") // XML 루트 태그 이름 설정
-@XmlType(propOrder = {"mnuNo", "mnuNm", "mnuParent", "mnuType", "mnuDesc", "mnuTarget", "mnuFilenm", "mnuImgpath", "mnuCustom", "mnuDesktop", "mnuMobile", "mnuOrder", "mnuCertType", "mnuExtnConnYn", "mnuStartHour", "mnuEndHour", "regdate", "reguserno", "chgdate", "chguserno", "deleteflag"})
+@XmlType(propOrder = {"mnuNo", "mnuNm", "mnuMsgCd", "mnuParent", "mnuType", "mnuDesc", "mnuTarget", "mnuFilenm", "mnuImgpath", "mnuCustom", "mnuDesktop", "mnuMobile", "mnuOrder", "mnuCertType", "mnuExtnConnYn", "mnuStartHour", "mnuEndHour", "regdate", "reguserno", "chgdate", "chguserno", "deleteflag"})
 // XML 및 Swagger에서 필드 출력 순서 정의
 @Getter
 @Setter
@@ -33,6 +33,9 @@ public class MenuVO {
 
     @Schema(description = "메뉴명", example = "대시보드")
     private String mnuNm;
+
+    @Schema(description = "메뉴 다국어 코드", example = "menu.dashboard")
+    private String mnuMsgCd;
 
     @Schema(description = "설명", example = "메뉴에 대한 설명")
     private String mnuDesc;

@@ -34,6 +34,7 @@
             $("#mnuNo").val(data.mnuNo);
             $("#mnuParent").val(data.mnuParent);
             $("#mnuNm").val(data.mnuNm);
+            $("#mnuMsgCd").val(data.mnuMsgCd);
             $("#mnuType").val(data.mnuType);
             $("#mnuTarget").val(data.mnuTarget);
             $("#mnuFilenm").val(data.mnuFilenm);
@@ -53,6 +54,7 @@
             $("#mnuNo").val("");
             $("#mnuParent").val(parentMenuKey);
             $("#mnuNm").val("");
+            $("#mnuMsgCd").val("");
             $("#mnuType").val("");
             $("#mnuTarget").val("");
             $("#mnuFilenm").val("");
@@ -72,6 +74,7 @@
             $("#mnuNo").val("");
             $("#mnuParent").val(menuKey);
             $("#mnuNm").val("");
+            $("#mnuMsgCd").val("");
             $("#mnuType").val("");
             $("#mnuTarget").val("");
             $("#mnuFilenm").val("");
@@ -127,6 +130,7 @@
                     mnuNo: $("#mnuNo").val(),
                     mnuParent: $("#mnuParent").val(),
                     mnuNm: $("#mnuNm").val(),
+                    mnuMsgCd: $("#mnuMsgCd").val(),
                     mnuType: $("#mnuType").val(),
                     mnuTarget: $("#mnuTarget").val(),
                     mnuFilenm: $("#mnuFilenm").val(),
@@ -210,6 +214,12 @@
                         <label class="col-lg-3"><s:message code="common.menuName"/></label>
                         <div class="col-lg-9">
                             <input name="mnuNm" id="mnuNm" style="width: 300px;" type="text" maxlength="100" value="" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-lg-3">메뉴 다국어 코드</label>
+                        <div class="col-lg-9">
+                            <input name="mnuMsgCd" id="mnuMsgCd" style="width: 300px;" type="text" maxlength="100" value="" class="form-control">
                         </div>
                     </div>
                     <div class="row form-group">

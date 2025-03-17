@@ -1,5 +1,7 @@
 package com.devkbil.mtssbj.config;
 
+import com.devkbil.mtssbj.admin.menu.MenuService;
+
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -10,7 +12,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 
 import java.util.Arrays;
+import java.util.List;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -23,8 +27,10 @@ import lombok.extern.slf4j.Slf4j;
 @EnableCaching
 @Configuration
 @Slf4j
+@RequiredArgsConstructor
 public class CacheConfig {
 
+    private final MenuService menuService;
     private CacheManager cacheManager;
 
     /**
@@ -42,7 +48,8 @@ public class CacheConfig {
             "boardList",     // 게시판 목록 캐시
             "boardDetail",   // 개별 게시판 게시물 캐시
             "alertCount",    // 알림 카운트 캐시
-            "exampleCache"   // 레거시 캐시
+            "exampleCache",  // 레거시 캐시
+            "menuList"      // 메뉴 데이터 캐시
         ));
 
         // 다양한 유형에 대한 서로 다른 TTL로 캐시 설정 구성
@@ -71,12 +78,28 @@ public class CacheConfig {
             return;
         }
 
-        Cache cache = cacheManager.getCache("exampleCache");
-        if (cache != null) {
-            cache.put("preloadedKey", "preloadedValue");
+        // 예제 캐시 초기화
+        Cache exampleCache = cacheManager.getCache("exampleCache");
+        if (exampleCache != null) {
+            exampleCache.put("preloadedKey", "preloadedValue");
             log.info("캐시 'exampleCache'가 데이터로 초기화되었습니다.");
         } else {
             log.warn("'exampleCache' 캐시를 찾을 수 없습니다.");
+        }
+
+        // 메뉴 캐시 초기화
+        Cache menuList = cacheManager.getCache("menuList");
+        if (menuList != null) {
+            try {
+                // 모든 메뉴 데이터를 조회하여 캐시에 저장
+                List<?> allMenus = menuService.selectMenu();
+                menuList.put("allMenus", allMenus);
+                log.info("캐시 'menuList'가 모든 메뉴 데이터로 초기화되었습니다. 메뉴 수: {}", allMenus.size());
+            } catch (Exception e) {
+                log.error("메뉴 캐시 초기화 중 오류 발생", e);
+            }
+        } else {
+            log.warn("'menuList' 캐시를 찾을 수 없습니다.");
         }
     }
 }

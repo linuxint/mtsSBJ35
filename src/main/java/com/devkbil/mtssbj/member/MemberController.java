@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -63,7 +64,6 @@ public class MemberController {
      * 프로필 사진이 업로드된 경우 이미지를 저장하고, 사용자 정보를 업데이트합니다.
      *
      * @param userInfo 저장할 사용자 정보 ({@link UserVO})
-     * @param modelMap 뷰에 전달할 데이터를 담는 모델 객체
      * @return 저장 완료 후 리다이렉트할 URL
      */
     @PostMapping("/userSave")
@@ -110,7 +110,7 @@ public class MemberController {
      * @param modelMap 뷰에 전달할 데이터를 담는 모델 객체
      * @return "member/searchMember" 뷰 페이지 경로
      */
-    @GetMapping("/searchMember")
+    @RequestMapping("/searchMember")
     public String searchMember(@ModelAttribute @Valid SearchVO searchVO, ModelMap modelMap) {
 
         if (StringUtils.hasText(searchVO.getSearchKeyword())) {
