@@ -72,16 +72,19 @@ public class FileUpload {
 
         FileVO fileVO = new FileVO();
         try {
-            String basePath = System.getProperty("user.dir") + File.separator + "fileupload";
-            String savedPath = saveFileOne(
-                uploadfile,
-                basePath,
-                uploadfile.getOriginalFilename()
-            );
+            String basePath = System.getProperty("user.dir") + File.separator + "fileupload" + File.separator;
+            String newName = FileUtil.getNewName();
+            basePath = FileUtil.getRealPath(basePath, newName);
+
+            String savedPath = saveFileOne(uploadfile, basePath, newName);
+
             fileVO.setFilepath(savedPath);
             fileVO.setFilename(uploadfile.getOriginalFilename());
+            fileVO.setRealname(newName);
             fileVO.setFilesize(uploadfile.getSize());
+
             return fileVO;
+
         } catch (Exception e) {
             log.error("Failed to save file: " + e.getMessage(), e);
             return null;
