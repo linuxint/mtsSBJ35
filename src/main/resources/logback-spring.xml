@@ -10,7 +10,7 @@
     <property resource ="application.properties"/>
     <springProperty name="NAME" source="spring.application.name" />
 
-    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+    <conversionRule conversionWord="clr" class="org.springframework.boot.logging.logback.ColorConverter" />
 
     <!-- spring.profile에 따른 설정파일 분기 -->
     <springProfile name = "local">
