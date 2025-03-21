@@ -90,7 +90,7 @@ JSP에서 React.js로 전환할 때 다음 원칙을 따릅니다:
    // config.ts
    const config = {
      development: {
-       apiBaseUrl: 'http://localhost:8080/api/v1',
+       apiBaseUrl: 'http://localhost:9090/api/v1',
        enableMocking: true
      },
      production: {

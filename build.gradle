@@ -4,7 +4,7 @@
 import org.cyclonedx.gradle.CycloneDxTask
 
 plugins {
-    id 'org.springframework.boot' version '3.5.0-M2'
+    id 'org.springframework.boot' version '3.5.0-M3'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'maven-publish'
     id 'java'
@@ -71,13 +71,11 @@ configurations.configureEach {
 
 dependencyManagement {
     imports {
-        mavenBom('org.springframework.boot:spring-boot-dependencies:3.5.0-M2') {
-//            bomProperty 'spring-framework.version', '7.0.0-M3'
-//            bomProperty 'spring-security.version', '6.5.0-M2'
-//            bomProperty 'spring-session.version', '3.4.2'
-//            bomProperty 'spring-integration.version', '6.5.0-M2'
-//            bomProperty 'spring-hateoas.version', '3.0.0-M1'
-//            bomProperty 'spring-retry.version', '2.0.11'
+        mavenBom('org.springframework.boot:spring-boot-dependencies:3.5.0-M3') {
+            bomProperty 'spring-security.version', '6.5.0-M3'
+            bomProperty 'spring-integration.version', '6.5.0-M3'
+            bomProperty 'spring-retry.version', '2.0.11'
+            bomProperty 'spring-amqp.version', '4.0.0-M2'
         }
         mavenBom('org.springframework.data:spring-data-bom:2025.1.0-M1') {
             bomProperty 'spring-data-jpa', '4.0.0-M1'
@@ -98,6 +96,7 @@ dependencies {
 //    implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-M6")
     implementation platform("com.fasterxml.jackson:jackson-bom:2.18.3")
     implementation platform("io.micrometer:micrometer-bom:1.15.0-M3")
+    implementation platform("org.junit:junit-bom:5.12.1")
 //    implementation platform("org.springframework.modulith:spring-modulith-bom:1.4.0-M1")
 
     // ======================
@@ -179,7 +178,7 @@ dependencies {
 
 //    runtimeOnly 'org.springframework.boot:spring-boot-starter-jetty'        // 내장 Tomcat 런타임
 //    implementation 'org.eclipse.jetty.http3:jetty-http3:12.0.16' // Jetty HTTP/3 의존성 추가
-//    implementation 'org.eclipse.jetty.ee10:jetty-ee10-apache-jsp:12.0.16' // J SP 처리 엔진
+//    implementation 'org.eclipse.jetty.ee10:jetty-ee10-apache-jsp:12.0.16' // JSP 처리 엔진
 //    implementation 'org.eclipse.jetty.ee10:jetty-ee10-servlet:12.0.16'   // 서블릿 지원
 //    implementation 'org.eclipse.jetty.ee10:jetty-ee10-webapp:12.0.16'
 //    implementation 'org.eclipse.jetty:jetty-server:12.0.16'
@@ -191,7 +190,7 @@ dependencies {
 //    implementation 'org.eclipse.jetty:jetty-annotations:11.0.24'
 
     // ======================
-    // 6. Database & Persistence
+    // 5. 데이터베이스 및 퍼시스턴스
     // ======================
     // JDBC Drivers
     implementation 'org.xerial:sqlite-jdbc:3.49.1.0'
@@ -212,7 +211,7 @@ dependencies {
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.5-alpha1'
 
     // Elasticsearch Test
-    testImplementation 'org.testcontainers:elasticsearch:1.20.5'
+    testImplementation 'org.testcontainers:elasticsearch:1.20.6'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
     // ======================
@@ -255,6 +254,7 @@ dependencies {
     implementation 'org.apache.tika:tika-core:3.1.0'
     implementation 'org.apache.tika:tika-parsers-standard-package:3.1.0'
     annotationProcessor 'org.apache.tika:tika-core:3.1.0'
+    implementation 'org.apache.tika:tika-parsers:3.1.0'
 
     // Office Documents
     implementation 'org.apache.poi:poi-ooxml:5.4.0'
@@ -270,6 +270,7 @@ dependencies {
     implementation 'com.github.jai-imageio:jai-imageio-core:1.4.0'
     implementation 'com.github.jai-imageio:jai-imageio-jpeg2000:1.4.0'
     implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.12.0'
+    implementation 'org.imgscalr:imgscalr-lib:4.2'
 
     // Other Formats
     implementation 'com.google.zxing:javase:3.5.3'
@@ -291,9 +292,10 @@ dependencies {
     // 13. Utilities
     // ======================
     // Common Utils
-    implementation 'com.google.guava:guava:33.4.0-jre'
+    implementation 'com.google.guava:guava:33.4.5-jre'
     implementation 'org.modelmapper:modelmapper:3.2.2'
     implementation 'org.jodd:jodd-util:6.3.0'
+//    implementation 'commons-lang:commons-lang:2.6'
     implementation 'org.apache.commons:commons-lang3:3.17.0'
     implementation 'org.apache.commons:commons-text:1.13.0'
 
@@ -352,7 +354,7 @@ dependencies {
     runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.0.RC4'
 
     // Version Control
-    implementation 'org.eclipse.jgit:org.eclipse.jgit:7.1.0.202411261347-r'
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r'
 
     // External Libraries
     implementation fileTree(dir: 'lib', include: ['*.jar'])
