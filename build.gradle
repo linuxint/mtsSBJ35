@@ -195,7 +195,7 @@ dependencies {
     // JDBC Drivers
     implementation 'org.xerial:sqlite-jdbc:3.49.1.0'
     implementation 'com.oracle.database.jdbc:ojdbc11:23.7.0.25.01'
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.5.2'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.5.3'
     runtimeOnly 'com.h2database:h2:2.3.232'
 
     // ORM & SQL Mappers
