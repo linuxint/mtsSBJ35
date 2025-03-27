@@ -1,0 +1,43 @@
+cluster.name: mts-elasticsearch
+node.name: node-1
+network.host: 0.0.0.0
+http.port: 9200
+transport.port: 9300
+
+# 단일 노드 설정
+discovery.type: single-node
+cluster.routing.allocation.disk.threshold_enabled: false
+
+# 보안 설정
+xpack.security.enabled: false
+xpack.ml.enabled: false
+
+# 메모리 설정
+bootstrap.memory_lock: true
+indices.memory.index_buffer_size: 30%
+
+# 로깅 설정
+logger.level: INFO
+logger.org.elasticsearch: INFO
+logger.org.elasticsearch.discovery: INFO
+logger.org.elasticsearch.index: INFO
+logger.org.elasticsearch.indices: INFO
+logger.org.elasticsearch.search: INFO
+logger.org.elasticsearch.snapshots: INFO
+logger.org.elasticsearch.transport: INFO
+
+# 한글 분석기 설정
+analysis:
+  analyzer:
+    nori_analyzer:
+      type: custom
+      tokenizer: nori_tokenizer
+      filter:
+        - nori_readingform
+        - nori_number
+        - nori_compound
+        - nori_part_of_speech
+        - nori_trim
+        - lowercase
+        - stop
+        - synonym 

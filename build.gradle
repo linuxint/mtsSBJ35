@@ -562,3 +562,80 @@ tasks.spotlessJava {
     dependsOn tasks.named('appCyclonedxBom') // Spotless가 CycloneDX 작업 이후 실행되도록 설정
     dependsOn tasks.named('copySbomToResources') // Spotless가 CycloneDX 작업 이후 실행되도록 설정
 }
+
+// Docker 관련 태스크 추가
+task checkDocker(type: Exec) {
+    group = 'docker'
+    description = 'Docker가 설치되어 있는지 확인합니다.'
+    workingDir = 'docker'
+    commandLine 'docker', 'info'
+    ignoreExitValue = true
+    doLast {
+        if (execResult.exitValue != 0) {
+            throw new GradleException('Docker가 설치되어 있지 않거나 실행 중이지 않습니다.')
+        }
+    }
+}
+
+task checkDockerCompose(type: Exec) {
+    group = 'docker'
+    description = 'Docker Compose가 설치되어 있는지 확인합니다.'
+    workingDir = 'docker'
+    commandLine 'docker-compose', 'version'
+    ignoreExitValue = true
+    doLast {
+        if (execResult.exitValue != 0) {
+            throw new GradleException('Docker Compose가 설치되어 있지 않습니다.')
+        }
+    }
+}
+
+task dockerUp(type: Exec) {
+    group = 'docker'
+    description = 'Docker 서비스를 시작합니다.'
+    dependsOn checkDocker, checkDockerCompose
+    workingDir = 'docker'
+    commandLine 'docker-compose', 'up', '-d'
+    doLast {
+        println "Docker 서비스가 시작되었습니다."
+        println "다음 URL에서 서비스에 접근할 수 있습니다:"
+        println "Spring Boot 애플리케이션: http://localhost:9090"
+        println "Oracle Database: localhost:1521"
+        println "Elasticsearch: http://localhost:9200"
+        println "Prometheus: http://localhost:9091"
+        println "Grafana: http://localhost:3001"
+    }
+}
+
+task dockerDown(type: Exec) {
+    group = 'docker'
+    description = 'Docker 서비스를 중지하고 제거합니다.'
+    dependsOn checkDocker, checkDockerCompose
+    workingDir = 'docker'
+    commandLine 'docker-compose', 'down'
+    doLast {
+        println "Docker 서비스가 중지되었습니다."
+    }
+}
+
+task dockerRemove(type: Exec) {
+    group = 'docker'
+    description = 'Docker 서비스와 볼륨을 제거합니다.'
+    dependsOn checkDocker, checkDockerCompose
+    workingDir = 'docker'
+    commandLine 'sh', 'docker-remove.sh'
+    doLast {
+        println "Docker 서비스와 볼륨이 제거되었습니다."
+    }
+}
+
+// 빌드 전 Docker 서비스 중지
+build.dependsOn dockerDown
+
+// 빌드 후 Docker 서비스 시작
+build.finalizedBy dockerUp
+
+// clean 태스크에 Docker 서비스 제거 추가
+clean.doFirst {
+    tasks.getByPath('dockerDown').execute()
+}
