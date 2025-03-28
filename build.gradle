@@ -382,17 +382,23 @@ tasks.named('test').configure {
 
 // Clean Configuration
 tasks.named('clean').configure {
-    delete(layout.projectDirectory.dir('logs_local'))
-    delete(layout.projectDirectory.dir('logs_dev'))
-    delete(layout.projectDirectory.dir('logs_stag'))
-    delete(layout.projectDirectory.dir('logs_prod'))
-    delete(layout.projectDirectory.dir('out'))
-    delete(layout.projectDirectory.dir('logs'))
-    delete(layout.projectDirectory.dir('work'))
+    doFirst {
+        // 디렉토리 삭제
+        delete(layout.projectDirectory.dir('logs_local'))
+        delete(layout.projectDirectory.dir('logs_dev'))
+        delete(layout.projectDirectory.dir('logs_stag'))
+        delete(layout.projectDirectory.dir('logs_prod'))
+        delete(layout.projectDirectory.dir('logs'))
+        delete(layout.projectDirectory.dir('work'))
 
-    delete(layout.projectDirectory.dir('bin'))
-    delete(layout.projectDirectory.dir('target'))
+        delete(layout.projectDirectory.dir('bin'))
+        delete(layout.projectDirectory.dir('target'))
+    }
 }
+
+// Docker 관련 태스크 의존성 제거
+//build.dependsOn.removeAll { it.name == 'dockerDown' }
+//build.finalizedBy.removeAll { it.name == 'dockerUp' }
 
 // External Libraries Configuration
 tasks.register('copyExternalLibs', Copy) {
@@ -479,12 +485,11 @@ spotless {
 
 // Checkstyle
 checkstyle {
-    maxWarnings = 0
-    configFile = file("$rootDir/codestyle/naver-checkstyle-rules.xml")
-    configProperties = [
-        'suppressionFile': file("$rootDir/codestyle/naver-checkstyle-suppressions.xml")
-    ]
     toolVersion = '10.21.4'
+    maxWarnings = 0
+    configDirectory.set(file("$rootDir/codestyle"))
+    configFile = file("$rootDir/codestyle/naver-checkstyle-rules.xml")
+    configProperties["suppressionFile"] = file("$rootDir/codestyle/naver-checkstyle-suppressions.xml").absolutePath
 }
 
 // Format Check
@@ -563,29 +568,35 @@ tasks.spotlessJava {
     dependsOn tasks.named('copySbomToResources') // Spotless가 CycloneDX 작업 이후 실행되도록 설정
 }
 
-// Docker 관련 태스크 추가
-task checkDocker(type: Exec) {
-    group = 'docker'
-    description = 'Docker가 설치되어 있는지 확인합니다.'
-    workingDir = 'docker'
-    commandLine 'docker', 'info'
-    ignoreExitValue = true
+// Docker 관련 태스크 수정
+task checkDocker {
     doLast {
-        if (execResult.exitValue != 0) {
-            throw new GradleException('Docker가 설치되어 있지 않거나 실행 중이지 않습니다.')
+        try {
+            def process = "docker info".execute()
+            def exitCode = process.waitFor()
+            if (exitCode != 0) {
+                logger.warn("Docker가 설치되어 있지 않거나 실행 중이지 않습니다. Docker를 설치하거나 실행해주세요.")
+            } else {
+                logger.info("Docker가 실행 중입니다.")
+            }
+        } catch (Exception e) {
+            logger.warn("Docker 체크 중 오류 발생: ${e.message}")
         }
     }
 }
 
-task checkDockerCompose(type: Exec) {
-    group = 'docker'
-    description = 'Docker Compose가 설치되어 있는지 확인합니다.'
-    workingDir = 'docker'
-    commandLine 'docker-compose', 'version'
-    ignoreExitValue = true
+task checkDockerCompose {
     doLast {
-        if (execResult.exitValue != 0) {
-            throw new GradleException('Docker Compose가 설치되어 있지 않습니다.')
+        try {
+            def process = "docker-compose version".execute()
+            def exitCode = process.waitFor()
+            if (exitCode != 0) {
+                logger.warn("Docker Compose가 설치되어 있지 않거나 실행 중이지 않습니다. Docker Compose를 설치하거나 실행해주세요.")
+            } else {
+                logger.info("Docker Compose가 실행 중입니다.")
+            }
+        } catch (Exception e) {
+            logger.warn("Docker Compose 체크 중 오류 발생: ${e.message}")
         }
     }
 }
@@ -593,49 +604,32 @@ task checkDockerCompose(type: Exec) {
 task dockerUp(type: Exec) {
     group = 'docker'
     description = 'Docker 서비스를 시작합니다.'
-    dependsOn checkDocker, checkDockerCompose
     workingDir = 'docker'
     commandLine 'docker-compose', 'up', '-d'
+    ignoreExitValue = true
     doLast {
-        println "Docker 서비스가 시작되었습니다."
-        println "다음 URL에서 서비스에 접근할 수 있습니다:"
-        println "Spring Boot 애플리케이션: http://localhost:9090"
-        println "Oracle Database: localhost:1521"
-        println "Elasticsearch: http://localhost:9200"
-        println "Prometheus: http://localhost:9091"
-        println "Grafana: http://localhost:3001"
+        logger.info("Docker 서비스 시작 시도 완료")
     }
 }
 
 task dockerDown(type: Exec) {
     group = 'docker'
     description = 'Docker 서비스를 중지하고 제거합니다.'
-    dependsOn checkDocker, checkDockerCompose
     workingDir = 'docker'
     commandLine 'docker-compose', 'down'
+    ignoreExitValue = true
     doLast {
-        println "Docker 서비스가 중지되었습니다."
+        logger.info("Docker 서비스 중지 시도 완료")
     }
 }
 
 task dockerRemove(type: Exec) {
     group = 'docker'
     description = 'Docker 서비스와 볼륨을 제거합니다.'
-    dependsOn checkDocker, checkDockerCompose
     workingDir = 'docker'
     commandLine 'sh', 'docker-remove.sh'
+    ignoreExitValue = true
     doLast {
-        println "Docker 서비스와 볼륨이 제거되었습니다."
+        logger.info("Docker 서비스 제거 시도 완료")
     }
-}
-
-// 빌드 전 Docker 서비스 중지
-build.dependsOn dockerDown
-
-// 빌드 후 Docker 서비스 시작
-build.finalizedBy dockerUp
-
-// clean 태스크에 Docker 서비스 제거 추가
-clean.doFirst {
-    tasks.getByPath('dockerDown').execute()
 }
