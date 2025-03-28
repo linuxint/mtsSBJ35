@@ -162,7 +162,6 @@ management:
       sla:
         http.server.requests: 10ms, 50ms, 100ms, 200ms, 500ms
 
-spring:
   application:
     name: mtsSBJ35
   sleuth:
