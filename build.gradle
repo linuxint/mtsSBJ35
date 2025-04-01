@@ -358,6 +358,9 @@ dependencies {
 
     // External Libraries
     implementation fileTree(dir: 'lib', include: ['*.jar'])
+
+    // Vibur Connection Pool
+    implementation 'org.vibur:vibur-dbcp:25.0'
 }
 
 // ======================
@@ -392,6 +395,7 @@ tasks.named('clean').configure {
         delete(layout.projectDirectory.dir('work'))
 
         delete(layout.projectDirectory.dir('bin'))
+        delete(layout.projectDirectory.dir('out'))
         delete(layout.projectDirectory.dir('target'))
     }
 }
@@ -631,5 +635,20 @@ task dockerRemove(type: Exec) {
     ignoreExitValue = true
     doLast {
         logger.info("Docker 서비스 제거 시도 완료")
+    }
+}
+
+bootRun {
+    // bootRun 시 테스트 실행 제외
+    dependsOn 'compileJava', 'processResources'
+    systemProperty 'spring.profiles.active', 'local'
+}
+
+test {
+    // 테스트 실행 비활성화
+    enabled = false
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
     }
 }
