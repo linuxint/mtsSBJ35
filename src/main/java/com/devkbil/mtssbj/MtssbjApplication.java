@@ -52,7 +52,7 @@ public class MtssbjApplication implements CommandLineRunner {
         // WebApplicationType 설정 (Servlet 모드)
         application.setWebApplicationType(WebApplicationType.SERVLET);
 
-        // 커스텀 ApplicationListeners 추가
+        // 필수 ApplicationListeners만 추가
         application.addListeners(
             new ApplicationStartingEventListener(),
             new ApplicationReadyEventListener(),
@@ -76,6 +76,11 @@ public class MtssbjApplication implements CommandLineRunner {
         CustomApplicationEvent customEvent = new CustomApplicationEvent(this, "Hello from CustomApplicationEvent");
         applicationEventPublisher.publishEvent(customEvent);
         log.info("Custom application event published");
+
+        // 명령행 인수 로깅 (필요한 경우)
+        if (args.length > 0) {
+            log.info("Command line arguments: {}", (Object) args);
+        }
     }
 
     @Bean
