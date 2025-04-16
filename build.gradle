@@ -170,11 +170,11 @@ dependencies {
 
     // Embedded Tomcat
     runtimeOnly 'org.springframework.boot:spring-boot-starter-tomcat'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-core:11.0.5'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-websocket:11.0.5'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-el:11.0.5'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:11.0.5'
-    implementation 'org.apache.tomcat:tomcat-annotations-api:11.0.5'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-core:11.0.6'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-websocket:11.0.6'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-el:11.0.6'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:11.0.6'
+    implementation 'org.apache.tomcat:tomcat-annotations-api:11.0.6'
 
 //    runtimeOnly 'org.springframework.boot:spring-boot-starter-jetty'        // 내장 Tomcat 런타임
 //    implementation 'org.eclipse.jetty.http3:jetty-http3:12.0.16' // Jetty HTTP/3 의존성 추가
@@ -223,7 +223,7 @@ dependencies {
     implementation 'io.micrometer:micrometer-jakarta9'
     implementation 'io.micrometer:micrometer-observation'
     implementation 'io.micrometer:micrometer-commons'
-    implementation 'io.micrometer:micrometer-tracing:1.5.0-M3'
+    implementation 'io.micrometer:micrometer-tracing:1.5.0-RC1'
 
     // Database Monitoring
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.11.0'
@@ -257,9 +257,9 @@ dependencies {
     implementation 'org.apache.tika:tika-parsers:3.1.0'
 
     // Office Documents
-    implementation 'org.apache.poi:poi-ooxml:5.4.0'
+    implementation 'org.apache.poi:poi-ooxml:5.4.1'
     implementation 'org.jxls:jxls-poi:3.0.0'
-    implementation 'net.sf.mpxj:mpxj:13.11.0'
+    implementation 'net.sf.mpxj:mpxj:13.12.0'
     implementation 'net.freeutils:jtnef:2.1.0'
 
     // PDF Processing
@@ -292,12 +292,12 @@ dependencies {
     // 13. Utilities
     // ======================
     // Common Utils
-    implementation 'com.google.guava:guava:33.4.6-jre'
+    implementation 'com.google.guava:guava:33.4.8-jre'
     implementation 'org.modelmapper:modelmapper:3.2.2'
     implementation 'org.jodd:jodd-util:6.3.0'
 //    implementation 'commons-lang:commons-lang:2.6'
     implementation 'org.apache.commons:commons-lang3:3.17.0'
-    implementation 'org.apache.commons:commons-text:1.13.0'
+    implementation 'org.apache.commons:commons-text:1.13.1'
 
     // Code Quality
     implementation 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.43'
@@ -351,7 +351,7 @@ dependencies {
     // 17. Miscellaneous
     // ======================
     // Network
-    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.0.RC4'
+    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.0.Final'
 
     // Version Control
     implementation 'org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r'
