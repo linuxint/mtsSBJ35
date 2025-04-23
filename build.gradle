@@ -72,12 +72,12 @@ configurations.configureEach {
 dependencyManagement {
     imports {
         mavenBom('org.springframework.boot:spring-boot-dependencies:3.5.0-M3') {
-            bomProperty 'spring-security.version', '6.5.0-M3'
-            bomProperty 'spring-integration.version', '6.5.0-M3'
+            bomProperty 'spring-security.version', '6.5.0-RC1'
+            bomProperty 'spring-integration.version', '6.5.0-RC1'
             bomProperty 'spring-retry.version', '2.0.11'
             bomProperty 'spring-amqp.version', '4.0.0-M2'
         }
-        mavenBom('org.springframework.data:spring-data-bom:2025.1.0-M1') {
+        mavenBom('org.springframework.data:spring-data-bom:2025.1.0-M2') {
             bomProperty 'spring-data-jpa', '4.0.0-M1'
             bomProperty 'spring-data-jdbc', '4.0.0-M1'
             bomProperty 'spring-data-elasticsearch', '6.0.0-M1'
