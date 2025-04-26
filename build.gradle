@@ -10,7 +10,7 @@ plugins {
     id 'java'
     id 'org.springdoc.openapi-gradle-plugin' version '1.9.0'
     id 'checkstyle'
-    id 'com.diffplug.spotless' version '7.0.2'
+    id 'com.diffplug.spotless' version '7.0.3'
     id 'org.cyclonedx.bom' version '2.2.0'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'net.ltgt.errorprone' version '4.1.0'
@@ -94,9 +94,9 @@ dependencies {
 //    implementation platform("org.springframework.data:spring-data-bom:2025.1.0-M1")
 //    implementation platform("org.springframework.integration:spring-integration-bom:6.5.0-M2")
 //    implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-M6")
-    implementation platform("com.fasterxml.jackson:jackson-bom:2.18.3")
-    implementation platform("io.micrometer:micrometer-bom:1.15.0-M3")
-    implementation platform("org.junit:junit-bom:5.12.1")
+    implementation platform("com.fasterxml.jackson:jackson-bom:2.19.0")
+    implementation platform("io.micrometer:micrometer-bom:1.15.0-RC1")
+    implementation platform("org.junit:junit-bom:5.13.0-M2")
 //    implementation platform("org.springframework.modulith:spring-modulith-bom:1.4.0-M1")
 
     // ======================
@@ -121,7 +121,7 @@ dependencies {
 //    implementation 'org.ehcache:ehcache' //:3.10.8
 
     // 코드 품질
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.21.4'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.23.0'
 
     // ======================
     // 3. Spring Data & Integration
@@ -386,17 +386,17 @@ tasks.named('test').configure {
 // Clean Configuration
 tasks.named('clean').configure {
     doFirst {
-        // 디렉토리 삭제
-        delete(layout.projectDirectory.dir('logs_local'))
-        delete(layout.projectDirectory.dir('logs_dev'))
-        delete(layout.projectDirectory.dir('logs_stag'))
-        delete(layout.projectDirectory.dir('logs_prod'))
-        delete(layout.projectDirectory.dir('logs'))
-        delete(layout.projectDirectory.dir('work'))
-
-        delete(layout.projectDirectory.dir('bin'))
-        delete(layout.projectDirectory.dir('out'))
-        delete(layout.projectDirectory.dir('target'))
+        delete(
+                'logs_local',
+                'logs_dev',
+                'logs_stag',
+                'logs_prod',
+                'logs',
+                'work',
+                'bin',
+                'out',
+                'target'
+        )
     }
 }
 
@@ -489,7 +489,7 @@ spotless {
 
 // Checkstyle
 checkstyle {
-    toolVersion = '10.21.4'
+    toolVersion = '10.23.0'
     maxWarnings = 0
     configDirectory.set(file("$rootDir/codestyle"))
     configFile = file("$rootDir/codestyle/naver-checkstyle-rules.xml")
