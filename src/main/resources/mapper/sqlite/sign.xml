@@ -77,6 +77,7 @@ MATCH_RELEVANCE OR TEST
     <update id="updateSignDoc" parameterType="com.devkbil.mtssbj.sign.SignDocVO">
         UPDATE SGN_DOC
            SET DOCTITLE=#{doctitle}, DOCCONTENTS=#{doccontents}, DOCSIGNPATH=#{docsignpath}
+             , DOCSTATUS=#{docstatus}
              , CHGDATE=CURRENT_TIMESTAMP
          WHERE DOCNO=#{docno} 
     </update> 

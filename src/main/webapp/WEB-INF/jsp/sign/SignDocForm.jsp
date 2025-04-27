@@ -15,7 +15,7 @@
                 alert("결재라인을 추가해주세요");
                 return false;
             }
-
+            $("#docstatus").val("1");
             $("#form1").submit();
         }
 
