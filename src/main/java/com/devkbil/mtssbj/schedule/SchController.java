@@ -44,13 +44,13 @@ public class SchController {
     private final AuthService authService;
 
     /**
-     * Retrieves a list of schedules for a specific month.
-     * Populates the model with scheduling data and related attributes.
+     * 특정 월의 일정 목록을 검색합니다.
+     * 일정 데이터와 관련 속성으로 모델을 채웁니다.
      *
-     * @param request Represents the HTTP request, used to retrieve session details like user number.
-     * @param searchVO Contains the search criteria such as year and month for filtering schedules.
-     * @param modelMap A map that holds attributes to be sent to the view.
-     * @return A string representing the path to the schedule list view.
+     * @param request HTTP 요청을 나타내며, 사용자 번호와 같은 세션 세부정보를 검색하는데 사용됩니다.
+     * @param searchVO 일정을 필터링하기 위한 연도 및 월과 같은 검색 기준이 포함됩니다.
+     * @param modelMap 뷰로 전송될 속성을 보관하는 맵입니다.
+     * @return 일정 목록 뷰의 경로를 나타내는 문자열입니다.
      */
     @Operation(summary = "일정 목록 조회", description = "특정 달(month)의 일정 목록을 조회합니다.")
     @ApiResponses(value = {
@@ -85,16 +85,15 @@ public class SchController {
     }
 
     /**
-     * Retrieves the schedule input/edit screen.
-     * This method is used to display the interface for inputting or editing specific schedule information.
+     * 일정 입력/수정 화면을 조회합니다.
+     * 이 메소드는 특정 일정 정보를 입력하거나 수정하기 위한 인터페이스를 표시하는 데 사용됩니다.
      *
-     * @param cddate An optional string representing the reference date for schedule initialization.
-     *               If not provided, default date settings are applied.
-     * @param schInfo A model attribute representing the schedule information. It must be valid.
-     *                If the schedule ID (ssno) is present, the existing schedule data is retrieved.
-     * @param modelMap A ModelMap object used to store attributes for rendering the view, including
-     *                 schedule information and supplementary type list data.
-     * @return A string representing the name of the view to be displayed for schedule input/edit (typically "schedule/SchForm").
+     * @param cddate 일정 초기화를 위한 기준 날짜를 나타내는 선택적 문자열.
+     *               제공되지 않으면 기본 날짜 설정이 적용됩니다.
+     * @param schInfo 일정 정보를 나타내는 모델 속성. 유효성 검사 필요. 
+     *                일정 ID(ssno)가 있는 경우 기존 일정 데이터를 조회합니다.
+     * @param modelMap 일정 정보와 보조 유형 목록 데이터를 포함하여 뷰 렌더링에 사용되는 속성을 저장하는 ModelMap 객체.
+     * @return 일정 입력/수정을 위해 표시될 뷰의 이름을 나타내는 문자열(일반적으로 "schedule/SchForm").
      */
     @Operation(summary = "일정 입력/수정 화면 조회", description = "특정 일정 정보를 입력하거나 수정합니다.")
     @ApiResponse(responseCode = "200", description = "일정 입력/수정 화면을 반환했습니다.")
@@ -208,10 +207,10 @@ public class SchController {
     }
 
     /**
-     * Initializes the default schedule settings for the provided schedule information object.
+     * 제공된 일정 정보 객체에 대한 기본 일정 설정을 초기화합니다.
      *
-     * @param cddate   Optional parameter representing the custom date. If not provided, the current date is used.
-     * @param schInfo  The schedule information object to be initialized. Must be valid and properly annotated.
+     * @param cddate   선택적 매개변수로 사용자 지정 날짜를 나타냅니다. 제공되지 않으면 현재 날짜가 사용됩니다.
+     * @param schInfo  초기화할 일정 정보 객체입니다. 유효하고 적절히 주석 처리되어야 합니다.
      */
     private void initializeDefaultSchedule(@RequestParam(value = "cddate", required = false) String cddate, @ModelAttribute @Valid SchVO schInfo) {
 
