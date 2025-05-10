@@ -194,7 +194,7 @@ dependencies {
     // ======================
     // JDBC Drivers
     implementation 'org.xerial:sqlite-jdbc:3.49.1.0'
-    implementation 'com.oracle.database.jdbc:ojdbc11:23.7.0.25.01'
+    implementation 'com.oracle.database.jdbc:ojdbc11:23.8.0.25.04'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.5.3'
     runtimeOnly 'com.h2database:h2:2.3.232'
 
@@ -259,7 +259,7 @@ dependencies {
     // Office Documents
     implementation 'org.apache.poi:poi-ooxml:5.4.1'
     implementation 'org.jxls:jxls-poi:3.0.0'
-    implementation 'net.sf.mpxj:mpxj:13.12.0'
+    implementation 'net.sf.mpxj:mpxj:14.0.0'
     implementation 'net.freeutils:jtnef:2.1.0'
 
     // PDF Processing
@@ -280,7 +280,7 @@ dependencies {
     // ======================
     // 11. API Documentation
     // ======================
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
 
     // ======================
     // 12. Testing
@@ -351,7 +351,7 @@ dependencies {
     // 17. Miscellaneous
     // ======================
     // Network
-    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.0.Final'
+    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.1.Final'
 
     // Version Control
     implementation 'org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r'
