@@ -199,7 +199,8 @@ public class GradleDependencyChecker {
             String line;
 
             // "<version>" 태그에서 버전 추출
-            Pattern pattern = Pattern.compile("<version>(.*?)</version>");
+            Pattern pattern = Pattern.compile("<latest>(.*?)</latest>");  // 최신버전
+//            Pattern pattern = Pattern.compile("<version>(.*?)</version>");  // 모든버전
             while ((line = reader.readLine()) != null) {
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
