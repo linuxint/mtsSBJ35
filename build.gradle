@@ -4,14 +4,14 @@
 import org.cyclonedx.gradle.CycloneDxTask
 
 plugins {
-    id 'org.springframework.boot' version '3.5.0-RC1'
+    id 'org.springframework.boot' version '3.5.0'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'maven-publish'
     id 'java'
     id 'org.springdoc.openapi-gradle-plugin' version '1.9.0'
     id 'checkstyle'
     id 'com.diffplug.spotless' version '7.0.3'
-    id 'org.cyclonedx.bom' version '2.2.0'
+    id 'org.cyclonedx.bom' version '2.3.0'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'net.ltgt.errorprone' version '4.1.0'
 }
@@ -208,7 +208,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
     // HTTP Client for Elasticsearch
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.5-alpha1'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.5'
 
     // Elasticsearch Test
     testImplementation 'org.testcontainers:elasticsearch:1.20.6'
@@ -300,10 +300,10 @@ dependencies {
     implementation 'org.apache.commons:commons-text:1.13.1'
 
     // Code Quality
-    implementation 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.44'
-    checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:0.0.44'
-    runtimeOnly 'io.spring.javaformat:spring-javaformat-config:0.0.44'
-    runtimeOnly 'io.spring.javaformat:spring-javaformat-intellij-idea-plugin:0.0.44'
+    implementation 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.45'
+    checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:0.0.45'
+    runtimeOnly 'io.spring.javaformat:spring-javaformat-config:0.0.45'
+    runtimeOnly 'io.spring.javaformat:spring-javaformat-intellij-idea-plugin:0.0.45'
     annotationProcessor 'com.google.errorprone:error_prone_core:2.36.0'
     errorprone 'com.google.errorprone:error_prone_core:2.36.0'
 
@@ -311,9 +311,9 @@ dependencies {
     // 14. Persistence & Validation
     // ======================
     // Hibernate
-    implementation 'org.hibernate.validator:hibernate-validator:9.0.0.CR1'
-    implementation 'org.hibernate.orm:hibernate-core:7.0.0.CR2'
-    implementation 'org.hibernate.orm:hibernate-jcache:7.0.0.CR2'
+    implementation 'org.hibernate.validator:hibernate-validator:9.0.0.Final'
+    implementation 'org.hibernate.orm:hibernate-core:7.0.0.Final'
+    implementation 'org.hibernate.orm:hibernate-jcache:7.0.0.Final'
 
     // Jakarta Persistence
     implementation 'jakarta.validation:jakarta.validation-api:3.1.1'
@@ -479,9 +479,6 @@ spotless {
             "", "\\#static"
         )
 
-        // Code Style
-        eclipse().configFile('codestyle/Naver_coding_convention_v1_2.xml')
-
         // Custom Rules
         custom 'Format comments with <pre>', { content ->
             content.replaceAll(/\/\*\*([\s\S]*?)\*\//, { String match, String body ->
@@ -491,7 +488,6 @@ spotless {
             })
         }}
 }
-
 // ======================
 // Quality Checks Configuration
 // ======================
@@ -499,10 +495,7 @@ spotless {
 // Checkstyle
 checkstyle {
     toolVersion = '10.23.0'
-    maxWarnings = 0
-    configDirectory.set(file("$rootDir/codestyle"))
-    configFile = file("$rootDir/codestyle/naver-checkstyle-rules.xml")
-    configProperties["suppressionFile"] = file("$rootDir/codestyle/naver-checkstyle-suppressions.xml").absolutePath
+    config = resources.text.fromUri('https://raw.githubusercontent.com/spring-io/spring-javaformat/main/spring-javaformat-checkstyle/src/main/resources/spring-javaformat-checkstyle.xml')
 }
 
 // Format Check
@@ -535,17 +528,12 @@ tasks.register('appCyclonedxBom', CycloneDxTask) {
 }
 
 // SBOM 파일을 src/main/resources로 복사
-tasks.register('copySbomToResources') {
-    dependsOn 'jvmCyclonedxBom', 'appCyclonedxBom'
-    doLast {
-        println "SBOM 복사 시작: $buildDir//cyclonedx/sbom/"
-        copy {
-            from "$buildDir/cyclonedx/sbom/" // CycloneDX가 생성한 빌드 출력 파일
-            include '*.json'
-            into "$projectDir/src/main/resources/" // 리소스 디렉토리 복사
-        }
-        println "SBOM 복사 완료: $projectDir/src/main/resources/"
-    }
+tasks.register('copySbomToResources', Copy) {
+    dependsOn 'appCyclonedxBom'
+    from("${buildDir}/sbom") // 예시: 생성된 SBOM 파일 경로
+    into("${projectDir}/src/main/resources")
+
+    outputs.upToDateWhen { false } // 캐시 무효화 (필요 시)
 }
 
 // META-INF/sbom/ 등의 불필요 경로 제거
