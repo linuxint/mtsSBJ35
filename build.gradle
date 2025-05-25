@@ -105,6 +105,7 @@ dependencies {
     // Spring MVC 및 웹 관련
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'  // WebClient 지원을 위해 추가
 
     // 모니터링 및 관리
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -232,7 +233,7 @@ dependencies {
     implementation 'net.ttddyy:datasource-proxy:1.10.1'
 
     // Application Monitoring
-    implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.6'
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.7'
 
     // Distributed Tracing
     implementation 'org.springframework.cloud:spring-cloud-starter-sleuth:3.1.11'
@@ -287,6 +288,7 @@ dependencies {
     // ======================
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mockito:mockito-core:5.16.0'
+    testImplementation 'com.github.tomakehurst:wiremock-jre8:3.0.1'  // WireMock 테스트 지원
 
     // ======================
     // 13. Utilities
@@ -298,6 +300,8 @@ dependencies {
 //    implementation 'commons-lang:commons-lang:2.6'
     implementation 'org.apache.commons:commons-lang3:3.17.0'
     implementation 'org.apache.commons:commons-text:1.13.1'
+    implementation 'io.projectreactor:reactor-core:3.8.0-M3'  // Reactor Core 추가
+
 
     // Code Quality
     implementation 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.45'
@@ -466,17 +470,17 @@ spotless {
 
         // Import Management
         importOrder(
-            "ch",
-            "", "co",
-            "", "com",
-            "", "io",
-            "", "jakarta",
-            "", "net",
-            "", "org",
-            "", "javax",
-            "", "java",
-            "", "lombok",
-            "", "\\#static"
+                "ch",
+                "", "co",
+                "", "com",
+                "", "io",
+                "", "jakarta",
+                "", "net",
+                "", "org",
+                "", "javax",
+                "", "java",
+                "", "lombok",
+                "", "\\#static"
         )
 
         // Custom Rules
