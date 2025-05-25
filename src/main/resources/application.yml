@@ -1,4 +1,3 @@
-#default 설정
 spring:
   profiles:
     active: local # 기본 환경을 local로
@@ -16,6 +15,13 @@ spring:
       initialize-schema: always  # 스키마 자동 생성
       table-name: SPRING_SESSION  # 테이블 이름 설정
       schema: classpath:org/springframework/session/jdbc/schema-oracle.sql  # Oracle 스키마 스크립트 위치
+
+# 천문과학원 API 설정
+kasi:
+  api:
+    domain: http://apis.data.go.kr/B090041/openapi
+    lunarservice: /service/SpcdeInfoService/getRestDeInfo
+    key: 6W+vw4jgc6ITVy4FPwAV/Izu45/ciBi+f4ZQBy1CF7DWc0tDNX9NpCuoGLhUr/NQVeV9xzu0K/DcznvJ4Ooxcw==
 
 --- #--------------------------------- common
 spring:
@@ -69,6 +75,10 @@ logging:
       apache:
         catalina: DEBUG
         tomcat: DEBUG
+    com:
+      devkbil:
+        mtssbj:
+          schedule: DEBUG
   file:
     name: work/log/catalina.out
     path: work/log/
@@ -144,9 +154,11 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info,metrics,prometheus,heapdump
       base-path: /actuator
   endpoint:
+    heapdump:
+      access: unrestricted
     health:
       show-details: always
     metrics:
@@ -181,4 +193,3 @@ logging:
     org.springframework.web: INFO
     io.micrometer: DEBUG
     org.springframework.sleuth: DEBUG
-
