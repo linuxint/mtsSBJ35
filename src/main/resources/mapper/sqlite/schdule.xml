@@ -7,7 +7,7 @@
 
     <select id="selectCalendar" resultType="com.devkbil.mtssbj.schedule.CalendarVO" parameterType="com.devkbil.mtssbj.schedule.MonthVO">
         SELECT /* selectCalendar */ DISTINCT CDDATE, CDDD, CDDAYOFWEEK, SHCOLOR
-          FROM COM_DATE CD LEFT JOIN SCH_HOLIDAY ON CDMM = SHMONTH AND CDDD = SHDATE AND SHCOLOR != 'GREEN' AND DELETEFLAG = 'N'
+          FROM COM_DATE CD LEFT JOIN SCH_HOLIDAY ON CDMM = SHMONTH AND CDDD = SHDAY AND SHCOLOR != 'GREEN' AND DELETEFLAG = 'N'
 
          WHERE CDYEAR=#{year} AND CDMM=#{month}
          AND SHCOLOR IS NOT NULL
@@ -19,7 +19,7 @@
           FROM (
                 SELECT '' AS SSNO, '' AS SDSEQ, SHTITLE AS SSTITLE, '' AS USERNO, '' AS SDHOUR, '' AS SDMINUTE, SHCOLOR AS FONTCOLOR
                   FROM SCH_HOLIDAY SH
-                 WHERE SHMONTH=strftime('%m', #{field2}) AND SHDATE=strftime('%d', #{field2}) AND SH.DELETEFLAG='N'
+                 WHERE SHMONTH=strftime('%m', #{field2}) AND SHDAY=strftime('%d', #{field2}) AND SH.DELETEFLAG='N'
                  UNION ALL
                 SELECT SD.SSNO, SDSEQ, SSTITLE, USERNO, SD.SDHOUR, SD.SDMINUTE, NULL FONTCOLOR
                   FROM SCH_DETAIL SD 
