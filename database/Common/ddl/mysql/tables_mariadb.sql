@@ -48,7 +48,7 @@ CREATE TABLE PRJ_TASKFILE
     FILENAME VARCHAR(100) NULL COMMENT '파일명',
     REALNAME VARCHAR(30)  NULL COMMENT '실제파일명',
     FILESIZE INT(10)      NULL COMMENT '파일크기',
-    DELETEFLAG CHAR(1) DEFAULT 'N'
+    DELETEFLAG CHAR(1) DEFAULT 'N',
     PRIMARY KEY (FILENO)
 ) COMMENT ='첨부파일';
 
@@ -248,13 +248,17 @@ CREATE TABLE COM_DATE
 (
     CDNO          bigint NOT NULL AUTO_INCREMENT COMMENT '번호',
     CDDATE        varchar(10) COMMENT '날짜',
-    CDYEAR        varchar(4) COMMENT '년도',
-    CDMM          varchar(2) COMMENT '월',
-    CDDD          varchar(2) COMMENT '일',
+    CDYEAR        smallint COMMENT '년도',
+    CDMM          smallint COMMENT '월',
+    CDDD          smallint COMMENT '일',
     CDWEEKOFYEAR  smallint COMMENT 'WEEKOFYEAR',
     CDWEEKOFMONTH smallint COMMENT 'WEEKOFMONTH',
     CDWEEK        smallint COMMENT 'WEEK',
     CDDAYOFWEEK   smallint COMMENT 'DAYOFWEEK',
+    CDLUNARYEAR   varchar(4) COMMENT '음력년도',
+    CDLUNARMONTH  varchar(2) COMMENT '음력월',
+    CDLUNARDAY    varchar(2) COMMENT '음력일',
+    CDLUNARLEAP   char(1) DEFAULT 'N' COMMENT '음력윤달여부',
     PRIMARY KEY (CDNO),
     UNIQUE (CDNO)
 ) COMMENT = '날짜';
@@ -262,7 +266,7 @@ CREATE TABLE COM_DATE
 -- 메일주소
 CREATE TABLE EML_ADDRESS
 (
-    EMNO      INT(10) NOT NULL COMMENT '메일번호', , --EML_MAIL.EMNO
+    EMNO      INT(10) NOT NULL COMMENT '메일번호',
     EASEQ     INT     NOT NULL COMMENT '순번',
     EATYPE    CHAR(1) NOT NULL COMMENT '주소종류',
     EAADDRESS VARCHAR(150) COMMENT '메일주소',
@@ -333,14 +337,19 @@ CREATE TABLE SCH_DETAIL
 
 
 -- 공휴일
+DROP TABLE IF EXISTS SCH_HOLIDAY;
 CREATE TABLE SCH_HOLIDAY
 (
     SHNO       SMALLINT NOT NULL AUTO_INCREMENT COMMENT '번호',
     SHTITLE    VARCHAR(20) COMMENT '공휴일명',
+    SHYEAR     SMALLINT COMMENT '년(년도 한정 공휴일/임시공휴일)',
     SHMONTH    SMALLINT COMMENT '월',
-    SHDATE     SMALLINT COMMENT '일',
+    SHDAY      SMALLINT COMMENT '일',
+    SHLUNAR_YN CHAR(1) DEFAULT 'N' COMMENT '음력여부',
+    SHALT_YN   CHAR(1) DEFAULT 'N' COMMENT '대체휴무여부',
+    SHTYPE     CHAR(1) COMMENT '휴무유형(1-당일휴무,3-당일포함 3일휴무)',
     SHCOLOR    VARCHAR(10) COMMENT '색상',
-    DELETEFLAG CHAR(1) COMMENT '삭제',
+    DELETEFLAG CHAR(1) DEFAULT 'N' COMMENT '삭제',
     PRIMARY KEY (SHNO),
     UNIQUE (SHNO)
 ) COMMENT = '공휴일';
@@ -461,27 +470,27 @@ CREATE TABLE SGN_SIGN
 
 create table COM_MENU
 (
-    MNU_NO           INT(10) NOT NULL AUTO_INCREMENT COMMENT '메뉴ID'
-    MNU_PARENT       INT(10) COMMENT '상위메뉴ID'
-    MNU_TYPE         VARCHAR(10) COMMENT '메뉴업무구분코드'
-    MNU_NM           VARCHAR(100) COMMENT '메뉴명'
-    MNU_DESC         VARCHAR(400) COMMENT '설명'
-    MNU_TARGET       VARCHAR(100) COMMENT '메뉴링크'
-    MNU_FILENM       VARCHAR(100) COMMENT '파일명'
-    MNU_IMGPATH      VARCHAR(100) COMMENT '이미지경로'
-    MNU_CUSTOM       VARCHAR(400) COMMENT '커스텀태그'
-    MNU_DESKTOP      CHAR(1) DEFAULT 'N' COMMENT '데스크탑버전 사용여부'
-    MNU_MOBILE       CHAR(1) DEFAULT 'N' COMMENT '모바일버전 사용여부'
-    MNU_ORDER        INT(10) COMMENT '정렬순서'
-    MNU_CERT_TYPE    VARCHAR(10) COMMENT '인증구분코드'
-    MNU_EXTN_CONN_YN CHAR(1) DEFAULT 'N' COMMENT '외부연결여부'
-    MNU_START_HOUR   VARCHAR(5) COMMENT '사용시작시'
-    MNU_END_HOUR     VARCHAR(5) COMMENT '사용종료시'
-    REGDATE          DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '등록일자'
-    REGUSERNO        NUMBER(10) COMMENT '등록자'
-    CHGDATE          DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '수정일자'
-    CHGUSERNO        INT(10) COMMENT '수정자'
-    DELETEFLAG       CHAR(1) COMMENT '삭제 여부'
+    MNU_NO           INT(10) NOT NULL AUTO_INCREMENT COMMENT '메뉴ID',
+    MNU_PARENT       INT(10) COMMENT '상위메뉴ID',
+    MNU_TYPE         VARCHAR(10) COMMENT '메뉴업무구분코드',
+    MNU_NM           VARCHAR(100) COMMENT '메뉴명',
+    MNU_DESC         VARCHAR(400) COMMENT '설명',
+    MNU_TARGET       VARCHAR(100) COMMENT '메뉴링크',
+    MNU_FILENM       VARCHAR(100) COMMENT '파일명',
+    MNU_IMGPATH      VARCHAR(100) COMMENT '이미지경로',
+    MNU_CUSTOM       VARCHAR(400) COMMENT '커스텀태그',
+    MNU_DESKTOP      CHAR(1) DEFAULT 'N' COMMENT '데스크탑버전 사용여부',
+    MNU_MOBILE       CHAR(1) DEFAULT 'N' COMMENT '모바일버전 사용여부',
+    MNU_ORDER        INT(10) COMMENT '정렬순서',
+    MNU_CERT_TYPE    VARCHAR(10) COMMENT '인증구분코드',
+    MNU_EXTN_CONN_YN CHAR(1) DEFAULT 'N' COMMENT '외부연결여부',
+    MNU_START_HOUR   VARCHAR(5) COMMENT '사용시작시',
+    MNU_END_HOUR     VARCHAR(5) COMMENT '사용종료시',
+    REGDATE          DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '등록일자',
+    REGUSERNO        INT(10) COMMENT '등록자',
+    CHGDATE          DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '수정일자',
+    CHGUSERNO        INT(10) COMMENT '수정자',
+    DELETEFLAG       CHAR(1) COMMENT '삭제 여부',
 ) COMMENT = '메뉴정보';
 
 CREATE INDEX EML_MAIL_INX01 ON EML_MAIL (EMTYPE ASC, USERNO ASC, EMINO ASC);
@@ -538,8 +547,8 @@ BEGIN
     DECLARE sdate date DEFAULT STR_TO_DATE(startdate, '%Y-%m-%d');
     DECLARE edate date DEFAULT STR_TO_DATE(enddate, '%Y-%m-%d');
 
-    SELECT CONCATE('sdate=' , sdate);
-    SELECT CONCATE('edate=' , edate);
+    SELECT CONCAT('sdate=' , sdate);
+    SELECT CONCAT('edate=' , edate);
 
     IF sdate IS NULL THEN
         SELECT DATE_ADD(MAX(DATE_FORMAT(CDDATE,'%Y-%m-%d')), INTERVAL 1 DAY),
@@ -548,17 +557,17 @@ BEGIN
         FROM COM_DATE;
     END IF;
 
-    SELECT CONCATE('sdate=', DATE_FORMAT(sdate,'%Y-%m-%d'));
-    SELECT CONCATE('edate=', DATE_FORMAT(edate,'%Y-%m-%d'));
+    SELECT CONCAT('sdate=', DATE_FORMAT(sdate,'%Y-%m-%d'));
+    SELECT CONCAT('edate=', DATE_FORMAT(edate,'%Y-%m-%d'));
 
     IF edate <= sdate THEN
-        DBMS_OUTPUT.PUT_LINE('edate <= sdate RET');
-        RETURN ret_;
+        SELECT 'edate <= sdate RET';
+        RETURN;
     END IF;
 
     WHILE sdate <= edate
         DO
-          SELECT CONCATE('LOOP ', DATE_FORMAT(sdate,'%Y-%m-%d'));
+          SELECT CONCAT('LOOP ', DATE_FORMAT(sdate,'%Y-%m-%d'));
 
           INSERT INTO COM_DATE (CDDATE, CDYEAR, CDMM, CDDD, CDWEEKOFYEAR, CDWEEKOFMONTH, CDWEEK, CDDAYOFWEEK)
             SELECT SDATE,
@@ -573,7 +582,7 @@ BEGIN
 
             SET sdate = DATE_ADD(sdate, INTERVAL 1 DAY);
         END WHILE;
-        SELECT CONCATE('LOOP END');
+        SELECT CONCAT('LOOP END');
 END;
 
 DELIMITER $$
