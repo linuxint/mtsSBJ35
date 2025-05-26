@@ -1,16 +1,25 @@
 package com.devkbil.mtssbj.manager;
 
-import lombok.Getter;
-
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import com.google.common.base.Splitter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import lombok.Getter;
 
 /**
  * Gradle 빌드 파일에서 의존성을 파싱하고,
@@ -23,7 +32,6 @@ import java.util.regex.Pattern;
  */
 public class GradleDependencyChecker {
 
-    private static final String MAVEN_METADATA_URL = "https://repo1.maven.org/maven2/%s/%s/maven-metadata.xml";
 
     // ANSI 컬러 코드 (콘솔 출력을 위한 색상 설정)
     private static final String ANSI_RESET = "\u001B[0m";
@@ -71,7 +79,7 @@ public class GradleDependencyChecker {
 
         // 의존성을 추출하기 위한 정규표현식 패턴
         Pattern dependencyPattern = Pattern.compile("(implementation|api|runtimeOnly)\\s+'([\\w.-]+):([\\w.-]+):([\\w.-]+)'");
-        try (BufferedReader reader = new BufferedReader(new FileReader(gradleFilePath))) {
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(gradleFilePath), StandardCharsets.UTF_8)) {
             String line;
 
             // 파일에서 한 줄씩 읽어 의존성 추출
@@ -119,16 +127,16 @@ public class GradleDependencyChecker {
      * @return 검사 결과 객체 (DependencyCheckResult)
      */
     private static DependencyCheckResult checkDependency(String dependency) {
-        String[] parts = dependency.split(":");
+        List<String> parts = Splitter.on(':').splitToList(dependency);
 
         // 의존성 형식이 올바르지 않은 경우
-        if (parts.length != 3) {
+        if (parts.size() != 3) {
             return new DependencyCheckResult(dependency, null, "error");
         }
 
-        String groupId = parts[0];
-        String artifactId = parts[1];
-        String declaredVersion = parts[2];
+        String groupId = parts.get(0);
+        String artifactId = parts.get(1);
+        String declaredVersion = parts.get(2);
 
         // 캐시에 이미 결과가 있는 경우 캐시 결과 반환
         if (CACHE.containsKey(dependency)) {
@@ -164,7 +172,7 @@ public class GradleDependencyChecker {
      * @return 최신 버전 (문자열) 또는 null
      */
     private static String fetchLatestVersion(String groupId, String artifactId) {
-        String metadataUrl = String.format(MAVEN_METADATA_URL, groupId.replace('.', '/'), artifactId);
+        String metadataUrl = String.format("https://repo1.maven.org/maven2/%s/%s/maven-metadata.xml", groupId.replace('.', '/'), artifactId);
 
         // 최대 3회 재시도 실행
         for (int i = 0; i < 3; i++) {
@@ -195,7 +203,7 @@ public class GradleDependencyChecker {
         connection.setConnectTimeout(5000);
         connection.setReadTimeout(5000);
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
 
             // "<version>" 태그에서 버전 추출

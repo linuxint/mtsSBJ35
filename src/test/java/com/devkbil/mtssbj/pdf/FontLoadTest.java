@@ -27,15 +27,15 @@ public class FontLoadTest {
 
         // 배경이미지 로드
         // PDImageXObject pdImage = PDImageXObject.createFromFile(webroot + "resources/back.jpg", doc);
-        PDImageXObject pdImage = PDImageXObject.createFromFile(absolutePath + "back.jpg", doc);
+        PDImageXObject.createFromFile(absolutePath + "back.jpg", doc);
 
         // ttf
         InputStream fontStream = new FileInputStream(absolutePath + "/font/" + "NanumGothicLight.ttf");
         PDType0Font fontGulim = PDType0Font.load(doc, fontStream);
-        String basefont = fontGulim.getBaseFont();
-        Set<String> fonts = Standard14Fonts.getNames();
+        fontGulim.getBaseFont();
+        Standard14Fonts.getNames();
         Standard14Fonts.FontName fontName3v = Standard14Fonts.getMappedFontName("NanumGothicLight");
-        PDFont pdfFont = new PDType1Font(fontName3v);
+        new PDType1Font(fontName3v);
 
         // ttf
         TrueTypeCollection trueTypeCollection = new TrueTypeCollection(fontStream);
@@ -46,6 +46,6 @@ public class FontLoadTest {
                     System.out.println(trueTypeFont);
                 }
             });
-        PDType0Font fontTimes = PDType0Font.load(doc, trueTypeCollection.getFontByName("Menlo-Regular"), true);
+        PDType0Font.load(doc, trueTypeCollection.getFontByName("Menlo-Regular"), true);
     }
 }

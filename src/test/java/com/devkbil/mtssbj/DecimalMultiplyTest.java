@@ -2,8 +2,11 @@ package com.devkbil.mtssbj;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * JAVA 소수점 곱하기 테스트
@@ -78,7 +81,7 @@ public class DecimalMultiplyTest {
 
         // Then
         // Verify that direct BigDecimal construction produces different results than String conversion
-        assertEquals(false, directBigDecimal.equals(stringBigDecimal), 
+        assertNotEquals(0, directBigDecimal.compareTo(stringBigDecimal),
             "Direct BigDecimal construction should produce different results than String conversion");
     }
 }

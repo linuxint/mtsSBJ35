@@ -23,6 +23,5 @@ public class CurrentTimeMillisTest {
         result[1] = "2";
         System.out.println(Arrays.toString(result));
 
-        String filename = "C:\\dev_x64\\apache-tomcat-8.5.83\\conf";
     }
 }

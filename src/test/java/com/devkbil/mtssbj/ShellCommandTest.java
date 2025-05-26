@@ -5,7 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 public class ShellCommandTest {
@@ -20,7 +23,7 @@ public class ShellCommandTest {
 
         @Override
         public void run() {
-            new BufferedReader(new InputStreamReader(inputStream)).lines().forEach(consumer);
+            new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)).lines().forEach(consumer);
         }
     }
 
@@ -45,14 +48,14 @@ public class ShellCommandTest {
 
         StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
 
-        Executors.newSingleThreadExecutor().submit(streamGobbler);
+        Future<?> future = Executors.newSingleThreadExecutor().submit(streamGobbler);
 
         int exitCode = process.waitFor();
         assert exitCode == 0;
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
+        boolean isWindows = System.getProperty("os.name").toLowerCase(Locale.ROOT).startsWith("windows");
         System.out.println(":: OS is " + (isWindows ? "window" : "mac"));
         ShellCommandTest.processBuilder(isWindows);
     }

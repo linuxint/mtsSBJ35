@@ -8,6 +8,6 @@ import java.net.URL;
 public class ResourceTest {
 
     public ResourceTest() throws FileNotFoundException {
-        URL url = ResourceUtils.getURL("classpath:logback");
+        ResourceUtils.getURL("classpath:logback");
     }
 }

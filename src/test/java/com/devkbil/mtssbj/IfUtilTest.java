@@ -1,10 +1,12 @@
 package com.devkbil.mtssbj;
 
 import com.devkbil.common.util.IfUtil;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("IfUtil Tests")

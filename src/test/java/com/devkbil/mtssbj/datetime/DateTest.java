@@ -1,8 +1,10 @@
 package com.devkbil.mtssbj.datetime;
 
 import java.time.DayOfWeek;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Arrays;
@@ -16,7 +18,7 @@ public class DateTest {
         String[] stringArray = new String[2];
         System.out.println(Arrays.toString(stringArray));
         // 현재 날짜/시간
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
         // 현재 날짜/시간 출력
         System.out.println(now); // 2022-05-03T15:52:21.419878100
 
@@ -71,7 +73,7 @@ public class DateTest {
         System.out.println(dayOfWeek2.getDisplayName(TextStyle.FULL, Locale.getDefault())); // 토요일
 
         Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
+        cal.setTimeInMillis(Instant.now().toEpochMilli());
         System.out.println(cal.getTime());
     }
 }
