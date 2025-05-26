@@ -266,7 +266,7 @@ public class ModernDateUtil {
 
         // 요일 설정 (1: 일요일, 2: 월요일, ..., 7: 토요일)
         int dayOfWeek = localDate.getDayOfWeek().getValue() % 7 + 1;
-        dateVO.setWeek(String.valueOf(dayOfWeek));
+        dateVO.setWeek(dayOfWeek);
 
         return dateVO;
     }
@@ -1339,7 +1339,9 @@ public class ModernDateUtil {
         dateVO.setYear(date.getYear());
         dateVO.setMonth(date.getMonthValue());
         dateVO.setDay(date.getDayOfMonth());
-        dateVO.setWeek(String.valueOf(date.getDayOfWeek()));
+        // 요일 설정 (1: 일요일, 2: 월요일, ..., 7: 토요일)
+        int dayOfWeek = date.getDayOfWeek().getValue() % 7 + 1;
+        dateVO.setWeek(dayOfWeek);
 
         return dateVO;
     }

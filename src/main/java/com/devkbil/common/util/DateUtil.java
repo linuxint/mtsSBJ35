@@ -152,7 +152,7 @@ public class DateUtil {
         dvo.setYear(cal.get(Calendar.YEAR));
         dvo.setMonth(cal.get(Calendar.MONTH) + 1);
         dvo.setDay(cal.get(Calendar.DAY_OF_MONTH));
-        dvo.setWeek(DAY_ARR[cal.get(Calendar.DAY_OF_WEEK) - 1]);
+        dvo.setWeek(cal.get(Calendar.DAY_OF_WEEK));
         return dvo;
     }
 

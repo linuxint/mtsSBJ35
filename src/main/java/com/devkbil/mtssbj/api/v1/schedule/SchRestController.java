@@ -190,4 +190,31 @@ public class SchRestController {
 
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * 캘린더 생성 API.
+     * 지정된 시작일부터 종료일까지의 날짜 데이터를 생성합니다.
+     *
+     * @param startDate 시작일 (yyyy-MM-dd 형식, 선택적)
+     * @param endDate 종료일 (yyyy-MM-dd 형식, 선택적)
+     * @return 생성된 날짜 데이터 수를 담은 ResponseEntity
+     */
+    @Operation(summary = "캘린더 생성", description = "지정된 기간의 날짜 데이터를 생성합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "캘린더 생성 성공"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @GetMapping("/makeCalendar")
+    public ResponseEntity<Map<String, Object>> makeCalendar(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+
+        int count = schService.makeCalendar(startDate, endDate);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("count", count);
+        result.put("message", "캘린더 데이터가 성공적으로 생성되었습니다.");
+
+        return ResponseEntity.ok(result);
+    }
 }

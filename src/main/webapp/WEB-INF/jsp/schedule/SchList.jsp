@@ -59,8 +59,32 @@
                 </h1>
             </div>
             <div class="col-lg-2">
-                <button class="btn btn-outline btn-primary" style="margin-top:20px;" onclick="fn_moveToURL('schForm', '')">일정추가</button>
+                <button class="btn btn-outline btn-primary" style="margin-top:20px; margin-right:5px;" onclick="fn_moveToURL('schForm', '')">일정추가</button>
+                <button class="btn btn-outline btn-success" style="margin-top:20px;" onclick="makeCalendar()">캘린더생성</button>
             </div>
+
+            <script>
+                function makeCalendar() {
+                    if (confirm('캘린더 데이터를 생성하시겠습니까?')) {
+                        $.ajax({
+                            url: '/api/v1/schedule/makeCalendar',
+                            type: 'GET',
+                            success: function(response) {
+                                if (response.success) {
+                                    alert(response.message);
+                                    location.reload();
+                                } else {
+                                    alert('캘린더 생성 실패: ' + response.message);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                alert('캘린더 생성 중 오류가 발생했습니다.');
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                }
+            </script>
         </div>
         <!-- /.row -->
         <div class="calendarRow">

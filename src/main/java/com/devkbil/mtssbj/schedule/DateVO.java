@@ -13,13 +13,17 @@ import lombok.Setter;
 /**
  * DateVO
  * - 특정 날짜에 대한 세부 정보를 담는 VO 클래스.
+ * - ComDateVO를 대체하기 위해 확장됨.
  */
 @Schema(description = "날짜 정보 : DateVO")
 @XmlRootElement(name = "DateVO")
-@XmlType(propOrder = {"year", "month", "day", "date", "week", "istoday", "list"})
+@XmlType(propOrder = {"cdno", "year", "month", "day", "date", "week", "weekOfYear", "weekOfMonth", "dayOfWeek", "istoday", "list"})
 @Getter
 @Setter
 public class DateVO {
+
+    @Schema(description = "번호")
+    private Long cdno; // 날짜 레코드의 고유 식별자
 
     @Schema(description = "연도")
     private int year;
@@ -34,7 +38,16 @@ public class DateVO {
     private String date;
 
     @Schema(description = "주")
-    private String week; // 주차 혹은 요일 정보
+    private Integer week; // 주차 혹은 요일 정보
+
+    @Schema(description = "연별주차")
+    private Integer weekOfYear; // 연도 내 주차
+
+    @Schema(description = "월별주차")
+    private Integer weekOfMonth; // 월 내 주차
+
+    @Schema(description = "주별일자")
+    private Integer dayOfWeek; // 요일 (1: 일요일, 7: 토요일)
 
     @Schema(description = "오늘 여부")
     private boolean istoday = false; // 해당 날짜가 오늘인지 여부

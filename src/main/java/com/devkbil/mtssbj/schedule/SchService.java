@@ -1,6 +1,7 @@
 package com.devkbil.mtssbj.schedule;
 
 import com.devkbil.common.util.DateUtil;
+import com.devkbil.mtssbj.schedule.DateVO;
 import com.devkbil.mtssbj.common.ExtFieldVO;
 import com.devkbil.mtssbj.search.SearchVO;
 
@@ -9,8 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.WeekFields;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class SchService {
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private final SqlSessionTemplate sqlSession;
 
@@ -240,5 +247,98 @@ public class SchService {
      */
     public int deleteSch(SchVO param) {
         return sqlSession.delete("deleteSch", param);
+    }
+
+    /**
+     * makeCalendar 함수를 구현합니다.
+     * 지정된 시작일부터 종료일까지의 날짜 데이터를 COM_DATE 테이블에 생성합니다.
+     * 시작일이 null이면 COM_DATE 테이블의 마지막 날짜 다음 날부터 300일간의 데이터를 생성합니다.
+     * 테이블이 비어있으면 2020-01-01부터 오늘 이후 300일까지의 데이터를 생성합니다.
+     *
+     * @param startDateStr 시작일 (yyyy-MM-dd 형식, null 가능)
+     * @param endDateStr   종료일 (yyyy-MM-dd 형식, null 가능)
+     * @return 생성된 레코드 수
+     */
+    @Transactional
+    public int makeCalendar(String startDateStr, String endDateStr) {
+        LocalDate startDate;
+        LocalDate endDate;
+
+        // 시작일이 null이면 COM_DATE 테이블의 마지막 날짜 다음 날부터 시작
+        if (startDateStr == null || startDateStr.isEmpty()) {
+            String maxDateStr = sqlSession.selectOne("com.devkbil.mtssbj.calendar.ComDateMapper.selectMaxDate");
+            if (maxDateStr == null || maxDateStr.isEmpty()) {
+                // 테이블이 비어있으면 2020-01-01부터 시작
+                startDate = LocalDate.of(2020, 1, 1);
+                // 종료일은 오늘 이후 300일
+                endDate = LocalDate.now().plusDays(300);
+            } else {
+                startDate = LocalDate.parse(maxDateStr, DATE_FORMATTER).plusDays(1);
+                // 종료일은 시작일로부터 300일 후
+                endDate = startDate.plusDays(299);
+            }
+        } else {
+            startDate = LocalDate.parse(startDateStr, DATE_FORMATTER);
+            if (endDateStr == null || endDateStr.isEmpty()) {
+                // 종료일이 null이면 시작일로부터 300일 후
+                endDate = startDate.plusDays(299);
+            } else {
+                endDate = LocalDate.parse(endDateStr, DATE_FORMATTER);
+            }
+        }
+
+        log.info("makeCalendar: startDate={}, endDate={}", startDate, endDate);
+
+        // 종료일이 시작일보다 이전이면 오류
+        if (endDate.isBefore(startDate)) {
+            log.error("makeCalendar: endDate is before startDate");
+            return 0;
+        }
+
+        int count = 0;
+        LocalDate currentDate = startDate;
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+
+        // 시작일부터 종료일까지 반복
+        while (!currentDate.isAfter(endDate)) {
+            String dateStr = currentDate.format(DATE_FORMATTER);
+
+            // 이미 존재하는 날짜는 건너뜀
+            if (sqlSession.selectOne("com.devkbil.mtssbj.calendar.ComDateMapper.existsByDate", dateStr)) {
+                log.info("makeCalendar: date {} already exists, skipping", dateStr);
+                currentDate = currentDate.plusDays(1);
+                continue;
+            }
+
+            DateVO dateVO = new DateVO();
+            dateVO.setDate(dateStr);
+            dateVO.setYear(currentDate.getYear());
+            dateVO.setMonth(currentDate.getMonthValue());
+            dateVO.setDay(currentDate.getDayOfMonth());
+            dateVO.setWeekOfYear(currentDate.get(weekFields.weekOfYear()));
+            dateVO.setWeekOfMonth(currentDate.get(weekFields.weekOfMonth()));
+
+            // 주 계산 (Oracle의 TO_CHAR(sdate + 1, 'IW') - 1 와 유사하게 구현)
+            int week = currentDate.plusDays(1).get(weekFields.weekOfYear()) - 1;
+            if (week <= 0) {
+                // 연도가 바뀌는 경우 처리
+                week = LocalDate.of(currentDate.getYear() - 1, 12, 31).get(weekFields.weekOfYear());
+            }
+            dateVO.setWeek(week);
+
+            // 요일 계산 (1: 일요일, 2: 월요일, ..., 7: 토요일)
+            int dayOfWeek = currentDate.getDayOfWeek().getValue() % 7 + 1;
+            dateVO.setDayOfWeek(dayOfWeek);
+
+            // 데이터 삽입
+            sqlSession.insert("com.devkbil.mtssbj.calendar.ComDateMapper.insertComDate", dateVO);
+            count++;
+
+            // 다음 날짜로 이동
+            currentDate = currentDate.plusDays(1);
+        }
+
+        log.info("makeCalendar: {} records created", count);
+        return count;
     }
 }

@@ -32,7 +32,7 @@
          ORDER BY SDHOUR, SDMINUTE, SSNO
     </select> 
 
-    
+
     <sql id="includeSch">
         WHERE DELETEFLAG='N'
     </sql>
@@ -42,7 +42,7 @@
           FROM SCH_SCHEDULE TC
          <include refid="includeSch"/>
     </select> 
-    
+
     <select id="selectSchList" resultType="com.devkbil.mtssbj.schedule.SchVO" parameterType="com.devkbil.mtssbj.search.SearchVO">
         SELECT SSTITLE, SSTYPE, SSSTARTDATE, SSSTARTHOUR, SSSTARTMINUTE, SSENDDATE, SSENDHOUR
              , SSENDMINUTE, SSREPEATTYPE, SSREPEATEND, SSCONTENTS, SSISOPEN, TC.USERNO, USERNM
@@ -54,7 +54,7 @@
              LIMIT ${rowStart-1}, 10
          </if>
     </select> 
-        
+
     <insert id="insertSch" parameterType="com.devkbil.mtssbj.schedule.SchVO" useGeneratedKeys="true" keyProperty="ssno">
         INSERT INTO SCH_SCHEDULE(SSTITLE, SSTYPE, SSSTARTDATE, SSSTARTHOUR, SSSTARTMINUTE, SSENDDATE, SSENDHOUR, 
                     SSENDMINUTE, SSREPEATTYPE, SSREPEATOPTION, SSREPEATEND, SSCONTENTS, SSISOPEN, USERNO, CHGDATE, REGDATE, DELETEFLAG)
@@ -64,7 +64,7 @@
             SELECT LAST_INSERT_ID()
         </selectKey>
     </insert>
-    
+
     <update id="updateSch" parameterType="com.devkbil.mtssbj.schedule.SchVO">
         UPDATE SCH_SCHEDULE
            SET SSTITLE=#{sstitle}, SSTYPE=#{sstype}, SSSTARTDATE=#{ssstartdate}, SSSTARTHOUR=#{ssstarthour}, SSSTARTMINUTE=#{ssstartminute}, SSENDDATE=#{ssenddate}
@@ -77,13 +77,13 @@
         INSERT INTO SCH_DETAIL(SSNO, SDSEQ, SDDATE, SDHOUR, SDMINUTE) 
                 VALUES(#{ssno}, #{sdseq}, #{sddate}, #{sdhour}, #{sdminute})
     </insert>
-     
+
     <delete id="deleteSchDetail" parameterType="String">
         DELETE
           FROM SCH_DETAIL
          WHERE SSNO=#{ssno} 
     </delete>  
-                
+
     <select id="selectSchOne" parameterType="com.devkbil.mtssbj.schedule.SchVO" resultType="com.devkbil.mtssbj.schedule.SchVO">
         SELECT SSNO, SSTITLE, SSTYPE, SSSTARTDATE, SSSTARTHOUR, SSSTARTMINUTE, SSENDDATE, SSENDHOUR 
              , SSENDMINUTE, SSREPEATTYPE, SSREPEATOPTION, SSREPEATEND, SSCONTENTS, SSISOPEN, TC.USERNO, USERNM
@@ -102,11 +102,33 @@
          INNER JOIN COM_CODE CC3 ON CC3.CODECD=TC.SSISOPEN AND CC3.CLASSNO=6
          WHERE TC.DELETEFLAG='N' AND SSNO=#{ssno}
     </select>  
-    
+
     <delete id="deleteSch" parameterType="com.devkbil.mtssbj.schedule.SchVO">
         UPDATE SCH_SCHEDULE
            SET DELETEFLAG='Y'
          WHERE SSNO=#{ssno} 
     </delete>  
-</mapper>
 
+    <!-- 아래는 comdate.xml에서 병합된 쿼리들 -->
+    <insert id="insertComDate" parameterType="com.devkbil.mtssbj.schedule.DateVO">
+        INSERT INTO COM_DATE (
+            CDDATE, CDYEAR, CDMM, CDDD, CDWEEKOFYEAR, CDWEEKOFMONTH, CDWEEK, CDDAYOFWEEK
+        ) VALUES (
+            #{date}, #{year}, #{month}, #{day}, #{weekOfYear}, #{weekOfMonth}, #{week}, #{dayOfWeek}
+        )
+        <selectKey keyProperty="cdno" resultType="Long" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <select id="selectMaxDate" resultType="String">
+        SELECT MAX(CDDATE)
+        FROM COM_DATE
+    </select>
+
+    <select id="existsByDate" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM COM_DATE
+        WHERE CDDATE = #{date}
+    </select>
+</mapper>
