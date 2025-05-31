@@ -17,7 +17,7 @@ import lombok.Setter;
  */
 @Schema(description = "날짜 정보 : DateVO")
 @XmlRootElement(name = "DateVO")
-@XmlType(propOrder = {"cdno", "year", "month", "day", "date", "week", "weekOfYear", "weekOfMonth", "dayOfWeek", "istoday", "list"})
+@XmlType(propOrder = {"cdno", "year", "month", "day", "date", "week", "weekOfYear", "weekOfMonth", "dayOfWeek", "lunarYear", "lunarMonth", "lunarDay", "lunarLeap", "istoday", "list"})
 @Getter
 @Setter
 public class DateVO {
@@ -48,6 +48,18 @@ public class DateVO {
 
     @Schema(description = "주별일자")
     private Integer dayOfWeek; // 요일 (1: 일요일, 7: 토요일)
+
+    @Schema(description = "음력 연도")
+    private int lunarYear;
+
+    @Schema(description = "음력 월")
+    private int lunarMonth;
+
+    @Schema(description = "음력 일")
+    private int lunarDay;
+
+    @Schema(description = "음력 윤달 여부")
+    private String lunarLeap = "N";
 
     @Schema(description = "오늘 여부")
     private boolean istoday = false; // 해당 날짜가 오늘인지 여부

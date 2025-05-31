@@ -10,9 +10,11 @@
             SELECT CDNO_SEQ.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO COM_DATE (
-            CDNO, CDDATE, CDYEAR, CDMM, CDDD, CDWEEKOFYEAR, CDWEEKOFMONTH, CDWEEK, CDDAYOFWEEK
+            CDNO, CDDATE, CDYEAR, CDMM, CDDD, CDWEEKOFYEAR, CDWEEKOFMONTH, CDWEEK, CDDAYOFWEEK,
+            CDLUNARYEAR, CDLUNARMONTH, CDLUNARDAY, CDLUNARLEAP
         ) VALUES (
-            #{cdno}, #{date}, #{year}, #{month}, #{day}, #{weekOfYear}, #{weekOfMonth}, #{week}, #{dayOfWeek}
+            #{cdno}, #{date}, #{year}, #{month}, #{day}, #{weekOfYear}, #{weekOfMonth}, #{week}, #{dayOfWeek},
+            #{lunarYear, jdbcType=NUMERIC}, #{lunarMonth, jdbcType=NUMERIC}, #{lunarDay, jdbcType=NUMERIC}, #{lunarLeap, jdbcType=VARCHAR}
         )
     </insert>
 

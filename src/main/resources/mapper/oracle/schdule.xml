@@ -16,29 +16,74 @@
     </insert>
 
     <select id="selectCalendar" resultType="com.devkbil.mtssbj.schedule.CalendarVO" parameterType="com.devkbil.mtssbj.schedule.MonthVO">
-        SELECT /* selectCalendar */ DISTINCT CDDATE, CDDD, CDDAYOFWEEK, SHCOLOR
-          FROM COM_DATE CD LEFT OUTER JOIN SCH_HOLIDAY ON CDMM = SHMONTH AND CDDD = SHDAY AND SHCOLOR != 'GREEN' AND DELETEFLAG = 'N'
-         WHERE CDYEAR=#{year} AND CDMM=#{month}
-         ORDER BY CDDATE
+        SELECT DISTINCT
+            CDDATE, CDDD, CDDAYOFWEEK, SHCOLOR
+        FROM COM_DATE CD
+        LEFT OUTER JOIN SCH_HOLIDAY SH
+            ON (
+                -- Solar holidays
+                (CD.CDMM = SH.SHMONTH AND CD.CDDD = SH.SHDAY AND SH.SHLUNAR_YN = 'N')
+                OR
+                -- Lunar holidays (normal month)
+                (CD.CDLUNARMONTH = SH.SHMONTH AND CD.CDLUNARDAY = SH.SHDAY AND SH.SHLUNAR_YN = 'Y')
+                OR
+                -- Lunar holidays (leap month)
+                (CD.CDLUNARMONTH = SH.SHMONTH AND CD.CDLUNARDAY = SH.SHDAY AND SH.SHLUNAR_YN = 'M')
+            )
+            AND (SH.SHYEAR IS NULL OR SH.SHYEAR = #{year})
+            AND SH.DELETEFLAG = 'N'
+            AND SH.SHCOLOR != 'GREEN'
+        WHERE CD.CDYEAR = #{year}
+          AND CD.CDMM = #{month}
+        ORDER BY CDDATE
     </select>
 
     <select id="selectSchList4Calen" resultType="com.devkbil.mtssbj.schedule.SchDetailVO" parameterType="com.devkbil.mtssbj.common.ExtFieldVO">
         SELECT SSNO, SDSEQ, SSTITLE, USERNO, SDHOUR, SDMINUTE, FONTCOLOR
         FROM (
+                 -- 양력 공휴일
                  SELECT NULL SSNO, NULL SDSEQ, SHTITLE SSTITLE, NULL USERNO, NULL SDHOUR, NULL SDMINUTE, SHCOLOR FONTCOLOR
                  FROM SCH_HOLIDAY SH
-                 WHERE SHMONTH=extract (month from TO_DATE(#{field2})) AND SHDAY=extract (day from TO_DATE(#{field2})) AND SH.DELETEFLAG='N'
+                 WHERE SH.SHLUNAR_YN = 'N'
+                   AND SH.SHMONTH = EXTRACT(MONTH FROM TO_DATE(#{field2}))
+                   AND SH.SHDAY = EXTRACT(DAY FROM TO_DATE(#{field2}))
+                   AND (SH.SHYEAR IS NULL OR SH.SHYEAR = TO_CHAR(TO_DATE(#{field2}), 'YYYY'))
+                   AND SH.DELETEFLAG = 'N'
+
                  UNION ALL
+
+                 -- 음력 공휴일 (윤달 포함)
+                 SELECT NULL SSNO, NULL SDSEQ, SHTITLE SSTITLE, NULL USERNO, NULL SDHOUR, NULL SDMINUTE, SHCOLOR FONTCOLOR
+                 FROM SCH_HOLIDAY SH
+                 JOIN COM_DATE CD
+                   ON CD.CDDATE = #{field2}
+                  AND SH.SHLUNAR_YN = 'Y'
+                  AND SH.SHMONTH = TO_NUMBER(CDLUNARMONTH)
+                  AND SH.SHDAY = TO_NUMBER(CDLUNARDAY)
+                  AND (SH.SHYEAR IS NULL OR SH.SHYEAR = CD.CDYEAR)
+                 WHERE SH.DELETEFLAG = 'N'
+
+                 UNION ALL
+
+                 -- 공개 일정
                  SELECT SD.SSNO, SDSEQ, SSTITLE, USERNO, SD.SDHOUR, SD.SDMINUTE, NULL FONTCOLOR
                  FROM SCH_DETAIL SD
-                          LEFT OUTER JOIN SCH_SCHEDULE SS ON SS.SSNO=SD.SSNO
-                 WHERE SDDATE=#{field2} AND SS.DELETEFLAG='N' AND SS.SSISOPEN='Y'
+                 LEFT OUTER JOIN SCH_SCHEDULE SS ON SS.SSNO = SD.SSNO
+                 WHERE SDDATE = #{field2}
+                   AND SS.DELETEFLAG = 'N'
+                   AND SS.SSISOPEN = 'Y'
+
                  UNION ALL
+
+                 -- 비공개 개인 일정
                  SELECT SD.SSNO, SDSEQ, SSTITLE, USERNO, SD.SDHOUR, SD.SDMINUTE, NULL FONTCOLOR
                  FROM SCH_DETAIL SD
-                          LEFT OUTER JOIN SCH_SCHEDULE SS ON SS.SSNO=SD.SSNO
-                 WHERE SDDATE=#{field2} AND SS.DELETEFLAG='N' AND SS.SSISOPEN='N' AND USERNO=#{field1}
-             )DS
+                 LEFT OUTER JOIN SCH_SCHEDULE SS ON SS.SSNO = SD.SSNO
+                 WHERE SDDATE = #{field2}
+                   AND SS.DELETEFLAG = 'N'
+                   AND SS.SSISOPEN = 'N'
+                   AND USERNO = #{field1}
+             ) DS
         ORDER BY SDHOUR, SDMINUTE, SSNO
     </select>
 
@@ -122,26 +167,4 @@
          WHERE SSNO=#{ssno} 
     </delete>
 
-    <!-- 아래는 comdate.xml에서 병합된 쿼리들 -->
-    <insert id="insertComDate" parameterType="com.devkbil.mtssbj.schedule.DateVO">
-        <selectKey keyProperty="cdno" resultType="Long" order="BEFORE">
-            SELECT CDNO_SEQ.NEXTVAL FROM DUAL
-        </selectKey>
-        INSERT INTO COM_DATE (
-            CDNO, CDDATE, CDYEAR, CDMM, CDDD, CDWEEKOFYEAR, CDWEEKOFMONTH, CDWEEK, CDDAYOFWEEK
-        ) VALUES (
-            #{cdno}, #{date}, #{year}, #{month}, #{day}, #{weekOfYear}, #{weekOfMonth}, #{week}, #{dayOfWeek}
-        )
-    </insert>
-
-    <select id="selectMaxDate" resultType="String">
-        SELECT MAX(CDDATE)
-        FROM COM_DATE
-    </select>
-
-    <select id="existsByDate" resultType="boolean">
-        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
-        FROM COM_DATE
-        WHERE CDDATE = #{date}
-    </select>
 </mapper>

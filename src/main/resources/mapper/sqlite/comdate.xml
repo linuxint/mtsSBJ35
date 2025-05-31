@@ -7,9 +7,11 @@
 
     <insert id="insertComDate" parameterType="com.devkbil.mtssbj.schedule.DateVO">
         INSERT INTO COM_DATE (
-            CDDATE, CDYEAR, CDMM, CDDD, CDWEEKOFYEAR, CDWEEKOFMONTH, CDWEEK, CDDAYOFWEEK
+            CDDATE, CDYEAR, CDMM, CDDD, CDWEEKOFYEAR, CDWEEKOFMONTH, CDWEEK, CDDAYOFWEEK,
+            CDLUNARYEAR, CDLUNARMONTH, CDLUNARDAY, CDLUNARLEAP
         ) VALUES (
-            #{date}, #{year}, #{month}, #{day}, #{weekOfYear}, #{weekOfMonth}, #{week}, #{dayOfWeek}
+            #{date}, #{year}, #{month}, #{day}, #{weekOfYear}, #{weekOfMonth}, #{week}, #{dayOfWeek},
+            #{lunarYear}, #{lunarMonth}, #{lunarDay}, #{lunarLeap}
         )
         <selectKey keyProperty="cdno" resultType="Long" order="AFTER">
             SELECT last_insert_rowid()

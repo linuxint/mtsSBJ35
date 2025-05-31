@@ -4,6 +4,7 @@ import com.devkbil.common.util.DateUtil;
 import com.devkbil.mtssbj.schedule.DateVO;
 import com.devkbil.mtssbj.common.ExtFieldVO;
 import com.devkbil.mtssbj.search.SearchVO;
+import com.devkbil.mtssbj.calendar.LunarCalendarService;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.time.temporal.WeekFields;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,7 @@ public class SchService {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private final SqlSessionTemplate sqlSession;
+    private final LunarCalendarService lunarCalendarService;
 
     /**
      * 캘린더 일정 조회
@@ -329,6 +332,24 @@ public class SchService {
             // 요일 계산 (1: 일요일, 2: 월요일, ..., 7: 토요일)
             int dayOfWeek = currentDate.getDayOfWeek().getValue() % 7 + 1;
             dateVO.setDayOfWeek(dayOfWeek);
+
+            // 음력 정보 설정
+            try {
+                Map<String, String> lunarInfo = lunarCalendarService.getLunarDate(currentDate);
+                if (!lunarInfo.isEmpty()) {
+                    dateVO.setLunarYear(Integer.parseInt(lunarInfo.get("lunarYear")));
+                    dateVO.setLunarMonth(Integer.parseInt(lunarInfo.get("lunarMonth")));
+                    dateVO.setLunarDay(Integer.parseInt(lunarInfo.get("lunarDay")));
+                    dateVO.setLunarLeap(lunarInfo.get("lunarLeap"));
+                    log.debug("Lunar date set for {}: {}-{}-{}, leap: {}", 
+                            dateStr, lunarInfo.get("lunarYear"), lunarInfo.get("lunarMonth"), 
+                            lunarInfo.get("lunarDay"), lunarInfo.get("lunarLeap"));
+                } else {
+                    log.warn("No lunar date information available for {}", dateStr);
+                }
+            } catch (Exception e) {
+                log.error("Error setting lunar date for {}: {}", dateStr, e.getMessage(), e);
+            }
 
             // 데이터 삽입
             sqlSession.insert("com.devkbil.mtssbj.calendar.ComDateMapper.insertComDate", dateVO);

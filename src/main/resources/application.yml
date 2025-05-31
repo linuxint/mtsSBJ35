@@ -17,11 +17,16 @@ spring:
       schema: classpath:org/springframework/session/jdbc/schema-oracle.sql  # Oracle 스키마 스크립트 위치
 
 # 천문과학원 API 설정
-kasi:
-  api:
-    domain: http://apis.data.go.kr/B090041/openapi
-    lunarservice: /service/SpcdeInfoService/getRestDeInfo
-    key: 6W+vw4jgc6ITVy4FPwAV/Izu45/ciBi+f4ZQBy1CF7DWc0tDNX9NpCuoGLhUr/NQVeV9xzu0K/DcznvJ4Ooxcw==
+# 공공데이터포털 API 설정
+data:
+  go:
+    kr:
+      api:
+        domain: http://apis.data.go.kr
+        serviceKey: 6W%2Bvw4jgc6ITVy4FPwAV%2FIzu45%2FciBi%2Bf4ZQBy1CF7DWc0tDNX9NpCuoGLhUr%2FNQVeV9xzu0K%2FDcznvJ4Ooxcw%3D%3D
+        holidayservice: /B090041/openapi/service/SpcdeInfoService/getRestDeInfo
+        lunarservice: /B090041/openapi/service/LrsrCldInfoService/getLunCalInfo
+
 
 --- #--------------------------------- common
 spring:

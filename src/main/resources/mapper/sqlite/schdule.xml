@@ -6,13 +6,18 @@
 <mapper namespace="schdule">
 
     <select id="selectCalendar" resultType="com.devkbil.mtssbj.schedule.CalendarVO" parameterType="com.devkbil.mtssbj.schedule.MonthVO">
-        SELECT /* selectCalendar */ DISTINCT CDDATE, CDDD, CDDAYOFWEEK, SHCOLOR
-          FROM COM_DATE CD LEFT JOIN SCH_HOLIDAY ON CDMM = SHMONTH AND CDDD = SHDAY AND SHCOLOR != 'GREEN' AND DELETEFLAG = 'N'
-
-         WHERE CDYEAR=#{year} AND CDMM=#{month}
-         AND SHCOLOR IS NOT NULL
-         ORDER BY CDDATE
-    </select> 
+        SELECT DISTINCT CDDATE, CDDD, CDDAYOFWEEK, SHCOLOR
+          FROM COM_DATE CD
+          LEFT JOIN SCH_HOLIDAY SH
+            ON CD.CDMM = SH.SHMONTH
+           AND CD.CDDD = SH.SHDAY
+           AND SH.DELETEFLAG = 'N'
+         WHERE CD.CDYEAR = #{year}
+           AND CD.CDMM = #{month}
+           AND SH.SHCOLOR IS NOT NULL
+           AND SH.SHCOLOR != 'GREEN'
+         ORDER BY CD.CDDATE
+    </select>
 
     <select id="selectSchList4Calen" resultType="com.devkbil.mtssbj.schedule.SchDetailVO" parameterType="com.devkbil.mtssbj.common.ExtFieldVO">
         SELECT SSNO, SDSEQ, SSTITLE, USERNO, SDHOUR, SDMINUTE, FONTCOLOR
@@ -114,26 +119,4 @@
          WHERE SSNO=#{ssno} 
     </delete>  
 
-    <!-- 아래는 comdate.xml에서 병합된 쿼리들 -->
-    <insert id="insertComDate" parameterType="com.devkbil.mtssbj.schedule.DateVO">
-        INSERT INTO COM_DATE (
-            CDDATE, CDYEAR, CDMM, CDDD, CDWEEKOFYEAR, CDWEEKOFMONTH, CDWEEK, CDDAYOFWEEK
-        ) VALUES (
-            #{date}, #{year}, #{month}, #{day}, #{weekOfYear}, #{weekOfMonth}, #{week}, #{dayOfWeek}
-        )
-        <selectKey keyProperty="cdno" resultType="Long" order="AFTER">
-            SELECT last_insert_rowid()
-        </selectKey>
-    </insert>
-
-    <select id="selectMaxDate" resultType="String">
-        SELECT MAX(CDDATE)
-        FROM COM_DATE
-    </select>
-
-    <select id="existsByDate" resultType="boolean">
-        SELECT COUNT(*) > 0
-        FROM COM_DATE
-        WHERE CDDATE = #{date}
-    </select>
 </mapper>

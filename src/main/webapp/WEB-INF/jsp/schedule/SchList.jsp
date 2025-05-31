@@ -59,7 +59,7 @@
                 </h1>
             </div>
             <div class="col-lg-2">
-                <button class="btn btn-outline btn-primary" style="margin-top:20px; margin-right:5px;" onclick="fn_moveToURL('schForm', '')">일정추가</button>
+                <button class="btn btn-outline btn-primary" style="margin-top:20px;" onclick="fn_moveToURL('schForm', '')">일정추가</button>
                 <button class="btn btn-outline btn-success" style="margin-top:20px;" onclick="makeCalendar()">캘린더생성</button>
             </div>
 

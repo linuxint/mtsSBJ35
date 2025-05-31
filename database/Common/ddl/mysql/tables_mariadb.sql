@@ -255,9 +255,9 @@ CREATE TABLE COM_DATE
     CDWEEKOFMONTH smallint COMMENT 'WEEKOFMONTH',
     CDWEEK        smallint COMMENT 'WEEK',
     CDDAYOFWEEK   smallint COMMENT 'DAYOFWEEK',
-    CDLUNARYEAR   varchar(4) COMMENT '음력년도',
-    CDLUNARMONTH  varchar(2) COMMENT '음력월',
-    CDLUNARDAY    varchar(2) COMMENT '음력일',
+    CDLUNARYEAR   smallint COMMENT '음력년도',
+    CDLUNARMONTH  smallint COMMENT '음력월',
+    CDLUNARDAY    smallint COMMENT '음력일',
     CDLUNARLEAP   char(1) DEFAULT 'N' COMMENT '음력윤달여부',
     PRIMARY KEY (CDNO),
     UNIQUE (CDNO)

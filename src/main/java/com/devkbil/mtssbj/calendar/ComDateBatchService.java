@@ -46,9 +46,10 @@ public class ComDateBatchService {
 
     /**
      * 애플리케이션 시작 시 makeCalendar 함수를 실행합니다.
-     * 이 메서드는 애플리케이션이 시작될 때 자동으로 실행됩니다.
+     * 이 메서드는 수동으로 호출해야 합니다.
+     * 자동 실행은 주석 처리되었습니다 (@PostConstruct 제거).
      */
-    @PostConstruct
+    // @PostConstruct - 자동 실행 비활성화
     public void initMakeCalendar() {
         logBatch.info("Initial makeCalendar started");
         try {
