@@ -52,6 +52,19 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+processResources {
+    filesMatching('application.properties') {
+        expand(
+            project: [              
+                name: project.name,
+                description: project.description ?: '',
+                version: project.version
+            ],
+            java: [version: System.getProperty('java.version')]
+        )
+    }
+}
+
 javadoc {
     options {
         encoding = 'UTF-8'
@@ -233,7 +246,7 @@ dependencies {
     implementation 'net.ttddyy:datasource-proxy:1.10.1'
 
     // Application Monitoring
-    implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.7'
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.5.0'
 
     // Distributed Tracing
     implementation 'org.springframework.cloud:spring-cloud-starter-sleuth:3.1.11'
@@ -252,10 +265,10 @@ dependencies {
     // 10. File & Document Processing
     // ======================
     // Document Parsing
-    implementation 'org.apache.tika:tika-core:3.1.0'
-    implementation 'org.apache.tika:tika-parsers-standard-package:3.1.0'
-    annotationProcessor 'org.apache.tika:tika-core:3.1.0'
-    implementation 'org.apache.tika:tika-parsers:3.1.0'
+    implementation 'org.apache.tika:tika-core:3.2.0'
+    implementation 'org.apache.tika:tika-parsers-standard-package:3.2.0'
+    annotationProcessor 'org.apache.tika:tika-core:3.2.0'
+    implementation 'org.apache.tika:tika-parsers:3.2.0'
 
     // Office Documents
     implementation 'org.apache.poi:poi-ooxml:5.4.1'
@@ -499,7 +512,8 @@ spotless {
 // Checkstyle
 checkstyle {
     toolVersion = '10.23.0'
-    config = resources.text.fromUri('https://raw.githubusercontent.com/spring-io/spring-javaformat/main/spring-javaformat-checkstyle/src/main/resources/spring-javaformat-checkstyle.xml')
+    // Using a local Checkstyle configuration file
+    config = resources.text.fromFile('codestyle/naver-checkstyle-rules.xml')
 }
 
 // Format Check
@@ -541,12 +555,13 @@ tasks.register('copySbomToResources', Copy) {
 }
 
 // META-INF/sbom/ 등의 불필요 경로 제거
-tasks.register('cleanSbomPaths') {
-    doLast {
-        delete("$buildDir/resources/main/META-INF/sbom/") // 삭제
-        delete("$buildDir/BOOT-INF/classes/META-INF/sbom/") // 중첩 경로 삭제
-        delete("$buildDir/resources/main/META-INF/sbom/application.cdx.json") // 파일 삭제
-    }
+tasks.register('cleanSbomPaths', Delete) {
+    description = '불필요한 SBOM 경로 제거'
+    delete(
+        layout.buildDirectory.dir("resources/main/META-INF/sbom/"),
+        layout.buildDirectory.dir("BOOT-INF/classes/META-INF/sbom/"),
+        layout.buildDirectory.file("resources/main/META-INF/sbom/application.cdx.json")
+    )
 }
 
 // Gradle 빌드 과정에서 적용
