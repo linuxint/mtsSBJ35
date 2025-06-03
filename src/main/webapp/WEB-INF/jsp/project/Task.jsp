@@ -35,7 +35,25 @@
 
         });
 
+        $.fn.datebox.defaults.formatter = function(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            var d = date.getDate();
+            return y + '-' + (m < 10 ? '0' + m : m) + '-' + (d < 10 ? '0' + d : d);
+        };
 
+        $.fn.datebox.defaults.parser = function(s) {
+            if (!s) return new Date();
+            var parts = s.split('-');
+            var y = parseInt(parts[0], 10);
+            var m = parseInt(parts[1], 10);
+            var d = parseInt(parts[2], 10);
+            if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+                return new Date(y, m - 1, d);
+            } else {
+                return new Date();
+            }
+        };
         function formatProgress(value, row) {
             if (!value) {
                 return ''
