@@ -64,6 +64,12 @@ public class FileUtil {
      * @throws StringIndexOutOfBoundsException filename이 8자리 미만이거나 null인 경우 발생
      */
     public static String getRealPath(String path, String filename) {
+        // 유효성 검사: null 체크, 길이 확인, 숫자만 포함 여부
+        if (filename == null || filename.length() < 8 || !filename.matches("^\\d{8}.*")) {
+            return path + "/";
+        }
+
+        // 디렉토리 경로 구성
         return path + filename.substring(0, 4) + "/" + filename.substring(4, 6) + "/" + filename.substring(6, 8) + "/";
     }
 
