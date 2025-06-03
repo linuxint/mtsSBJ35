@@ -198,7 +198,7 @@ docker run --name oracle11g -d -p 1521:1521 linuxint/oracle11g
 ```bash
 # Elasticsearch 가져오기 및 실행
 docker pull elasticsearch:8.15.1
-docker run -p 9200:9200 -p 9300:9300 --name es8 \
+docker run -p 9200:9200 -p 9300:9300 --name elasticsearch \
     -e "discovery.type=single-node" \
     -e "xpack.ml.enabled=false" \
     elasticsearch:8.15.1
@@ -242,6 +242,24 @@ docker exec -it elasticsearch /bin/bash
 # Reenter password for [elastic]: manager
 # Enter password for [apm_system]: manager
 # ... (모든 사용자에 대해 반복)
+```
+#### logstash
+```bash
+docker pull docker.elastic.co/logstash/logstash:8.15.1
+docker run --name logstash \
+-p 5044:5044 \
+-p 5000:5000/tcp \
+-p 5000:5000/udp \
+-p 9600:9600 \
+-d docker.elastic.co/logstash/logstash:8.15.1
+```
+
+#### kibana
+```bash
+docker pull docker.elastic.co/kibana/kibana:8.15.1
+docker run --name kibana \
+-p 5601:5601 \
+-d docker.elastic.co/kibana/kibana:8.15.1
 ```
 
 #### 메일 서버 (James)
