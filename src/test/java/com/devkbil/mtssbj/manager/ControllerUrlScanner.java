@@ -34,7 +34,7 @@ public class ControllerUrlScanner {
     }
 
     /**
-     * @Controller 어노테이션이 있는 모든 클래스를 스캔하고 URL 매핑을 추출합니다.
+     * '@Controller' 어노테이션이 있는 모든 클래스를 스캔하고 URL 매핑을 추출합니다.
      * 
      * @return 컨트롤러 파일 이름과 URL 매핑 목록을 포함하는 맵
      * @throws IOException 파일 읽기 오류 발생 시
