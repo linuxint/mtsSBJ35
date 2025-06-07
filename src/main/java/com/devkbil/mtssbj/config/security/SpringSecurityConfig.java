@@ -37,7 +37,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.sql.DataSource;
 
@@ -101,10 +100,20 @@ public class SpringSecurityConfig {
             corsConfiguration.setAllowCredentials(true);
             return corsConfiguration;
         }));
-        http.headers(headerConfig -> headerConfig
-                // iframe 참조 허용
+        http
+            .headers(headerConfig -> headerConfig
                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
-        );
+                .contentSecurityPolicy(csp -> csp
+//                    .policyDirectives("default-src 'self'; script-src 'self'; object-src 'none';")
+                    .policyDirectives(
+                        "default-src 'self'; " +
+                            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+                            "style-src 'self' 'unsafe-inline'; " +
+                            "font-src 'self' data:; " +
+                            "object-src 'none';"
+                    )
+                )
+            );
         http.authorizeHttpRequests(authorize -> authorize
                 .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                 .requestMatchers(ConfigConstant.allAllowList).permitAll()
@@ -134,7 +143,7 @@ public class SpringSecurityConfig {
                 .tokenRepository(tokenRepository())
         );
         http.logout(logout -> logout
-                .logoutRequestMatcher(new AntPathRequestMatcher(ConfigConstant.URL_LOGOUT))
+                .logoutUrl(ConfigConstant.URL_LOGOUT)
                 .invalidateHttpSession(true)
                 .deleteCookies(ConfigConstant.SID_COOKIE_NAME, ConfigConstant.JSESSIONID, ConfigConstant.REMEMBER_ME_COOKIE_NAME)
                 .permitAll()
