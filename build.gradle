@@ -52,16 +52,21 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-processResources {
-    filesMatching('application.properties') {
-        expand(
-            project: [              
-                name: project.name,
+def expandProperties = [
+        project: [
+                name       : project.name,
                 description: project.description ?: '',
-                version: project.version
-            ],
-            java: [version: System.getProperty('java.version')]
-        )
+                version    : project.version
+        ],
+        java: [
+                version: System.getProperty('java.version')
+        ]
+]
+
+tasks.named('processResources') {
+    inputs.properties expandProperties
+    filesMatching('application.properties') {
+        expand(expandProperties)
     }
 }
 
@@ -101,6 +106,9 @@ dependencyManagement {
 }
 
 dependencies {
+
+    implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1'
+
     // ======================
     // 1. Platform & BOM
     // ======================
@@ -256,10 +264,10 @@ dependencies {
     // 9. Encryption & Security Utils
     // ======================
     // Bouncy Castle Security Provider
-    implementation 'org.bouncycastle:bcjmail-jdk18on:1.80'
-    implementation 'org.bouncycastle:bcpkix-jdk18on:1.80'
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.80'
-    implementation 'org.bouncycastle:bcutil-jdk18on:1.80'
+    implementation 'org.bouncycastle:bcjmail-jdk18on:1.81'
+    implementation 'org.bouncycastle:bcpkix-jdk18on:1.81'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.81'
+    implementation 'org.bouncycastle:bcutil-jdk18on:1.81'
 
     // ======================
     // 10. File & Document Processing
@@ -273,7 +281,7 @@ dependencies {
     // Office Documents
     implementation 'org.apache.poi:poi-ooxml:5.4.1'
     implementation 'org.jxls:jxls-poi:3.0.0'
-    implementation 'net.sf.mpxj:mpxj:14.0.0'
+    implementation 'net.sf.mpxj:mpxj:14.1.0'
     implementation 'net.freeutils:jtnef:2.1.0'
 
     // PDF Processing
@@ -317,10 +325,10 @@ dependencies {
 
 
     // Code Quality
-    implementation 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.45'
-    checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:0.0.45'
-    runtimeOnly 'io.spring.javaformat:spring-javaformat-config:0.0.45'
-    runtimeOnly 'io.spring.javaformat:spring-javaformat-intellij-idea-plugin:0.0.45'
+    implementation 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.46'
+    checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:0.0.46'
+    runtimeOnly 'io.spring.javaformat:spring-javaformat-config:0.0.46'
+    runtimeOnly 'io.spring.javaformat:spring-javaformat-intellij-idea-plugin:0.0.46'
     annotationProcessor 'com.google.errorprone:error_prone_core:2.36.0'
     errorprone 'com.google.errorprone:error_prone_core:2.36.0'
 
@@ -368,10 +376,10 @@ dependencies {
     // 17. Miscellaneous
     // ======================
     // Network
-    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.1.Final'
+    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.2.Final'
 
     // Version Control
-    implementation 'org.eclipse.jgit:org.eclipse.jgit:7.2.1.202505142326-r'
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r'
 
     // External Libraries
     implementation fileTree(dir: 'lib', include: ['*.jar'])
