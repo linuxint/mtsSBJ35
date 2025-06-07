@@ -41,5 +41,5 @@
     <script src='js/fullcalendar5/main.js'></script>
     <script src='js/fullcalendar5/locales-all.js'></script>
     <script src="js/datepicker/bootstrap-datepicker.js"></script>
-    <script src="js/ckeditor/ckeditor.js"></script>
+    <script src="js/ckeditor5/ckeditor.js"></script>
     <script src="js/mts.js"></script>

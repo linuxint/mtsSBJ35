@@ -3,9 +3,19 @@
 
     <script>
         window.onload = function () {
-            CKEDITOR.replace('dtcontents', {'filebrowserUploadUrl': 'upload4ckeditor'});
+            ClassicEditor
+                .create(document.querySelector('#dtcontents'), {
+                    ckfinder: {
+                        uploadUrl: 'upload4ckeditor'
+                    }
+                })
+                .then(editor => {
+                    console.log('CKEditor 5 initialized', editor);
+                })
+                .catch(error => {
+                    console.error('CKEditor 5 load error', error);
+                });
         }
-
         function fn_formSubmit() {
             CKEDITOR.instances["dtcontents"].updateElement();
 

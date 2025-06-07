@@ -2,9 +2,19 @@
 <%@include file="../inc/header.jsp" %>
     <script>
         window.onload = function () {
-            CKEDITOR.replace('emcontents', {'filebrowserUploadUrl': 'upload4ckeditor'});
+            ClassicEditor
+                .create(document.querySelector('#emcontents'), {
+                    ckfinder: {
+                        uploadUrl: 'upload4ckeditor'
+                    }
+                })
+                .then(editor => {
+                    console.log('CKEditor 5 initialized', editor);
+                })
+                .catch(error => {
+                    console.error('CKEditor 5 load error', error);
+                });
         }
-
         function fn_formSubmit() {
             if (!chkInputValue("#strTo", "받는 사람 이메일 주소")) return false;
             if (!chkInputValue("#emsubject", "제목")) return false;

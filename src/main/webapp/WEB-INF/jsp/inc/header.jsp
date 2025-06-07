@@ -4,7 +4,7 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="x" uri="jakarta.tags.xml" %>
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
-<c:set var="timestamps" value="20240101"/>
+<c:set var="timestamps" value="20250604"/>
 <!DOCTYPE html>
 <html>
 <head>
@@ -25,6 +25,7 @@
     <link href="css/sb-admin/morris.css?v=${timestamps}" rel="stylesheet">
     <link href="css/sign.css?v=${timestamps}" rel="stylesheet" type="text/css">
     <link href="css/index.css?v=${timestamps}" rel="stylesheet">
+    <link href="js/w2ui/w2ui.min.css?v=${timestamps}" rel="stylesheet">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -36,6 +37,8 @@
     <script src="js/jquery-2.2.3.min.js?v=${timestamps}"></script>
     <script src="js/jquery-ui.js?v=${timestamps}"></script>
     <script src="js/easyui/jquery.easyui.min.js?v=${timestamps}"></script>
+    <script src="js/w2ui/w2ui.min.js?v=${timestamps}"></script>
+
     <script src="js/dynatree/jquery.dynatree.js?v=${timestamps}"></script>
     <script src="css/sb-admin/bootstrap.min.js?v=${timestamps}"></script>
     <script src="css/sb-admin/metisMenu.min.js?v=${timestamps}"></script>
@@ -43,7 +46,7 @@
     <script src="js/fullcalendar5/main.js?v=${timestamps}"></script>
     <script src="js/fullcalendar5/locales-all.js?v=${timestamps}"></script>
     <script src="js/datepicker/bootstrap-datepicker.js?v=${timestamps}"></script>
-    <script src="js/ckeditor/ckeditor.js?v=${timestamps}"></script>
+    <script src="js/ckeditor5/ckeditor.js?v=${timestamps}"></script>
     <script src="css/sb-admin/raphael-min.js?v=${timestamps}"></script>
     <script src="css/sb-admin/morris.min.js?v=${timestamps}"></script>
     <script src="js/mts.js?v=${timestamps}"></script>

@@ -4,10 +4,13 @@ import com.fasterxml.jackson.core.SerializableString;
 import com.fasterxml.jackson.core.io.CharacterEscapes;
 import com.fasterxml.jackson.core.io.SerializedString;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.text.translate.AggregateTranslator;
 import org.apache.commons.text.translate.CharSequenceTranslator;
 import org.apache.commons.text.translate.EntityArrays;
 import org.apache.commons.text.translate.LookupTranslator;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -84,5 +87,14 @@ public class HtmlCharacterEscapes extends CharacterEscapes {
         return new SerializedString(escaped);
         // 참고 - 커스터마이징이 필요없다면 아래와 같이 Apache Commons Text에서 제공하는 메서드를 써도 된다.
         // return new SerializedString(StringEscapeUtils.escapeHtml4(Character.toString((char) ch)));
+    }
+
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer customJsonEscape() {
+        return builder -> {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.getFactory().setCharacterEscapes(new HtmlCharacterEscapes());
+            builder.configure(objectMapper);
+        };
     }
 }
