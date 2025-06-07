@@ -44,6 +44,7 @@ public class BoardSearchVO extends PagingVO {
      * @return `searchType` 필드를 나누어 얻은 문자열 배열을 반환합니다.
      */
     public String[] getSearchTypeArr() {
-        return searchType.split(",");
+        this.searchTypeArr = searchType.split(",");
+        return this.searchTypeArr;
     }
 }
