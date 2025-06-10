@@ -11,10 +11,10 @@ plugins {
     id 'java'
     id 'org.springdoc.openapi-gradle-plugin' version '1.9.0'
     id 'checkstyle'
-    id 'com.diffplug.spotless' version '7.0.3'
-    id 'org.cyclonedx.bom' version '2.3.0'
+    id 'com.diffplug.spotless' version '7.0.4'
+    id 'org.cyclonedx.bom' version '2.3.1'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
-    id 'net.ltgt.errorprone' version '4.1.0'
+    id 'net.ltgt.errorprone' version '4.2.0'
 }
 
 // Project Information
@@ -49,8 +49,8 @@ springBoot {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_24
+    targetCompatibility = JavaVersion.VERSION_24
 }
 
 def expandProperties = [
@@ -117,8 +117,8 @@ dependencies {
 //    implementation platform("org.springframework.integration:spring-integration-bom:6.5.0-M2")
 //    implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-M6")
     implementation platform("com.fasterxml.jackson:jackson-bom:2.19.0")
-    implementation platform("io.micrometer:micrometer-bom:1.15.0-RC1")
-    implementation platform("org.junit:junit-bom:5.13.0-M2")
+    implementation platform("io.micrometer:micrometer-bom:1.15.0")
+    implementation platform("org.junit:junit-bom:5.13.1")
 //    implementation platform("org.springframework.modulith:spring-modulith-bom:1.4.0-M1")
 
     // ======================
@@ -140,7 +140,7 @@ dependencies {
 
     // 캐시 관련
     implementation 'org.springframework.boot:spring-boot-starter-cache'
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.2.0'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.2.1'
 //    implementation 'org.ehcache:ehcache' //:3.10.8
 
     // 코드 품질
@@ -193,11 +193,11 @@ dependencies {
 
     // Embedded Tomcat
     runtimeOnly 'org.springframework.boot:spring-boot-starter-tomcat'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-core:11.0.7'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-websocket:11.0.7'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-el:11.0.7'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:11.0.7'
-    implementation 'org.apache.tomcat:tomcat-annotations-api:11.0.7'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-core:11.0.8'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-websocket:11.0.8'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-el:11.0.8'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:11.0.8'
+    implementation 'org.apache.tomcat:tomcat-annotations-api:11.0.8'
 
 //    runtimeOnly 'org.springframework.boot:spring-boot-starter-jetty'        // 내장 Tomcat 런타임
 //    implementation 'org.eclipse.jetty.http3:jetty-http3:12.0.16' // Jetty HTTP/3 의존성 추가
@@ -216,7 +216,7 @@ dependencies {
     // 5. 데이터베이스 및 퍼시스턴스
     // ======================
     // JDBC Drivers
-    implementation 'org.xerial:sqlite-jdbc:3.49.1.0'
+    implementation 'org.xerial:sqlite-jdbc:3.50.1.0'
     implementation 'com.oracle.database.jdbc:ojdbc11:23.8.0.25.04'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.5.3'
     runtimeOnly 'com.h2database:h2:2.3.232'
@@ -246,7 +246,7 @@ dependencies {
     implementation 'io.micrometer:micrometer-jakarta9'
     implementation 'io.micrometer:micrometer-observation'
     implementation 'io.micrometer:micrometer-commons'
-    implementation 'io.micrometer:micrometer-tracing:1.5.0'
+    implementation 'io.micrometer:micrometer-tracing:1.5.1'
 
     // Database Monitoring
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.11.0'
@@ -303,7 +303,7 @@ dependencies {
     // ======================
     // 11. API Documentation
     // ======================
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
 
     // ======================
     // 12. Testing
@@ -322,7 +322,7 @@ dependencies {
 //    implementation 'commons-lang:commons-lang:2.6'
     implementation 'org.apache.commons:commons-lang3:3.17.0'
     implementation 'org.apache.commons:commons-text:1.13.1'
-    implementation 'io.projectreactor:reactor-core:3.8.0-M3'  // Reactor Core 추가
+    implementation 'io.projectreactor:reactor-core:3.8.0-M4'  // Reactor Core 추가
 
 
     // Code Quality
@@ -338,8 +338,8 @@ dependencies {
     // ======================
     // Hibernate
     implementation 'org.hibernate.validator:hibernate-validator:9.0.0.Final'
-    implementation 'org.hibernate.orm:hibernate-core:7.0.0.Final'
-    implementation 'org.hibernate.orm:hibernate-jcache:7.0.0.Final'
+    implementation 'org.hibernate.orm:hibernate-core:7.0.1.Final'
+    implementation 'org.hibernate.orm:hibernate-jcache:7.0.1.Final'
 
     // Jakarta Persistence
     implementation 'jakarta.validation:jakarta.validation-api:3.1.1'
