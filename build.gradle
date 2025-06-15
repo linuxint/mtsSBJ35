@@ -246,7 +246,7 @@ dependencies {
     implementation 'io.micrometer:micrometer-jakarta9'
     implementation 'io.micrometer:micrometer-observation'
     implementation 'io.micrometer:micrometer-commons'
-    implementation 'io.micrometer:micrometer-tracing:1.5.1'
+    implementation 'io.micrometer:micrometer-tracing'
 
     // Database Monitoring
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.11.0'
@@ -337,9 +337,9 @@ dependencies {
     // 14. Persistence & Validation
     // ======================
     // Hibernate
-    implementation 'org.hibernate.validator:hibernate-validator:9.0.0.Final'
-    implementation 'org.hibernate.orm:hibernate-core:7.0.1.Final'
-    implementation 'org.hibernate.orm:hibernate-jcache:7.0.1.Final'
+    implementation 'org.hibernate.validator:hibernate-validator:9.0.1.Final'
+    implementation 'org.hibernate.orm:hibernate-core:7.0.2.Final'
+    implementation 'org.hibernate.orm:hibernate-jcache:7.0.2.Final'
 
     // Jakarta Persistence
     implementation 'jakarta.validation:jakarta.validation-api:3.1.1'
