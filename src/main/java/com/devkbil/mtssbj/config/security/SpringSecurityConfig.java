@@ -109,6 +109,7 @@ public class SpringSecurityConfig {
                         "default-src 'self'; " +
                             "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
                             "style-src 'self' 'unsafe-inline'; " +
+                            "img-src 'self' data:; " + // ← 이 줄 추가!
                             "font-src 'self' data:; " +
                             "object-src 'none';"
                     )
