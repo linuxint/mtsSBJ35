@@ -50,12 +50,17 @@ public class GradleDependencyChecker {
 
         // 1. Gradle 파일에서 의존성 목록 추출
         List<String> dependencies = parseDependencies(gradleFilePath);
+        // 1-1. Gradle 파일에서 플러그인 목록 추출
+        List<PluginInfo> plugins = parsePlugins(gradleFilePath);
 
         // 2. 의존성 검사 수행 (병렬로 처리)
         List<DependencyCheckResult> results = checkDependenciesInParallel(dependencies);
+        // 2-1. 플러그인 검사 수행 (병렬로 처리)
+        List<DependencyCheckResult> pluginResults = checkPluginsInParallel(plugins);
 
         // 3. 검사 결과를 출력
         printResults(results);
+        printPluginResults(pluginResults);
 
         // 스레드 풀 종료 (자원 반환)
         THREAD_POOL.shutdown();
@@ -103,6 +108,43 @@ public class GradleDependencyChecker {
     }
 
     /**
+     * build.gradle 파일에서 plugins 블록을 파싱해 플러그인 id와 버전 리스트로 반환
+     * @param gradleFilePath build.gradle 파일의 경로
+     * @return 파싱된 플러그인 정보 리스트
+     */
+    private static List<PluginInfo> parsePlugins(String gradleFilePath) {
+        List<PluginInfo> plugins = new ArrayList<>();
+        boolean inPluginsBlock = false;
+        Pattern pluginPattern = Pattern.compile("id ['\"]([\\w.\\-]+)['\"](?: version ['\"]([\\w.\\-]+)['\"])?");
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(gradleFilePath), StandardCharsets.UTF_8)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.startsWith("plugins")) {
+                    inPluginsBlock = true;
+                    continue;
+                }
+                if (inPluginsBlock && line.startsWith("}")) {
+                    break;
+                }
+                if (inPluginsBlock) {
+                    Matcher matcher = pluginPattern.matcher(line);
+                    if (matcher.find()) {
+                        String id = matcher.group(1);
+                        String version = matcher.group(2);
+                        if (version != null) {
+                            plugins.add(new PluginInfo(id, version));
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to parse plugins: " + e.getMessage());
+        }
+        return plugins;
+    }
+
+    /**
      * 의존성을 병렬로 검사하여 검사 결과 리스트 반환
      *
      * @param dependencies 검사할 의존성 목록
@@ -146,7 +188,7 @@ public class GradleDependencyChecker {
         }
 
         // 최신 버전 가져오기
-        String latestVersion = fetchLatestVersion(groupId, artifactId);
+        String latestVersion = fetchLatestVersion(groupId, artifactId, false);
 
         // 최신 버전 정보가 없는 경우 오류 처리
         if (latestVersion == null) {
@@ -165,29 +207,27 @@ public class GradleDependencyChecker {
     }
 
     /**
-     * Maven Central에서 최신 버전 정보를 가져옴
-     *
-     * @param groupId    의존성의 groupId
-     * @param artifactId 의존성의 artifactId
+     * Maven Central 또는 Plugin Portal에서 최신 버전 정보를 가져옴
+     * @param groupId groupId
+     * @param artifactId artifactId
+     * @param isPlugin 플러그인 여부 (true면 Plugin Portal, false면 Maven Central)
      * @return 최신 버전 (문자열) 또는 null
      */
-    private static String fetchLatestVersion(String groupId, String artifactId) {
-        String metadataUrl = String.format("https://repo1.maven.org/maven2/%s/%s/maven-metadata.xml", groupId.replace('.', '/'), artifactId);
-
-        // 최대 3회 재시도 실행
+    private static String fetchLatestVersion(String groupId, String artifactId, boolean isPlugin) {
+        String baseUrl = isPlugin
+            ? "https://plugins.gradle.org/m2/%s/%s/maven-metadata.xml"
+            : "https://repo1.maven.org/maven2/%s/%s/maven-metadata.xml";
+        String metadataUrl = String.format(baseUrl, groupId.replace('.', '/'), artifactId);
         for (int i = 0; i < 3; i++) {
             try {
-                // 모든 버전 리스트를 가져온 후 최신 버전 선택
                 List<String> versions = fetchAllVersions(metadataUrl);
                 if (!versions.isEmpty()) {
-                    return versions.get(versions.size() - 1); // 최신 버전 반환
+                    return versions.get(versions.size() - 1);
                 }
             } catch (Exception e) {
-                // 요청 실패 시 재시도
                 System.err.println("Attempt " + (i + 1) + " failed for URL: " + metadataUrl);
             }
         }
-        // 재시도 후 실패한 경우
         return null;
     }
 
@@ -247,6 +287,74 @@ public class GradleDependencyChecker {
             .filter(result -> "error".equals(result.getStatus()))
             .forEach(System.out::println);
     }
+
+    /**
+     * 플러그인 정보를 병렬로 검사하여 결과 리스트 반환
+     * @param plugins 검사할 플러그인 목록
+     * @return 플러그인 검사 결과 리스트
+     */
+    private static List<DependencyCheckResult> checkPluginsInParallel(List<PluginInfo> plugins) {
+        List<CompletableFuture<DependencyCheckResult>> futures = plugins.stream()
+            .map(plugin -> CompletableFuture.supplyAsync(() -> checkPlugin(plugin), THREAD_POOL))
+            .toList();
+        return futures.stream().map(CompletableFuture::join).toList();
+    }
+
+    /**
+     * 특정 플러그인의 버전을 검사하고 결과를 반환
+     * @param plugin 검사할 플러그인 정보
+     * @return 검사 결과 객체 (DependencyCheckResult)
+     */
+    private static DependencyCheckResult checkPlugin(PluginInfo plugin) {
+        String groupId = plugin.id;
+        String artifactId = plugin.id + ".gradle.plugin";
+        String declaredVersion = plugin.version;
+        String key = groupId + ":" + artifactId + ":" + declaredVersion;
+        if (CACHE.containsKey(key)) {
+            String cachedVersion = CACHE.get(key);
+            String status = declaredVersion.equals(cachedVersion) ? "latest" : "outdated";
+            return new DependencyCheckResult("[plugin] " + key, cachedVersion, status);
+        }
+        String latestVersion = fetchLatestVersion(groupId, artifactId, true); // Plugin Portal 우선 조회
+        if (latestVersion == null) {
+            return new DependencyCheckResult("[plugin] " + key, null, "error");
+        }
+        CACHE.put(key, latestVersion);
+        if (declaredVersion.equals(latestVersion)) {
+            return new DependencyCheckResult("[plugin] " + key, latestVersion, "latest");
+        } else {
+            return new DependencyCheckResult("[plugin] " + key, latestVersion, "outdated");
+        }
+    }
+
+    /**
+     * 플러그인 검사 결과를 콘솔에 출력
+     * @param results 플러그인 검사 결과 목록
+     */
+    private static void printPluginResults(List<DependencyCheckResult> results) {
+        System.out.println("\n=== 최신 상태 플러그인 ===");
+        results.stream()
+            .filter(result -> "latest".equals(result.getStatus()))
+            .forEach(System.out::println);
+
+        System.out.println("\n=== 업데이트가 필요한 플러그인 ===");
+        results.stream()
+            .filter(result -> "outdated".equals(result.status()))
+            .forEach(result -> {
+                String output = result.toString().replace("[outdated]", ANSI_RED + "[outdated]" + ANSI_RESET);
+                System.out.println(output);
+            });
+
+        System.out.println("\n=== 확인 실패한 플러그인 ===");
+        results.stream()
+            .filter(result -> "error".equals(result.getStatus()))
+            .forEach(System.out::println);
+    }
+
+    /**
+     * 플러그인 정보 record
+     */
+    private record PluginInfo(String id, String version) {}
 
     /**
      * 특정 의존성에 대한 버전 확인 결과를 나타내며,
