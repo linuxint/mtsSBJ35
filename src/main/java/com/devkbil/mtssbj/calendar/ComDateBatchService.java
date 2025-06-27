@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class ComDateBatchService {
 
-    private static final Logger log = LoggerFactory.getLogger(ComDateBatchService.class);
     private static final Logger logBatch = LoggerFactory.getLogger("BATCH");
 
     private final SchService schService;

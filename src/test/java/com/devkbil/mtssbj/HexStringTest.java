@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import java.util.Locale;
 
 @DisplayName("Hex String Operation Tests")
 public class HexStringTest {
@@ -44,7 +45,7 @@ public class HexStringTest {
         int value = 20221123;
 
         // When
-        String result = Integer.toString(value, 16).toUpperCase();
+        String result = Integer.toString(value, 16).toUpperCase(Locale.ROOT);
 
         // Then
         assertEquals("1348CC3", result, "Should convert integer to correct hex string");

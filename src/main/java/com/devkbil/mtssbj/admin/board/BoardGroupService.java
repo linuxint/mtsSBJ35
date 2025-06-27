@@ -101,7 +101,7 @@ public class BoardGroupService {
      * @return String 검증된 부모 그룹 ID 또는 null
      */
     private String validateBgparent(String bgparent) {
-        return (!StringUtils.hasText(bgparent)) ? null : bgparent;
+        return !StringUtils.hasText(bgparent) ? null : bgparent;
     }
 
 }

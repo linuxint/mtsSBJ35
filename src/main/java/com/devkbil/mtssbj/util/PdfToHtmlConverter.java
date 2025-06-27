@@ -71,12 +71,11 @@ public class PdfToHtmlConverter {
                 PDFTextStripper stripper = new PDFTextStripper() {
                     @Override
                     protected void processTextPosition(TextPosition text) {
-                        float x = text.getX();
                         float y = pageHeight - text.getY();
                         float fontSize = Math.max(text.getFontSize() * FONT_SCALE, BASE_FONT_SIZE);
                         String textContent = text.getUnicode();
                         textContent = textContent.replace("<", "&lt;").replace(">", "&gt;");
-                        textElements.add(new TextElement(x, y, fontSize, textContent));
+                        textElements.add(new TextElement(y, fontSize, textContent));
                     }
                 };
                 stripper.setStartPage(i + 1);
@@ -121,8 +120,7 @@ public class PdfToHtmlConverter {
                 PDResources resources = page.getResources();
                 for (COSName name : resources.getXObjectNames()) {
                     PDXObject xObject = resources.getXObject(name);
-                    if (xObject instanceof PDImageXObject) {
-                        PDImageXObject image = (PDImageXObject) xObject;
+                    if (xObject instanceof PDImageXObject image) {
                         String imageFileName = String.format("image_%d_%s.png", i, name.getName());
                         Path imagePath = imagesPath.resolve(imageFileName);
                         
@@ -149,13 +147,11 @@ public class PdfToHtmlConverter {
     }
 
     private static class TextElement {
-        final float x;
         final float y;
         final float fontSize;
         final String text;
 
-        TextElement(float x, float y, float fontSize, String text) {
-            this.x = x;
+        TextElement(float y, float fontSize, String text) {
             this.y = y;
             this.fontSize = fontSize;
             this.text = text;

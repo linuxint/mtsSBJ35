@@ -177,6 +177,9 @@
                     <li>
                         <a href="adCodeList"><i class="fa fa-gear fa-fw"></i> <s:message code="menu.code"/></a>
                     </li>
+                    <li>
+                        <a href="admin/spec"><i class="fa fa-file-text-o fa-fw"></i> 전문 관리</a>
+                    </li>
                 </c:if>
                 <c:if test='${sessionScope.userrole == "ADMIN"}'>
                     <li>
@@ -218,7 +221,7 @@
                         </ul>
                     </li>
                 </c:if>
-</ul>
+            </ul>
         </div>
         <!-- /.sidebar-collapse -->
     </div>

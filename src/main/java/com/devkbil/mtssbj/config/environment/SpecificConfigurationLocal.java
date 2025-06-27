@@ -30,8 +30,6 @@ public class SpecificConfigurationLocal implements EnvConfiguration {
 
     /**
      * Local 캐시 구성
-     *
-     * @return
      */
     @Override
     @Bean

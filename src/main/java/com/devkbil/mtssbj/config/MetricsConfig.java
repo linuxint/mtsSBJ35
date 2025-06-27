@@ -10,6 +10,8 @@ import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 /**
  * Micrometer 메트릭 설정
@@ -39,37 +41,33 @@ public class MetricsConfig {
      *         캐시 메트릭을 등록하는 MeterRegistryCustomizer 인스턴스를 반환.
      */
     @Bean
-    MeterRegistryCustomizer<MeterRegistry> metricsCommonTags() {
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public MeterRegistryCustomizer<MeterRegistry> metricsCustomizer() {
         return registry -> {
-            // 각 Caffeine 캐시에 대해 캐시 메트릭 등록
+            // 공통 태그 및 필터를 먼저 설정
+            registry.config()
+                .commonTags("application", "my-app")
+                .meterFilter(MeterFilter.ignoreTags("cacheName"))
+                .meterFilter(MeterFilter.renameTag("cache.puts", "cacheName", "cache.name"))
+                .meterFilter(MeterFilter.deny(id -> {
+                    if ("cache.size".equals(id.getName()) && id.getTags().stream().anyMatch(tag -> tag.getKey().equals("cacheName"))) {
+                        return true;
+                    }
+                    return false;
+                }));
+
+            // 캐시 모니터링 등록
             cacheManager.getCacheNames().forEach(cacheName -> {
-                CaffeineCache caffeineCache = (CaffeineCache)cacheManager.getCache(cacheName);
+                CaffeineCache caffeineCache = (CaffeineCache) cacheManager.getCache(cacheName);
                 if (caffeineCache != null) {
-                    // 코드 수정: 키-값 태그 추가
                     CaffeineCacheMetrics.monitor(
                         registry,
                         caffeineCache.getNativeCache(),
                         cacheName
                     );
-                    registry.config().commonTags("cacheName", cacheName); // 키-값 쌍으로 태그 설정
                 }
             });
         };
-    }
-
-    @Bean
-    public MeterRegistryCustomizer<MeterRegistry> metricsRegistryCustomizer() {
-        return registry -> registry.config()
-            .commonTags("application", "my-app") // 모든 메트릭에 공통 태그 추가
-            .meterFilter(MeterFilter.ignoreTags("cacheName")) // 충돌 원인이 되는 태그 무시
-            .meterFilter(MeterFilter.renameTag("cache.puts", "cacheName", "cache.name")) // 태그 이름 변경
-            .meterFilter(MeterFilter.deny(id -> {
-                // 중복 메트릭 방지
-                if ("cache.size".equals(id.getName()) && id.getTags().stream().anyMatch(tag -> tag.getKey().equals("cacheName"))) {
-                    return true; // 특정 메트릭의 등록 제외
-                }
-                return false;
-            }));
     }
 
 }

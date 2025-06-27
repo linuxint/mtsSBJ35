@@ -259,8 +259,7 @@ public class Imap {
 
         if (content instanceof String) {
             mail.setEmcontents((String) content); // 텍스트 콘텐츠
-        } else if (content instanceof Multipart) {
-            Multipart multipart = (Multipart) content;
+        } else if (content instanceof Multipart multipart) {
             for (int i = 0; i < multipart.getCount(); i++) {
                 extractContent(multipart.getBodyPart(i), mail); // 재귀적으로 처리
             }

@@ -124,7 +124,7 @@ public class MailService {
      * @param emino 이메일 번호
      */
     @Transactional(rollbackFor = Exception.class)
-    public void insertMails(ArrayList<MailVO> param, String userno, String emino) {
+    public void insertMails(List<MailVO> param, String userno, String emino) {
         try {
             for (MailVO mail : param) {
                 mail.setUserno(userno);
@@ -218,7 +218,7 @@ public class MailService {
      * @param addressesList 삽입할 이메일 주소 리스트; null이 아니어야 함
      * @param addressVO 삽입을 위해 이메일 주소와 인덱스를 설정하는 MailAddressVO 객체; null이 아니어야 함
      */
-    public void insertMailAddress(ArrayList<String> addressesList, MailAddressVO addressVO) {
+    public void insertMailAddress(List<String> addressesList, MailAddressVO addressVO) {
         String email;
         for (int j = 0; j < addressesList.size(); j++) {
             email = addressesList.get(j);

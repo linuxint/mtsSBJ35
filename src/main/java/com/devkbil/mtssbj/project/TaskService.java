@@ -74,7 +74,8 @@ public class TaskService {
             String userno = param.getUserno();
             if (StringUtils.hasText(userno)) {
                 ExtFieldVO fld = new ExtFieldVO(param.getTsno(), null, null);
-                String[] usernos = userno.split(",");
+                // Note: split(",") may not handle spaces around commas. Consider split("\\s*,\\s*") for robustness.
+                String[] usernos = userno.split("\\s*,\\s*");
 
                 for (String uno : usernos) {
                     if (StringUtils.hasText(uno)) {

@@ -86,8 +86,7 @@ public class QrCodeController {
     @ApiResponse(responseCode = "500", description = "PDF 생성 중 오류가 발생했습니다.")
     @GetMapping("/qrpdf")
     public void downQrCodePdf(HttpServletResponse response) {
-        PdfUtil pdfUtil = new PdfUtil();
-        Date nowDate = new Date();
+        java.time.LocalDateTime nowDate = java.time.LocalDateTime.now();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
         try (PDDocument document = new PDDocument()) {
@@ -112,7 +111,7 @@ public class QrCodeController {
                 // 가로 반복
                 for (int nXloopCnt = 1; nXloopCnt <= QrConstant.QR_X_COUNT; nXloopCnt++) {
                     // QR 코드 박스 생성
-                    getQrBox(pdImage, document, contentStream,
+                    getQrBox(document, contentStream,
                         QrConstant.QRCODE_STARTX + (QrConstant.QRCODE_WIDTH + QrConstant.QRCODE_XGAP) * (nXloopCnt - 1), // 가로 좌표
                         QrConstant.QRCODE_STARTY + (QrConstant.QRCODE_YGAP + QrConstant.QRCODE_HEIGHT) * (nYloopCnt - 1) // 세로 좌표
                     ); // Y행 X열
@@ -133,7 +132,6 @@ public class QrCodeController {
     /**
      * PDF 페이지에 QR 코드를 생성하고 해당 박스를 추가합니다.
      *
-     * @param pdImage       QR 코드 이미지로 사용할 PDImageXObject
      * @param document      PDF 문서를 나타내는 PDDocument
      * @param contentStream QR 코드와 박스를 작성할 PDPageContentStream
      * @param xpos          QR 코드가 위치할 x 좌표
@@ -141,8 +139,8 @@ public class QrCodeController {
      * @throws IOException     PDF 콘텐츠 스트림에 쓰기 시 오류가 발생한 경우
      * @throws WriterException QR 코드 생성 중 오류가 발생한 경우
      */
-    private void getQrBox(PDImageXObject pdImage, PDDocument document, PDPageContentStream contentStream, int xpos, int ypos) throws IOException, WriterException {
-        pdImage = PDImageXObject.createFromByteArray(document, qrCodeService.generateQrCode(UUID.randomUUID().toString()), null);
+    private void getQrBox(PDDocument document, PDPageContentStream contentStream, int xpos, int ypos) throws IOException, WriterException {
+        PDImageXObject pdImage = PDImageXObject.createFromByteArray(document, qrCodeService.generateQrCode(UUID.randomUUID().toString()), null);
         contentStream.drawImage(pdImage, xpos, ypos, QrConstant.QRCODE_WIDTH, QrConstant.QRCODE_HEIGHT); // QR 코드 배치
         Rectangle signBox = new Rectangle(xpos + QrConstant.QRCODE_WIDTH, ypos, -QrConstant.SEALBOX_WIDTH, QrConstant.SEALBOX_HEIGHT);
         drawRect(contentStream, QrConstant.SEALBOX_BGCOLOR, signBox, QrConstant.SEALBOX_LINECOLOR);

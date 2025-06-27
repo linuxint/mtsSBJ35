@@ -18,10 +18,8 @@ import java.util.Iterator;
 public class JpgToTIffTest {
     public static void main(String[] args) throws IOException {
 
-        String compressionType = "JPEG";
         String dirName = "/module/jpg";
         String outputFileName = "result";
-        boolean generated = false;
         ImageOutputStream ios = null;
         ImageWriter writer = null;
         try {
@@ -81,15 +79,14 @@ public class JpgToTIffTest {
                     }
                 }
                 ios.flush();
-                generated = true;
             }
 
         } catch (FileNotFoundException ex) {
-            generated = false;
+            // handle exception if needed
         } catch (IOException ex) {
-            generated = false;
+            // handle exception if needed
         } catch (Exception ex) {
-            generated = false;
+            // handle exception if needed
         } finally {
             if (null != ios) {
                 ios.close();

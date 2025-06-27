@@ -51,9 +51,6 @@ public class JgitUtilTest {
     @Autowired
     private JgitUtil jgitUtil;
 
-    @Autowired
-    private GitConfig gitConfig;
-
     @BeforeEach
     void setUp() {
         logger.info("[DEBUG_LOG] Starting Git test");

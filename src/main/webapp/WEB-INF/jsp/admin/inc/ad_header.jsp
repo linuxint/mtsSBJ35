@@ -16,14 +16,14 @@
     <meta name="author" content="">
 
     <title><s:message code="common.pageTitle"/></title>
-    <link href="css/sb-admin/bootstrap.min.css" rel="stylesheet">
-    <link href="css/sb-admin/metisMenu.min.css" rel="stylesheet">
-    <link href="css/sb-admin/sb-admin-2.css" rel="stylesheet">
-    <link href="css/sb-admin/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href="js/dynatree/ui.dynatree.css" rel="stylesheet" id="skinSheet"/>
-    <link href='js/fullcalendar5/main.css' rel='stylesheet'/>
-    <link href="js/datepicker/datepicker.css" rel="stylesheet" type="text/css">
-    <link href="css/sign.css" rel="stylesheet" type="text/css">
+    <link href="<c:url value='/css/sb-admin/bootstrap.min.css'/>" rel="stylesheet">
+    <link href="<c:url value='/css/sb-admin/metisMenu.min.css'/>" rel="stylesheet">
+    <link href="<c:url value='/css/sb-admin/sb-admin-2.css'/>" rel="stylesheet">
+    <link href="<c:url value='/css/sb-admin/font-awesome.min.css'/>" rel="stylesheet" type="text/css">
+    <link href="<c:url value='/js/dynatree/ui.dynatree.css'/>" rel="stylesheet" id="skinSheet"/>
+    <link href='<c:url value="/js/fullcalendar5/main.css"/>' rel='stylesheet'/>
+    <link href="<c:url value='/js/datepicker/datepicker.css'/>" rel="stylesheet" type="text/css">
+    <link href="<c:url value='/css/sign.css'/>" rel="stylesheet" type="text/css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -32,14 +32,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <script src="js/jquery-2.2.3.min.js"></script>
-    <script src="js/jquery-ui.js"></script>
-    <script src="js/dynatree/jquery.dynatree.js"></script>
-    <script src="css/sb-admin/bootstrap.min.js"></script>
-    <script src="css/sb-admin/metisMenu.min.js"></script>
-    <script src="css/sb-admin/sb-admin-2.js"></script>
-    <script src='js/fullcalendar5/main.js'></script>
-    <script src='js/fullcalendar5/locales-all.js'></script>
-    <script src="js/datepicker/bootstrap-datepicker.js"></script>
-    <script src="js/ckeditor5/ckeditor.js"></script>
-    <script src="js/mts.js"></script>
+    <script src="<c:url value='/js/jquery-2.2.3.min.js'/>"></script>
+    <script src="<c:url value='/js/jquery-ui.js'/>"></script>
+    <script src="<c:url value='/js/dynatree/jquery.dynatree.js'/>"></script>
+    <script src="<c:url value='/css/sb-admin/bootstrap.min.js'/>"></script>
+    <script src="<c:url value='/css/sb-admin/metisMenu.min.js'/>"></script>
+    <script src="<c:url value='/css/sb-admin/sb-admin-2.js'/>"></script>
+    <script src='<c:url value="/js/fullcalendar5/main.js"/>'></script>
+    <script src='<c:url value="/js/fullcalendar5/locales-all.js"/>'></script>
+    <script src="<c:url value='/js/datepicker/bootstrap-datepicker.js'/>"></script>
+    <script src="<c:url value='/js/ckeditor5/ckeditor.js'/>"></script>
+    <script src="<c:url value='/js/mts.js'/>"></script>

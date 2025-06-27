@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Dependency Controller
@@ -38,7 +40,7 @@ public class DependencyController {
         List<String> dependenciesList = new ArrayList<>();
 
         String[] command;
-        boolean isWindowsOS = System.getProperty("os.name").toLowerCase().startsWith("windows");
+        boolean isWindowsOS = System.getProperty("os.name").toLowerCase(Locale.ROOT).startsWith("windows");
         String outputLine;
         try {
             ProcessBuilder processBuilder = new ProcessBuilder();
@@ -53,13 +55,14 @@ public class DependencyController {
 
             // 명령어 실행
             Process process = processBuilder.start();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
 
             // 결과 읽기
             while ((outputLine = bufferedReader.readLine()) != null) {
                 dependenciesList.add(outputLine);
             }
-            int exitCode = process.waitFor(); // 처리 완료 대기
+            process.waitFor(); // 처리 완료 대기
         } catch (IOException | InterruptedException e) {
             //e.getMessage();
         }

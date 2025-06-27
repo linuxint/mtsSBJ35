@@ -43,7 +43,7 @@ public class PdfFIleMergeTest {
             }
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            System.err.println("Error merging PDF files: " + ex.getMessage());
         }
         file = null;
         // Merging the documents

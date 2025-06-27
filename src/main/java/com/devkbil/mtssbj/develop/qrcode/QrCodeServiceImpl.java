@@ -25,6 +25,7 @@ public class QrCodeServiceImpl extends QRCodeGenerator implements QrCodeService 
      * @throws IOException     QR 코드 생성 또는 입출력 오류 발생 시 예외 처리
      * @throws WriterException QR 코드 생성 과정에서 발생하는 오류 처리
      */
+    @Override
     public byte[] generateQrCode(String link) throws IOException, WriterException {
 
         // QR 코드 생성

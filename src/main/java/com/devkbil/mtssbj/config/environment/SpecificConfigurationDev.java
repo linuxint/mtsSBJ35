@@ -30,8 +30,6 @@ public class SpecificConfigurationDev implements EnvConfiguration {
 
     /**
      * Dev 캐시 구성
-     *
-     * @return
      */
     @Override
     @Bean

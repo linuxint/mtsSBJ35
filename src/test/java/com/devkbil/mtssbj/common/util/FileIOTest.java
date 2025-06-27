@@ -12,6 +12,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
+import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +28,7 @@ class FileIOTest {
     void readFileForText() throws IOException {
         File testFile = new File(tempDir.toFile(), "test.txt");
         String testContent = "Hello, World!\nTest line 2";
-        try (FileWriter writer = new FileWriter(testFile)) {
+        try (java.io.Writer writer = Files.newBufferedWriter(testFile.toPath(), StandardCharsets.UTF_8)) {
             writer.write(testContent);
         }
 
@@ -49,7 +51,7 @@ class FileIOTest {
     @Test
     void readFile() throws IOException {
         String testContent = "Test content";
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(testContent.getBytes());
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(testContent.getBytes(StandardCharsets.UTF_8));
 
         String content = FileIO.readFile(inputStream);
         assertEquals(testContent, content);
@@ -59,7 +61,7 @@ class FileIOTest {
     void readFileByLine() throws IOException {
         File testFile = new File(tempDir.toFile(), "test.txt");
         String[] testLines = {"Line 1", "Line 2", "Line 3"};
-        try (PrintWriter writer = new PrintWriter(testFile)) {
+        try (PrintWriter writer = new PrintWriter(testFile, StandardCharsets.UTF_8)) {
             for (String line : testLines) {
                 writer.println(line);
             }
@@ -75,7 +77,7 @@ class FileIOTest {
         String initialContent = "Initial line";
         String additionalLine = "Additional line";
 
-        try (FileWriter writer = new FileWriter(testFile)) {
+        try (java.io.Writer writer = Files.newBufferedWriter(testFile.toPath(), StandardCharsets.UTF_8)) {
             writer.write(initialContent + "\n");
         }
 

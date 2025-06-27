@@ -111,7 +111,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     /**
      * resourceHandlers정의 (/js, /css)
      *
-     * @param registry
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

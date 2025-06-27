@@ -17,8 +17,7 @@ public class FIleDownloadTest {
         URL url;
 
         try {
-
-            url = (new URI(urlStr)).toURL();
+            url = new URI(urlStr).toURL();
 
             ReadableByteChannel inputChannel = Channels.newChannel(url.openStream());
 
@@ -29,7 +28,9 @@ public class FIleDownloadTest {
             outputChannel.transferFrom(inputChannel, 0, Long.MAX_VALUE);
 
         } catch (MalformedURLException ex) {
+            // handle exception if needed
         } catch (IOException | URISyntaxException ex) {
+            // handle exception if needed
         }
     }
 }

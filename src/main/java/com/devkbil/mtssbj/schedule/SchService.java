@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.Date;
@@ -145,16 +146,16 @@ public class SchService {
      */
     private void processDailyRepeat(SchVO param, SchDetailVO param2) {
 
-        Date startDate = DateUtil.str2Date(param.getSsstartdate());
-        Date endDate = DateUtil.str2Date(param.getSsenddate());
+        LocalDate startDate = LocalDate.parse(param.getSsstartdate(), DATE_FORMATTER);
+        LocalDate endDate = LocalDate.parse(param.getSsenddate(), DATE_FORMATTER);
         int seq = 1;
 
-        while (!startDate.after(endDate)) {
+        while (!startDate.isAfter(endDate)) {
             param2.setSdseq(seq++);
-            param2.setSddate(DateUtil.date2Str(startDate));
+            param2.setSddate(startDate.format(DATE_FORMATTER));
             sqlSession.insert("insertSchDetail", param2);
 
-            startDate = DateUtil.dateAdd(startDate, 1); // 다음 날짜로 이동
+            startDate = startDate.plusDays(1); // 다음 날짜로 이동
         }
     }
 
@@ -166,23 +167,25 @@ public class SchService {
      */
     private void processWeeklyRepeat(SchVO param, SchDetailVO param2) {
 
-        Date startDate = DateUtil.str2Date(param.getSsstartdate());
-        Date endDate = DateUtil.str2Date(param.getSsrepeatend());
+        LocalDate startDate = LocalDate.parse(param.getSsstartdate(), DATE_FORMATTER);
+        LocalDate endDate = LocalDate.parse(param.getSsrepeatend(), DATE_FORMATTER);
         int dayOfWeek = Integer.parseInt(param.getSsrepeatoption());
         int seq = 1;
 
+        LocalDate currentDate = startDate;
         // 시작일을 지정된 요일로 이동
-        while (DateUtil.getDayOfWeek(startDate) != dayOfWeek) {
-            startDate = DateUtil.dateAdd(startDate, 1);
+        // java.time.DayOfWeek: MON(1)..SUN(7). DB에는 1:일요일, 2:월요일...
+        while ((currentDate.getDayOfWeek().getValue() % 7 + 1) != dayOfWeek) {
+            currentDate = currentDate.plusDays(1);
         }
 
         // 반복 일정 처리
-        while (!startDate.after(endDate)) {
+        while (!currentDate.isAfter(endDate)) {
             param2.setSdseq(seq++);
-            param2.setSddate(DateUtil.date2Str(startDate));
+            param2.setSddate(currentDate.format(DATE_FORMATTER));
             sqlSession.insert("insertSchDetail", param2);
 
-            startDate = DateUtil.dateAdd(startDate, 7); // 다음 주로 이동
+            currentDate = currentDate.plusWeeks(1); // 다음 주로 이동
         }
     }
 
@@ -194,31 +197,34 @@ public class SchService {
      */
     private void processMonthlyRepeat(SchVO param, SchDetailVO param2) {
 
-        Date startDate = DateUtil.str2Date(param.getSsstartdate());
-        Date endDate = DateUtil.str2Date(param.getSsrepeatend());
+        LocalDate startDate = LocalDate.parse(param.getSsstartdate(), DATE_FORMATTER);
+        LocalDate endDate = LocalDate.parse(param.getSsrepeatend(), DATE_FORMATTER);
         int dayOfMonth = Integer.parseInt(param.getSsrepeatoption());
         int seq = 1;
 
-        while (!startDate.after(endDate)) {
-            int year = DateUtil.getYear(startDate);
-            int month = DateUtil.getMonth(startDate);
-
-            // 현재 월의 반복 날짜 계산
-            Date repeatDate = DateUtil.str2Date(String.format("%d-%02d-%02d", year, month, dayOfMonth));
-            if (startDate.after(repeatDate)) {
-                month++; // 다음 달로 이동
-                repeatDate = DateUtil.str2Date(String.format("%d-%02d-%02d", year, month, dayOfMonth));
+        LocalDate currentDate = startDate;
+        while (!currentDate.isAfter(endDate)) {
+            LocalDate repeatDate;
+            try {
+                repeatDate = currentDate.withDayOfMonth(dayOfMonth);
+            } catch (java.time.DateTimeException e) {
+                // 현재 월에 해당 일이 없는 경우 (예: 4월 31일), 다음 달로 넘어감
+                currentDate = currentDate.plusMonths(1).withDayOfMonth(1);
+                continue;
             }
 
-            // 반복 조건 확인
-            if (!startDate.after(repeatDate) && !repeatDate.after(endDate)) {
+            if (repeatDate.isBefore(startDate)) {
+                currentDate = currentDate.plusMonths(1).withDayOfMonth(1);
+                continue;
+            }
+
+            if (!repeatDate.isAfter(endDate)) {
                 param2.setSdseq(seq++);
-                param2.setSddate(DateUtil.date2Str(repeatDate));
+                param2.setSddate(repeatDate.format(DATE_FORMATTER));
                 sqlSession.insert("insertSchDetail", param2);
             }
 
-            // 다음 월로 이동
-            startDate = DateUtil.monthAdd(startDate, 1);
+            currentDate = currentDate.plusMonths(1).withDayOfMonth(1);
         }
     }
 
@@ -274,7 +280,7 @@ public class SchService {
                 // 테이블이 비어있으면 2020-01-01부터 시작
                 startDate = LocalDate.of(2020, 1, 1);
                 // 종료일은 오늘 이후 300일
-                endDate = LocalDate.now().plusDays(300);
+                endDate = LocalDate.now(ZoneId.systemDefault()).plusDays(300);
             } else {
                 startDate = LocalDate.parse(maxDateStr, DATE_FORMATTER).plusDays(1);
                 // 종료일은 시작일로부터 300일 후

@@ -3,6 +3,7 @@ package com.devkbil.mtssbj;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.StringUtils;
+import com.google.common.base.Splitter;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,11 +34,11 @@ public class StringUtilTest {
         String input = "011,008,019,020,040,025,037,038";
 
         // When
-        String[] elements = input.split(",");
+        java.util.List<String> elements = Splitter.on(',').splitToList(input);
 
         // Then
-        assertTrue(elements.length == 8, "Split should produce 8 elements");
-        assertTrue(elements[0].equals("011"), "First element should be '011'");
-        assertTrue(elements[7].equals("038"), "Last element should be '038'");
+        assertTrue(elements.size() == 8, "Split should produce 8 elements");
+        assertTrue(elements.get(0).equals("011"), "First element should be '011'");
+        assertTrue(elements.get(7).equals("038"), "Last element should be '038'");
     }
 }

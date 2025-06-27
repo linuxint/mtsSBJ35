@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import com.google.common.base.Splitter;
 
 @Slf4j
 public class SqlXmlLoader {
@@ -75,15 +76,9 @@ public class SqlXmlLoader {
         try {
             // SQL ID와 관련된 속성을 맵에 저장
             String id = node.getAttributes().getNamedItem("id").getNodeValue(); // SQL ID 추출
-            String parameterType = Optional.ofNullable(node.getAttributes().getNamedItem("parameterType"))
-                .map(attr -> attr.getNodeValue())
-                .orElse(null); // Parameter 타입 추출
-            String resultType = Optional.ofNullable(node.getAttributes().getNamedItem("resultType"))
-                .map(attr -> attr.getNodeValue())
-                .orElse(null); // Result 타입 추출
             SQL_MAP.put(
                 namespace + "." + id,
-                new QueryInfo(id, parameterType, resultType, namespace)); // SQL 맵에 저장
+                new QueryInfo(namespace)); // SQL 맵에 저장
             log.debug("SQL 등록됨: {} (namespace: {})", id, namespace); // 디버그 로그
         } catch (Exception e) {
             log.error("SQL ID 등록 중 오류 발생. namespace: {}, node: {}", namespace, node, e); // 실패 시 오류 처리
@@ -98,7 +93,7 @@ public class SqlXmlLoader {
         // Namespace를 제외한 SQL ID만 추출하여 반환
         return SQL_MAP.keySet()
             .stream()
-            .map(id -> id.contains(".") ? id.split("\\.")[1] : id)
+            .map(id -> id.contains(".") ? com.google.common.collect.Iterables.get(Splitter.on('.').split(id), 1) : id)
             .collect(Collectors.toSet());
     }
 
@@ -112,15 +107,9 @@ public class SqlXmlLoader {
     }
 
     public static class QueryInfo {
-        private final String id; // SQL ID
-        private final String parameterType; // Parameter 타입
-        private final String resultType; // 결과 타입
         private final String namespace; // Namespace
 
-        public QueryInfo(String id, String parameterType, String resultType, String namespace) {
-            this.id = id;
-            this.parameterType = parameterType;
-            this.resultType = resultType;
+        public QueryInfo(String namespace) {
             this.namespace = namespace;
         }
 

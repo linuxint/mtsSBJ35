@@ -1,5 +1,6 @@
 package com.devkbil.mtssbj.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,7 @@ import java.util.logging.Logger;
  * 느린 쿼리 감지를 위해 SLF4JQueryLoggingListener가 특정 로그 레벨 및 기타 사용자 정의 설정으로 구성됩니다.
  */
 @Component
+@Slf4j
 public class DatasourceProxyBeanPostProcessor implements BeanPostProcessor {
 
     private static final Logger logger = Logger.getLogger(DatasourceProxyBeanPostProcessor.class.getName());

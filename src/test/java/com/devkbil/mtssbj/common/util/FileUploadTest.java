@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -37,7 +38,7 @@ class FileUploadTest {
     void setUp() {
         fileUpload = new FileUpload();
         originalFilename = "test.txt";
-        content = "Test content".getBytes();
+        content = "Test content".getBytes(StandardCharsets.UTF_8);
         System.setProperty("user.dir", tempDir.toFile().getAbsolutePath());
     }
 
@@ -67,8 +68,8 @@ class FileUploadTest {
 
     @Test
     void saveAllFiles() {
-        MultipartFile file1 = new MockMultipartFile("file1", "test1.txt", "text/plain", "content1".getBytes());
-        MultipartFile file2 = new MockMultipartFile("file2", "test2.txt", "text/plain", "content2".getBytes());
+        MultipartFile file1 = new MockMultipartFile("file1", "test1.txt", "text/plain", "content1".getBytes(StandardCharsets.UTF_8));
+        MultipartFile file2 = new MockMultipartFile("file2", "test2.txt", "text/plain", "content2".getBytes(StandardCharsets.UTF_8));
         List<MultipartFile> files = Arrays.asList(file1, file2);
 
         List<FileVO> results = fileUpload.saveAllFiles(files);
@@ -127,7 +128,7 @@ class FileUploadTest {
 
     @Test
     void saveAllFiles_WithEmptyFiles() {
-        MultipartFile file1 = new MockMultipartFile("file1", "test1.txt", "text/plain", "content1".getBytes());
+        MultipartFile file1 = new MockMultipartFile("file1", "test1.txt", "text/plain", "content1".getBytes(StandardCharsets.UTF_8));
         MultipartFile emptyFile = new MockMultipartFile("file2", "empty.txt", "text/plain", new byte[0]);
         List<MultipartFile> files = Arrays.asList(file1, emptyFile);
 

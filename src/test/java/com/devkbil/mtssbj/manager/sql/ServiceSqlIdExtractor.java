@@ -32,11 +32,12 @@ public class ServiceSqlIdExtractor {
 
         try {
             // 디렉토리 내의 파일들을 순회하며 Service 파일을 처리
-            Files.walk(Paths.get(servicePath)) // 지정된 경로의 파일들을 재귀적으로 탐색
-                    .parallel() // 병렬 처리 설정
-                    .filter(Files::isRegularFile) // 파일만 필터링 (디렉토리는 제외)
-                    .filter(path -> path.toString().endsWith("Service.java")) // 파일 이름이 "Service.java"로 끝나는 경우만 처리
-                    .forEach(path -> processServiceFile(path, sqlIds)); // 각 파일을 처리하고 SQL ID를 추출
+            try (java.util.stream.Stream<Path> paths = Files.walk(Paths.get(servicePath))) {
+                paths.parallel()
+                    .filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith("Service.java"))
+                    .forEach(path -> processServiceFile(path, sqlIds));
+            }
         } catch (IOException e) {
             // 경로 처리 중 예외 발생 시 로그 기록
             log.error("서비스 경로 처리 실패: {}", servicePath, e);

@@ -48,7 +48,7 @@ public class ShellCommandTest {
 
         StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
 
-        Future<?> future = Executors.newSingleThreadExecutor().submit(streamGobbler);
+        Future<?> unused = Executors.newSingleThreadExecutor().submit(streamGobbler);
 
         int exitCode = process.waitFor();
         assert exitCode == 0;

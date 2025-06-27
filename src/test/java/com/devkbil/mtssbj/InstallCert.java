@@ -16,12 +16,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Class used to add the server's certificate to the KeyStore with your trusted
@@ -118,7 +119,7 @@ public class InstallCert {
             executeCommand(exportCommand);
 
             // Keystore backup
-            Files.copy(caCerts.toPath(), new File(caCerts.getAbsolutePath() + ".bak." + new Date().getTime()).toPath());
+            Files.copy(caCerts.toPath(), new File(caCerts.getAbsolutePath() + ".bak." + Instant.now().toEpochMilli()).toPath());
 
             // Keytool import command
             ProcessBuilder importCommand = new ProcessBuilder(
@@ -136,7 +137,7 @@ public class InstallCert {
     private static void executeCommand(ProcessBuilder command) throws IOException, InterruptedException {
         Process process = command.start();
         process.waitFor();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 System.out.println(line);
@@ -163,14 +164,17 @@ public class InstallCert {
             this.trustManager = trustManager;
         }
 
+        @Override
         public X509Certificate[] getAcceptedIssuers() {
             return new X509Certificate[0];
         }
 
+        @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
             this.chain = chain;
             trustManager.checkServerTrusted(chain, authType);

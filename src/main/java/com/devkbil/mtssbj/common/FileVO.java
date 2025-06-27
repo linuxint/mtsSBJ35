@@ -66,7 +66,7 @@ public class FileVO {
         if (filesize < unit) {
             return String.format("(%d B)", filesize);
         }
-        int exp = (int) (Math.log(filesize) / Math.log(unit));
+        int exp = (int) (Math.log((double) filesize) / Math.log(unit));
 
         return String.format("(%.0f %s)", filesize / Math.pow(unit, exp), "KMGTPE".charAt(exp - 1));
     }

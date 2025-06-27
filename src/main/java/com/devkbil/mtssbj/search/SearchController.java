@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
@@ -162,7 +163,7 @@ public class SearchController {
             queryBuilder.withFields(INCLUDE_FIELDS);
 
             // 검색 쿼리 설정
-            queryBuilder.withQuery(makeQuery(searchRange, searchVO.getSearchKeyword().split(" "), searchVO));
+            queryBuilder.withQuery(makeQuery(searchRange, searchVO.getSearchKeyword().split("\\s+"), searchVO));
 
             // 그룹화 Aggregation 설정
             queryBuilder.withAggregation("group_by_board",
@@ -204,7 +205,7 @@ public class SearchController {
 
                 // 검색 키워드로 하이라이팅 처리
                 Map<String, Object> source = new HashMap<>(hit.getContent());
-                String[] keywords = searchVO.getSearchKeyword().split(" ");
+                String[] keywords = searchVO.getSearchKeyword().split("\\s+");
                 for (String keyword : keywords) {
                     if (!StringUtils.hasText(keyword)) {
                         continue;
@@ -281,7 +282,7 @@ public class SearchController {
 
         // 키워드 검색 조건 추가
         for (String word : words) {
-            final String processedWord = word.trim().toLowerCase();
+            final String processedWord = word.trim().toLowerCase(Locale.ROOT);
             if (processedWord.isEmpty()) {
                 continue;
             }

@@ -22,6 +22,9 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import lombok.extern.slf4j.Slf4j;
+import com.google.common.base.Splitter;
+import java.util.regex.Pattern;
+import java.time.ZoneId;
 
 /**
  * SpringCalendarExtractorTxt 클래스는 iCalendar (.ics) 파일 데이터를 다운로드, 파싱 및 처리하는 작업을 수행합니다.
@@ -166,13 +169,13 @@ public class SpringCalendarExtractorTxt {
         String version = DEFAULT_VERSION;           // 기본값: 버전
 
         // 공백으로 나뉜 토큰
-        String[] tokens = eventSummary.trim().split("\\s+");
+        java.util.List<String> tokens = Splitter.on(Pattern.compile("\\s+")).splitToList(eventSummary.trim());
 
-        if (tokens.length == 1) {  // 단어가 하나뿐인 경우
-            if (isVersion(tokens[0])) {
-                version = tokens[0];
+        if (tokens.size() == 1) {  // 단어가 하나뿐인 경우
+            if (isVersion(tokens.get(0))) {
+                version = tokens.get(0);
             } else {
-                programName = tokens[0];
+                programName = tokens.get(0);
             }
         } else {
             // 여러 단어인 경우
@@ -180,8 +183,8 @@ public class SpringCalendarExtractorTxt {
             StringBuilder versionBuilder = new StringBuilder();
             boolean versionFound = false;
 
-            for (int i = tokens.length - 1; i >= 0; i--) {  // 뒤에서부터 탐색
-                String token = tokens[i];
+            for (int i = tokens.size() - 1; i >= 0; i--) {  // 뒤에서부터 탐색
+                String token = tokens.get(i);
 
                 if (!versionFound && isVersion(token)) {
                     versionBuilder.insert(0, token + " ");
@@ -286,7 +289,7 @@ public class SpringCalendarExtractorTxt {
             Map<LocalDate, StringBuilder> eventsByDate = groupEventsByDate(calendar);
 
             // 4단계: 오늘 기준 5일 전 이후 일정만 출력
-            printGroupedEventsByDate(eventsByDate, LocalDate.now().minusDays(5));
+            printGroupedEventsByDate(eventsByDate, LocalDate.now(ZoneId.systemDefault()).minusDays(5));
 
         } catch (Exception e) {
             log.error("An error occurred: {}", e.getMessage(), e);

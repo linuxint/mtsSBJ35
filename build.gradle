@@ -5,7 +5,7 @@ import org.cyclonedx.gradle.CycloneDxTask
 import org.apache.maven.artifact.versioning.ComparableVersion
 
 plugins {
-    id 'org.springframework.boot' version '3.5.0'
+    id 'org.springframework.boot' version '3.5.3'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'maven-publish'
     id 'java'
@@ -14,7 +14,7 @@ plugins {
     id 'com.diffplug.spotless' version '7.0.4'
     id 'org.cyclonedx.bom' version '2.3.1'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
-    id 'net.ltgt.errorprone' version '4.2.0'
+    id 'net.ltgt.errorprone' version '4.3.0'
 }
 
 // Project Information
@@ -49,8 +49,8 @@ springBoot {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_24
-    targetCompatibility = JavaVersion.VERSION_24
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 def expandProperties = [
@@ -317,7 +317,7 @@ dependencies {
     // ======================
     // Common Utils
     implementation 'com.google.guava:guava:33.4.8-jre'
-    implementation 'org.modelmapper:modelmapper:3.2.3'
+    implementation 'org.modelmapper:modelmapper:3.2.4'
     implementation 'org.jodd:jodd-util:6.3.0'
 //    implementation 'commons-lang:commons-lang:2.6'
     implementation 'org.apache.commons:commons-lang3:3.17.0'
@@ -326,10 +326,10 @@ dependencies {
 
 
     // Code Quality
-    implementation 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.46'
-    checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:0.0.46'
-    runtimeOnly 'io.spring.javaformat:spring-javaformat-config:0.0.46'
-    runtimeOnly 'io.spring.javaformat:spring-javaformat-intellij-idea-plugin:0.0.46'
+    implementation 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.47'
+    checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:0.0.47'
+    runtimeOnly 'io.spring.javaformat:spring-javaformat-config:0.0.47'
+    runtimeOnly 'io.spring.javaformat:spring-javaformat-intellij-idea-plugin:0.0.47'
     annotationProcessor 'com.google.errorprone:error_prone_core:2.36.0'
     errorprone 'com.google.errorprone:error_prone_core:2.36.0'
 
@@ -338,8 +338,8 @@ dependencies {
     // ======================
     // Hibernate
     implementation 'org.hibernate.validator:hibernate-validator:9.0.1.Final'
-    implementation 'org.hibernate.orm:hibernate-core:7.0.2.Final'
-    implementation 'org.hibernate.orm:hibernate-jcache:7.0.2.Final'
+    implementation 'org.hibernate.orm:hibernate-core:7.0.3.Final'
+    implementation 'org.hibernate.orm:hibernate-jcache:7.0.3.Final'
 
     // Jakarta Persistence
     implementation 'jakarta.validation:jakarta.validation-api:3.1.1'
@@ -365,8 +365,8 @@ dependencies {
     // ======================
     // JOOQ
     implementation 'org.springframework.boot:spring-boot-starter-jooq'
-    implementation 'org.jooq:jooq:3.20.4'
-    implementation 'org.jooq:jooq-codegen:3.20.4'
+    implementation 'org.jooq:jooq:3.20.5'
+    implementation 'org.jooq:jooq-codegen:3.20.5'
     // jood.sql-dialect: ORACLE // application.properties || application.yml
     // 세선 DB
 
@@ -677,7 +677,7 @@ task dockerUp(type: Exec) {
     group = 'docker'
     description = 'Docker 서비스를 시작합니다.'
     workingDir = 'docker'
-    commandLine 'docker-compose', 'up', '-d'
+    commandLine 'docker', 'compose', 'up', '-d'
     ignoreExitValue = true
     doLast {
         logger.info("Docker 서비스 시작 시도 완료")
@@ -688,7 +688,7 @@ task dockerDown(type: Exec) {
     group = 'docker'
     description = 'Docker 서비스를 중지하고 제거합니다.'
     workingDir = 'docker'
-    commandLine 'docker-compose', 'down'
+    commandLine 'docker', 'compose', 'down'
     ignoreExitValue = true
     doLast {
         logger.info("Docker 서비스 중지 시도 완료")

@@ -32,8 +32,6 @@ public class SpecificConfigurationStag implements EnvConfiguration {
 
     /**
      * Stag Cache Configuration
-     *
-     * @return
      */
     @Override
     @Bean

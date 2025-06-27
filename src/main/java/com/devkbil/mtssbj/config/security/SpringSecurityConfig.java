@@ -117,7 +117,7 @@ public class SpringSecurityConfig {
             );
         http.authorizeHttpRequests(authorize -> authorize
                 .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-                .requestMatchers(ConfigConstant.allAllowList).permitAll()
+                .requestMatchers(ConfigConstant.allAllowList.toArray(new String[0])).permitAll()
                 .anyRequest().authenticated()
         );
         http.exceptionHandling(

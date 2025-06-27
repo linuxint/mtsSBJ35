@@ -8,9 +8,10 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,7 +46,7 @@ class FileListTest {
 
     private File createTestFile(File dir, String name, String content) throws IOException {
         File file = new File(dir, name);
-        try (FileWriter writer = new FileWriter(file)) {
+        try (java.io.Writer writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
             writer.write(content);
         }
         return file;

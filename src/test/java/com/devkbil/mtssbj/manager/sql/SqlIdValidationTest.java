@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.extern.slf4j.Slf4j;
+import com.google.common.base.Splitter;
 
 @Slf4j
 public class SqlIdValidationTest {
@@ -22,7 +23,6 @@ public class SqlIdValidationTest {
 
         // 1. MyBatis XML에서 SQL ID 로드
         SqlXmlLoader.loadSqlQueries("classpath:mapper/oracle/*.xml"); // XML 파일에서 SQL ID 로드
-        Set<String> sqlXmlIdsWithNamespace = SqlXmlLoader.getAllSqlIds(); // Namespace 포함 SQL ID 집합
         Set<String> sqlXmlIdsWithoutNamespace = SqlXmlLoader.getPureSqlIds(); // Namespace 제거 SQL ID 집합
         Set<String> namespaces = SqlXmlLoader.getNamespaces(); // Namespace 목록 추출
 
@@ -54,9 +54,9 @@ public class SqlIdValidationTest {
                 batch -> batch.forEach(
                     sqlId -> {
                         if (sqlId.contains(".")) { // SQL ID에 Namespace가 포함된 경우
-                            String[] parts = sqlId.split("\\.", 2); // Namespace와 순수 SQL ID 분리
-                            String namespace = parts[0];
-                            String pureSqlId = parts[1];
+                            java.util.List<String> parts = Splitter.on('.').limit(2).splitToList(sqlId);
+                            String namespace = parts.get(0);
+                            String pureSqlId = parts.get(1);
 
                             // Namespace와 SQL ID가 유효한지 검증
                             if (!namespaces.contains(namespace)) { // Namespace가 없으면 실패 처리

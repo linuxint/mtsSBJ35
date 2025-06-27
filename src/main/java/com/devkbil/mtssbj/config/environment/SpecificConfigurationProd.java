@@ -31,8 +31,6 @@ public class SpecificConfigurationProd implements EnvConfiguration {
 
     /**
      * Prod Cache Configuration
-     *
-     * @return
      */
     @Override
     @Bean

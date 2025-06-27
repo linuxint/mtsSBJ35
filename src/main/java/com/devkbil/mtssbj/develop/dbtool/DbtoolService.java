@@ -22,6 +22,7 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -173,7 +174,7 @@ public class DbtoolService {
         List<Map<String, String>> columns = new ArrayList<>();
         try (Connection connection = sqlSession.getSqlSessionFactory().openSession().getConnection()) {
             DatabaseMetaData metaData = connection.getMetaData();
-            ResultSet rs = metaData.getColumns(null, null, tableName.toUpperCase(), null);
+            ResultSet rs = metaData.getColumns(null, null, tableName.toUpperCase(Locale.ROOT), null);
             while (rs.next()) {
                 String columnName = rs.getString("COLUMN_NAME");
                 String dataType = rs.getString("TYPE_NAME"); // 데이터 타입 가져오기
@@ -337,7 +338,12 @@ public class DbtoolService {
                 return cell.getStringCellValue();
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    return cell.getDateCellValue().toString();
+                    // Apache POI returns java.util.Date; if migration is not possible, document why.
+                    java.util.Date date = cell.getDateCellValue();
+                    // If you want to convert to java.time.LocalDate:
+                    // LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    // return localDate.toString();
+                    return date.toString();
                 } else {
                     return String.valueOf((int) cell.getNumericCellValue());
                 }

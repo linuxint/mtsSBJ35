@@ -301,6 +301,7 @@ public class PdfUtil {
             }
             mergerUtility.mergeDocuments(null);
         } catch (IOException ioe) {
+            log.error("Failed to merge PDF files: {}", ioe.getMessage(), ioe);
         }
     }
 

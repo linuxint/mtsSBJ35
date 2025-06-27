@@ -3,6 +3,8 @@ package com.devkbil.mtssbj.develop.logview;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import ch.qos.logback.core.encoder.Encoder;
 
+import java.nio.charset.StandardCharsets;
+
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
@@ -36,7 +38,7 @@ public class DevLogbackAppender<E> extends UnsynchronizedAppenderBase<E> {
         if (!isStarted()) {
             return;
         }
-        devLogbackAppenderService.addLog(eventObject, new String(encoder.encode(eventObject)));
+        devLogbackAppenderService.addLog(eventObject, new String(encoder.encode(eventObject), StandardCharsets.UTF_8));
     }
 
 }

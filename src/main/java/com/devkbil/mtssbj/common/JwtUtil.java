@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,8 +34,8 @@ public class JwtUtil {
      */
     private final SecretKey secretKey = Keys.hmacShaKeyFor(
         Base64.getEncoder()
-            .encodeToString("N8smKe2pXyZCd3Rsv7nNni0gfZsl7J7MfinPxaO2Bgk=".getBytes())
-            .getBytes());
+            .encodeToString("N8smKe2pXyZCd3Rsv7nNni0gfZsl7J7MfinPxaO2Bgk=".getBytes(StandardCharsets.UTF_8))
+            .getBytes(StandardCharsets.UTF_8));
 
     // 액세스 토큰 만료 시간 (기본값: 1시간)
     @Value("${jwt.access-token.expiration:3600000}")
@@ -94,7 +95,7 @@ public class JwtUtil {
      * @return 만료 여부 (true: 만료됨)
      */
     private Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        return extractExpiration(token).toInstant().isBefore(java.time.Instant.now());
     }
 
     /**
@@ -145,8 +146,8 @@ public class JwtUtil {
         return Jwts.builder()
             .setClaims(claims) // 클레임 정보 설정
             .setSubject(subject) // 서브젝트 설정
-            .setIssuedAt(new Date(System.currentTimeMillis())) // 생성 시점 설정
-            .setExpiration(new Date(System.currentTimeMillis() + expiration)) // 만료 시간 설정
+            .setIssuedAt(new java.util.Date(System.currentTimeMillis())) // JWT 라이브러리 요구로 Date 유지
+            .setExpiration(new java.util.Date(System.currentTimeMillis() + expiration)) // JWT 라이브러리 요구로 Date 유지
             .signWith(secretKey) // 비밀 키로 서명
             .compact(); // 직렬화된 토큰 반환
     }

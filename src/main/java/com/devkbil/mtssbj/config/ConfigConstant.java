@@ -36,18 +36,18 @@ public class ConfigConstant {
     public static final String PARAMETER_LOGIN_ID = "userid";
     public static final String PARAMETER_LOGIN_PWD = "userpw";
 
-    public static final String[] allAllowList = {
-        "/actuator/**",
-        "/api/monitor/**", // MonitorSecurityConfig 대신해서 코드추가
-        "/api/v1/auth/**",
-        "/css/**",
-        "/js/**",
-        "/images/**",
-        "/favicon.ico",
-        "/memberLogout",
-        "/memberLogin",
-        "/login-process",
-        "/memberLoginChk",
-        "/error/**"
-    };
+    public static final java.util.List<String> allAllowList = java.util.List.of(
+            "/actuator/**",
+            "/api/monitor/**", // MonitorSecurityConfig 대신해서 코드추가
+            "/api/v1/auth/**",
+            "/css/**",
+            "/js/**",
+            "/images/**",
+            "/favicon.ico",
+            "/memberLogout",
+            "/memberLogin",
+            "/login-process",
+            "/memberLoginChk",
+            "/error/**"
+    );
 }
