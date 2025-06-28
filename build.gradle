@@ -199,19 +199,6 @@ dependencies {
     implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:11.0.8'
     implementation 'org.apache.tomcat:tomcat-annotations-api:11.0.8'
 
-//    runtimeOnly 'org.springframework.boot:spring-boot-starter-jetty'        // 내장 Tomcat 런타임
-//    implementation 'org.eclipse.jetty.http3:jetty-http3:12.0.16' // Jetty HTTP/3 의존성 추가
-//    implementation 'org.eclipse.jetty.ee10:jetty-ee10-apache-jsp:12.0.16' // JSP 처리 엔진
-//    implementation 'org.eclipse.jetty.ee10:jetty-ee10-servlet:12.0.16'   // 서블릿 지원
-//    implementation 'org.eclipse.jetty.ee10:jetty-ee10-webapp:12.0.16'
-//    implementation 'org.eclipse.jetty:jetty-server:12.0.16'
-//    implementation 'org.eclipse.jetty:jetty-session:12.0.16'
-
-//    implementation 'org.eclipse.jetty:jetty-webapp:11.0.24'
-//    implementation 'org.eclipse.jetty:jetty-servlet:11.0.24'
-//    implementation 'org.eclipse.jetty:apache-jsp:11.0.24'
-//    implementation 'org.eclipse.jetty:jetty-annotations:11.0.24'
-
     // ======================
     // 5. 데이터베이스 및 퍼시스턴스
     // ======================
