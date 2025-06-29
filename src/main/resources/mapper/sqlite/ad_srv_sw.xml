@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ad_srv_sw">
+
+    <sql id="includeSrvSw">
+        WHERE TSW.DELETEFLAG='N'
+        <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
+            <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
+                 ${item} LIKE '%' || #{searchKeyword} || '%'
+            </foreach>
+        </if>
+        <if test="hw_id!=null and hw_id!=''">
+            AND TSW.HW_ID=#{hw_id}
+        </if>
+        <if test="sw_type!=null and sw_type!=''">
+            AND TSW.SW_TYPE=#{sw_type}
+        </if>
+        <if test="sw_status!=null and sw_status!=''">
+            AND TSW.SW_STATUS=#{sw_status}
+        </if>
+    </sql>
+
+    <select id="selectSrvSwCount" parameterType="com.devkbil.mtssbj.common.SearchVO" resultType="Integer">
+        SELECT COUNT(*)
+          FROM TBL_SRV_SW TSW
+         INNER JOIN TBL_SRV_HW TSH ON TSH.HW_ID=TSW.HW_ID
+         <include refid="includeSrvSw"/>
+    </select>
+
+    <select id="selectSrvSwList" parameterType="com.devkbil.mtssbj.common.SearchVO" resultType="com.devkbil.mtssbj.admin.server.SrvSwVO">
+        SELECT TSW.SW_ID, TSW.HW_ID, TSH.HW_NAME, TSW.SW_NAME, TSW.SW_VERSION, TSW.SW_TYPE
+             , TSW.SW_LICENSE, strftime('%Y-%m-%d', TSW.SW_INSTALL_DATE) as SW_INSTALL_DATE
+             , strftime('%Y-%m-%d', TSW.SW_EXPIRY_DATE) as SW_EXPIRY_DATE
+             , TSW.SW_VENDOR, TSW.SW_DESCRIPTION, TSW.SW_STATUS
+             , strftime('%Y-%m-%d', TSW.REGDATE) as REGDATE
+          FROM TBL_SRV_SW TSW
+         INNER JOIN TBL_SRV_HW TSH ON TSH.HW_ID=TSW.HW_ID
+         <include refid="includeSrvSw"/>
+         ORDER BY TSW.SW_ID DESC
+         <if test="rowStart != null">
+             LIMIT ${displayRowCount} OFFSET ${rowStart-1}
+         </if>
+    </select>
+
+    <select id="selectSrvSwOne" parameterType="com.devkbil.mtssbj.common.ExtFieldVO" resultType="com.devkbil.mtssbj.admin.server.SrvSwVO">
+        SELECT TSW.SW_ID, TSW.HW_ID, TSH.HW_NAME, TSW.SW_NAME, TSW.SW_VERSION, TSW.SW_TYPE
+             , TSW.SW_LICENSE, strftime('%Y-%m-%d', TSW.SW_INSTALL_DATE) as SW_INSTALL_DATE
+             , strftime('%Y-%m-%d', TSW.SW_EXPIRY_DATE) as SW_EXPIRY_DATE
+             , TSW.SW_VENDOR, TSW.SW_DESCRIPTION, TSW.SW_STATUS
+             , strftime('%Y-%m-%d', TSW.REGDATE) as REGDATE
+          FROM TBL_SRV_SW TSW
+         INNER JOIN TBL_SRV_HW TSH ON TSH.HW_ID=TSW.HW_ID
+         WHERE TSW.SW_ID=#{field1}
+    </select>
+
+    <insert id="insertSrvSw" parameterType="com.devkbil.mtssbj.admin.server.SrvSwVO" >
+        INSERT INTO TBL_SRV_SW(HW_ID, SW_NAME, SW_VERSION, SW_TYPE, SW_LICENSE, SW_INSTALL_DATE, SW_EXPIRY_DATE, SW_VENDOR, SW_DESCRIPTION, SW_STATUS, REGDATE)
+        VALUES (#{hw_id}, #{sw_name}, #{sw_version}, #{sw_type}, #{sw_license}, #{sw_install_date}, #{sw_expiry_date}, #{sw_vendor}, #{sw_description}, #{sw_status}, datetime('now'))
+        <selectKey keyProperty="sw_id" resultType="String" order="AFTER">
+            SELECT last_insert_rowid()
+        </selectKey>
+    </insert>
+
+    <update id="updateSrvSw" parameterType="com.devkbil.mtssbj.admin.server.SrvSwVO">
+        UPDATE TBL_SRV_SW
+           SET HW_ID=#{hw_id}
+             , SW_NAME=#{sw_name}
+             , SW_VERSION=#{sw_version}
+             , SW_TYPE=#{sw_type}
+             , SW_LICENSE=#{sw_license}
+             , SW_INSTALL_DATE=#{sw_install_date}
+             , SW_EXPIRY_DATE=#{sw_expiry_date}
+             , SW_VENDOR=#{sw_vendor}
+             , SW_DESCRIPTION=#{sw_description}
+             , SW_STATUS=#{sw_status}
+             , CHGDATE=datetime('now')
+         WHERE SW_ID=#{sw_id}
+    </update>
+
+    <delete id="deleteSrvSw" parameterType="String">
+        UPDATE TBL_SRV_SW
+           SET DELETEFLAG='Y'
+             , CHGDATE=datetime('now')
+         WHERE SW_ID=#{sw_id}
+    </delete>
+
+    <select id="selectSrvSwTypeList" resultType="com.devkbil.mtssbj.common.ComboVO">
+        SELECT DISTINCT SW_TYPE as VALUE, SW_TYPE as LABEL
+          FROM TBL_SRV_SW
+         WHERE DELETEFLAG='N'
+         ORDER BY SW_TYPE
+    </select>
+
+    <select id="selectSrvSwStatusList" resultType="com.devkbil.mtssbj.common.ComboVO">
+        SELECT DISTINCT SW_STATUS as VALUE, SW_STATUS as LABEL
+          FROM TBL_SRV_SW
+         WHERE DELETEFLAG='N'
+         ORDER BY SW_STATUS
+    </select>
+
+    <select id="selectSrvHwList4Sw" resultType="com.devkbil.mtssbj.common.ComboVO">
+        SELECT HW_ID as VALUE, HW_NAME as LABEL
+          FROM TBL_SRV_HW
+         WHERE DELETEFLAG='N'
+         ORDER BY HW_NAME
+    </select>
+
+</mapper> 

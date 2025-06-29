@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="etc">
+
+    <select id="selectAlertCount" parameterType="String" resultType="Integer">
+        <![CDATA[
+        SELECT (
+                    SELECT COUNT(distinct TB.BRDNO||TBL.BLNO) CNT
+                      FROM TBL_BOARD TB
+                      LEFT OUTER JOIN TBL_BOARDREAD TBR ON TBR.BRDNO=TB.BRDNO AND TBR.USERNO=#{userno}
+                     INNER JOIN TBL_BOARDLIKE TBL ON TBL.BRDNO=TB.BRDNO
+                     WHERE TB.DELETEFLAG='N' AND TB.USERNO=#{userno}
+                       AND TBL.REGDATE > CASE WHEN TB.REGDATE>TBR.REGDATE THEN TB.REGDATE ELSE TBR.REGDATE END
+                ) + (
+                    SELECT COUNT(*) CNT
+                      FROM (
+                            SELECT TB.BRDNO, TBRE.RENO
+                              FROM TBL_BOARD TB
+                              LEFT OUTER JOIN TBL_BOARDREAD TBR ON TBR.BRDNO=TB.BRDNO AND TBR.USERNO=#{userno}
+                             INNER JOIN TBL_BOARDREPLY TBRE ON TBRE.BRDNO=TB.BRDNO
+                             WHERE TB.DELETEFLAG='N' AND TB.USERNO=#{userno} AND TBRE.USERNO!=#{userno}
+                               AND TBRE.REGDATE > CASE WHEN TB.REGDATE>TBR.REGDATE THEN TB.REGDATE ELSE TBR.REGDATE END
+                            UNION 
+                            SELECT TBR.BRDNO, TBRE.RENO
+                              FROM TBL_BOARDREPLY TBR
+                             INNER JOIN TBL_BOARDREAD TBRR ON TBR.BRDNO=TBRR.BRDNO
+                             INNER JOIN TBL_BOARDREPLY TBRE ON TBRE.BRDNO=TBR.BRDNO
+                             WHERE TBR.REDELETEFLAG='N' AND TBR.USERNO=#{userno} AND TBRR.USERNO=#{userno} AND TBRE.USERNO!=#{userno}
+                               AND TBRE.REGDATE > TBRR.REGDATE
+                    ) DS               
+                ) CNT FROM DUAL
+        ]]>
+    </select>
+    
+    <select id="selectAlertList4Ajax" parameterType="String" resultType="com.devkbil.mtssbj.board.BoardVO">
+        <![CDATA[
+        SELECT DS.BRDNO, DS.RENO, UF_DATETIME2STRING(DS.REGDATE) as REGDATE, DS.TYPE as extfield1
+             , TB.BRDTITLE
+        FROM (
+                 SELECT DISTINCT TB.BRDNO, TBL.BLNO RENO, TBL.REGDATE REGDATE, TBL.USERNO, 'thumbs-o-up' as TYPE
+                 FROM TBL_BOARD TB
+                          LEFT OUTER JOIN TBL_BOARDREAD TBR ON TBR.BRDNO=TB.BRDNO AND TBR.USERNO=#{userno}
+                          INNER JOIN TBL_BOARDLIKE TBL ON TBL.BRDNO=TB.BRDNO
+                 WHERE TB.DELETEFLAG='N' AND TB.USERNO=#{userno}
+                   AND TBL.REGDATE > CASE WHEN TB.REGDATE>TBR.REGDATE THEN TB.REGDATE ELSE TBR.REGDATE END
+                 UNION ALL
+                   SELECT BRDNO, RENO, REGDATE, USERNO
+                        , NVL2((SELECT TBRE.BRDNO FROM TBL_BOARDREPLY TBRE WHERE TBRE.BRDNO=BRDNO AND TBRE.USERNO=#{userno}), 'comments', 'files-o') TYPE
+                   FROM ( SELECT * FROM (
+                            SELECT ROW_NUMBER() OVER (ORDER BY TBRE.REGDATE DESC) AS RNUM
+                                ,TB.BRDNO, TBRE.RENO, TBRE.REGDATE REGDATE, TBRE.USERNO
+                            FROM TBL_BOARD TB
+                                     LEFT OUTER JOIN TBL_BOARDREAD TBR ON TBR.BRDNO=TB.BRDNO AND TBR.USERNO=#{userno}
+                                     INNER JOIN TBL_BOARDREPLY TBRE ON TBRE.BRDNO=TB.BRDNO
+                            WHERE TB.DELETEFLAG='N' AND TB.USERNO=#{userno} AND TBRE.USERNO!=#{userno}
+                              AND TBRE.REGDATE > CASE WHEN TB.REGDATE>TBR.REGDATE THEN TB.REGDATE ELSE TBR.REGDATE END
+                            UNION
+                            SELECT ROW_NUMBER() OVER (ORDER BY TBRE.REGDATE DESC) AS RNUM, TBR.BRDNO, TBRE.RENO, TBRE.REGDATE REGDATE, TBRE.USERNO
+                            FROM TBL_BOARDREPLY TBR
+                                     INNER JOIN TBL_BOARDREAD TBRR ON TBR.BRDNO=TBRR.BRDNO
+                                     INNER JOIN TBL_BOARDREPLY TBRE ON TBRE.BRDNO=TBR.BRDNO
+                            WHERE TBR.REDELETEFLAG='N' AND TBR.USERNO=#{userno} AND TBRR.USERNO=#{userno} AND TBRE.USERNO!=#{userno}
+                              AND TBRE.REGDATE > TBRR.REGDATE
+                         ) DS
+                         WHERE RNUM <= 5
+                    )
+             ) DS
+                 INNER JOIN TBL_BOARD TB ON DS.BRDNO=TB.BRDNO
+        ORDER BY DS.REGDATE DESC
+        ]]>
+     </select>
+     
+    <select id="selectAlertList" parameterType="String" resultType="com.devkbil.mtssbj.board.BoardVO">
+        SELECT DS.BRDNO, DS.RENO, TO_CHAR(DS.REGDATE,'YYYY-MM-DD HH24:MI') as REGDATE, DS.USERNO, DS.TYPE as extfield1
+             , TB.BRDTITLE, TB.BRDLIKE, USERNM BRDWRITER
+             , (SELECT COUNT(*) FROM TBL_BOARDREAD WHERE BRDNO=TB.BRDNO) BRDHIT
+             , (SELECT COUNT(*) FROM TBL_BOARDREPLY WHERE BRDNO=TB.BRDNO AND REDELETEFLAG='N') REPLYCNT
+             
+          FROM (
+                SELECT DISTINCT TB.BRDNO, TBL.BLNO RENO, TBL.REGDATE REGDATE, TBL.USERNO, 'thumbs-o-up' as TYPE
+                  FROM TBL_BOARD TB
+                  LEFT OUTER JOIN TBL_BOARDREAD TBR ON TBR.BRDNO=TB.BRDNO AND TBR.USERNO=#{userno}
+                 INNER JOIN TBL_BOARDLIKE TBL ON TBL.BRDNO=TB.BRDNO
+                 WHERE TB.DELETEFLAG='N' AND TB.USERNO=#{userno}
+                   AND TBL.REGDATE > CASE WHEN TB.REGDATE>TBR.REGDATE THEN TB.REGDATE ELSE TBR.REGDATE END
+                UNION ALL
+                SELECT BRDNO, RENO, REGDATE, USERNO
+                     , NVL2((SELECT TBRE.BRDNO FROM TBL_BOARDREPLY TBRE WHERE TBRE.BRDNO=DS.BRDNO AND TBRE.USERNO=#{userno}), 'comments', 'files-o') TYPE
+                  FROM (
+                        SELECT TB.BRDNO, TBRE.RENO, TBRE.REGDATE REGDATE, TBRE.USERNO
+                          FROM TBL_BOARD TB
+                          LEFT OUTER JOIN TBL_BOARDREAD TBR ON TBR.BRDNO=TB.BRDNO AND TBR.USERNO=#{userno}
+                         INNER JOIN TBL_BOARDREPLY TBRE ON TBRE.BRDNO=TB.BRDNO
+                         WHERE TB.DELETEFLAG='N' AND TB.USERNO=#{userno} AND TBRE.USERNO!=#{userno}
+                           AND TBRE.REGDATE > CASE WHEN TB.REGDATE>TBR.REGDATE THEN TB.REGDATE ELSE TBR.REGDATE END
+                        UNION
+                        SELECT TBR.BRDNO, TBRE.RENO, TBRE.REGDATE REGDATE, TBRE.USERNO
+                          FROM TBL_BOARDREPLY TBR
+                         INNER JOIN TBL_BOARDREAD TBRR ON TBR.BRDNO=TBRR.BRDNO
+                         INNER JOIN TBL_BOARDREPLY TBRE ON TBRE.BRDNO=TBR.BRDNO
+                         WHERE TBR.REDELETEFLAG='N' AND TBR.USERNO=#{userno} AND TBRR.USERNO=#{userno} AND TBRE.USERNO!=#{userno}
+                           AND TBRE.REGDATE > TBRR.REGDATE
+                ) DS
+                 ORDER BY REGDATE DESC
+        ) DS
+         INNER JOIN TBL_BOARD TB ON DS.BRDNO=TB.BRDNO
+         LEFT OUTER JOIN COM_USER CU ON CU.USERNO=DS.USERNO
+         ORDER BY DS.REGDATE DESC
+    </select>
+
+    <select id="selectList4UserCount" parameterType="com.devkbil.mtssbj.board.BoardSearchVO" resultType="Integer">
+        SELECT (
+                SELECT COUNT(*)
+                  FROM TBL_BOARD TB
+                 WHERE DELETEFLAG='N' AND TB.USERNO=#{searchExt1}
+               ) + ( 
+                SELECT COUNT(*)
+                  FROM TBL_BOARDREPLY TBR
+                 WHERE TBR.REDELETEFLAG='N' AND TBR.USERNO=#{searchExt1}
+               ) FROM DUAL
+     </select>        
+    <select id="selectList4User" parameterType="com.devkbil.mtssbj.board.BoardSearchVO" resultType="com.devkbil.mtssbj.board.BoardVO">
+    SELECT * FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY TB.REGDATE DESC) AS RNUM
+             , DS.BRDNO, TO_CHAR(DS.REGDATE,'YYYY-MM-DD HH24:MI') as REGDATE, DS.TYPE extfield1
+             , TB.BRDTITLE, BGNAME, USERNM BRDWRITER
+             , (SELECT COUNT(*) FROM TBL_BOARDREAD WHERE BRDNO=TB.BRDNO) BRDHIT
+             , (SELECT COUNT(*) FROM TBL_BOARDREPLY WHERE BRDNO=TB.BRDNO AND REDELETEFLAG='N') REPLYCNT
+          FROM (
+                SELECT TB.BRDNO, REGDATE, 'files-o' as TYPE
+                  FROM TBL_BOARD TB
+                 WHERE TB.DELETEFLAG='N' AND TB.USERNO=#{searchExt1}
+                UNION ALL
+                SELECT TBR.BRDNO, TBR.REGDATE REGDATE, 'comments' as TYPE
+                  FROM TBL_BOARDREPLY TBR
+                 WHERE TBR.REDELETEFLAG='N' AND TBR.USERNO=#{searchExt1}
+                 ORDER BY REGDATE DESC
+        ) DS
+         INNER JOIN TBL_BOARD TB ON DS.BRDNO=TB.BRDNO
+         INNER JOIN TBL_BOARDGROUP TBG ON TBG.BGNO=TB.BGNO
+         LEFT OUTER JOIN COM_USER CU ON CU.USERNO=TB.USERNO
+    )
+    <if test="rowStart != null">
+        WHERE RNUM BETWEEN ${rowStart} AND ${rowStart-1}+${displayRowCount}
+        -- OFFSET ${rowStart-1} ROWS FETCH FIRST ${displayRowCount} ROWS ONLY -- oracle12c
+    </if>
+     </select>
+
+    <select id="selectClassCode" parameterType="String"  resultType="com.devkbil.mtssbj.etc.ClassCodeVO">
+        SELECT CODECD, CODENM 
+          FROM COM_CODE 
+         WHERE CLASSNO=#{classno} -- AND DELETEFLAG='N'
+         ORDER BY CAST(CODECD AS INT)
+    </select>
+</mapper>
+

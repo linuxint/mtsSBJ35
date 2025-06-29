@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ad_srv_svc">
+
+    <sql id="includeSrvSvc">
+        WHERE TSVC.DELETEFLAG='N'
+        <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
+            <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
+                 ${item} LIKE CONCAT('%', #{searchKeyword}, '%')
+            </foreach>
+        </if>
+        <if test="hw_id!=null and hw_id!=''">
+            AND TSVC.HW_ID=#{hw_id}
+        </if>
+        <if test="sw_id!=null and sw_id!=''">
+            AND TSVC.SW_ID=#{sw_id}
+        </if>
+        <if test="svc_type!=null and svc_type!=''">
+            AND TSVC.SVC_TYPE=#{svc_type}
+        </if>
+        <if test="svc_status!=null and svc_status!=''">
+            AND TSVC.SVC_STATUS=#{svc_status}
+        </if>
+    </sql>
+
+    <select id="selectSrvSvcCount" parameterType="com.devkbil.mtssbj.common.SearchVO" resultType="Integer">
+        SELECT COUNT(*)
+          FROM TBL_SRV_SVC TSVC
+         INNER JOIN TBL_SRV_HW TSH ON TSH.HW_ID=TSVC.HW_ID
+         LEFT OUTER JOIN TBL_SRV_SW TSW ON TSW.SW_ID=TSVC.SW_ID
+         <include refid="includeSrvSvc"/>
+    </select>
+
+    <select id="selectSrvSvcList" parameterType="com.devkbil.mtssbj.common.SearchVO" resultType="com.devkbil.mtssbj.admin.server.SrvSvcVO">
+        SELECT TSVC.SVC_ID, TSVC.HW_ID, TSH.HW_NAME, TSVC.SW_ID, TSW.SW_NAME, TSVC.SVC_NAME
+             , TSVC.SVC_TYPE, TSVC.SVC_PORT, TSVC.SVC_PROTOCOL, TSVC.SVC_STATUS
+             , DATE_FORMAT(TSVC.SVC_START_DATE,'%Y-%m-%d') as SVC_START_DATE
+             , TSVC.SVC_DESCRIPTION, DATE_FORMAT(TSVC.REGDATE,'%Y-%m-%d') as REGDATE
+          FROM TBL_SRV_SVC TSVC
+         INNER JOIN TBL_SRV_HW TSH ON TSH.HW_ID=TSVC.HW_ID
+         LEFT OUTER JOIN TBL_SRV_SW TSW ON TSW.SW_ID=TSVC.SW_ID
+         <include refid="includeSrvSvc"/>
+         ORDER BY TSVC.SVC_ID DESC
+         <if test="rowStart != null">
+             LIMIT ${rowStart-1}, 10
+         </if>
+    </select>
+
+    <select id="selectSrvSvcOne" parameterType="com.devkbil.mtssbj.common.ExtFieldVO" resultType="com.devkbil.mtssbj.admin.server.SrvSvcVO">
+        SELECT TSVC.SVC_ID, TSVC.HW_ID, TSH.HW_NAME, TSVC.SW_ID, TSW.SW_NAME, TSVC.SVC_NAME
+             , TSVC.SVC_TYPE, TSVC.SVC_PORT, TSVC.SVC_PROTOCOL, TSVC.SVC_STATUS
+             , DATE_FORMAT(TSVC.SVC_START_DATE,'%Y-%m-%d') as SVC_START_DATE
+             , TSVC.SVC_DESCRIPTION, DATE_FORMAT(TSVC.REGDATE,'%Y-%m-%d') as REGDATE
+          FROM TBL_SRV_SVC TSVC
+         INNER JOIN TBL_SRV_HW TSH ON TSH.HW_ID=TSVC.HW_ID
+         LEFT OUTER JOIN TBL_SRV_SW TSW ON TSW.SW_ID=TSVC.SW_ID
+         WHERE TSVC.SVC_ID=#{field1}
+    </select>
+
+    <insert id="insertSrvSvc" parameterType="com.devkbil.mtssbj.admin.server.SrvSvcVO" >
+        INSERT INTO TBL_SRV_SVC(HW_ID, SW_ID, SVC_NAME, SVC_TYPE, SVC_PORT, SVC_PROTOCOL, SVC_STATUS, SVC_START_DATE, SVC_DESCRIPTION, REGDATE)
+        VALUES (#{hw_id}, #{sw_id}, #{svc_name}, #{svc_type}, #{svc_port}, #{svc_protocol}, #{svc_status}, #{svc_start_date}, #{svc_description}, NOW())
+        <selectKey keyProperty="svc_id" resultType="String" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="updateSrvSvc" parameterType="com.devkbil.mtssbj.admin.server.SrvSvcVO">
+        UPDATE TBL_SRV_SVC
+           SET HW_ID=#{hw_id}
+             , SW_ID=#{sw_id}
+             , SVC_NAME=#{svc_name}
+             , SVC_TYPE=#{svc_type}
+             , SVC_PORT=#{svc_port}
+             , SVC_PROTOCOL=#{svc_protocol}
+             , SVC_STATUS=#{svc_status}
+             , SVC_START_DATE=#{svc_start_date}
+             , SVC_DESCRIPTION=#{svc_description}
+             , CHGDATE=NOW()
+         WHERE SVC_ID=#{svc_id}
+    </update>
+
+    <delete id="deleteSrvSvc" parameterType="String">
+        UPDATE TBL_SRV_SVC
+           SET DELETEFLAG='Y'
+             , CHGDATE=NOW()
+         WHERE SVC_ID=#{svc_id}
+    </delete>
+
+    <select id="selectSrvSvcTypeList" resultType="com.devkbil.mtssbj.common.ComboVO">
+        SELECT DISTINCT SVC_TYPE as VALUE, SVC_TYPE as LABEL
+          FROM TBL_SRV_SVC
+         WHERE DELETEFLAG='N'
+         ORDER BY SVC_TYPE
+    </select>
+
+    <select id="selectSrvSvcStatusList" resultType="com.devkbil.mtssbj.common.ComboVO">
+        SELECT DISTINCT SVC_STATUS as VALUE, SVC_STATUS as LABEL
+          FROM TBL_SRV_SVC
+         WHERE DELETEFLAG='N'
+         ORDER BY SVC_STATUS
+    </select>
+
+    <select id="selectSrvHwList4Svc" resultType="com.devkbil.mtssbj.common.ComboVO">
+        SELECT HW_ID as VALUE, HW_NAME as LABEL
+          FROM TBL_SRV_HW
+         WHERE DELETEFLAG='N'
+         ORDER BY HW_NAME
+    </select>
+
+    <select id="selectSrvSwList4Svc" resultType="com.devkbil.mtssbj.common.ComboVO">
+        SELECT SW_ID as VALUE, SW_NAME as LABEL
+          FROM TBL_SRV_SW
+         WHERE DELETEFLAG='N'
+         ORDER BY SW_NAME
+    </select>
+
+</mapper> 

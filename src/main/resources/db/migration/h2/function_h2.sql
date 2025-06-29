@@ -1,0 +1,115 @@
+-- H2 데이터베이스용 함수들 (Oracle 호환 모드)
+
+-- 1. UF_DATETIME2STRING 함수
+-- CREATE OR REPLACE FUNCTION uf_datetime2string(dt_ IN DATE) 
+-- RETURN VARCHAR2 IS
+--     ti NUMBER;
+--     ret_ varchar2(10);
+-- BEGIN
+--     ti := to_date(SYSDATE,'YYYY-MM-DD HH24:MI') - to_date(dt_,'YYYY-MM-DD HH24:MI');
+--     
+--     IF ti < 1 THEN 
+--         ret_:='방금';
+--     ELSIF ti < 60 THEN 
+--         ret_:= CONCAT(TRUNC(ti ,0), '분전');
+--     ELSIF ti < 60*24 THEN
+--         IF (abs(trunc(sysdate) - to_date(dt_,'YYYY-MM-DD')) =1) THEN
+--             ret_:= '어제';
+--         ELSE
+--             ret_:= CONCAT(TRUNC(ti/60 ,0), '시간전');
+--         END IF;
+--     ELSIF ti < 60*24*7 THEN 
+--         ret_:= CONCAT(TRUNC(ti/60/24 ,0), '일전');
+--     ELSIF ti < 60*24*7*4 THEN 
+--         ret_:= CONCAT(TRUNC(ti/60/24/7 ,0), '주전');
+--     ELSIF (MONTHS_BETWEEN(dt_, SYSDATE)=1) THEN 
+--         ret_:= '지난달';
+--     ELSIF (MONTHS_BETWEEN(dt_, SYSDATE)<13) THEN
+--         IF (MONTHS_BETWEEN(dt_, SYSDATE)/12 =1) THEN
+--             ret_:= '작년';
+--         ELSE
+--             ret_:= TRUNC(MONTHS_BETWEEN(dt_, SYSDATE) ,0)||'달전';
+--         END IF;
+--     ELSE 
+--         ret_:= TRUNC(MONTHS_BETWEEN(dt_, SYSDATE)/12) || '년전';
+--     END IF;
+--
+--     RETURN ret_;
+-- END;
+-- /
+
+-- 2. MAKECALENDAR 함수
+-- CREATE OR REPLACE FUNCTION makeCalendar(startdate IN VARCHAR2, enddate IN VARCHAR2)
+--     RETURN VARCHAR2 IS
+--     ret_ varchar2(10) := null;
+--     sdate date := to_date(startdate,'YYYY-MM-DD');
+--     edate date := to_date(enddate,'YYYY-MM-DD');
+-- BEGIN
+--     IF sdate IS NULL THEN
+--         SELECT MAX(TO_DATE(CDDATE,'YYYY-MM-DD'))+1, MAX(TO_DATE(CDDATE,'YYYY-MM-DD'))+300
+--         INTO sdate, edate
+--         FROM COM_DATE;
+--     END IF;
+--
+--     IF edate <= sdate THEN
+--         RETURN ret_;
+--     END IF;
+--
+--     WHILE (sdate <= edate) LOOP
+--         INSERT INTO COM_DATE (CDNO, CDDATE, CDYEAR, CDMM, CDDD, CDWEEKOFYEAR, CDWEEKOFMONTH, CDWEEK, CDDAYOFWEEK)
+--         SELECT CDNO_SEQ.NEXTVAL,
+--                TO_CHAR(sdate, 'YYYY-MM-DD'),
+--                EXTRACT(year from TO_DATE(TO_DATE(sdate))),
+--                EXTRACT(month from TO_DATE(TO_DATE(sdate))),
+--                EXTRACT(day from TO_DATE(TO_DATE(sdate))),
+--                TO_CHAR(TO_DATE(sdate), 'IW'),
+--                TO_CHAR(sdate, 'WW'),
+--                TO_CHAR(sdate + 1, 'IW') - 1,
+--                TO_CHAR(sdate, 'D')
+--         FROM DUAL;
+--
+--         SELECT sdate + 1 INTO sdate FROM DUAL;
+--     END LOOP;
+--
+--     RETURN ret_;
+-- END makeCalendar;
+-- /
+
+-- 3. GETCOLOR4ALERT 함수
+-- CREATE OR REPLACE FUNCTION getColor4Alert(TSSTARTDATE_ IN VARCHAR2
+-- , TSENDDATE_ IN VARCHAR2
+-- , TSENDREAL_ IN VARCHAR2
+-- , TSRATE_ IN NUMBER)
+--     RETURN VARCHAR2 IS
+--     BGCOLOR_ varchar2(10)  := 'gray'; -- tsstartdate < today
+--     TODAY_   TIMESTAMP(6) := SYSDATE;
+-- BEGIN
+--     /*
+--       진행률이 100% 미만인 경우
+--       시작일이 오늘보다 늦으면 회색
+--       종료일이 오늘보다 빠르면 빨간색
+--       시작일이 종료일보다 50% 이전이면 초록색
+--       시작일이 종료일보다 50% 이후이면 노란색
+--       진행률이 100%이면 완료일이 종료일보다 빠르면 초록색, 늦으면 주황색
+--     */
+--     IF TSRATE_ < 100 THEN
+--         IF TSSTARTDATE_ > TODAY_ THEN
+--             BGCOLOR_ := 'gray';
+--         ELSIF TSENDDATE_ < TODAY_ THEN
+--             BGCOLOR_ := 'red';
+--         ELSIF TO_DATE(TSSTARTDATE_, 'YYYY-MM-DD') - TRUNC(SYSDATE) < TRUNC(SYSDATE) - TO_DATE(TSENDDATE_, 'YYYY-MM-DD') THEN
+--             BGCOLOR_ := 'green';
+--         ELSIF TO_DATE(TSSTARTDATE_, 'YYYY-MM-DD') - TRUNC(SYSDATE) >= TRUNC(SYSDATE) - TO_DATE(TSENDDATE_, 'YYYY-MM-DD') THEN
+--             BGCOLOR_ := 'yellow';
+--         END IF;
+--     ELSE
+--         IF TSENDREAL_ IS NOT NULL AND TSENDREAL_ <= TSENDDATE_ THEN
+--             BGCOLOR_ := 'green';
+--         ELSE
+--             BGCOLOR_ := 'orange';
+--         END IF;
+--     END IF;
+--
+--     RETURN BGCOLOR_;
+-- END;
+-- /

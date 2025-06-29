@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="member">
+
+    <select id="selectSearchMemberCount" parameterType="com.devkbil.mtssbj.search.SearchVO" resultType="Integer" >
+        SELECT COUNT(*)
+          FROM COM_USER CU
+         WHERE CU.DELETEFLAG='N'
+           AND CU.USERNM LIKE '%'||#{searchKeyword}||'%'
+    </select> 
+    
+    <select id="selectSearchMemberList" parameterType="com.devkbil.mtssbj.search.SearchVO" resultType="com.devkbil.mtssbj.member.UserVO" >
+        SELECT USERNO, USERID, USERNM, PHOTO, DEPTNM as DEPTNO
+          FROM COM_USER CU
+         INNER JOIN COM_DEPT CD ON CD.DEPTNO=CU.DEPTNO
+         WHERE CU.DELETEFLAG='N' AND CD.DELETEFLAG='N'
+           AND CU.USERNM LIKE '%'||#{searchKeyword}||'%'
+         ORDER BY USERNO
+        <if test="rowStart != null">
+            OFFSET ${rowStart-1} ROWS FETCH FIRST ${displayRowCount} ROWS ONLY
+        </if>
+    </select>
+
+    <select id="selectMember4Login" parameterType="com.devkbil.mtssbj.member.UserVO" resultType="com.devkbil.mtssbj.member.UserVO" >
+        SELECT USERNO, USERID, USERNM, USERROLE
+          FROM COM_USER
+         WHERE DELETEFLAG='N' AND USERID=#{userid}
+    </select>
+
+    <select id="selectMemberOne" parameterType="String" resultType="com.devkbil.mtssbj.member.UserVO" >
+        SELECT USERNO, USERID, USERNM, USERROLE, PHOTO, DEPTNO
+          FROM COM_USER
+         WHERE DELETEFLAG='N' AND USERNO=#{userno}
+    </select>
+
+    <select id="selectMemberList" parameterType="com.devkbil.mtssbj.search.SearchVO" resultType="com.devkbil.mtssbj.member.UserVO" >
+        SELECT USERNO, USERID, USERNM, USERROLE, PHOTO, DEPTNO
+          FROM COM_USER
+         WHERE DELETEFLAG='N'
+         ORDER BY USERNO
+        <if test="rowStart != null">
+            OFFSET ${rowStart-1} ROWS FETCH FIRST ${displayRowCount} ROWS ONLY
+        </if>
+    </select>
+
+    <select id="selectMemberCount" parameterType="com.devkbil.mtssbj.search.SearchVO" resultType="Integer" >
+        SELECT COUNT(*)
+          FROM COM_USER
+         WHERE DELETEFLAG='N'
+    </select>
+
+    <insert id="insertMember" parameterType="com.devkbil.mtssbj.member.UserVO" >
+        <selectKey resultType="String" keyProperty="userno" order="BEFORE">
+            SELECT USERNO_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO COM_USER(USERNO, USERID, USERNM, USERPW, USERROLE, PHOTO, DEPTNO, DELETEFLAG)
+        VALUES (#{userno}, #{userid}, #{usernm}, #{userpw}, #{userrole}, #{photo}, #{deptno}, 'N')
+    </insert>
+
+    <update id="updateMember" parameterType="com.devkbil.mtssbj.member.UserVO">
+        UPDATE COM_USER
+           SET USERNM=#{usernm}
+             , USERROLE=#{userrole}
+             , PHOTO=#{photo}
+             , DEPTNO=#{deptno}
+         WHERE USERNO=#{userno}
+    </update>
+
+    <delete id="deleteMember" parameterType="String">
+        UPDATE COM_USER
+           SET DELETEFLAG='Y'
+         WHERE USERNO=#{userno}
+    </delete>
+
+    <insert id="insertLogIn" parameterType="String">
+        INSERT INTO COM_LOGINOUT (LNO, USERNO, LTYPE, REGDATE)
+         VALUES (LNO_SEQ.NEXTVAL, #{userno}, 'I', SYSDATE )
+    </insert>
+
+    <insert id="insertLogOut" parameterType="String">
+        INSERT INTO COM_LOGINOUT (LNO, USERNO, LTYPE, REGDATE)
+            VALUES (LNO_SEQ.NEXTVAL, #{userno}, 'O', SYSDATE )
+    </insert>
+    
+</mapper>
+

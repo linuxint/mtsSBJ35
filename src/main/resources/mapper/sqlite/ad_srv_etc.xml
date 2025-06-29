@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ad_srv_etc">
+
+    <sql id="includeSrvEtc">
+        WHERE TETC.DELETEFLAG='N'
+        <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
+            <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
+                 ${item} LIKE '%' || #{searchKeyword} || '%'
+            </foreach>
+        </if>
+        <if test="conn_id!=null and conn_id!=''">
+            AND TETC.CONN_ID=#{conn_id}
+        </if>
+        <if test="etc_type!=null and etc_type!=''">
+            AND TETC.ETC_TYPE=#{etc_type}
+        </if>
+        <if test="etc_status!=null and etc_status!=''">
+            AND TETC.ETC_STATUS=#{etc_status}
+        </if>
+    </sql>
+
+    <select id="selectSrvEtcCount" parameterType="com.devkbil.mtssbj.common.SearchVO" resultType="Integer">
+        SELECT COUNT(*)
+          FROM TBL_SRV_ETC TETC
+         INNER JOIN TBL_SRV_CONN TCONN ON TCONN.CONN_ID=TETC.CONN_ID
+         <include refid="includeSrvEtc"/>
+    </select>
+
+    <select id="selectSrvEtcList" parameterType="com.devkbil.mtssbj.common.SearchVO" resultType="com.devkbil.mtssbj.admin.server.SrvEtcVO">
+        SELECT TETC.ETC_ID, TETC.CONN_ID, TCONN.CONN_NAME, TETC.ETC_NAME, TETC.ETC_TYPE
+             , TETC.ETC_VALUE, TETC.ETC_DESCRIPTION, TETC.ETC_STATUS, strftime('%Y-%m-%d', TETC.REGDATE) as REGDATE
+          FROM TBL_SRV_ETC TETC
+         INNER JOIN TBL_SRV_CONN TCONN ON TCONN.CONN_ID=TETC.CONN_ID
+         <include refid="includeSrvEtc"/>
+         ORDER BY TETC.ETC_ID DESC
+         <if test="rowStart != null">
+             LIMIT ${displayRowCount} OFFSET ${rowStart-1}
+         </if>
+    </select>
+
+    <select id="selectSrvEtcOne" parameterType="com.devkbil.mtssbj.common.ExtFieldVO" resultType="com.devkbil.mtssbj.admin.server.SrvEtcVO">
+        SELECT TETC.ETC_ID, TETC.CONN_ID, TCONN.CONN_NAME, TETC.ETC_NAME, TETC.ETC_TYPE
+             , TETC.ETC_VALUE, TETC.ETC_DESCRIPTION, TETC.ETC_STATUS, strftime('%Y-%m-%d', TETC.REGDATE) as REGDATE
+          FROM TBL_SRV_ETC TETC
+         INNER JOIN TBL_SRV_CONN TCONN ON TCONN.CONN_ID=TETC.CONN_ID
+         WHERE TETC.ETC_ID=#{field1}
+    </select>
+
+    <insert id="insertSrvEtc" parameterType="com.devkbil.mtssbj.admin.server.SrvEtcVO" >
+        INSERT INTO TBL_SRV_ETC(CONN_ID, ETC_NAME, ETC_TYPE, ETC_VALUE, ETC_DESCRIPTION, ETC_STATUS, REGDATE)
+        VALUES (#{conn_id}, #{etc_name}, #{etc_type}, #{etc_value}, #{etc_description}, #{etc_status}, datetime('now'))
+        <selectKey keyProperty="etc_id" resultType="String" order="AFTER">
+            SELECT last_insert_rowid()
+        </selectKey>
+    </insert>
+
+    <update id="updateSrvEtc" parameterType="com.devkbil.mtssbj.admin.server.SrvEtcVO">
+        UPDATE TBL_SRV_ETC
+           SET CONN_ID=#{conn_id}
+             , ETC_NAME=#{etc_name}
+             , ETC_TYPE=#{etc_type}
+             , ETC_VALUE=#{etc_value}
+             , ETC_DESCRIPTION=#{etc_description}
+             , ETC_STATUS=#{etc_status}
+             , CHGDATE=datetime('now')
+         WHERE ETC_ID=#{etc_id}
+    </update>
+
+    <delete id="deleteSrvEtc" parameterType="String">
+        UPDATE TBL_SRV_ETC
+           SET DELETEFLAG='Y'
+             , CHGDATE=datetime('now')
+         WHERE ETC_ID=#{etc_id}
+    </delete>
+
+    <select id="selectSrvEtcTypeList" resultType="com.devkbil.mtssbj.common.ComboVO">
+        SELECT DISTINCT ETC_TYPE as VALUE, ETC_TYPE as LABEL
+          FROM TBL_SRV_ETC
+         WHERE DELETEFLAG='N'
+         ORDER BY ETC_TYPE
+    </select>
+
+    <select id="selectSrvEtcStatusList" resultType="com.devkbil.mtssbj.common.ComboVO">
+        SELECT DISTINCT ETC_STATUS as VALUE, ETC_STATUS as LABEL
+          FROM TBL_SRV_ETC
+         WHERE DELETEFLAG='N'
+         ORDER BY ETC_STATUS
+    </select>
+
+    <select id="selectSrvConnList4Etc" resultType="com.devkbil.mtssbj.common.ComboVO">
+        SELECT CONN_ID as VALUE, CONN_NAME as LABEL
+          FROM TBL_SRV_CONN
+         WHERE DELETEFLAG='N'
+         ORDER BY CONN_NAME
+    </select>
+
+</mapper> 

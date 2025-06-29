@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ad_srv_hw">
+
+    <sql id="includeSrvHw">
+        WHERE DELETEFLAG='N'
+        <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
+            <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
+                 ${item} LIKE '%' || #{searchKeyword} || '%'
+            </foreach>
+        </if>
+        <if test="hw_type!=null and hw_type!=''">
+            AND HW_TYPE=#{hw_type}
+        </if>
+        <if test="hw_status!=null and hw_status!=''">
+            AND HW_STATUS=#{hw_status}
+        </if>
+    </sql>
+
+    <select id="selectSrvHwCount" parameterType="com.devkbil.mtssbj.common.SearchVO" resultType="Integer">
+        SELECT COUNT(*)
+          FROM TBL_SRV_HW
+         <include refid="includeSrvHw"/>
+    </select>
+
+    <select id="selectSrvHwList" parameterType="com.devkbil.mtssbj.common.SearchVO" resultType="com.devkbil.mtssbj.admin.server.SrvHwVO">
+        SELECT HW_ID, HW_NAME, HW_TYPE, HW_SPEC, HW_LOCATION, HW_STATUS
+             , strftime('%Y-%m-%d', HW_PURCHASE_DATE) as HW_PURCHASE_DATE
+             , strftime('%Y-%m-%d', HW_WARRANTY_DATE) as HW_WARRANTY_DATE
+             , HW_MANUFACTURER, HW_MODEL, HW_SERIAL, HW_IP_ADDRESS, HW_MAC_ADDRESS
+             , HW_DESCRIPTION, strftime('%Y-%m-%d', REGDATE) as REGDATE
+          FROM TBL_SRV_HW
+         <include refid="includeSrvHw"/>
+         ORDER BY HW_ID DESC
+         <if test="rowStart != null">
+             LIMIT ${displayRowCount} OFFSET ${rowStart-1}
+         </if>
+    </select>
+
+    <select id="selectSrvHwOne" parameterType="com.devkbil.mtssbj.common.ExtFieldVO" resultType="com.devkbil.mtssbj.admin.server.SrvHwVO">
+        SELECT HW_ID, HW_NAME, HW_TYPE, HW_SPEC, HW_LOCATION, HW_STATUS
+             , strftime('%Y-%m-%d', HW_PURCHASE_DATE) as HW_PURCHASE_DATE
+             , strftime('%Y-%m-%d', HW_WARRANTY_DATE) as HW_WARRANTY_DATE
+             , HW_MANUFACTURER, HW_MODEL, HW_SERIAL, HW_IP_ADDRESS, HW_MAC_ADDRESS
+             , HW_DESCRIPTION, strftime('%Y-%m-%d', REGDATE) as REGDATE
+          FROM TBL_SRV_HW
+         WHERE HW_ID=#{field1}
+    </select>
+
+    <insert id="insertSrvHw" parameterType="com.devkbil.mtssbj.admin.server.SrvHwVO" >
+        INSERT INTO TBL_SRV_HW(HW_NAME, HW_TYPE, HW_SPEC, HW_LOCATION, HW_STATUS, HW_PURCHASE_DATE, HW_WARRANTY_DATE, HW_MANUFACTURER, HW_MODEL, HW_SERIAL, HW_IP_ADDRESS, HW_MAC_ADDRESS, HW_DESCRIPTION, REGDATE)
+        VALUES (#{hw_name}, #{hw_type}, #{hw_spec}, #{hw_location}, #{hw_status}, #{hw_purchase_date}, #{hw_warranty_date}, #{hw_manufacturer}, #{hw_model}, #{hw_serial}, #{hw_ip_address}, #{hw_mac_address}, #{hw_description}, datetime('now'))
+        <selectKey keyProperty="hw_id" resultType="String" order="AFTER">
+            SELECT last_insert_rowid()
+        </selectKey>
+    </insert>
+
+    <update id="updateSrvHw" parameterType="com.devkbil.mtssbj.admin.server.SrvHwVO">
+        UPDATE TBL_SRV_HW
+           SET HW_NAME=#{hw_name}
+             , HW_TYPE=#{hw_type}
+             , HW_SPEC=#{hw_spec}
+             , HW_LOCATION=#{hw_location}
+             , HW_STATUS=#{hw_status}
+             , HW_PURCHASE_DATE=#{hw_purchase_date}
+             , HW_WARRANTY_DATE=#{hw_warranty_date}
+             , HW_MANUFACTURER=#{hw_manufacturer}
+             , HW_MODEL=#{hw_model}
+             , HW_SERIAL=#{hw_serial}
+             , HW_IP_ADDRESS=#{hw_ip_address}
+             , HW_MAC_ADDRESS=#{hw_mac_address}
+             , HW_DESCRIPTION=#{hw_description}
+             , CHGDATE=datetime('now')
+         WHERE HW_ID=#{hw_id}
+    </update>
+
+    <delete id="deleteSrvHw" parameterType="String">
+        UPDATE TBL_SRV_HW
+           SET DELETEFLAG='Y'
+             , CHGDATE=datetime('now')
+         WHERE HW_ID=#{hw_id}
+    </delete>
+
+    <select id="selectSrvHwTypeList" resultType="com.devkbil.mtssbj.common.ComboVO">
+        SELECT DISTINCT HW_TYPE as VALUE, HW_TYPE as LABEL
+          FROM TBL_SRV_HW
+         WHERE DELETEFLAG='N'
+         ORDER BY HW_TYPE
+    </select>
+
+    <select id="selectSrvHwStatusList" resultType="com.devkbil.mtssbj.common.ComboVO">
+        SELECT DISTINCT HW_STATUS as VALUE, HW_STATUS as LABEL
+          FROM TBL_SRV_HW
+         WHERE DELETEFLAG='N'
+         ORDER BY HW_STATUS
+    </select>
+
+</mapper> 

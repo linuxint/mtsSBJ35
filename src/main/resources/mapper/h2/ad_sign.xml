@@ -8,33 +8,37 @@
         WHERE DELETEFLAG='N'
         <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
             <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
-                 ${item} LIKE '%' || #{searchKeyword} || '%'
+                 ${item} LIKE '%'||#{searchKeyword}||'%'
             </foreach>
         </if>               
     </sql>
 
     <select id="selectSignDocTypeCount" resultType="Integer" parameterType="com.devkbil.mtssbj.search.SearchVO">
         SELECT COUNT(*)
-          FROM SGN_DOCTYPE AS SDT
+          FROM SGN_DOCTYPE SDT
          <include refid="includeSignDocType"/>
     </select> 
     
     <select id="selectSignDocTypeList" resultType="com.devkbil.mtssbj.admin.sign.SignDocTypeVO" parameterType="com.devkbil.mtssbj.search.SearchVO">
-        SELECT DTNO, DTTITLE, DTCONTENTS
-          FROM SGN_DOCTYPE SDT
-         <include refid="includeSignDocType"/>
-         ORDER BY DTNO DESC
-         <if test="rowStart != null">
-             LIMIT 10 OFFSET ${rowStart-1}
-         </if>
+        SELECT * FROM (
+            SELECT ROW_NUMBER() OVER (ORDER BY DTNO DESC) AS RNUM
+                 , DTNO, DTTITLE, DTCONTENTS
+            FROM SGN_DOCTYPE SDT
+            <include refid="includeSignDocType"/>
+            -- ORDER BY DTNO DESC
+        )
+        <if test="rowStart != null">
+            WHERE RNUM BETWEEN ${rowStart} AND ${rowStart-1}+${displayRowCount}
+            -- OFFSET ${rowStart-1} ROWS FETCH FIRST ${displayRowCount} ROWS ONLY -- oracle12c
+        </if>
     </select> 
 
     <insert id="insertSignDocType" parameterType="com.devkbil.mtssbj.admin.sign.SignDocTypeVO" >
-        INSERT INTO SGN_DOCTYPE(DTTITLE, DTCONTENTS, DELETEFLAG)
-        VALUES (#{dttitle}, #{dtcontents}, 'N')
-        <selectKey keyProperty="dtno" resultType="String" order="AFTER">
-            SELECT last_insert_rowid()
+        <selectKey resultType="String" keyProperty="dtno" order="BEFORE">
+            SELECT DTNO_SEQ.NEXTVAL FROM DUAL
         </selectKey>
+        INSERT INTO SGN_DOCTYPE(DTNO, DTTITLE, DTCONTENTS, DELETEFLAG)
+        VALUES (#{dtno}, #{dttitle}, #{dtcontents}, 'N')
     </insert>
     
     <update id="updateSignDocType" parameterType="com.devkbil.mtssbj.admin.sign.SignDocTypeVO">

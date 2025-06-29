@@ -1,4 +1,5 @@
 -- Add indexes for board-related tables to improve query performance
+-- This migration works for both H2 and Oracle databases
 
 -- Indexes for TBL_BOARD
 CREATE INDEX idx_board_deleteflag ON TBL_BOARD(DELETEFLAG);

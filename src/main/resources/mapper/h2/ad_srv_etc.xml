@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ad_srv_etc">
+
+    <sql id="includeServerCommon">
+        WHERE ETC.DELETEFLAG='N'
+        <if test="etcId!=null and etcId!=''">
+            AND ETC.ETC_ID=#{etcId}
+        </if>
+        <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
+            <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
+                ${item} LIKE '%'||#{searchKeyword}||'%'
+            </foreach>
+        </if>
+    </sql>
+
+    <!-- 중첩된 JOIN 쿼리를 통해 상속 계층 데이터 조회 -->
+    <select id="selectSrvEtcList" resultType="com.devkbil.mtssbj.admin.server.SrvEtcVO"
+            parameterType="com.devkbil.mtssbj.search.ServerSearchVO">
+        SELECT * FROM (
+            SELECT ROW_NUMBER() OVER (ORDER BY ETC.ETC_ID DESC) AS RNUM
+                   , ETC.ETC_ID     AS etcId
+                   , ETC.CONN_ID    AS connId
+                   , CONN.SVC_ID    AS svcId
+                   , SVC.SVC_NAME   AS svcName
+                   , SVC.HW_ID      AS hwId
+                   , HW.HW_NAME     AS hwName
+                   , SW.SW_ID       AS swId
+                   , SW.SW_NAME     AS swName
+                   , SVC.SVC_PORT   AS svcPort
+                   , SVC.SW_ID      AS svcSwId
+                   , CONN.USER_NAME AS userName
+                   , ETC.ETC_NAME   AS etcName
+                   , ETC.ETC_DATA   AS etcData
+                   , ETC.ACT_YN     AS actYn
+                   , ETC.DELETEFLAG AS deleteFlag
+                   , ETC.REGDATE    AS regDate
+                   , ETC.REGUSERNO  AS regUserNo
+                   , ETC.CHGDATE    AS chgDate
+                   , ETC.CHGUSERNO  AS chgUserNo
+             FROM TBL_SRV_ETC ETC
+        LEFT JOIN TBL_SRV_CONN CONN ON ETC.CONN_ID = CONN.CONN_ID
+        LEFT JOIN TBL_SRV_SVC SVC ON CONN.SVC_ID = SVC.SVC_ID
+        LEFT JOIN TBL_SRV_SW SW ON SVC.SW_ID = SW.SW_ID
+        LEFT JOIN TBL_SRV_HW HW ON SVC.HW_ID = HW.HW_ID
+        <include refid="includeServerCommon"/>
+        )
+        <if test="rowStart != null">
+        WHERE RNUM BETWEEN ${rowStart} AND ${rowStart-1}+${displayRowCount}
+        </if>
+    </select>
+
+    <!-- 최종 기타 정보 상세 보기 -->
+    <select id="selectSrvEtcOne" parameterType="String" resultType="com.devkbil.mtssbj.admin.server.SrvEtcVO">
+        SELECT ETC.ETC_ID       AS etcId
+               , ETC.CONN_ID    AS connId
+               , CONN.SVC_ID    AS svcId
+               , SVC.HW_ID      AS hwId
+               , HW.HW_NAME     AS hwName
+               , SW.SW_ID       AS swId
+               , SW.SW_NAME     AS swName
+               , SVC.SVC_PORT   AS svcPort
+               , SVC.SW_ID      AS svcSwId
+               , CONN.USER_NAME AS userName
+               , CONN.USER_PW   AS userPw
+               , ETC.ETC_NAME   AS etcName
+               , ETC.ETC_DATA   AS etcData
+               , ETC.ACT_YN     AS actYn
+               , ETC.DELETEFLAG AS deleteFlag
+               , ETC.REGDATE    AS regDate
+               , ETC.REGUSERNO  AS regUserNo
+               , ETC.CHGDATE    AS chgDate
+               , ETC.CHGUSERNO  AS chgUserNo
+         FROM TBL_SRV_ETC ETC
+    LEFT JOIN TBL_SRV_CONN CONN ON ETC.CONN_ID = CONN.CONN_ID
+    LEFT JOIN TBL_SRV_SVC SVC ON CONN.SVC_ID = SVC.SVC_ID
+    LEFT JOIN TBL_SRV_SW SW ON SVC.SW_ID = SW.SW_ID
+    LEFT JOIN TBL_SRV_HW HW ON SVC.HW_ID = HW.HW_ID
+        WHERE ETC.DELETEFLAG = 'N'
+          AND ETC.ETC_ID = #{etcId}
+    </select>
+
+    <!-- 기타 정보 등록 -->
+    <insert id="insertSrvEtc" parameterType="com.devkbil.mtssbj.admin.server.SrvEtcVO">
+        <selectKey resultType="String" keyProperty="etcId" order="BEFORE">
+            SELECT ETC_ID_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_SRV_ETC ( ETC_ID, CONN_ID, ETC_NAME, ETC_DATA, ACT_YN, DELETEFLAG, REGDATE, REGUSERNO, CHGDATE, CHGUSERNO )
+        VALUES ( #{etcId}, #{connId}, #{etcName}, #{etcData}, #{actYn}, 'N', CURRENT_TIMESTAMP, #{regUserNo}, CURRENT_TIMESTAMP, #{chgUserNo} )
+    </insert>
+
+    <!-- 기타 정보 수정 -->
+    <update id="updateSrvEtc" parameterType="com.devkbil.mtssbj.admin.server.SrvEtcVO">
+        UPDATE TBL_SRV_ETC
+           SET CONN_ID     = #{connId}
+               , ETC_NAME  = #{etcName}
+               , ETC_DATA  = #{etcData}
+               , ACT_YN    = #{actYn}
+               , CHGDATE   = CURRENT_TIMESTAMP
+               , CHGUSERNO = #{chgUserNo}
+         WHERE ETC_ID = #{etcId}
+           AND DELETEFLAG = 'N'
+    </update>
+
+    <!-- 기타 정보 삭제 -->
+    <delete id="deleteSrvEtc" parameterType="String">
+        UPDATE TBL_SRV_ETC
+           SET DELETEFLAG = 'Y'
+               , CHGDATE  = CURRENT_TIMESTAMP
+         WHERE ETC_ID = #{etcId}
+    </delete>
+
+</mapper>

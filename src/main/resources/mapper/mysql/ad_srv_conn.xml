@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ad_srv_conn">
+
+    <sql id="includeSrvConn">
+        WHERE TCONN.DELETEFLAG='N'
+        <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
+            <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
+                 ${item} LIKE CONCAT('%', #{searchKeyword}, '%')
+            </foreach>
+        </if>
+        <if test="svc_id!=null and svc_id!=''">
+            AND TCONN.SVC_ID=#{svc_id}
+        </if>
+        <if test="conn_type!=null and conn_type!=''">
+            AND TCONN.CONN_TYPE=#{conn_type}
+        </if>
+        <if test="conn_status!=null and conn_status!=''">
+            AND TCONN.CONN_STATUS=#{conn_status}
+        </if>
+    </sql>
+
+    <select id="selectSrvConnCount" parameterType="com.devkbil.mtssbj.common.SearchVO" resultType="Integer">
+        SELECT COUNT(*)
+          FROM TBL_SRV_CONN TCONN
+         INNER JOIN TBL_SRV_SVC TSVC ON TSVC.SVC_ID=TCONN.SVC_ID
+         <include refid="includeSrvConn"/>
+    </select>
+
+    <select id="selectSrvConnList" parameterType="com.devkbil.mtssbj.common.SearchVO" resultType="com.devkbil.mtssbj.admin.server.SrvConnVO">
+        SELECT TCONN.CONN_ID, TCONN.SVC_ID, TSVC.SVC_NAME, TCONN.CONN_NAME, TCONN.CONN_TYPE
+             , TCONN.CONN_SOURCE, TCONN.CONN_DESTINATION, TCONN.CONN_PROTOCOL, TCONN.CONN_PORT
+             , TCONN.CONN_STATUS, TCONN.CONN_DESCRIPTION, DATE_FORMAT(TCONN.REGDATE,'%Y-%m-%d') as REGDATE
+          FROM TBL_SRV_CONN TCONN
+         INNER JOIN TBL_SRV_SVC TSVC ON TSVC.SVC_ID=TCONN.SVC_ID
+         <include refid="includeSrvConn"/>
+         ORDER BY TCONN.CONN_ID DESC
+         <if test="rowStart != null">
+             LIMIT ${rowStart-1}, 10
+         </if>
+    </select>
+
+    <select id="selectSrvConnOne" parameterType="com.devkbil.mtssbj.common.ExtFieldVO" resultType="com.devkbil.mtssbj.admin.server.SrvConnVO">
+        SELECT TCONN.CONN_ID, TCONN.SVC_ID, TSVC.SVC_NAME, TCONN.CONN_NAME, TCONN.CONN_TYPE
+             , TCONN.CONN_SOURCE, TCONN.CONN_DESTINATION, TCONN.CONN_PROTOCOL, TCONN.CONN_PORT
+             , TCONN.CONN_STATUS, TCONN.CONN_DESCRIPTION, DATE_FORMAT(TCONN.REGDATE,'%Y-%m-%d') as REGDATE
+          FROM TBL_SRV_CONN TCONN
+         INNER JOIN TBL_SRV_SVC TSVC ON TSVC.SVC_ID=TCONN.SVC_ID
+         WHERE TCONN.CONN_ID=#{field1}
+    </select>
+
+    <insert id="insertSrvConn" parameterType="com.devkbil.mtssbj.admin.server.SrvConnVO" >
+        INSERT INTO TBL_SRV_CONN(SVC_ID, CONN_NAME, CONN_TYPE, CONN_SOURCE, CONN_DESTINATION, CONN_PROTOCOL, CONN_PORT, CONN_STATUS, CONN_DESCRIPTION, REGDATE)
+        VALUES (#{svc_id}, #{conn_name}, #{conn_type}, #{conn_source}, #{conn_destination}, #{conn_protocol}, #{conn_port}, #{conn_status}, #{conn_description}, NOW())
+        <selectKey keyProperty="conn_id" resultType="String" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="updateSrvConn" parameterType="com.devkbil.mtssbj.admin.server.SrvConnVO">
+        UPDATE TBL_SRV_CONN
+           SET SVC_ID=#{svc_id}
+             , CONN_NAME=#{conn_name}
+             , CONN_TYPE=#{conn_type}
+             , CONN_SOURCE=#{conn_source}
+             , CONN_DESTINATION=#{conn_destination}
+             , CONN_PROTOCOL=#{conn_protocol}
+             , CONN_PORT=#{conn_port}
+             , CONN_STATUS=#{conn_status}
+             , CONN_DESCRIPTION=#{conn_description}
+             , CHGDATE=NOW()
+         WHERE CONN_ID=#{conn_id}
+    </update>
+
+    <delete id="deleteSrvConn" parameterType="String">
+        UPDATE TBL_SRV_CONN
+           SET DELETEFLAG='Y'
+             , CHGDATE=NOW()
+         WHERE CONN_ID=#{conn_id}
+    </delete>
+
+    <select id="selectSrvConnTypeList" resultType="com.devkbil.mtssbj.common.ComboVO">
+        SELECT DISTINCT CONN_TYPE as VALUE, CONN_TYPE as LABEL
+          FROM TBL_SRV_CONN
+         WHERE DELETEFLAG='N'
+         ORDER BY CONN_TYPE
+    </select>
+
+    <select id="selectSrvConnStatusList" resultType="com.devkbil.mtssbj.common.ComboVO">
+        SELECT DISTINCT CONN_STATUS as VALUE, CONN_STATUS as LABEL
+          FROM TBL_SRV_CONN
+         WHERE DELETEFLAG='N'
+         ORDER BY CONN_STATUS
+    </select>
+
+    <select id="selectSrvSvcList4Conn" resultType="com.devkbil.mtssbj.common.ComboVO">
+        SELECT SVC_ID as VALUE, SVC_NAME as LABEL
+          FROM TBL_SRV_SVC
+         WHERE DELETEFLAG='N'
+         ORDER BY SVC_NAME
+    </select>
+
+</mapper> 

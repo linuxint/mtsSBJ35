@@ -5,44 +5,46 @@
 
 <mapper namespace="ad_menu">
 
-    <select id="selectMenu" resultType="com.devkbil.mtssbj.common.TreeVO" >
-        SELECT MNU_NO as KEY, MNU_NM as TITLE, MNU_PARENT as PARENT
+    <select id="selectMenuList" resultType="com.devkbil.mtssbj.common.TreeVO">
+        SELECT MNU_NO as "KEY", MNU_NM as TITLE, MNU_PARENT as PARENT
           FROM COM_MENU
          WHERE DELETEFLAG='N'
          ORDER BY MNU_NO
     </select>
 
     <insert id="insertMenu" parameterType="com.devkbil.mtssbj.admin.menu.MenuVO">
-        INSERT INTO COM_MENU(MNU_PARENT , MNU_TYPE , MNU_NM , MNU_MSG_CD , MNU_DESC
-        , MNU_TARGET , MNU_FILENM , MNU_IMGPATH , MNU_CUSTOM , MNU_DESKTOP
-        , MNU_MOBILE , MNU_ORDER , MNU_CERT_TYPE , MNU_EXTN_CONN_YN , MNU_START_HOUR
-        , MNU_END_HOUR , REGUSERNO , CHGUSERNO , DELETEFLAG)
-        VALUES (#{mnuParent}, #{mnuType}, #{mnuNm}, #{mnuMsgCd}, #{mnuDesc}
-        , #{mnuTarget}, #{mnuFilenm}, #{mnuImgpath}, #{mnuCustom}, #{mnuDesktop}
-        , #{mnuMobile}, #{mnuOrder}, #{mnuCertType}, #{mnuExtnConnYn}, #{mnuStartHour}
-        , #{mnuEndHour}, #{reguserno}, #{chguserno}, 'N')
-        <selectKey keyProperty="mnuNo" resultType="String">
-            SELECT LAST_INSERT_ID()
+        <selectKey resultType="String" keyProperty="mnuNo" order="BEFORE">
+            SELECT MNU_NO_SEQ.NEXTVAL FROM DUAL
         </selectKey>
+        INSERT INTO COM_MENU (
+            MNU_NO , MNU_PARENT , MNU_TYPE , MNU_NM , MNU_MSG_CD , MNU_DESC
+            , MNU_TARGET , MNU_FILENM , MNU_IMGPATH , MNU_CUSTOM , MNU_DESKTOP
+            , MNU_MOBILE , MNU_ORDER , MNU_CERT_TYPE , MNU_EXTN_CONN_YN , MNU_START_HOUR
+            , MNU_END_HOUR , REGUSERNO , CHGUSERNO , DELETEFLAG
+        ) VALUES (
+            #{mnuNo}, #{mnuParent}, #{mnuType}, #{mnuNm}, #{mnuMsgCd}, #{mnuDesc}
+            , #{mnuTarget}, #{mnuFilenm}, #{mnuImgpath}, #{mnuCustom}, #{mnuDesktop}
+            , #{mnuMobile}, #{mnuOrder}, #{mnuCertType}, #{mnuExtnConnYn}, #{mnuStartHour}
+            , #{mnuEndHour}, #{reguserno}, #{chguserno}, 'N')
     </insert>
 
     <update id="updateMenu" parameterType="com.devkbil.mtssbj.admin.menu.MenuVO">
         UPDATE COM_MENU
-        SET MNU_NM=#{mnuNm}
-          , MNU_MSG_CD=#{mnuMsgCd}
-          , MNU_PARENT=#{mnuParent}
-          , MNU_TYPE=#{mnuType}
-          , MNU_TARGET=#{mnuTarget}
-          , MNU_FILENM=#{mnuFilenm}
-          , MNU_IMGPATH=#{mnuImgpath}
-          , MNU_CUSTOM=#{mnuCustom}
-          , MNU_DESC=#{mnuDesc}
-          , MNU_ORDER=#{mnuOrder}
-          , MNU_DESKTOP=#{mnuDesktop}
-          , MNU_MOBILE=#{mnuMobile}
-          , MNU_EXTN_CONN_YN=#{mnuExtnConnYn}
-          , MNU_START_HOUR=#{mnuStartHour}
-          , MNU_END_HOUR=#{mnuEndHour}
+           SET MNU_NM=#{mnuNm}
+            , MNU_MSG_CD=#{mnuMsgCd}
+            , MNU_PARENT=#{mnuParent}
+            , MNU_TYPE=#{mnuType}
+            , MNU_TARGET=#{mnuTarget}
+            , MNU_FILENM=#{mnuFilenm}
+            , MNU_IMGPATH=#{mnuImgpath}
+            , MNU_CUSTOM=#{mnuCustom}
+            , MNU_DESC=#{mnuDesc}
+            , MNU_ORDER=#{mnuOrder}
+            , MNU_DESKTOP=#{mnuDesktop}
+            , MNU_MOBILE=#{mnuMobile}
+            , MNU_EXTN_CONN_YN=#{mnuExtnConnYn}
+            , MNU_START_HOUR=#{mnuStartHour}
+            , MNU_END_HOUR=#{mnuEndHour}
         WHERE MNU_NO=#{mnuNo}
     </update>
 

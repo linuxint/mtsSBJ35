@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ad_srv_sw">
+
+    <sql id="includeServerCommon">
+        WHERE SW.DELETEFLAG='N'
+        <if test="swId!=null and swId!=''">
+            AND SW.ETC_ID=#{swId}
+        </if>
+        <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
+            <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
+                ${item} LIKE '%'||#{searchKeyword}||'%'
+            </foreach>
+        </if>
+    </sql>
+
+    <!-- srv_sw 목록 조회 -->
+    <select id="selectSrvSwList" resultType="com.devkbil.mtssbj.admin.server.SWVO"
+            parameterType="com.devkbil.mtssbj.search.ServerSearchVO">
+        SELECT * FROM (
+            SELECT ROW_NUMBER() OVER (ORDER BY SW.SW_ID DESC) AS RNUM
+                   , SW.SW_ID      AS swId
+                   , SW.HW_ID      AS hwId
+                   , SW.SW_NAME    AS swName
+                   , SW.SW_TYPE_CD AS swTypeCd
+                   , SW.ACT_YN     AS actYn
+                   , SW.DELETEFLAG AS deleteFlag
+                   , SW.REGDATE    AS regDate
+                   , SW.REGUSERNO  AS regUserNo
+                   , SW.CHGDATE    AS chgDate
+                   , SW.CHGUSERNO  AS chgUserNo
+                   , HW.HW_NAME    AS hwName
+                   , HW.HW_IP      AS hwIp
+              FROM TBL_SRV_SW SW
+         LEFT JOIN TBL_SRV_HW HW ON SW.HW_ID = HW.HW_ID
+        <include refid="includeServerCommon"/>
+        )
+        <if test="rowStart != null">
+        WHERE RNUM BETWEEN ${rowStart} AND ${rowStart-1}+${displayRowCount}
+        </if>
+    </select>
+
+    <!-- srv_sw 상세 조회 -->
+    <select id="selectSrvSwOne" parameterType="String" resultType="com.devkbil.mtssbj.admin.server.SWVO">
+        SELECT SW.SW_ID        AS swId
+               , SW.HW_ID      AS hwId
+               , SW.SW_NAME    AS swName
+               , SW.SW_TYPE_CD AS swTypeCd
+               , SW.ACT_YN     AS actYn
+               , SW.DELETEFLAG AS deleteFlag
+               , SW.REGDATE    AS regDate
+               , SW.REGUSERNO  AS regUserNo
+               , SW.CHGDATE    AS chgDate
+               , SW.CHGUSERNO  AS chgUserNo
+               , HW.HW_NAME    AS hwName
+               , HW.HW_IP      AS hwIp
+         FROM TBL_SRV_SW SW
+    LEFT JOIN TBL_SRV_HW HW ON SW.HW_ID = HW.HW_ID
+        WHERE SW.DELETEFLAG = 'N'
+          AND SW.SW_ID = #{swId}
+    </select>
+
+    <!-- srv_sw 등록 -->
+    <insert id="insertSrvSw" parameterType="com.devkbil.mtssbj.admin.server.SWVO">
+        <selectKey resultType="String" keyProperty="swId" order="BEFORE">
+            SELECT SW_ID_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_SRV_SW ( SW_ID, HW_ID, SW_NAME, SW_TYPE_CD, ACT_YN, DELETEFLAG, REGDATE, REGUSERNO, CHGDATE, CHGUSERNO )
+        VALUES ( #{swId}, #{hwId}, #{swName}, #{swTypeCd}, #{actYn}, 'N', CURRENT_TIMESTAMP, #{regUserNo}, CURRENT_TIMESTAMP, #{chgUserNo} )
+    </insert>
+
+    <!-- srv_sw 수정 -->
+    <update id="updateSrvSw" parameterType="com.devkbil.mtssbj.admin.server.SWVO">
+        UPDATE TBL_SRV_SW
+           SET HW_ID        = #{hwId}
+               , SW_NAME    = #{swName}
+               , SW_TYPE_CD = #{swTypeCd}
+               , ACT_YN     = #{actYn}
+               , CHGDATE    = CURRENT_TIMESTAMP
+               , CHGUSERNO  = #{chgUserNo}
+         WHERE SW_ID        = #{swId}
+           AND DELETEFLAG   = 'N'
+    </update>
+
+    <!-- srv_sw 삭제 -->
+    <delete id="deleteSrvSw" parameterType="String">
+        UPDATE TBL_SRV_SW
+           SET DELETEFLAG = 'Y'
+               , CHGDATE  = CURRENT_TIMESTAMP
+         WHERE SW_ID = #{swId}
+    </delete>
+
+</mapper>
