@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.devkbil.mtssbj.calendar.ComDateMapper">
+
+    <insert id="insertComDate" parameterType="com.devkbil.mtssbj.schedule.DateVO">
+        <selectKey keyProperty="cdno" resultType="Long" order="BEFORE">
+            SELECT CDNO_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO COM_DATE (
+            CDNO, CDDATE, CDYEAR, CDMM, CDDD, CDWEEKOFYEAR, CDWEEKOFMONTH, CDWEEK, CDDAYOFWEEK,
+            CDLUNARYEAR, CDLUNARMONTH, CDLUNARDAY, CDLUNARLEAP
+        ) VALUES (
+            #{cdno}, #{date}, #{year}, #{month}, #{day}, #{weekOfYear}, #{weekOfMonth}, #{week}, #{dayOfWeek},
+            #{lunarYear, jdbcType=NUMERIC}, #{lunarMonth, jdbcType=NUMERIC}, #{lunarDay, jdbcType=NUMERIC}, #{lunarLeap, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <select id="selectMaxDate" resultType="String">
+        SELECT MAX(CDDATE)
+        FROM COM_DATE
+    </select>
+
+    <select id="existsByDate" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM COM_DATE
+        WHERE CDDATE = #{date}
+    </select>
+
+</mapper>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="main">
+
+    <select id="selectRecentNews" resultType="com.devkbil.mtssbj.board.BoardVO">
+        <![CDATA[
+    SELECT * FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY TB.BRDNO DESC) AS RNUM
+             , BRDNO, BRDTITLE, TO_CHAR(TB.REGDATE,'YYYY-MM-DD') as REGDATE
+             , TB.USERNO, USERNM BRDWRITER, BGNAME, TB.BGNO
+             , (SELECT COUNT(*) FROM TBL_BOARDREPLY WHERE BRDNO=TB.BRDNO AND REDELETEFLAG='N') as REPLYCNT
+          FROM TBL_BOARD TB
+         LEFT OUTER JOIN COM_USER CU ON TB.USERNO=CU.USERNO
+         INNER JOIN TBL_BOARDGROUP TBG ON TBG.BGNO=TB.BGNO
+         WHERE TB.DELETEFLAG='N' AND TBG.DELETEFLAG='N'
+     ) WHERE RNUM <= 15
+        ]]>
+    </select>
+    
+    <select id="selectTimeLine" resultType="com.devkbil.mtssbj.board.BoardReplyVO" >
+        <![CDATA[
+    SELECT * FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY TB.REGDATE DESC) AS RNUM
+             , TB.BRDNO, SUBSTR(TB.BRDTITLE, 0, 10) REMEMO, USERNM REWRITER, PHOTO
+             , TO_CHAR(TB.REGDATE, 'YYYY-MM-DD') as REGDATE
+          FROM TBL_BOARD TB
+         INNER JOIN TBL_BOARDREPLY TBR ON TBR.BRDNO=TB.BRDNO
+         LEFT OUTER JOIN COM_USER CU ON TBR.USERNO=CU.USERNO
+         WHERE TB.DELETEFLAG='N' AND REDELETEFLAG='N'
+     ) WHERE RNUM <= 20
+        ]]>
+    </select>
+
+    <select id="selectNoticeListTop5" parameterType="com.devkbil.mtssbj.board.BoardSearchVO" resultType="com.devkbil.mtssbj.board.BoardVO">
+        <![CDATA[
+    SELECT * FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY BRDNO DESC) AS RNUM
+             , BRDNO, BRDTITLE, TO_CHAR(TB.REGDATE,'YYYY-MM-DD') as REGDATE, BRDNOTICE
+             , TB.USERNO, USERNM BRDWRITER
+          FROM TBL_BOARD TB
+         LEFT OUTER JOIN COM_USER CU ON TB.USERNO=CU.USERNO
+         WHERE TB.DELETEFLAG='N' AND BRDNOTICE='Y'
+     ) WHERE RNUM <= 5
+        ]]>
+    </select>
+     
+</mapper>
+

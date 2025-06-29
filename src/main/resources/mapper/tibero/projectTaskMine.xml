@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="taskMine">
+
+    <select id="selectTaskMineList" resultType="com.devkbil.mtssbj.project.TaskVO" parameterType="com.devkbil.mtssbj.common.ExtFieldVO">
+        SELECT PRNO, PT.TSNO, TSPARENT, TSSORT, TSTITLE,
+               TSSTARTDATE,
+               TSENDDATE,
+               TSENDREAL, TSRATE
+             , GETCOLOR4ALERT (TSSTARTDATE, TSENDDATE, TSENDREAL, TSRATE) STATUSCOLOR
+             , (SELECT LISTAGG(USERNM,',') WITHIN GROUP (ORDER BY USERNM) AS USERNM FROM PRJ_TASKUSER PTU, COM_USER CU WHERE TSNO=PT.TSNO AND PTU.USERNO=CU.USERNO) USERNM
+          FROM PRJ_TASK PT
+         INNER JOIN PRJ_TASKUSER PTU ON PTU.TSNO=PT.TSNO
+         WHERE PT.DELETEFLAG='N' AND PRNO=#{field1} AND PTU.USERNO=#{field2}
+         ORDER BY TSNO
+    </select>
+
+    <update id="updateTaskMine" parameterType="com.devkbil.mtssbj.project.TaskVO">
+        UPDATE PRJ_TASK
+           SET TSRATE=#{tsrate}
+         WHERE DELETEFLAG='N'
+           AND TSNO=#{tsno}
+    </update>
+
+    <select id="selectTaskMineOne" resultType="com.devkbil.mtssbj.project.TaskVO" parameterType="String">
+        SELECT PRNO, TSNO, TSPARENT, TSSORT, TSTITLE
+             , TSSTARTDATE
+             , TSENDDATE
+             , TSENDREAL
+             , TSRATE
+             , GETCOLOR4ALERT (TSSTARTDATE, TSENDDATE, TSENDREAL, TSRATE) STATUSCOLOR
+             , (SELECT LISTAGG(USERNO,',') WITHIN GROUP (ORDER BY USERNO) AS USERNO FROM PRJ_TASKUSER WHERE TSNO=PT.TSNO) USERNO
+             , (SELECT LISTAGG(USERNM,',') WITHIN GROUP (ORDER BY USERNM) AS USERNM FROM PRJ_TASKUSER PTU, COM_USER CU WHERE TSNO=PT.TSNO AND PTU.USERNO=CU.USERNO) USERNM
+          FROM PRJ_TASK PT
+        WHERE PT.DELETEFLAG='N' AND TSNO=#{tsno}
+    </select>
+
+    <!-- =============================================================================== -->
+    <select id="selectTaskFileList" resultType="com.devkbil.mtssbj.common.FileVO" parameterType="String">
+        SELECT FILENO, FILENAME, REALNAME, FILESIZE
+          FROM PRJ_TASKFILE
+         WHERE TSNO=#{brdno}
+         ORDER BY FILENO DESC
+    </select>
+
+    <insert id="insertTaskFile" parameterType="com.devkbil.mtssbj.common.FileVO" >
+        <selectKey resultType="int" keyProperty="fileno" order="BEFORE">
+            SELECT FILENO_TASK_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO PRJ_TASKFILE (TSNO, FILENO, FILENAME, REALNAME, FILESIZE)
+        VALUES (#{parentPK}, #{fileno}, #{filename}, #{realname}, #{filesize})
+    </insert>
+
+    <update id="updateTaskFile" parameterType="hashmap">
+        UPDATE PRJ_TASKFILE SET DELETEFLAG = 'Y'
+        WHERE FILENO IN (
+        <foreach item="item" index="index" collection="fileno" separator=",">
+            ${item}
+        </foreach>
+        )
+    </update>
+
+    <delete id="deleteTaskFile" parameterType="hashmap">
+        DELETE
+          FROM PRJ_TASKFILE
+         WHERE FILENO IN (
+              <foreach item="item" index="index" collection="fileno" separator=",">
+                     ${item}
+              </foreach>
+        )
+    </delete>
+
+</mapper>

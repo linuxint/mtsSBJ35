@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ad_srv_hw">
+
+    <sql id="includeServerCommon">
+        WHERE HW.DELETEFLAG='N'
+        <if test="hwId!=null and hwId!=''">
+            AND HW.HW_ID=#{hwId}
+        </if>
+        <if test="searchKeyword!=null and searchKeyword!='' and searchType!=''">
+            <foreach item="item" index="index" collection="searchTypeArr" separator=" OR " open="AND (" close=")">
+                ${item} LIKE '%'||#{searchKeyword}||'%'
+            </foreach>
+        </if>
+    </sql>
+
+    <!-- 목록 조회 -->
+    <select id="selectSrvHwList" resultType="com.devkbil.mtssbj.admin.server.HWVO"
+            parameterType="com.devkbil.mtssbj.search.ServerSearchVO">
+        SELECT * FROM (
+            SELECT ROW_NUMBER() OVER (ORDER BY HW.HW_ID DESC) AS RNUM
+                    , HW.HW_ID         AS hwId
+                    , HW.HW_NAME       AS hwName
+                    , HW.HW_IP         AS hwIp
+                    , HW.ADMIN_USER_NO AS adminUserNo
+                    , HW.ADMIN_EMAIL   AS adminEmail
+                    , HW.OS_INFO       AS osInfo
+                    , HW.CPU_INFO      AS cpuInfo
+                    , HW.MEMORY_INFO   AS memoryInfo
+                    , HW.DISK_INFO     AS diskInfo
+                    , HW.ETC_INFO      AS etcInfo
+                    , HW.ACT_YN        AS actYn
+                    , HW.DELETEFLAG    AS deleteFlag
+                    , HW.REGDATE       AS regDate
+                    , HW.REGUSERNO     AS regUserNo
+                    , HW.CHGDATE       AS chgDate
+                    , HW.CHGUSERNO     AS chgUserNo
+              FROM TBL_SRV_HW HW
+            <include refid="includeServerCommon"/>
+            )
+        <if test="rowStart != null">
+        WHERE RNUM BETWEEN ${rowStart} AND ${rowStart-1}+${displayRowCount}
+        </if>
+    </select>
+
+    <!-- 상세 조회 -->
+    <select id="selectSrvHwOne" parameterType="String" resultType="com.devkbil.mtssbj.admin.server.HWVO">
+        SELECT HW_ID            AS hwId
+               , HW_NAME        AS hwName
+               , HW_IP          AS hwIp
+               , ADMIN_USER_NO  AS adminUserNo
+               , ADMIN_EMAIL    AS adminEmail
+               , OS_INFO        AS osInfo
+               , CPU_INFO       AS cpuInfo
+               , MEMORY_INFO    AS memoryInfo
+               , DISK_INFO      AS diskInfo
+               , ETC_INFO       AS etcInfo
+               , ACT_YN         AS actYn
+               , DELETEFLAG     AS deleteFlag
+               , REGDATE        AS regDate
+               , REGUSERNO      AS regUserNo
+               , CHGDATE        AS chgDate
+               , CHGUSERNO      AS chgUserNo
+          FROM TBL_SRV_HW
+         WHERE DELETEFLAG = 'N'
+           AND HW_ID = #{hwId}
+    </select>
+
+    <!-- 등록 -->
+    <insert id="insertSrvHw" parameterType="com.devkbil.mtssbj.admin.server.HWVO">
+        <selectKey resultType="String" keyProperty="hwId" order="BEFORE">
+            SELECT HW_ID_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_SRV_HW ( HW_ID, HW_NAME, HW_IP, ADMIN_USER_NO, ADMIN_EMAIL, OS_INFO, CPU_INFO, MEMORY_INFO, DISK_INFO, ETC_INFO, ACT_YN, DELETEFLAG, REGDATE, REGUSERNO )
+        VALUES ( #{hwId}, #{hwName}, #{hwIp}, #{adminUserNo}, #{adminEmail}, #{osInfo}, #{cpuInfo}, #{memoryInfo}, #{diskInfo}, #{etcInfo}, #{actYn}, 'N', CURRENT_TIMESTAMP, #{regUserno} )
+    </insert>
+
+    <!-- 수정 -->
+    <update id="updateSrvHw" parameterType="com.devkbil.mtssbj.admin.server.HWVO">
+        UPDATE TBL_SRV_HW
+           SET HW_NAME         = #{hwName}
+               , HW_IP         = #{hwIp}
+               , ADMIN_USER_NO = #{adminUserNo}
+               , ADMIN_EMAIL   = #{adminEmail}
+               , OS_INFO       = #{osInfo}
+               , CPU_INFO      = #{cpuInfo}
+               , MEMORY_INFO   = #{memoryInfo}
+               , DISK_INFO     = #{diskInfo}
+               , ETC_INFO      = #{etcInfo}
+               , ACT_YN        = #{actYn}
+               , CHGDATE       = CURRENT_TIMESTAMP
+               , CHGUSERNO     = #{chgUserno}
+         WHERE HW_ID = #{hwId}
+           AND DELETEFLAG = 'N'
+    </update>
+
+    <!-- 삭제 (논리 삭제) -->
+    <delete id="deleteSrvHw" parameterType="String">
+        UPDATE TBL_SRV_HW
+           SET DELETEFLAG = 'Y'
+               , CHGDATE    = CURRENT_TIMESTAMP
+         WHERE HW_ID = #{hwId}
+    </delete>
+
+</mapper>
