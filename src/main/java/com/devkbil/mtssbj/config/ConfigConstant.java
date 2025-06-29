@@ -48,6 +48,7 @@ public class ConfigConstant {
             "/memberLogin",
             "/login-process",
             "/memberLoginChk",
-            "/error/**"
+            "/error/**",
+            "/h2-console/**"  // H2 콘솔 접근 허용
     );
 }
