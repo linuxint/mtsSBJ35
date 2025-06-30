@@ -83,7 +83,7 @@ public class GradleDependencyChecker {
         List<String> dependencies = new ArrayList<>();
 
         // 의존성을 추출하기 위한 정규표현식 패턴
-        Pattern dependencyPattern = Pattern.compile("(implementation|api|runtimeOnly)\\s+'([\\w.-]+):([\\w.-]+):([\\w.-]+)'");
+        Pattern dependencyPattern = Pattern.compile("(mavenBom|checkstyle|implementation|api|runtimeOnly)\\s+'([\\w.-]+):([\\w.-]+):([\\w.-]+)'");
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(gradleFilePath), StandardCharsets.UTF_8)) {
             String line;
 
