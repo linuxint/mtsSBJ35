@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
  *
  * @param <E> 이벤트 객체의 타입
  */
-@Service
 @Slf4j
 @RequiredArgsConstructor
 public class DevLogbackAppenderService<E> {
