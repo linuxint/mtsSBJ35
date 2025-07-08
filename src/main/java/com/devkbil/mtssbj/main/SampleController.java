@@ -5,8 +5,6 @@ import com.devkbil.mtssbj.board.BoardSearchVO;
 import com.devkbil.mtssbj.board.BoardService;
 import com.devkbil.mtssbj.common.ExcelConstant;
 import com.devkbil.mtssbj.common.MakeExcel;
-import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.auth.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,9 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class SampleController {
 
     private final SampleService sampleService;
-    private final EtcService etcService;
     private final BoardService boardService;
-    private final AuthService authService;
 
     /**
      * 조직도/사용자 선택 샘플 페이지를 반환합니다.

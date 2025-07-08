@@ -2,7 +2,6 @@ package com.devkbil.mtssbj.api.v1.crud;
 
 import com.devkbil.mtssbj.crud.CrudService;
 import com.devkbil.mtssbj.crud.CrudVO;
-import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
 
@@ -36,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 public class CrudRestController {
 
     private final CrudService crudService;
-    private final EtcService etcService;
     private final AuthService authService;
 
     /**

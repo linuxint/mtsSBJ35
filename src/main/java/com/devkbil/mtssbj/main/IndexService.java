@@ -2,7 +2,6 @@ package com.devkbil.mtssbj.main;
 
 import com.devkbil.common.util.DateUtil;
 import com.devkbil.mtssbj.common.ExtFieldVO;
-import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.project.ProjectService;
 import com.devkbil.mtssbj.schedule.DateVO;
@@ -31,7 +30,6 @@ public class IndexService {
 
     private final SqlSessionTemplate sqlSession;
     final AuthService authService;
-    private final EtcService etcService;
     private final ProjectService projectService;
 
 

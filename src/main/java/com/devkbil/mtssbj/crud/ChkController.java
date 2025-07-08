@@ -1,7 +1,5 @@
 package com.devkbil.mtssbj.crud;
 
-import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,8 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ChkController {
 
     private final CrudService crudService;
-    private final EtcService etcService;
-    private final AuthService authService;
 
     /**
      * 체크 리스트 조회

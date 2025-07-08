@@ -2,8 +2,6 @@ package com.devkbil.mtssbj.admin.server;
 
 import com.devkbil.common.util.UtilEtc;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
-import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.ServerSearchVO;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,8 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 public class SWController {
 
     private final SWService swService;
-    private final EtcService etcService;
-    private final AuthService authService;
 
     /**
      * 모든 서버 소프트웨어 리스트를 조회합니다.

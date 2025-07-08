@@ -1,8 +1,6 @@
 package com.devkbil.mtssbj.admin.sign;
 
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
-import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,8 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 public class SignDocController {
 
     private final SignDocService signDocService;
-    private final EtcService etcService;
-    private final AuthService authService;
 
     /**
      * 문서 유형 리스트를 조회합니다.

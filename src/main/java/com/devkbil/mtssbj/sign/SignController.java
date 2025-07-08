@@ -2,7 +2,6 @@ package com.devkbil.mtssbj.sign;
 
 import com.devkbil.mtssbj.admin.sign.SignDocService;
 import com.devkbil.mtssbj.admin.sign.SignDocTypeVO;
-import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
 
@@ -38,7 +37,6 @@ public class SignController {
 
     private final SignService signService;
     private final SignDocService signDocService;
-    private final EtcService etcService;
     private final AuthService authService;
 
     /**

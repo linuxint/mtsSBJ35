@@ -1,7 +1,6 @@
 package com.devkbil.mtssbj.api.v1.schedule;
 
 import com.devkbil.common.util.DateUtil;
-import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.schedule.MonthVO;
 import com.devkbil.mtssbj.schedule.SchService;
@@ -40,7 +39,6 @@ import lombok.extern.slf4j.Slf4j;
 public class SchRestController {
 
     private final SchService schService;
-    private final EtcService etcService;
     private final AuthService authService;
 
     /**

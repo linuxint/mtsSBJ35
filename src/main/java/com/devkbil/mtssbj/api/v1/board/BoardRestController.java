@@ -4,7 +4,6 @@ import com.devkbil.mtssbj.board.BoardService;
 import com.devkbil.mtssbj.board.BoardVO;
 import com.devkbil.mtssbj.board.BoardReplyVO;
 import com.devkbil.mtssbj.board.BoardSearchVO;
-import com.devkbil.mtssbj.admin.board.BoardGroupService;
 import com.devkbil.mtssbj.admin.board.BoardGroupVO;
 import com.devkbil.mtssbj.common.ExtFieldVO;
 import com.devkbil.mtssbj.common.FileVO;
@@ -42,7 +41,6 @@ import lombok.extern.slf4j.Slf4j;
 public class BoardRestController {
 
     private final BoardService boardService;
-    private final BoardGroupService boardGroupService;
     private final AuthService authService;
 
     /**

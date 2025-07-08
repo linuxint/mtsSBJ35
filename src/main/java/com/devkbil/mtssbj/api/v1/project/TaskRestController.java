@@ -1,7 +1,6 @@
 package com.devkbil.mtssbj.api.v1.project;
 
 import com.devkbil.mtssbj.common.ExtFieldVO;
-import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.project.ProjectService;
 import com.devkbil.mtssbj.project.ProjectVO;
@@ -40,7 +39,6 @@ public class TaskRestController {
 
     private final TaskService taskService;
     private final ProjectService projectService;
-    private final EtcService etcService;
     private final AuthService authService;
 
     /**

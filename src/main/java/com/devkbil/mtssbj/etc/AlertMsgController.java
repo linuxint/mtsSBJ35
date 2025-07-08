@@ -1,7 +1,5 @@
 package com.devkbil.mtssbj.etc;
 
-import com.devkbil.mtssbj.member.auth.AuthService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -24,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class AlertMsgController {
 
     private final EtcService etcService;
-    private final AuthService authService;
 
     /**
      * 현재 사용자의 전체 Alert 메시지 리스트를 반환합니다.

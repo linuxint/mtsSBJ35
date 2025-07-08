@@ -2,8 +2,6 @@ package com.devkbil.mtssbj.admin.server;
 
 import com.devkbil.common.util.UtilEtc;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
-import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.ServerSearchVO;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,8 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ConnController {
 
     private final ConnService connService;
-    private final EtcService etcService;
-    private final AuthService authService;
 
     /**
      * 모든 서비스 접속 정보의 리스트를 조회합니다.

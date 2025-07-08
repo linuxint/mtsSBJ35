@@ -3,8 +3,6 @@ package com.devkbil.mtssbj.admin.organ;
 import com.devkbil.common.util.UtilEtc;
 import com.devkbil.mtssbj.common.TreeMaker;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
-import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.auth.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,9 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DeptController {
 
     private final DeptService deptService;
-    private final EtcService etcService;
     private final TreeMaker treeMaker = new TreeMaker();  // TreeMaker 재사용
-    private final AuthService authService;
 
     /**
      * 부서 트리 구조를 조회합니다.

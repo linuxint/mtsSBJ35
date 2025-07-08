@@ -3,9 +3,7 @@ package com.devkbil.mtssbj.admin.organ;
 import com.devkbil.common.util.UtilEtc;
 import com.devkbil.mtssbj.common.TreeMaker;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
-import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.UserVO;
-import com.devkbil.mtssbj.member.auth.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,10 +40,8 @@ public class UserController {
 
     private final DeptService deptService; // 부서 관련 서비스
     private final UserService userService; // 사용자 관련 서비스
-    private final EtcService etcService; // 기타 공통 서비스
     private final PasswordEncoder passwordEncoder; // 비밀번호 암호화 도구
     private final TreeMaker treeMaker = new TreeMaker(); // 부서 트리 생성 도구
-    private final AuthService authService;
 
     /**
      * 사용자 관리 메인 화면을 반환하는 메서드입니다.

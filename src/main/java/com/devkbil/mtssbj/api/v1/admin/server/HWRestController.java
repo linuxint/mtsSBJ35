@@ -3,8 +3,6 @@ package com.devkbil.mtssbj.api.v1.admin.server;
 import com.devkbil.mtssbj.admin.server.HWVO;
 import com.devkbil.mtssbj.admin.server.HWService;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
-import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.ServerSearchVO;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,8 +37,6 @@ import lombok.extern.slf4j.Slf4j;
 public class HWRestController {
 
     private final HWService hwService;
-    private final EtcService etcService;
-    private final AuthService authService;
 
     /**
      * 모든 서버 하드웨어 리스트를 조회합니다.

@@ -1,6 +1,5 @@
 package com.devkbil.mtssbj.mail;
 
-import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.search.SearchVO;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 public class MailInfoController {
 
     private final MailService mailService;
-    private final AuthService authService;
 
     /**
      * 메일 설정 리스트 조회

@@ -3,6 +3,8 @@ package com.devkbil.common.util;
 import com.devkbil.mtssbj.schedule.DateVO;
 import com.devkbil.mtssbj.schedule.MonthVO;
 
+import io.micrometer.common.lang.NonNullFields;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -27,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
+@SuppressWarnings("unused")
 public class ModernDateUtil {
 
     // 자주 사용되는 날짜 형식 상수

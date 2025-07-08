@@ -1,6 +1,5 @@
 package com.devkbil.mtssbj.api.v1.project;
 
-import com.devkbil.mtssbj.etc.EtcService;
 import com.devkbil.mtssbj.member.auth.AuthService;
 import com.devkbil.mtssbj.project.ProjectService;
 import com.devkbil.mtssbj.project.ProjectVO;
@@ -37,7 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ProjectRestController {
 
     private final ProjectService projectService;
-    private final EtcService etcService;
     private final AuthService authService;
 
     /**
