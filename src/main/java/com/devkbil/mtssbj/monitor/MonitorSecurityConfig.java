@@ -1,8 +1,5 @@
 package com.devkbil.mtssbj.monitor;
 
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
-
 /**
  * 모니터링 엔드포인트에 대한 보안 설정
  * 모니터링 API에 대한 액세스를 관리자 사용자로 제한

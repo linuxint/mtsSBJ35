@@ -1,7 +1,6 @@
 package com.devkbil.mtssbj.admin.board;
 
 import com.devkbil.mtssbj.error.BusinessExceptionHandler;
-import com.devkbil.mtssbj.error.ErrorCode;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;

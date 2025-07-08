@@ -3,8 +3,6 @@ package com.devkbil.mtssbj.admin.board;
 import com.devkbil.common.util.UtilEtc;
 import com.devkbil.mtssbj.common.TreeMaker;
 import com.devkbil.mtssbj.config.security.AdminAuthorize;
-import com.devkbil.mtssbj.etc.EtcService;
-import com.devkbil.mtssbj.member.auth.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -37,8 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 public class BoardGroupController {
 
     private final BoardGroupService boardGroupService;
-    private final EtcService etcService;
-    private final AuthService authService;
 
     /**
      * 모든 게시판 그룹의 리스트를 조회합니다.

@@ -1,7 +1,5 @@
 package com.devkbil.mtssbj.develop.logview;
 
-import org.springframework.stereotype.Service;
-
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 

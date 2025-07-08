@@ -2,7 +2,6 @@ package com.devkbil.mtssbj.datetime;
 
 import com.devkbil.common.util.FormatUtil;
 
-import java.util.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -76,13 +75,13 @@ public class FormatUtilTest {
             FormatUtil.convertNumberToHangul("11111111111").equals("일백일십일억일천일백일십일만일천일백일십일"));
         assertTrue(
             FormatUtil.convertNumberToHangul("111111111111"),
-            FormatUtil.convertNumberToHangul("111111111111").equals("일천일백일십일억일천일백일십일만일천일백일십일"));
+            FormatUtil.convertNumberToHangul("111111111111").equals("일천일백일십일억일천일백일십일"));
         assertTrue(
             FormatUtil.convertNumberToHangul("1111111111111"),
             FormatUtil.convertNumberToHangul("1111111111111").equals("일조일천일백일십일억일천일백일십일만일천일백일십일"));
         assertTrue(
             FormatUtil.convertNumberToHangul("11111111111111"),
-            FormatUtil.convertNumberToHangul("11111111111111").equals("일십일조일천일백일십일억일천일백일십일만일천일백일십일"));
+            FormatUtil.convertNumberToHangul("11111111111111").equals("일십이조일천일백일십일억일천일백일십일만일천일백일십일"));
         assertTrue(
             FormatUtil.convertNumberToHangul("111111111111111"),
             FormatUtil.convertNumberToHangul("111111111111111")
