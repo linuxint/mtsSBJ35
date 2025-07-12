@@ -11,7 +11,7 @@ plugins {
     id 'java'
     id 'org.springdoc.openapi-gradle-plugin' version '1.9.0'
     id 'checkstyle'
-    id 'com.diffplug.spotless' version '7.0.4'
+    id 'com.diffplug.spotless' version '7.1.0'
     id 'org.cyclonedx.bom' version '2.3.1'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'net.ltgt.errorprone' version '4.3.0'
@@ -144,7 +144,7 @@ dependencies {
 //    implementation 'org.ehcache:ehcache' //:3.10.8
 
     // 코드 품질
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.23.0'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.26.1'
 
     // ======================
     // 3. Spring Data & Integration
@@ -192,24 +192,24 @@ dependencies {
     implementation 'org.thymeleaf:thymeleaf-spring6:3.1.3.RELEASE'
 
     // Embedded Tomcat
-    runtimeOnly 'org.springframework.boot:spring-boot-starter-tomcat'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-core:11.0.8'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-websocket:11.0.8'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-el:11.0.8'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:11.0.8'
-    implementation 'org.apache.tomcat:tomcat-annotations-api:11.0.8'
+    runtimeOnly 'org.springframework.boot:spring-boot-starter-tomcat' // default tomcat 10.1.24
+    implementation 'org.apache.tomcat.embed:tomcat-embed-core:11.0.9'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-websocket:11.0.9'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-el:11.0.9'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:11.0.9'
+    implementation 'org.apache.tomcat:tomcat-annotations-api:11.0.9'
 
     // ======================
     // 5. 데이터베이스 및 퍼시스턴스
     // ======================
     // JDBC Drivers
-    implementation 'org.xerial:sqlite-jdbc:3.50.1.0'
+    implementation 'org.xerial:sqlite-jdbc:3.50.2.0'
     implementation 'com.oracle.database.jdbc:ojdbc11:23.8.0.25.04'
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.5.3'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.5.4'
     runtimeOnly 'com.h2database:h2:2.3.232'
 
     // ORM & SQL Mappers
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
 
     // ======================
     // 7. Search Engine & Elasticsearch
@@ -242,7 +242,7 @@ dependencies {
     implementation 'net.ttddyy:datasource-proxy:1.10.1'
 
     // Application Monitoring
-    implementation 'de.codecentric:spring-boot-admin-starter-client:3.5.0'
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.5.1'
 
     // Distributed Tracing
     implementation 'org.springframework.cloud:spring-cloud-starter-sleuth:3.1.11'
@@ -261,15 +261,15 @@ dependencies {
     // 10. File & Document Processing
     // ======================
     // Document Parsing
-    implementation 'org.apache.tika:tika-core:3.2.0'
-    implementation 'org.apache.tika:tika-parsers-standard-package:3.2.0'
-    annotationProcessor 'org.apache.tika:tika-core:3.2.0'
-    implementation 'org.apache.tika:tika-parsers:3.2.0'
+    implementation 'org.apache.tika:tika-core:3.2.1'
+    implementation 'org.apache.tika:tika-parsers-standard-package:3.2.1'
+    annotationProcessor 'org.apache.tika:tika-core:3.2.1'
+    implementation 'org.apache.tika:tika-parsers:3.2.1'
 
     // Office Documents
     implementation 'org.apache.poi:poi-ooxml:5.4.1'
     implementation 'org.jxls:jxls-poi:3.0.0'
-    implementation 'net.sf.mpxj:mpxj:14.1.0'
+    implementation 'net.sf.mpxj:mpxj:14.2.0'
     implementation 'net.freeutils:jtnef:2.1.0'
 
     // PDF Processing
@@ -297,7 +297,6 @@ dependencies {
     // ======================
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mockito:mockito-core:5.16.0'
-    testImplementation 'com.github.tomakehurst:wiremock-jre8:3.0.1'  // WireMock 테스트 지원
 
     // ======================
     // 13. Utilities
@@ -307,7 +306,7 @@ dependencies {
     implementation 'org.modelmapper:modelmapper:3.2.4'
     implementation 'org.jodd:jodd-util:6.3.0'
 //    implementation 'commons-lang:commons-lang:2.6'
-    implementation 'org.apache.commons:commons-lang3:3.17.0'
+    implementation 'org.apache.commons:commons-lang3:3.18.0'
     implementation 'org.apache.commons:commons-text:1.13.1'
     implementation 'io.projectreactor:reactor-core:3.8.0-M4'  // Reactor Core 추가
 
@@ -325,8 +324,8 @@ dependencies {
     // ======================
     // Hibernate
     implementation 'org.hibernate.validator:hibernate-validator:9.0.1.Final'
-    implementation 'org.hibernate.orm:hibernate-core:7.0.3.Final'
-    implementation 'org.hibernate.orm:hibernate-jcache:7.0.3.Final'
+    implementation 'org.hibernate.orm:hibernate-core:7.0.5.Final'
+    implementation 'org.hibernate.orm:hibernate-jcache:7.0.5.Final'
 
     // Jakarta Persistence
     implementation 'jakarta.validation:jakarta.validation-api:3.1.1'
@@ -550,7 +549,7 @@ spotless {
 
 // Checkstyle
 checkstyle {
-    toolVersion = '10.23.0'
+    toolVersion = '10.26.1'
     // Using a local Checkstyle configuration file
     config = resources.text.fromFile('codestyle/naver-checkstyle-rules.xml')
 }
@@ -569,7 +568,7 @@ tasks.register('jvmCyclonedxBom', CycloneDxTask) {
     description = 'Generates an SBOM for only JVM dependencies'
     skipConfigs = configurations.names.findAll { it != 'compileClasspath' }
     outputName.set("jvm-sbom")
-    destination.set(file("$buildDir/cyclonedx/sbom"))
+    destination.set(layout.buildDirectory.dir("cyclonedx/sbom").get().asFile)
     outputFormat.set('json')
 }
 
@@ -580,14 +579,14 @@ tasks.register('appCyclonedxBom', CycloneDxTask) {
     dependsOn 'jvmCyclonedxBom' // Ensure jvm-sbom.json is generated first
     skipConfigs.set(configurations.names - 'runtimeClasspath')
     outputName.set("application-sbom")
-    destination.set(file("$buildDir/cyclonedx/sbom"))
+    destination.set(layout.buildDirectory.dir("cyclonedx/sbom").get().asFile)
     outputFormat.set('json')
 }
 
 // SBOM 파일을 src/main/resources로 복사
 tasks.register('copySbomToResources', Copy) {
     dependsOn 'appCyclonedxBom'
-    from("${buildDir}/sbom") // 예시: 생성된 SBOM 파일 경로
+    from(layout.buildDirectory.dir("sbom")) // 예시: 생성된 SBOM 파일 경로
     into("${projectDir}/src/main/resources")
 
     outputs.upToDateWhen { false } // 캐시 무효화 (필요 시)
@@ -628,7 +627,7 @@ tasks.spotlessJava {
 }
 
 // Docker 관련 태스크 수정
-task checkDocker {
+tasks.register('checkDocker') {
     doLast {
         try {
             def process = "docker info".execute()
@@ -644,7 +643,7 @@ task checkDocker {
     }
 }
 
-task checkDockerCompose {
+tasks.register('checkDockerCompose') {
     doLast {
         try {
             def process = "docker-compose version".execute()
@@ -660,7 +659,7 @@ task checkDockerCompose {
     }
 }
 
-task dockerUp(type: Exec) {
+tasks.register('dockerUp', Exec) {
     group = 'docker'
     description = 'Docker 서비스를 시작합니다.'
     workingDir = 'docker'
@@ -671,7 +670,7 @@ task dockerUp(type: Exec) {
     }
 }
 
-task dockerDown(type: Exec) {
+tasks.register('dockerDown', Exec) {
     group = 'docker'
     description = 'Docker 서비스를 중지하고 제거합니다.'
     workingDir = 'docker'
@@ -682,7 +681,7 @@ task dockerDown(type: Exec) {
     }
 }
 
-task dockerRemove(type: Exec) {
+tasks.register('dockerRemove', Exec) {
     group = 'docker'
     description = 'Docker 서비스와 볼륨을 제거합니다.'
     workingDir = 'docker'
@@ -696,7 +695,7 @@ task dockerRemove(type: Exec) {
 bootRun {
     // bootRun 시 테스트 실행 제외
     dependsOn 'compileJava', 'processResources'
-    systemProperty 'spring.profiles.active', 'local'
+    //systemProperty 'spring.profiles.active', 'local'
 }
 
 test {

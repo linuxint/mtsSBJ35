@@ -72,8 +72,8 @@ public class ServiceSqlIdExtractor {
 
     /**
      * 클래스 파일이 @Service 어노테이션을 가지고 있는지 확인
-     * @param content 파일 내용
-     * @return @Service 어노테이션 존재 여부
+     * @param content content 파일 내용
+     * @return Service 어노테이션 존재 여부
      */
     private static boolean isServiceClass(String content) {
         // 파일 내용에서 @Service 패턴을 탐지하여 존재 여부 반환

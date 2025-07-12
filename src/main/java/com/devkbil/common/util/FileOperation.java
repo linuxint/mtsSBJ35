@@ -97,8 +97,10 @@ public class FileOperation {
      * @return 성공 여부 (1: 성공, 0: 실패)
      */
     public static int channelFileCopy(String source, String target) {
-        try (FileChannel sourceChannel = new FileInputStream(source).getChannel();
-             FileChannel targetChannel = new FileOutputStream(target).getChannel()) {
+        try (FileInputStream fis = new FileInputStream(source);
+             FileOutputStream fos = new FileOutputStream(target);
+             FileChannel sourceChannel = fis.getChannel();
+             FileChannel targetChannel = fos.getChannel()) {
 
             sourceChannel.transferTo(0, sourceChannel.size(), targetChannel);
             return 1; // 성공

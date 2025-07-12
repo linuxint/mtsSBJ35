@@ -26,9 +26,10 @@ public class GenerateOtp2Test {
         System.out.println("QR CODE : " + url);
 
         // 생성된 OTP 패스워드 인증 부분
-        Scanner scan = new Scanner(System.in, StandardCharsets.UTF_8);
+        try (Scanner scan = new Scanner(System.in, StandardCharsets.UTF_8)) {
         System.out.print("Input OTP Code : "); // 키보드에서 입력 - 앱의코드
         boolean check = checkCode(scan.next(), otpkey);
         System.out.println(check);
+        }
     }
 }

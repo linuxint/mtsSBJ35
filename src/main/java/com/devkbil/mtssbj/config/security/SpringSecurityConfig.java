@@ -20,6 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.session.SessionRegistry;
@@ -99,33 +100,31 @@ public class SpringSecurityConfig {
             corsConfiguration.setAllowCredentials(true);
             return corsConfiguration;
         }));
-        http
-            .headers(headerConfig -> headerConfig
+        http.headers(headerConfig -> headerConfig
                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
                 .contentSecurityPolicy(csp -> csp
-//                    .policyDirectives("default-src 'self'; script-src 'self'; object-src 'none';")
-                    .policyDirectives(
-                        "default-src 'self'; " +
-                            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-                            "style-src 'self' 'unsafe-inline'; " +
-                            "img-src 'self' data:; " + // ← 이 줄 추가!
-                            "font-src 'self' data:; " +
-                            "object-src 'none';"
-                    )
+//              .policyDirectives("default-src 'self'; script-src 'self'; object-src 'none';")
+                        .policyDirectives(
+                                "default-src 'self'; " +
+                                "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+                                "style-src 'self' 'unsafe-inline'; " +
+                                "img-src 'self' data:; " + // ← 이 줄 추가!
+                                "font-src 'self' data:; " +
+                                "object-src 'none';"
+                        )
                 )
-            );
+        );
         http.authorizeHttpRequests(authorize -> authorize
                 .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                 .requestMatchers(ConfigConstant.allAllowList.toArray(new String[0])).permitAll()
                 .anyRequest().authenticated()
         );
-        http.exceptionHandling(
-            exceptionConfig -> exceptionConfig
-            .authenticationEntryPoint(unauthorizedEntryPoint)
-            .accessDeniedHandler(accessDeniedHandler)
+        http.exceptionHandling(exceptionConfig -> exceptionConfig
+                .authenticationEntryPoint(unauthorizedEntryPoint)
+                .accessDeniedHandler(accessDeniedHandler)
         );
         http.formLogin(login -> login
-            .loginPage(URL_LOGIN)
+                .loginPage(URL_LOGIN)
                 .loginProcessingUrl(ConfigConstant.URL_LOGIN_PROCESS) // 로그인 고정
                 .usernameParameter(ConfigConstant.PARAMETER_LOGIN_ID)
                 .passwordParameter(ConfigConstant.PARAMETER_LOGIN_PWD)

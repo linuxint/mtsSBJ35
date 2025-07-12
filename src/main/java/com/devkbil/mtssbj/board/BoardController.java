@@ -252,7 +252,7 @@ public class BoardController {
         {
             // 댓글 전체 삭제
             ObjectMapper objectMapper = new ObjectMapper();
-            Map map = objectMapper.convertValue(boardInfo, Map.class);
+            Map<String, String> map = (Map<String, String>) objectMapper.convertValue(boardInfo, Map.class);
             boardService.deleteBoardReplyAll(map);
         }
         boardService.deleteBoardOne(brdno);

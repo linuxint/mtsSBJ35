@@ -9,6 +9,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -69,18 +70,22 @@ public class FileClasspath {
         } else {
             String path = resourceFile.getPath().substring(6).replace('\\', '/');
             String[] info = path.split("!/");
-            JarFile jar = null;
+            Optional.ofNullable(info)
+                .filter(i -> i.length > 0)
+                .ifPresent(i -> {
             try {
-                jar = new JarFile(info[0]);
-            } catch (IOException e1) {
-            }
+                        try (JarFile jar = new JarFile(i[0])) {
             Enumeration<JarEntry> entries = jar.entries();
             while (entries.hasMoreElements()) {
                 String entryName = entries.nextElement().getName();
-                if (entryName.startsWith(info[1]) && entryName.length() > 16) {
+                                if (entryName.startsWith(i[1]) && entryName.length() > 16) {
                     classNames.add(entryName.replace("/", ".").replace(".class", ""));
                 }
             }
+                        }
+                    } catch (IOException e1) {
+                    }
+                });
         }
 
         return classNames;

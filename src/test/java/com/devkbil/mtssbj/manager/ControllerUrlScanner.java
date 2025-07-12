@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.Optional;
 
 /**
  * 이 클래스는 @Controller 어노테이션이 있는 파일을 스캔하고 URL 매핑을 추출하는 유틸리티입니다.
@@ -114,14 +115,17 @@ public class ControllerUrlScanner {
                 }
 
                 // 클래스 레벨 매핑과 메소드 레벨 매핑 결합
-                if (!classLevelMapping.isEmpty()) {
+                StringBuilder urlBuilder = new StringBuilder(url);
+                Optional.ofNullable(classLevelMapping)
+                    .filter(map -> !map.isEmpty())
+                    .ifPresent(map -> {
                     // 메소드 레벨 매핑이 이미 클래스 레벨 매핑으로 시작하는 경우 중복 방지
-                    if (!url.startsWith(classLevelMapping)) {
-                        url = classLevelMapping + url;
+                        if (!urlBuilder.toString().startsWith(map)) {
+                            urlBuilder.insert(0, map);
                     }
-                }
+                    });
 
-                urls.add(mappingType + ": " + url);
+                urls.add(mappingType + ": " + urlBuilder.toString());
             }
         }
 

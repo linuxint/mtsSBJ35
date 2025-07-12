@@ -137,7 +137,8 @@ public class IndexingController {
         List<BoardVO> boardlist;
 
         if (!brdnoUpdate.equals(brdno)) {
-            boardlist = (List<BoardVO>)boardService.selectBoards4Indexing(brdnoUpdate);
+            List<BoardVO> boardlistTemp = (List<BoardVO>)boardService.selectBoards4Indexing(brdnoUpdate);
+            boardlist = boardlistTemp;
 
             // 배치 처리를 위한 리스트
             List<IndexQuery> indexQueries = new ArrayList<>();
@@ -184,6 +185,8 @@ public class IndexingController {
 
         // ---------------------------- 게시판 신규글 --------------------------------
         boardlist = (List<BoardVO>)boardService.selectBoards4Indexing(brdno);
+        List<BoardVO> boardlist2 = (List<BoardVO>)boardService.selectBoards4Indexing(brdno);
+        boardlist = boardlist2;
 
         // 배치 처리를 위한 리스트
         List<IndexQuery> indexQueries = new ArrayList<>();
@@ -233,6 +236,8 @@ public class IndexingController {
         lastVO.setField2(getLastValue("reply"));
 
         List<BoardReplyVO> replylist = (List<BoardReplyVO>)boardService.selectBoardReply4Indexing(lastVO);
+        List<BoardReplyVO> replylistTemp = (List<BoardReplyVO>)boardService.selectBoardReply4Indexing(lastVO);
+        replylist = replylistTemp;
 
         String reno = "";
 
@@ -276,6 +281,7 @@ public class IndexingController {
                     }
 
                     // 기존 배열에 새 댓글들 추가
+                    @SuppressWarnings("unchecked")
                     List<Map<String, Object>> existingReplies = (List<Map<String, Object>>)document.get("brdreply");
                     existingReplies.addAll(replies);
 
@@ -310,6 +316,8 @@ public class IndexingController {
         // ---------------------------- 첨부파일 --------------------------------
         lastVO.setField2(getLastValue("file"));
         List<FileVO> filelist = (List<FileVO>)boardService.selectBoardFiles4Indexing(lastVO);
+        List<FileVO> filelistTemp = (List<FileVO>)boardService.selectBoardFiles4Indexing(lastVO);
+        filelist = filelistTemp;
 
         String fileno = "";
 

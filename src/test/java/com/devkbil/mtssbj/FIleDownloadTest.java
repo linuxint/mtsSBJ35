@@ -21,11 +21,10 @@ public class FIleDownloadTest {
 
             ReadableByteChannel inputChannel = Channels.newChannel(url.openStream());
 
-            FileOutputStream fileOutputStream = new FileOutputStream(fileName);
-
+            try (FileOutputStream fileOutputStream = new FileOutputStream(fileName)) {
             FileChannel outputChannel = fileOutputStream.getChannel();
-
             outputChannel.transferFrom(inputChannel, 0, Long.MAX_VALUE);
+            }
 
         } catch (MalformedURLException ex) {
             // handle exception if needed

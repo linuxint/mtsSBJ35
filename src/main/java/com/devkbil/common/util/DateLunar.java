@@ -27,10 +27,10 @@ public class DateLunar {
      * - "leap": 윤달 여부 (0: 평달, 1: 윤달)
      * @throws IllegalArgumentException 날짜 형식이 잘못된 경우
      */
-    public static HashMap toLunar(String sDate) {
+    public static HashMap<String, Object> toLunar(String sDate) {
         String dateStr = validChkDate(sDate);
 
-        HashMap hm = new HashMap();
+        HashMap<String, Object> hm = new HashMap<>();
         hm.put("day", "");
         hm.put("leap", 0);
 

@@ -28,7 +28,9 @@ public class FontLoadTest {
         PDImageXObject.createFromFile(absolutePath + "back.jpg", doc);
 
         // ttf
-        InputStream fontStream = new FileInputStream(absolutePath + "/font/" + "NanumGothicLight.ttf");
+        try (InputStream fontStream = new FileInputStream(absolutePath + "/font/" + "NanumGothicLight.ttf");
+             TrueTypeCollection trueTypeCollection = new TrueTypeCollection(fontStream)) {
+
         PDType0Font fontGulim = PDType0Font.load(doc, fontStream);
         fontGulim.getBaseFont();
         Standard14Fonts.getNames();
@@ -36,7 +38,6 @@ public class FontLoadTest {
         new PDType1Font(fontName3v);
 
         // ttf
-        TrueTypeCollection trueTypeCollection = new TrueTypeCollection(fontStream);
         trueTypeCollection.processAllFonts(
             new TrueTypeCollection.TrueTypeFontProcessor() {
                 @Override
@@ -45,5 +46,6 @@ public class FontLoadTest {
                 }
             });
         PDType0Font.load(doc, trueTypeCollection.getFontByName("Menlo-Regular"), true);
+        }
     }
 }

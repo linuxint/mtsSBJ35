@@ -35,8 +35,8 @@ public class CodeCacheService { //extends EgovAbstractServiceImpl
      */
     public final CodeCacheDAO codeCacheDAO;
 
-    private static final List<Map> codeGroup = new ArrayList<Map>();
-    private static final List<Map> code = new ArrayList<Map>();
+    private static final List<Map<String, Object>> codeGroup = new ArrayList<>();
+    private static final List<Map<String, Object>> code = new ArrayList<>();
 
     /**
      * codeGroup과 code 객체의 내용을 모두 삭제합니다.
@@ -60,8 +60,8 @@ public class CodeCacheService { //extends EgovAbstractServiceImpl
      */
     public static String getCodeGroupNm(String codecd) throws Exception {
         String returnVal = "";
-        Iterator<Map> iterator = codeGroup.iterator();
-        Map map;
+        Iterator<Map<String, Object>> iterator = codeGroup.iterator();
+        Map<String, Object> map;
         while (iterator.hasNext()) {
             map = iterator.next();
             if (codecd.equals(map.get("codecd"))) {
@@ -82,8 +82,8 @@ public class CodeCacheService { //extends EgovAbstractServiceImpl
      */
     public static String getCodeNm(String pcodecd, String detailCode) throws Exception {
         String returnVal = "";
-        Iterator<Map> iterator = code.iterator();
-        Map map;
+        Iterator<Map<String, Object>> iterator = code.iterator();
+        Map<String, Object> map;
         while (iterator.hasNext()) {
             map = iterator.next();
             if (pcodecd.equals(map.get("pcodecd")) && detailCode.equals(map.get("codecd"))) {
@@ -101,12 +101,10 @@ public class CodeCacheService { //extends EgovAbstractServiceImpl
      * @return 지정된 코드 그룹에 대한 상세 코드 정보를 포함하는 맵 목록
      * @throws Exception 검색 과정 중 오류가 발생하면 예외를 던집니다.
      */
-    public static List<Map> getCode(String pcodecd) throws Exception {
-
-        List<Map> returnVal = new ArrayList<Map>();
-
-        Iterator<Map> iterator = code.iterator();
-        Map map;
+    public static List<Map<String, Object>> getCode(String pcodecd) throws Exception {
+        List<Map<String, Object>> returnVal = new ArrayList<>();
+        Iterator<Map<String, Object>> iterator = code.iterator();
+        Map<String, Object> map;
         while (iterator.hasNext()) {
             map = iterator.next();
             if (pcodecd.equals(map.get("pcodecd"))) {
@@ -122,7 +120,7 @@ public class CodeCacheService { //extends EgovAbstractServiceImpl
      * @return 각 맵이 상세 코드를 나타내는 Map 객체의 리스트
      * @throws Exception 검색 과정 중 오류가 발생하면 예외를 던집니다.
      */
-    public static List<Map> getCode() throws Exception {
+    public static List<Map<String, Object>> getCode() throws Exception {
         return code;
     }
 
@@ -141,23 +139,18 @@ public class CodeCacheService { //extends EgovAbstractServiceImpl
      */
     @PostConstruct
     public void resetCodeList() throws Exception {
-
         if (codeGroup.isEmpty()) {
             synchronized (codeGroup) {
                 if (codeGroup.isEmpty()) {
-
-                    List<Map> mapList;
-                    // 코드 그룹
-                    mapList = (ArrayList<Map>)codeCacheDAO.selectListCodeGroup();    // codecd,  codenm
-
+                    @SuppressWarnings("unchecked")
+                    List<Map<String, Object>> mapList = (ArrayList<Map<String, Object>>)codeCacheDAO.selectListCodeGroup();    // codecd,  codenm
                     codeGroup.clear();
                     codeGroup.addAll(mapList);
-
                     // 상세코드
-                    mapList = (ArrayList<Map>)codeCacheDAO.selectListCode();    // pcodecd, codecd, codenm
+                    @SuppressWarnings("unchecked")
+                    List<Map<String, Object>> mapList2 = (ArrayList<Map<String, Object>>)codeCacheDAO.selectListCode();    // pcodecd, codecd, codenm
                     code.clear();
-                    code.addAll(mapList);
-
+                    code.addAll(mapList2);
                 }
             }
         }
