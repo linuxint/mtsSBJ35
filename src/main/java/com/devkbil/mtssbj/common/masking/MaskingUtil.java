@@ -24,6 +24,23 @@ public class MaskingUtil {
     }
 
     /**
+     * Mask 어노테이션 기반 마스킹 처리 (정규식 우선, 없으면 타입 기반)
+     *
+     * @param mask Mask 어노테이션
+     * @param value 마스킹할 원본 문자열
+     * @return 마스킹된 문자열
+     */
+    public static String maskingOf(Mask mask, String value) {
+        if (mask == null || value == null) return value;
+        if (!mask.pattern().isEmpty()) {
+            // 정규식 기반 마스킹: 패턴에 매칭되는 부분을 ****로 대체
+            return value.replaceAll(mask.pattern(), "****");
+        } else {
+            return maskingOf(mask.type(), value);
+        }
+    }
+
+    /**
      * 이름에 대한 마스킹을 적용합니다.
      * 첫 글자와 마지막 글자를 제외한 나머지를 '*'로 마스킹합니다.
      * 예시: "홍길동" → "홍*동"

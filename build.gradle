@@ -5,13 +5,13 @@ import org.cyclonedx.gradle.CycloneDxTask
 import org.apache.maven.artifact.versioning.ComparableVersion
 
 plugins {
-    id 'org.springframework.boot' version '3.5.3'
+    id 'org.springframework.boot' version '3.5.4'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'maven-publish'
     id 'java'
     id 'org.springdoc.openapi-gradle-plugin' version '1.9.0'
     id 'checkstyle'
-    id 'com.diffplug.spotless' version '7.1.0'
+    id 'com.diffplug.spotless' version '7.2.1'
     id 'org.cyclonedx.bom' version '2.3.1'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'net.ltgt.errorprone' version '4.3.0'
@@ -140,7 +140,7 @@ dependencies {
 
     // 캐시 관련
     implementation 'org.springframework.boot:spring-boot-starter-cache'
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.2.1'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.2.2'
 //    implementation 'org.ehcache:ehcache' //:3.10.8
 
     // 코드 품질
@@ -203,7 +203,7 @@ dependencies {
     // 5. 데이터베이스 및 퍼시스턴스
     // ======================
     // JDBC Drivers
-    implementation 'org.xerial:sqlite-jdbc:3.50.2.0'
+    implementation 'org.xerial:sqlite-jdbc:3.50.3.0'
     implementation 'com.oracle.database.jdbc:ojdbc11:23.8.0.25.04'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.5.4'
     runtimeOnly 'com.h2database:h2:2.3.232'
@@ -236,10 +236,10 @@ dependencies {
     implementation 'io.micrometer:micrometer-tracing'
 
     // Database Monitoring
-    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.11.0'
-    implementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:1.11.0'
-    implementation 'com.github.gavlyukovskiy:flexy-pool-spring-boot-starter:1.11.0'
-    implementation 'net.ttddyy:datasource-proxy:1.10.1'
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.12.0'
+    implementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:1.12.0'
+    implementation 'com.github.gavlyukovskiy:flexy-pool-spring-boot-starter:1.12.0'
+    implementation 'net.ttddyy:datasource-proxy:1.11.0'
 
     // Application Monitoring
     implementation 'de.codecentric:spring-boot-admin-starter-client:3.5.1'
@@ -307,8 +307,8 @@ dependencies {
     implementation 'org.jodd:jodd-util:6.3.0'
 //    implementation 'commons-lang:commons-lang:2.6'
     implementation 'org.apache.commons:commons-lang3:3.18.0'
-    implementation 'org.apache.commons:commons-text:1.13.1'
-    implementation 'io.projectreactor:reactor-core:3.8.0-M4'  // Reactor Core 추가
+    implementation 'org.apache.commons:commons-text:1.14.0'
+    implementation 'io.projectreactor:reactor-core:3.8.0-M5'  // Reactor Core 추가
 
 
     // Code Quality
@@ -324,8 +324,8 @@ dependencies {
     // ======================
     // Hibernate
     implementation 'org.hibernate.validator:hibernate-validator:9.0.1.Final'
-    implementation 'org.hibernate.orm:hibernate-core:7.0.5.Final'
-    implementation 'org.hibernate.orm:hibernate-jcache:7.0.5.Final'
+    implementation 'org.hibernate.orm:hibernate-core:7.0.7.Final'
+    implementation 'org.hibernate.orm:hibernate-jcache:7.0.7.Final'
 
     // Jakarta Persistence
     implementation 'jakarta.validation:jakarta.validation-api:3.1.1'
@@ -363,7 +363,7 @@ dependencies {
     // 17. Miscellaneous
     // ======================
     // Network
-    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.2.Final'
+    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.3.Final'
 
     // Version Control
     implementation 'org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r'
