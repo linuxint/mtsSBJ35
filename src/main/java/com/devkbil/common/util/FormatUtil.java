@@ -366,8 +366,9 @@ public class FormatUtil {
     public static String getBizNo(String source) {
         if (source == null) {
             return null;
+        } else {
+            return source.replaceAll("^(\\d\\d\\d)(\\d\\d)(\\d\\d\\d\\d\\d)$", "$1-$2-$3");
         }
-        return source.replaceAll("^(\\d\\d\\d)(\\d\\d)(\\d\\d\\d\\d\\d)$", "$1-$2-$3");
     }
 
     /**
