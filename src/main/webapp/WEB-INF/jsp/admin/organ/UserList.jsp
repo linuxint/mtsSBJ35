@@ -30,8 +30,23 @@
             <td><a href="javascript:fn_UserRead(<c:out value="${listview.userno}"/>)"><c:out value="${listview.userid}"/></a></td>
             <td><a href="javascript:fn_UserRead(<c:out value="${listview.userno}"/>)"><c:out value="${listview.usernm}"/></a></td>
             <td><c:out value="${listview.userrole}"/></td>
-            <td><a href="javascript:fn_UserDelete(<c:out value="${listview.userno}"/>)"><i class="fa fa-times fa-fw"></i></a></td>
+            <td>
+                <a href="javascript:fn_UserDelete(<c:out value="${listview.userno}"/>)"><i class="fa fa-times fa-fw"></i></a>
+                <a href="javascript:sendToAD('<c:out value="${listview.userno}"/>','<c:out value="${listview.userpw}"/>','<c:out value="${listview.usernm}"/>','<c:out value="${listview.userid}"/>')"><i class="fa fa-times fa-fw"></i></a>
+            </td>
         </tr>
     </c:forEach>
     </tbody>
 </table>
+
+<script type="text/javascript">
+function sendToAD(username, password, displayName, userid) {
+    fetch('/api/ldap/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, displayName, userid })
+    })
+    .then(res => res.text())
+    .then(msg => alert(msg));
+}
+</script>
