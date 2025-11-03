@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{common.pageTitle}"></title>
+
+    <link href="/css/sb-admin/bootstrap.min.css" rel="stylesheet">
+
+    <style type="text/css">
+        .error-template {
+            padding: 40px 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="wrapper">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="error-template">
+                <h1>Exception Error</h1>
+                <h2 th:text="${status}"></h2>
+                <div class="error-details" th:text="${errorResponse.reason}">
+                </div>
+                <div th:text="${#dates.format(timestamp, 'yyyy-MM-dd HH:mm:ss')}"></div>
+                <div>
+                    <a th:href="@{/}" class="btn btn-default btn-lg">
+                        <span class="glyphicon glyphicon-home"></span> Take Me Home
+                    </a>
+                </div>
+                <div th:if="${errorResponse}">
+                    <hr/>
+                    <h3>JSON Error</h3>
+                    <pre th:text="${errorJson}"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>

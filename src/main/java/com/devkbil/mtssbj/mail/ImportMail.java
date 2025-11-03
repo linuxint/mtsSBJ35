@@ -8,6 +8,7 @@ import jakarta.xml.bind.annotation.XmlType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -58,7 +59,15 @@ public class ImportMail implements Runnable {
         }
 
         try {
-            list.forEach(obj -> executor.submit(() -> processMailAccount((MailInfoVO) obj)));
+            list.forEach(obj ->
+                    CompletableFuture.runAsync(
+                            () -> processMailAccount((MailInfoVO) obj),
+                            executor
+                    ).exceptionally(ex -> {
+                        log.error("메일 계정 처리 중 오류 발생: 사용자={}, 계정={}", userno, obj, ex);
+                        return null;
+                    })
+            );
         } catch (Exception e) {
             log.error("메일 수신 작업 중 오류 발생: 사용자={}", userno, e);
         } finally {
@@ -71,8 +80,9 @@ public class ImportMail implements Runnable {
         SpringIntegrationImap mail = new SpringIntegrationImap();
 
         try {
-            mail.connect(mivo.getEmiimap(), mivo.getEmiuser(), mivo.getEmipw());
+            mail.connect(mivo.getEmiimap(), mivo.getEmiimapport(), mivo.getEmiuser(), mivo.getEmipw());
             int total = mail.patchMessage(chgdate);
+            log.info("메일 검색 총 건수: {}", total);
 
             int cnt = 0;
             while (cnt < total) {
@@ -80,6 +90,7 @@ public class ImportMail implements Runnable {
                 if (msgList != null && !msgList.isEmpty()) {
                     mailService.insertMails(msgList, userno, mivo.getEmino());
                     cnt += msgList.size();
+                    log.info("DB 삽입 누적 건수: {} (이번 배치: {})", cnt, msgList.size());
                 } else {
                     break;
                 }

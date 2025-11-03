@@ -12,9 +12,10 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.Random;
+import java.nio.charset.StandardCharsets;
 
 /**
  * OTP(One Time Password) 생성 및 검증을 위한 유틸리티 클래스입니다.
@@ -27,20 +28,20 @@ public class OtpUtil {
      *
      * @param userName 사용자계정 - OTP 발급 대상 사용자의 식별자
      * @param hostName 시스템구분 - OTP를 사용할 시스템의 식별자
-     * @return HashMap 객체로, 다음 키를 포함:
+     * @return Map 객체로, 다음 키를 포함:
      *         - "encodedKey": Base32로 인코딩된 비밀키
      *         - "url": QR 코드 생성을 위한 URL
      */
-    public static HashMap<String, String> generate(String userName, String hostName) {
+    public static Map<String, String> generate(String userName, String hostName) {
 
-        HashMap<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         byte[] buffer = new byte[5 + 5 * 5];
         new Random().nextBytes(buffer);
         Base32 codec = new Base32();
         byte[] secretKey = Arrays.copyOf(buffer, 10);
         byte[] bEncodedKey = codec.encode(secretKey);
 
-        String encodedKey = new String(bEncodedKey);
+        String encodedKey = new String(bEncodedKey, StandardCharsets.UTF_8);
         String url = getQRBarcodeURL(userName, hostName, encodedKey);
         map.put("encodedKey", encodedKey);
         map.put("url", url);
@@ -71,7 +72,7 @@ public class OtpUtil {
      */
     public static boolean checkCode(String userCode, String otpkey) {
         long otpnum = Integer.parseInt(userCode);
-        long wave = new Date().getTime() / 30000;
+        long wave = System.currentTimeMillis() / 30000;
         boolean result = false;
         try {
             Base32 codec = new Base32();

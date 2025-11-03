@@ -70,6 +70,10 @@ public class MemberService {
         return sqlSession.insert("insertLogOut", param);
     }
 
+    public UserVO selectMemberOne(String userno) {
+        return sqlSession.selectOne("selectMemberOne", userno);
+    }
+
     /**
      * 사용자 ID를 기반으로 회원 정보를 조회합니다.
      *

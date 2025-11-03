@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 /**
@@ -29,7 +32,7 @@ public class ApplicationContextRefreshedEventListener implements ApplicationList
     public void onApplicationEvent(ContextRefreshedEvent event) {
         logSystem.debug("***********************************************************");
         logSystem.debug("*                                                         *");
-        logSystem.debug("* ContextRefreshedEvent 발생 시간: {} ", new Date(event.getTimestamp()));
+        logSystem.debug("* ContextRefreshedEvent 발생 시간: {} ", LocalDateTime.ofInstant(Instant.ofEpochMilli(event.getTimestamp()), ZoneId.systemDefault()));
         logSystem.debug("*                                                         *");
         logSystem.debug("***********************************************************");
     }

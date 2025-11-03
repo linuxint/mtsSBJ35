@@ -9,6 +9,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Locale;
+
 /**
  * DeviceDetectorInterceptor는 요청의 User-Agent 정보를 분석하여 디바이스의 종류(모바일/태블릿/일반)를 판별합니다.
  */
@@ -53,7 +55,7 @@ public class DeviceDetectorInterceptor implements HandlerInterceptor {
             return DEVICE_NORMAL; // 기본 디바이스
         }
 
-        String lowerUserAgent = userAgent.toLowerCase();
+        String lowerUserAgent = userAgent.toLowerCase(Locale.ROOT);
 
         if (lowerUserAgent.contains("android") && lowerUserAgent.contains("mobile")) {
             return DEVICE_MOBILE;

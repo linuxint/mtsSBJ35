@@ -5,6 +5,7 @@ import com.devkbil.mtssbj.search.SearchVO;
 
 import jakarta.mail.MessagingException;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionException;
@@ -161,6 +162,13 @@ public class MailService {
             param.setEmino(param.getEmfrom());
             param.setEmfrom(fromVO.getEmiuser());
 
+            // 본문 HTML 정규화: HTML 엔티티를 1~2회 풀어 원본 태그 형태로 저장/전송
+            if (param.getEmcontents() != null) {
+                String c = StringEscapeUtils.unescapeHtml4(param.getEmcontents());
+                c = StringEscapeUtils.unescapeHtml4(c);
+                param.setEmcontents(c);
+            }
+
             // 메일 DB에 삽입
             insertMailOne(param);
 
@@ -170,7 +178,9 @@ public class MailService {
                 fromVO.getEmismtpport(),
                 fromVO.getEmiuser(),
                 fromVO.getUsernm(),
-                fromVO.getEmipw()
+                fromVO.getEmipw(),
+                fromVO.getEmismtpauth(),
+                fromVO.getEmistarttl()
             );
             mailSender.send(true, to, cc, bcc, param.getEmsubject(), param.getEmcontents());
 

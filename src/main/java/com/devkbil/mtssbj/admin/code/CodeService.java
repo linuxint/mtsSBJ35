@@ -14,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -130,9 +133,22 @@ public class CodeService {
                 return cell.getStringCellValue();
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    return cell.getDateCellValue().toString();
+                    // 날짜 셀 처리
+                    LocalDateTime localDateTime = cell.getDateCellValue()
+                            .toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime();
+                    // 원하는 포맷 지정
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    return localDateTime.format(formatter);
                 } else {
-                    return String.valueOf((int)cell.getNumericCellValue());
+                    // 숫자 셀 처리 (정수로 변환)
+                    double value = cell.getNumericCellValue();
+                    if (value == (long) value) {
+                        return String.valueOf((long) value);
+                    } else {
+                        return String.valueOf(value);
+                    }
                 }
             case BOOLEAN:
                 return String.valueOf(cell.getBooleanCellValue());

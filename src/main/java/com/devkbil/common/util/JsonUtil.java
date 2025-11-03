@@ -1,18 +1,15 @@
 package com.devkbil.common.util;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper.Builder;
-import com.fasterxml.jackson.databind.ser.FilterProvider;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.PropertyNamingStrategy;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.ser.FilterProvider;
+import tools.jackson.databind.ser.std.SimpleBeanPropertyFilter;
+import tools.jackson.databind.ser.std.SimpleFilterProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,22 +25,15 @@ public class JsonUtil {
      * 기본적으로 제외할 필드 목록.
      * 비밀번호 관련 필드를 포함하며, 직렬화에서 제외됩니다.
      */
-    public static final String[] DEFAULT_EXCLUDE = {"password", "pwd", "userPwd", "currentPwd", "newPwd", "oldPwd"};
+    private static final String[] DEFAULT_EXCLUDE = {"password", "pwd", "userPwd", "currentPwd", "newPwd", "oldPwd"};
 
-    /**
-     * Jackson 기반 ObjectMapper 객체.
-     * 기본적으로 null 값을 포함하지 않으며, 특정 설정이 미리 적용되어 있다.
-     */
-    private static final ObjectMapper mapper = new ObjectMapper();
-
-    static {
-        /**
-         * 초기 설정 블록:
-         * 필터 설정 및 기본 직렬화 동작을 정의합니다.
-         */
-        mapper.setSerializationInclusion(Include.NON_NULL); // null 값 직렬화 제외
-        mapper.addMixIn(Object.class, MyMixIn.class); // 기본 MixIn 클래스
-        mapper.setFilterProvider(getFilterProvider(DEFAULT_EXCLUDE)); // 필터로 필드 제외
+    private static ObjectMapper mapperFor(PropertyNamingStrategy pns) {
+        JsonMapper.Builder builder = JsonMapper.builder()
+                .addMixIn(Object.class, MyMixIn.class);
+        if (pns != null) {
+            builder = builder.propertyNamingStrategy(pns);
+        }
+        return builder.build();
     }
 
     /**
@@ -96,15 +86,11 @@ public class JsonUtil {
      * @return 설정된 ObjectMapper
      */
     private static ObjectMapper getMapper(FilterProvider filterProvider, PropertyNamingStrategy pns) {
-        if (filterProvider == null) {
-            filterProvider = getFilterProvider(DEFAULT_EXCLUDE);
-        }
         if (pns == null) {
             pns = PropertyNamingStrategies.LOWER_CAMEL_CASE;
         }
-        mapper.setFilterProvider(filterProvider);
-        mapper.setPropertyNamingStrategy(pns);
-        return mapper;
+        // In Jackson 3, avoid mutating a global mapper; build per-use
+        return mapperFor(pns);
     }
 
     /**
@@ -126,11 +112,7 @@ public class JsonUtil {
         combinedWordList.addAll(defaultExcludeWordList);
         String[] combineExcludeWords = new String[combinedWordList.size()];
         combinedWordList.toArray(combineExcludeWords);
-        try {
-            return getMapper(getFilterProvider(combineExcludeWords)).writer().writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return getMapper().writer(getFilterProvider(combineExcludeWords)).writeValueAsString(object);
     }
 
     /**
@@ -148,11 +130,7 @@ public class JsonUtil {
         SimpleFilterProvider simpleFilterProvider = new SimpleFilterProvider();
         FilterProvider filterProvider = simpleFilterProvider//
                 .addFilter("myMixIn", SimpleBeanPropertyFilter.filterOutAllExcept(includeWords));
-        try {
-            return getMapper(filterProvider).writer().writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return getMapper().writer(filterProvider).writeValueAsString(object);
     }
 
     /**
@@ -165,11 +143,7 @@ public class JsonUtil {
         if (object == null) {
             return null;
         }
-        try {
-            return getMapper(getFilterProvider(DEFAULT_EXCLUDE)).writer().writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return getMapper(getFilterProvider(DEFAULT_EXCLUDE)).writer().writeValueAsString(object);
     }
 
     /**
@@ -183,12 +157,11 @@ public class JsonUtil {
         if (object == null) {
             return null;
         }
-        try {
-            Builder builder = JsonMapper.builder().disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
-            return builder.build().writerWithView(serializationView).writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return JsonMapper.builder()
+                .disable(MapperFeature.DEFAULT_VIEW_INCLUSION)
+                .build()
+                .writerWithView(serializationView)
+                .writeValueAsString(object);
     }
 
     /**
@@ -239,13 +212,12 @@ public class JsonUtil {
      * @param <T>           대상 타입
      * @return 변환된 객체
      */
-    @SuppressWarnings("unchecked")
-    public static <T> T toObject(String string, TypeReference<?> typeReference) {
+    public static <T> T toObject(String string, TypeReference<T> typeReference) {
         if (string == null) {
             return null;
         }
         try {
-            return (T) getMapper().readValue(string, typeReference);
+            return getMapper().readValue(string, typeReference);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -260,8 +232,7 @@ public class JsonUtil {
      * @param <T>                     대상 타입
      * @return 변환된 객체
      */
-    @SuppressWarnings("unchecked")
-    public static <T> T toObject(String string, TypeReference<?> typeReference,
+    public static <T> T toObject(String string, TypeReference<T> typeReference,
                                  PropertyNamingStrategy propertyNamingStrategies) {
         if (string == null) {
             return null;
@@ -284,14 +255,10 @@ public class JsonUtil {
         if (object == null) {
             return null;
         }
-        try {
-            if (filters != null) {
-                return getMapper().writer(filters).writeValueAsString(object);
-            } else {
-                return getMapper().writer().writeValueAsString(object);
-            }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        if (filters != null) {
+            return getMapper().writer(filters).writeValueAsString(object);
+        } else {
+            return getMapper().writer().writeValueAsString(object);
         }
     }
 
@@ -299,7 +266,7 @@ public class JsonUtil {
      * JSON 필드 필터링을 위한 MixIn 클래스.
      */
     @JsonFilter("myMixIn")
-    public class MyMixIn {
+    public static class MyMixIn {
         //
     }
 

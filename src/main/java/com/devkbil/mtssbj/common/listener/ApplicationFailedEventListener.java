@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationFailedEvent;
 import org.springframework.context.ApplicationListener;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 /**
@@ -29,7 +32,7 @@ public class ApplicationFailedEventListener implements ApplicationListener<Appli
     public void onApplicationEvent(ApplicationFailedEvent event) {
         logSystem.debug("***********************************************************");
         logSystem.debug("*                                                         *");
-        logSystem.debug("* ApplicationFailedEvent 발생 시간: {}", new Date(event.getTimestamp()));
+        logSystem.debug("* ApplicationFailedEvent 발생 시간: {}", LocalDateTime.ofInstant(Instant.ofEpochMilli(event.getTimestamp()), ZoneId.systemDefault()));
         logSystem.debug("*                                                         *");
         logSystem.debug("***********************************************************");
     }

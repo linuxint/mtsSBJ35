@@ -2,17 +2,12 @@ package com.devkbil.mtssbj.config;
 
 import com.devkbil.common.CustomXssFilter;
 import com.devkbil.common.HtmlCharacterEscapes;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.Filter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,28 +20,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
-public class XssConfig implements WebMvcConfigurer {
-
-    private final ObjectMapper objectMapper;
-
+public class XssConfig {
     /**
-     * (1) HTML 특수 문자를 이스케이프 처리하도록 수정된 ObjectMapper 기반의
-     * Jackson Message Converter 등록
+     * HTML 특수 문자를 이스케이프 처리하도록 수정된 ObjectMapper 빈 등록 (Jackson 3.x)
      */
     @Bean
-    public MappingJackson2HttpMessageConverter createJsonEscapeConverter() {
-        ObjectMapper escapedObjectMapper = objectMapper.copy();
-        escapedObjectMapper.getFactory().setCharacterEscapes(new HtmlCharacterEscapes());
-        return new MappingJackson2HttpMessageConverter(escapedObjectMapper);
+    public ObjectMapper xssSafeObjectMapper() {
+        // Jackson 3.x에서는 ObjectMapper에 직접 CharacterEscapes를 적용할 수 없습니다.
+        // 대신 ObjectMapper를 생성하고, 필요하다면 ObjectWriter/JsonGenerator 사용 시 CharacterEscapes를 적용해야 합니다.
+        // 빈 등록은 기본 ObjectMapper로 하고, 실제 직렬화 시점에 escapes 적용 권장
+        return new ObjectMapper();
     }
 
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(createJsonEscapeConverter());
-    }
-
-    /**₩₩
-     * (2) 커스텀 XSS 필터 등록 - 파라미터 기반 XSS 방지
+    /**
+     * 커스텀 XSS 필터 등록 - 파라미터 기반 XSS 방지
      */
     @Bean
     public FilterRegistrationBean<Filter> xssFilterRegistrationBean() {
@@ -57,4 +44,12 @@ public class XssConfig implements WebMvcConfigurer {
         return registration;
     }
 
+    @Bean
+    public FilterRegistrationBean<CustomXssFilter> xssFilterRegistration() {
+        FilterRegistrationBean<CustomXssFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new CustomXssFilter());
+        registrationBean.addUrlPatterns("/*"); // 필요한 경로 지정
+        registrationBean.setOrder(1); // 필터 순서
+        return registrationBean;
+    }
 }

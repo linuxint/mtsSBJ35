@@ -92,24 +92,13 @@ public class HttpUtil {
         httpPost.setHeaders(headers);
 
         HttpClientContext context = HttpClientContext.create();
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        try {
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
             httpPost.setEntity(new UrlEncodedFormEntity(params));
-            CloseableHttpResponse response = httpclient.execute(httpPost, context);
-            try {
-                String responseBody = EntityUtils.toString(response.getEntity(), charset);
-                return responseBody;
-            } finally {
-                response.close();
+            try (CloseableHttpResponse response = httpclient.execute(httpPost, context)) {
+                return EntityUtils.toString(response.getEntity(), charset);
             }
         } catch (Exception e) {
             throw new RuntimeException("POST 요청이 실패하였습니다.", e);
-        } finally {
-            try {
-                httpclient.close();
-            } catch (IOException e) {
-                throw new RuntimeException("HTTP 클라이언트 종료 중 오류가 발생하였습니다.", e);
-            }
         }
     }
 
@@ -169,23 +158,12 @@ public class HttpUtil {
         httpget.setConfig(getRequestConfig());
         httpget.setHeaders(headers);
         HttpClientContext context = HttpClientContext.create();
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        try {
-            CloseableHttpResponse response = httpclient.execute(httpget, context);
-            try {
-                String responseBody = EntityUtils.toString(response.getEntity(), charset);
-                return responseBody;
-            } finally {
-                response.close();
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            try (CloseableHttpResponse response = httpclient.execute(httpget, context)) {
+                return EntityUtils.toString(response.getEntity(), charset);
             }
         } catch (Exception e) {
             throw new RuntimeException("GET 요청이 실패하였습니다.", e);
-        } finally {
-            try {
-                httpclient.close();
-            } catch (IOException e) {
-                throw new RuntimeException("HTTP 클라이언트 종료 중 오류가 발생하였습니다.", e);
-            }
         }
     }
 
@@ -206,25 +184,13 @@ public class HttpUtil {
         httpPost.setHeaders(headers);
 
         HttpClientContext context = HttpClientContext.create();
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        try {
-
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
             httpPost.setEntity(new StringEntity(String.valueOf(requestBody)));
-            CloseableHttpResponse response = httpclient.execute(httpPost, context);
-            try {
-                String responseBody = EntityUtils.toString(response.getEntity(), charset);
-                return responseBody;
-            } finally {
-                response.close();
+            try (CloseableHttpResponse response = httpclient.execute(httpPost, context)) {
+                return EntityUtils.toString(response.getEntity(), charset);
             }
         } catch (Exception e) {
             throw new RuntimeException("POST 요청이 실패하였습니다.", e);
-        } finally {
-            try {
-                httpclient.close();
-            } catch (IOException e) {
-                throw new RuntimeException("HTTP 클라이언트 종료 중 오류가 발생하였습니다.", e);
-            }
         }
     }
 }

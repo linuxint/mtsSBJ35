@@ -2,13 +2,15 @@ package com.devkbil.mtssbj.mail.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.mail.ImapMailReceiver;
-import org.springframework.integration.mail.MailSendingMessageHandler;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.config.EnableIntegration;
+import org.springframework.integration.mail.inbound.ImapMailReceiver;
+import org.springframework.integration.mail.outbound.MailSendingMessageHandler;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.util.Properties;
 
@@ -63,6 +65,19 @@ public class MailIntegrationConfig {
     public MailSendingMessageHandler mailSendingHandler(JavaMailSender mailSender) {
         MailSendingMessageHandler handler = new MailSendingMessageHandler(mailSender);
         return handler;
+    }
+
+    /**
+     * Spring Integration이 사용하는 전역 taskScheduler 빈 등록.
+     * 빈 이름은 IntegrationContextUtils.TASK_SCHEDULER_BEAN_NAME ("taskScheduler") 와 일치해야 합니다.
+     */
+    @Bean(name = "taskScheduler")
+    public TaskScheduler taskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(4);
+        scheduler.setThreadNamePrefix("integration-task-");
+        scheduler.initialize();
+        return scheduler;
     }
 
     /**

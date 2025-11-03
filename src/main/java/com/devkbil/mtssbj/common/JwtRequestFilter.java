@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj.common;
 
-import io.jsonwebtoken.io.IOException;
+import java.io.IOException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -37,16 +37,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
      * @param request  현재 HTTP 요청 객체
      * @param response 현재 HTTP 응답 객체
      * @param chain    필터 체인의 다음 필터로 요청 전달
-     * @throws ServletException    서블릿 예외 처리
-     * @throws IOException         입출력 예외 처리
-     * @throws java.io.IOException 파일 입출력 예외 처리
+     * @throws ServletException 서블릿 예외 처리
+     * @throws IOException      입출력 예외 처리
      */
     @Override
     protected void doFilterInternal(
         HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-        throws ServletException,
-        IOException,
-        java.io.IOException {
+        throws ServletException, IOException {
 
         final String authorizationHeader = request.getHeader("Authorization"); // Authorization 헤더에서 토큰 추출
 

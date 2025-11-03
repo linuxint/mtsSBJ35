@@ -50,7 +50,6 @@ public class BoardGroupController {
     })
     public String boardGroupList(ModelMap modelMap) {
 
-
         List<?> listview = boardGroupService.selectBoardGroupList();
 
         TreeMaker tm = new TreeMaker();

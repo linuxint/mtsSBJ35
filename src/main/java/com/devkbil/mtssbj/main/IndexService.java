@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -85,28 +86,29 @@ public class IndexService {
 
         List<DateVO> calenList = new ArrayList<>();
 
-        Date today = DateUtil.getToday();
+        LocalDate today = DateUtil.toLocalDate(DateUtil.getToday());
         int month = DateUtil.getMonth(targetDay); // 월 계산
         int week = DateUtil.getWeekOfMonth(targetDay); // 주 계산
 
-        Date fweek = DateUtil.getFirstOfWeek(targetDay); // 주 시작일
-        Date lweek = DateUtil.getLastOfWeek(targetDay); // 주 종료일
-        Date preWeek = DateUtil.dateAdd(fweek, -1); // 이전 주
-        Date nextWeek = DateUtil.dateAdd(lweek, 1); // 다음 주
+        LocalDate fweek = DateUtil.toLocalDate(DateUtil.getFirstOfWeek(targetDay)); // 주 시작일
+        LocalDate lweek = DateUtil.toLocalDate(DateUtil.getLastOfWeek(targetDay)); // 주 종료일
+        LocalDate preWeek = fweek.minusDays(1); // 이전 주
+        LocalDate nextWeek = lweek.plusDays(1); // 다음 주
 
         ExtFieldVO fld = new ExtFieldVO();
         fld.setField1(userno);
 
-        while (fweek.compareTo(lweek) <= 0) {
-            DateVO dvo = DateUtil.date2VO(fweek);
-            dvo.setIstoday(DateUtil.dateDiff(fweek, today) == 0); // 오늘 여부 설정
-            dvo.setDate(DateUtil.date2Str(fweek)); // 날짜 설정
+        LocalDate current = fweek;
+        while (!current.isAfter(lweek)) {
+            DateVO dvo = DateUtil.toVO(DateUtil.toDate(current));
+            dvo.setIstoday(current.isEqual(today)); // 오늘 여부 설정
+            dvo.setDate(current.toString()); // 날짜 설정
 
             fld.setField2(dvo.getDate());
             dvo.setList(selectSchList4Calen(fld)); // 해당 날짜의 일정 조회
 
             calenList.add(dvo);
-            fweek = DateUtil.dateAdd(fweek, 1); // 다음 날짜로 이동
+            current = current.plusDays(1); // 다음 날짜로 이동
         }
 
         // 캘린더 데이터를 Map으로 반환
@@ -114,8 +116,8 @@ public class IndexService {
         calendarData.put("month", month);
         calendarData.put("week", week);
         calendarData.put("calenList", calenList);
-        calendarData.put("preWeek", DateUtil.date2Str(preWeek));
-        calendarData.put("nextWeek", DateUtil.date2Str(nextWeek));
+        calendarData.put("preWeek", preWeek.toString());
+        calendarData.put("nextWeek", nextWeek.toString());
 
         return calendarData;
     }

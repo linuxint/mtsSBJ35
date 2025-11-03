@@ -5,8 +5,8 @@ import org.apache.catalina.connector.Connector;
 import org.apache.coyote.ajp.AbstractAjpProtocol;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.servlet.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -47,7 +47,7 @@ public class TomcatConfiguration {
             }
         };
 
-        tomcat.addAdditionalTomcatConnectors(createAjpConnector()); // ajp 포트
+        tomcat.addAdditionalConnectors(createAjpConnector()); // ajp 포트
         //tomcat.addAdditionalTomcatConnectors(redirectConnector()); // 서비스 기본포트
         //createStandardConnector(8081); // http 추가포트
 

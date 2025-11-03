@@ -44,8 +44,11 @@ public class SpringIntegrationSendMail {
      * @param user   SMTP 계정 (발신 메일 계정)
      * @param usernm SMTP 사용자 이름
      * @param pw     SMTP 계정 비밀번호
+     * @param smtpauthYN SMTP 인증 사용 여부(Y/N)
+     * @param starttlsYN STARTTLS 사용 여부(Y/N)
      */
-    public SpringIntegrationSendMail(String host, String port, String user, String usernm, String pw) {
+    public SpringIntegrationSendMail(String host, String port, String user, String usernm, String pw,
+                                     String smtpauthYN, String starttlsYN) {
         this.smtpHost = host;
         this.smtpPort = port;
         this.smtpAccount = user;
@@ -54,6 +57,8 @@ public class SpringIntegrationSendMail {
         if (!"465".equals(port)) {  // 465 포트가 아니면 SSL 비활성화
             smtpssl = "false";
         }
+        boolean smtpAuth = "Y".equalsIgnoreCase(smtpauthYN);
+        boolean startTls = "Y".equalsIgnoreCase(starttlsYN);
         
         // Spring의 JavaMailSender 설정
         JavaMailSenderImpl sender = new JavaMailSenderImpl();
@@ -63,19 +68,29 @@ public class SpringIntegrationSendMail {
         sender.setPassword(smtpPasswd);
         
         Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.auth", String.valueOf(smtpAuth));
         props.put("mail.debug", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.EnableSSL.enable", "true");
-        
+        props.put("mail.smtp.starttls.enable", String.valueOf(startTls));
+
+        // 465(SSL) 포트 사용 시 SSL 사용
         if ("true".equals(smtpssl)) {
+            props.put("mail.smtp.ssl.enable", "true");
             props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
             props.put("mail.smtp.socketFactory.port", smtpPort);
+            // SSL 사용 시 STARTTLS는 보통 불필요하므로 비활성화 가능
+            if (startTls) {
+                props.put("mail.smtp.starttls.enable", "false");
+            }
         }
         props.put("mail.smtp.socketFactory.fallback", "false");
         
         sender.setJavaMailProperties(props);
         this.mailSender = sender;
+    }
+
+    // 하위호환: 기존 시그니처는 AUTH/STARTTLS를 기본 Y로 가정
+    public SpringIntegrationSendMail(String host, String port, String user, String usernm, String pw) {
+        this(host, port, user, usernm, pw, "Y", "Y");
     }
 
     /**

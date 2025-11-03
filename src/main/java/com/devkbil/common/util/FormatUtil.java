@@ -1,11 +1,18 @@
 package com.devkbil.common.util;
 
+import com.google.common.base.Splitter;
+
 import java.io.File;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -50,12 +57,12 @@ public class FormatUtil {
         }
         try {
             String strValue = String.valueOf(input);
-            String[] parts = strValue.split("\\.");
-            if (parts.length < 2 || decimalPlaces == 0) {
-                return String.format("%,d", Long.parseLong(parts[0]));
+            List<String> parts = Splitter.on('.').splitToList(strValue);
+            if (parts.size() < 2 || decimalPlaces == 0) {
+                return String.format("%,d", Long.parseLong(parts.get(0)));
             } else {
-                return String.format("%,d", Long.parseLong(parts[0])) + "." + parts[1].substring(0,
-                    Math.min(decimalPlaces, parts[1].length())).replaceAll("0+$", "");
+                return String.format("%,d", Long.parseLong(parts.get(0))) + "." + parts.get(1).substring(0,
+                    Math.min(decimalPlaces, parts.get(1).length())).replaceAll("0+$", "");
             }
         } catch (NumberFormatException e) {
             return String.valueOf(input);
@@ -96,7 +103,7 @@ public class FormatUtil {
         if (source instanceof Date) {
             return getDateTime((Date) source);
         } else if (source instanceof Long) {
-            return getDateTime(new Date((Long) source));
+            return getDateTime(Date.from(Instant.ofEpochMilli((Long) source)));
         } else {
             return getDateTime(String.valueOf(source));
         }
@@ -366,9 +373,8 @@ public class FormatUtil {
     public static String getBizNo(String source) {
         if (source == null) {
             return null;
-        } else {
-            return source.replaceAll("^(\\d\\d\\d)(\\d\\d)(\\d\\d\\d\\d\\d)$", "$1-$2-$3");
         }
+        return source.replaceAll("^(\\d\\d\\d)(\\d\\d)(\\d\\d\\d\\d\\d)$", "$1-$2-$3");
     }
 
     /**
@@ -458,16 +464,16 @@ public class FormatUtil {
         if (mail == null) {
             return null;
         }
-        String[] datas = mail.split("@");
-        if (datas.length != 2) {
+        List<String> datas = Splitter.on('@').splitToList(mail);
+        if (datas.size() != 2) {
             return getSecurity(mail);
         }
-        String[] bodys = datas[1].split("\\.", 2);
-        if (bodys.length != 2) {
+        List<String> bodys = Splitter.on('.').limit(2).splitToList(datas.get(1));
+        if (bodys.size() != 2) {
             return getSecurity(mail);
         }
-        String header = getSecurity(datas[0]);
-        return header + "@" + getSecurity(bodys[0]) + "." + bodys[1];
+        String header = getSecurity(datas.get(0));
+        return header + "@" + getSecurity(bodys.get(0)) + "." + bodys.get(1);
     }
 
     /**
@@ -676,11 +682,12 @@ public class FormatUtil {
      * @throws RuntimeException 날짜 형식이 잘못된 경우
      */
     public static Date stringToDate(String dateString, String format) {
-        SimpleDateFormat simpleFormat = new SimpleDateFormat(format);
-        simpleFormat.setTimeZone(timeZone);
         try {
-            return simpleFormat.parse(dateString);
-        } catch (ParseException e) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+            LocalDateTime localDateTime = LocalDateTime.parse(dateString, formatter);
+            ZoneId zoneId = timeZone.toZoneId();
+            return Date.from(localDateTime.atZone(zoneId).toInstant());
+        } catch (DateTimeParseException e) {
             throw new RuntimeException(e);
         }
     }
@@ -705,9 +712,10 @@ public class FormatUtil {
      * @return 지정된 형식으로 변환된 날짜 문자열
      */
     public static String dateToString(Date date, String format) {
-        SimpleDateFormat simpleFormat = new SimpleDateFormat(format);
-        simpleFormat.setTimeZone(timeZone);
-        return simpleFormat.format(date.getTime());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        ZoneId zoneId = timeZone.toZoneId();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(date.toInstant(), zoneId);
+        return localDateTime.format(formatter);
     }
 
     /**
@@ -718,9 +726,10 @@ public class FormatUtil {
      * @return 지정된 형식으로 변환된 날짜 문자열
      */
     public static String dateToString(Calendar date, String format) {
-        SimpleDateFormat simpleFormat = new SimpleDateFormat(format);
-        simpleFormat.setTimeZone(timeZone);
-        return simpleFormat.format(date.getTime());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        ZoneId zoneId = timeZone.toZoneId();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(date.toInstant(), zoneId);
+        return localDateTime.format(formatter);
     }
 
     /**
@@ -743,13 +752,13 @@ public class FormatUtil {
             nowInt = Integer.parseInt(number.substring(len - i, len - i + 1));
             int han2Pick = (i - 1) % 4;
             if (nowInt > 0) {
-                result += (han1[nowInt]) + (han2[han2Pick]);
+                result += han1[nowInt] + han2[han2Pick];
                 if (han2Pick > 0) {
                     hasHan3 = false;
                 }
             }
             if (!hasHan3 && han2Pick == 0) {
-                result += (han3[(i - 1) / 4]);
+                result += han3[(i - 1) / 4];
                 hasHan3 = true;
             }
         }

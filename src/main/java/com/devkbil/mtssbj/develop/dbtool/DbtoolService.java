@@ -17,6 +17,9 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -338,12 +341,11 @@ public class DbtoolService {
                 return cell.getStringCellValue();
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    // Apache POI returns java.util.Date; if migration is not possible, document why.
                     java.util.Date date = cell.getDateCellValue();
-                    // If you want to convert to java.time.LocalDate:
-                    // LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                    // return localDate.toString();
-                    return date.toString();
+                    LocalDateTime localDateTime = date.toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime();
+                    return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                 } else {
                     return String.valueOf((int) cell.getNumericCellValue());
                 }

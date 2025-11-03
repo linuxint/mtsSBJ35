@@ -36,7 +36,10 @@ public class MailVO {
     private String emsubject;  // 제목
 
     @Schema(description = "메일 내용", example = "안녕하세요, 프로젝트 진행 상황을 공유드립니다.")
-    private String emcontents;  // 내용
+    private String emcontents;  // 내용 (미리보기/요약)
+
+    @Schema(description = "메일 본문 파일명(서버 저장)")
+    private String emcontentFile; // 전체 본문 파일 경로/이름
 
     @Schema(description = "작성일 (YYYY-MM-DD 형식)", example = "2023-11-15")
     private String regdate;  // 작성일

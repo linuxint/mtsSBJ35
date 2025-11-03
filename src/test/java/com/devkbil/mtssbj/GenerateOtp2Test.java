@@ -1,6 +1,6 @@
 package com.devkbil.mtssbj;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.nio.charset.StandardCharsets;
 
@@ -19,7 +19,7 @@ public class GenerateOtp2Test {
         log.debug(qturl);
 
         // 키값 생성부분
-        HashMap<String, String> map = generate("linuxint@gmail.com", "localhost");
+        Map<String, String> map = generate("linuxint@gmail.com", "localhost");
         String otpkey = map.get("encodedKey");
         String url = map.get("url");
         System.out.println("Generated Key : " + otpkey); // 앱에 세팅할 코드

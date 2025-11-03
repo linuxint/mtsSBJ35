@@ -1,6 +1,7 @@
 package com.devkbil.mtssbj.common.masking;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+
 import java.lang.reflect.Field;
 
 public class MaskingLogUtil {

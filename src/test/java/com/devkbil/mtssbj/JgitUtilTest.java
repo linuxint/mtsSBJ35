@@ -30,7 +30,7 @@ public class JgitUtilTest {
             GitConfig.GitHub github = new GitConfig.GitHub();
             github.setToken("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");
             github.setUsername("linuxint@gmail.com");
-            github.setRepository("linuxint/mtsSBJ35");
+            github.setRepository("linuxint/mtsSBJ40");
 
             GitConfig.Git git = new GitConfig.Git();
             git.setUsername("linuxint@gmail.com");

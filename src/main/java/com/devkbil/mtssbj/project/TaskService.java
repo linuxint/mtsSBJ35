@@ -74,12 +74,15 @@ public class TaskService {
             String userno = param.getUserno();
             if (StringUtils.hasText(userno)) {
                 ExtFieldVO fld = new ExtFieldVO(param.getTsno(), null, null);
-                // Note: split(",") may not handle spaces around commas. Consider split("\\s*,\\s*") for robustness.
-                String[] usernos = userno.split("\\s*,\\s*");
+
+                String[] usernos = StringUtils.delimitedListToStringArray(userno, ",");
+                for (int i = 0; i < usernos.length; i++) {
+                    usernos[i] = usernos[i].trim(); // 공백 제거
+                }
 
                 for (String uno : usernos) {
                     if (StringUtils.hasText(uno)) {
-                        fld.setField2(uno); // 각 작업자의 ID 설정
+                        fld.setField2(uno);
                         sqlSession.update("insertTaskUser", fld);
                     }
                 }

@@ -25,4 +25,3 @@ public class LdapConfig {
         return new LdapTemplate(contextSource);
     }
 }
-

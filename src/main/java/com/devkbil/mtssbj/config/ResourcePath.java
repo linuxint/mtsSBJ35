@@ -5,7 +5,7 @@ public enum ResourcePath {
     CLASSPATH_CSS("classpath:/static/css/"), CLASSPATH_IMAGES("classpath:/static/images/"), CLASSPATH_JS("classpath:/static/js/"),
 
     // Resource 경로
-    RESOURCES_JS("resources/js/**"), RESOURCES_IMAGES("resources/images/**"), RESOURCES_CSS("resources/css/**");
+    RESOURCES_JS("/js/**"), RESOURCES_IMAGES("/images/**"), RESOURCES_CSS("/css/**");
 
     private final String path;
 

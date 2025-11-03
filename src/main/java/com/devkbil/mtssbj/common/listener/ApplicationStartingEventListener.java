@@ -1,8 +1,13 @@
 package com.devkbil.mtssbj.common.listener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.context.ApplicationListener;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ApplicationStartingEventListener implements ApplicationListener<ApplicationStartingEvent> {
 
+    private final Logger logSystem = LoggerFactory.getLogger("SYSTEM");
+
     /**
      * 애플리케이션 시작 단계에서 트리거되는 {@link ApplicationStartingEvent}를 처리합니다.
      * 이벤트 발생 시간을 포함한 애플리케이션 시작 정보를 콘솔에 출력합니다.
@@ -26,10 +33,10 @@ public class ApplicationStartingEventListener implements ApplicationListener<App
      */
     @Override
     public void onApplicationEvent(ApplicationStartingEvent event) {
-        System.out.println("***********************************************************");
-        System.out.println("*                                                         *");
-        System.out.println("* ApplicationStartingEvent " + new Date(event.getTimestamp()));
-        System.out.println("*                                                         *");
-        System.out.println("***********************************************************");
+        logSystem.debug("***********************************************************");
+        logSystem.debug("*                                                         *");
+        logSystem.debug("* ApplicationStartingEvent 발생 시간: {}", LocalDateTime.ofInstant(Instant.ofEpochMilli(event.getTimestamp()), ZoneId.systemDefault()));
+        logSystem.debug("*                                                         *");
+        logSystem.debug("***********************************************************");
     }
 }

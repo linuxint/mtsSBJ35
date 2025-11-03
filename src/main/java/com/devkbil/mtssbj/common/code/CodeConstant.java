@@ -1,6 +1,7 @@
 package com.devkbil.mtssbj.common.code;
 
 import java.util.Arrays;
+import com.google.common.collect.ImmutableList;
 
 import lombok.Getter;
 
@@ -96,70 +97,43 @@ public class CodeConstant {
      */
     @Getter
     public enum CodeGroup {
-        USER("사용자롤", new CodeOption[]{
-            CodeOption.ADMIN, CodeOption.USER
-        }),
-        SIGN("문서결제상태", new CodeOption[]{
-            CodeOption.SAVE, CodeOption.DELAY, CodeOption.CONTINUE, CodeOption.REJECT, CodeOption.COMPLETE
-        }),
-        POSITION("직책구", new CodeOption[]{
-            //CodeOption.SAVE, CodeOption.DELAY, CodeOption.CONTINUE, CodeOption.REJECT, CodeOption.COMPLETE
-        }),
-        WORK("근무상태", new CodeOption[]{
-            CodeOption.WORK, CodeOption.MEET
-        }),
-        REPEAT("반복단위", new CodeOption[]{
-            CodeOption.NOREPEAT, CodeOption.WREPEAT, CodeOption.MREPEAT
-        }),
-
-        OPEN("공개여부", new CodeOption[]{
-            CodeOption.OPEN, CodeOption.CLOSE
-        }),
-        EMPTY("없음", new CodeOption[]{});
+        USER("사용자롤", ImmutableList.of(
+                CodeOption.ADMIN, CodeOption.USER
+        )),
+        SIGN("문서결제상태", ImmutableList.of(
+                CodeOption.SAVE, CodeOption.DELAY, CodeOption.CONTINUE, CodeOption.REJECT, CodeOption.COMPLETE
+        )),
+        POSITION("직책구", ImmutableList.of(
+                //CodeOption.SAVE, CodeOption.DELAY, CodeOption.CONTINUE, CodeOption.REJECT, CodeOption.COMPLETE
+        )),
+        WORK("근무상태", ImmutableList.of(
+                CodeOption.WORK, CodeOption.MEET
+        )),
+        REPEAT("반복단위", ImmutableList.of(
+                CodeOption.NOREPEAT, CodeOption.WREPEAT, CodeOption.MREPEAT
+        )),
+        OPEN("공개여부", ImmutableList.of(
+                CodeOption.OPEN, CodeOption.CLOSE
+        )),
+        EMPTY("없음", ImmutableList.of());
 
         private final String viewName;
-        private final CodeOption[] containCode;
+        private final ImmutableList<CodeOption> containCode;
 
-        /**
-         * 지정된 설명 이름 및 연관된 `CodeOption` 값 배열로 `CodeGroup` 열거형의 새 인스턴스를 생성합니다.
-         *
-         * @param viewName 이 `CodeGroup`과 연관된 설명적 또는 로컬화된 이름
-         * @param containCode 이 `CodeGroup`에 속하는 `CodeOption` 값 배열
-         */
-        CodeGroup(String viewName, CodeOption[] containCode) {
+        CodeGroup(String viewName, ImmutableList<CodeOption> containCode) {
             this.viewName = viewName;
             this.containCode = containCode;
         }
 
-        /**
-         * 지정된 CodeOption과 일치하는 CodeGroup을 검색하여 반환합니다.
-         * <p>
-         * 이 메서드는 제공된 CodeOption이 어느 그룹에도 속하는지
-         * 확인하기 위해 사용 가능한 모든 CodeGroup 값을 검색합니다.
-         * 일치 항목이 없을 경우 기본값으로 CodeGroup.EMPTY를 반환합니다.
-         *
-         * @param searchTarget 검색할 CodeOption
-         * @return 일치하는 CodeGroup(찾을 경우); 그렇지 않으면 CodeGroup.EMPTY 반환
-         */
         public static CodeGroup findGroup(CodeOption searchTarget) {
             return Arrays.stream(CodeGroup.values())
-                .filter(group -> hasCodeOption(group, searchTarget))
-                .findAny()
-                .orElse(CodeGroup.EMPTY);
+                    .filter(group -> hasCodeOption(group, searchTarget))
+                    .findAny()
+                    .orElse(CodeGroup.EMPTY);
         }
 
-        /**
-         * 주어진 {@code CodeOption}이 {@code CodeGroup}의 코드 옵션에 존재하는지 확인합니다.
-         *
-         * @param from {@code CodeOption} 값을 포함하는 {@code CodeGroup} 인스턴스
-         * @param searchTarget {@code CodeGroup} 내에서 검색할 {@code CodeOption} 값
-         * @return {@code searchTarget}이 {@code from} {@code CodeGroup} 내에 존재하면 {@code true};
-         *         그렇지 않으면 {@code false}.
-         */
         private static boolean hasCodeOption(CodeGroup from, CodeOption searchTarget) {
-            return Arrays.stream(from.containCode)
-                .anyMatch(containCode -> containCode == searchTarget);
+            return from.containCode.contains(searchTarget);
         }
-
     }
 }

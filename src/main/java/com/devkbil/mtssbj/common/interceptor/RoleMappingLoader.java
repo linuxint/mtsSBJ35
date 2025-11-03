@@ -1,7 +1,7 @@
 package com.devkbil.mtssbj.common.interceptor;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Map;
@@ -28,15 +28,9 @@ public class RoleMappingLoader {
      */
     public Map<String, Map<String, RoleBasedMapping.UrlMapping>> loadMappingsFromString(String jsonString) {
         ObjectMapper objectMapper = new ObjectMapper(); // Jackson ObjectMapper 초기화
-        try {
-            // JSON 문자열을 Map 구조로 변환
-            return objectMapper.readValue(jsonString,
-                    new TypeReference<Map<String, Map<String, RoleBasedMapping.UrlMapping>>>() {
-                    });
-        } catch (IOException e) {
-            // JSON 파싱 예외 시 빈 Map 반환
-            e.printStackTrace();
-            return Map.of(); // 실패 시 빈 Map 반환
-        }
+        // JSON 문자열을 Map 구조로 변환
+        return objectMapper.readValue(jsonString,
+                new TypeReference<Map<String, Map<String, RoleBasedMapping.UrlMapping>>>() {
+                });
     }
 }

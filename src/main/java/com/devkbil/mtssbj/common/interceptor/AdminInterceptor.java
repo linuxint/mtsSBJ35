@@ -61,14 +61,14 @@ public class AdminInterceptor implements HandlerInterceptor {
                 log.warn("접근 권한 없음: 유저 세션 없음");
                 // 관리자 접근이 필요한 URL 패턴
                 // 로그인 페이지 URL
-                String loginPage = "memberLogin";
+                String loginPage = "/memberLogin";
                 redirectToPage(res, loginPage); // 로그인 페이지로 이동
                 return false;
             }
 
             // 2. 관리자 권한 확인
             String userrole = authService.getAuthUserrole();
-            if (Role.ROLE_ADMIN != Role.getRoleByValue(userrole)) {
+            if (Role.ROLE_ADMIN != Role.of(userrole)) {
                 log.warn("접근 권한 없음: 관리자 권한이 아님");
                 redirectToPage(res, noAuthPage); // 권한 없음 페이지로 이동
                 return false;

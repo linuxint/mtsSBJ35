@@ -4,6 +4,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Arrays;
+
 /**
  * [공통 코드] API 통신에 대한 '에러 코드'를 Enum 형태로 관리를 한다.
  * Global Error CodeList : 전역으로 발생하는 에러코드를 관리한다.
@@ -50,14 +52,21 @@ public enum ErrorCode {
     /**
      * ******************************* Error Code Constructor ***************************************
      */
-    private int status;             // 에러 코드의 '코드 상태'을 반환한다.
-    private String divisionCode;    // 에러 코드의 '코드간 구분 값'을 반환한다.
-    private String message;         // 에러 코드의 '코드 메시지'을 반환한다.
+    private final int status;             // 에러 코드의 '코드 상태'을 반환한다.
+    private final String divisionCode;    // 에러 코드의 '코드간 구분 값'을 반환한다.
+    private final String message;         // 에러 코드의 '코드 메시지'을 반환한다.
 
     // 생성자 구성
     ErrorCode(int status, String divisionCode, String message) {
         this.status = status;
         this.divisionCode = divisionCode;
         this.message = message;
+    }
+
+    public static ErrorCode resolve(int statusCode) {
+        return Arrays.stream(values())
+                .filter(value -> value.getStatus() == statusCode)
+                .findFirst()
+                .orElse(INTERNAL_SERVER_ERROR);
     }
 }

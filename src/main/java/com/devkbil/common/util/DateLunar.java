@@ -6,6 +6,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * 음력/양력 날짜 변환을 위한 유틸리티 클래스입니다.
@@ -27,7 +29,7 @@ public class DateLunar {
      * - "leap": 윤달 여부 (0: 평달, 1: 윤달)
      * @throws IllegalArgumentException 날짜 형식이 잘못된 경우
      */
-    public static HashMap<String, Object> toLunar(String sDate) {
+    public static Map<String, Object> toLunar(String sDate) {
         String dateStr = validChkDate(sDate);
 
         HashMap<String, Object> hm = new HashMap<>();
@@ -41,7 +43,7 @@ public class DateLunar {
         Calendar cal;
         ChineseCalendar lcal;
 
-        cal = Calendar.getInstance();
+        cal = Calendar.getInstance(TimeZone.getDefault());
         lcal = new ChineseCalendar();
 
         cal.set(Calendar.YEAR, Integer.parseInt(dateStr.substring(0, 4)));
@@ -81,7 +83,7 @@ public class DateLunar {
     public static String toSolar(String sDate, int iLeapMonth) {
         String dateStr = validChkDate(sDate);
 
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = Calendar.getInstance(TimeZone.getDefault());
         ChineseCalendar lcal = new ChineseCalendar();
 
         lcal.set(ChineseCalendar.EXTENDED_YEAR, Integer.parseInt(dateStr.substring(0, 4)) + 2637);

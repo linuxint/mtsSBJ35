@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationContextInitializedEvent;
 import org.springframework.context.ApplicationListener;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 /**
@@ -29,7 +32,7 @@ public class ApplicationContextInitializedEventListener implements ApplicationLi
     public void onApplicationEvent(ApplicationContextInitializedEvent event) {
         logSystem.debug("***********************************************************");
         logSystem.debug("*                                                         *");
-        logSystem.debug("* ApplicationContextInitializedEvent {} ", new Date(event.getTimestamp()));
+        logSystem.debug("* ApplicationContextInitializedEvent {} ", LocalDateTime.ofInstant(Instant.ofEpochMilli(event.getTimestamp()), ZoneId.systemDefault()));
         logSystem.debug("*                                                         *");
         logSystem.debug("***********************************************************");
     }

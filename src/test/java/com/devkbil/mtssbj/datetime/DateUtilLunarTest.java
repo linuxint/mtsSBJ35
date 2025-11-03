@@ -3,6 +3,7 @@ package com.devkbil.mtssbj.datetime;
 import com.devkbil.common.util.DateLunar;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class DateUtilLunarTest {
 
@@ -10,7 +11,7 @@ public class DateUtilLunarTest {
 
         // 양력->음력 변환
         String sSlrDate = "20140908";
-        HashMap hm = DateLunar.toLunar(sSlrDate);
+        Map<String, Object> hm = DateLunar.toLunar(sSlrDate);
 
         String retLrrDate = hm.get("day").toString();
         String retLeapMonth = hm.get("leap").toString();

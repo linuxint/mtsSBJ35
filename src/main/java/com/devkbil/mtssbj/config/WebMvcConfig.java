@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.CacheControl;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.DefaultMessageCodesResolver;
 import org.springframework.validation.MessageCodesResolver;
@@ -74,8 +73,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         AdminInterceptor adminInterceptor = new AdminInterceptor();
         registry.addInterceptor(adminInterceptor).order(3) // 우선순위 3
-                .addPathPatterns(adminInterceptor.getAdminEssential()); // 사용될 URL
-        //.excludePathPatterns(adminInterceptor.adminInessential); // 제외될 URL
+                .addPathPatterns(adminInterceptor.getAdminEssential()) // 사용될 URL
+                .excludePathPatterns("/memberLogin", "/memberLoginChk", "/memberLogout"); // 제외될 URL
 
         LoginInterceptor loginIntercepter = new LoginInterceptor();
         registry.addInterceptor(loginIntercepter).order(2) // 우선순위 2
@@ -120,9 +119,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
         addResourceHandler(registry, ResourcePath.RESOURCES_IMAGES.getPath(), ResourcePath.CLASSPATH_IMAGES.getPath());
         addResourceHandler(registry, ResourcePath.RESOURCES_CSS.getPath(), ResourcePath.CLASSPATH_CSS.getPath());
 
-        // 에러 페이지는 공통 캐싱이 필요 없으므로 직접 추가
+        // 에러 페이지
         registry.addResourceHandler(ConfigConstant.URL_ERROR)
-            .addResourceLocations(ConfigConstant.CLASSPATH_ERROR_PAGE);
+                .addResourceLocations(ConfigConstant.CLASSPATH_ERROR_PAGE)
+                .setCacheControl(CacheControl.noCache().cachePrivate());
     }
 
     private void addResourceHandler(ResourceHandlerRegistry registry, String path, String location) {
@@ -186,6 +186,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+        // Spring Boot 4.0에서 기본 타임아웃 설정
+        configurer.setDefaultTimeout(30000);
+        configurer.setTaskExecutor(null);
         WebMvcConfigurer.super.configureAsyncSupport(configurer);
     }
 
@@ -210,16 +213,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        WebMvcConfigurer.super.configureMessageConverters(converters);
-    }
-
-    @Override
-    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        WebMvcConfigurer.super.extendMessageConverters(converters);
-    }
-
-    @Override
     public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
         WebMvcConfigurer.super.configureHandlerExceptionResolvers(resolvers);
     }
@@ -238,4 +231,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public Validator getValidator() {
         return WebMvcConfigurer.super.getValidator();
     }
+
+
 }

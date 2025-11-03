@@ -281,7 +281,6 @@ public class IndexingController {
                     }
 
                     // 기존 배열에 새 댓글들 추가
-                    @SuppressWarnings("unchecked")
                     List<Map<String, Object>> existingReplies = (List<Map<String, Object>>)document.get("brdreply");
                     existingReplies.addAll(replies);
 

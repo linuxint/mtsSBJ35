@@ -4,26 +4,28 @@ import com.devkbil.common.util.DateUtil;
 import com.devkbil.common.util.FileUtil;
 import com.devkbil.mtssbj.common.FileVO;
 
+import com.google.common.collect.ImmutableList;
 import jakarta.mail.Message;
 import jakarta.mail.Multipart;
 import jakarta.mail.Part;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeUtility;
 
-import org.springframework.integration.mail.ImapMailReceiver;
+import org.springframework.integration.mail.inbound.ImapMailReceiver;
 import org.springframework.messaging.MessagingException;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SpringIntegrationImap {
 
-    private static final String PROTOCOL = "imaps";
     private static final String INBOX_FOLDER = "INBOX";
     private static final boolean DEBUG = true;
     private final String filePath = System.getProperty("user.dir") + "/fileupload/";
@@ -54,7 +55,7 @@ public class SpringIntegrationImap {
      */
     public static void main(String[] args) throws Exception {
         SpringIntegrationImap imap = new SpringIntegrationImap();
-        imap.connect("", "", "");
+        imap.connect("", "993", "", "");
         imap.patchMessage(null);
 
         int count = 0;
@@ -74,27 +75,80 @@ public class SpringIntegrationImap {
      * @param user     사용자 계정
      * @param password 사용자 비밀번호
      */
-    public void connect(String host, String user, String password) {
+    public void connect(String host, String port, String user, String password) {
         try {
-            // Spring Integration의 ImapMailReceiver 사용
-            String url = "imaps://" + user + ":" + password + "@" + host + "/" + INBOX_FOLDER;
+            if (host == null || host.isBlank()) {
+                throw new IllegalArgumentException("IMAP 호스트가 비어 있습니다.");
+            }
+            if (user == null || user.isBlank()) {
+                throw new IllegalArgumentException("IMAP 사용자명이 비어 있습니다.");
+            }
+            if (password == null || password.isBlank()) {
+                throw new IllegalArgumentException("IMAP 비밀번호가 설정되지 않았습니다.");
+            }
+            // Gmail 앱 비밀번호 등 공백 표시되는 경우 제거
+            String normalizedPassword = password.replaceAll("\\s+", "");
+            // 포트/프로토콜을 사용자별 DB 값에 맞춰 동적으로 구성
+            String resolvedPort = (port == null || port.isBlank()) ? "993" : port.trim();
+            boolean useImaps = "993".equals(resolvedPort);
+            String protocol = useImaps ? "imaps" : "imap";
+
+            // Spring Integration의 ImapMailReceiver 사용 (URL에 포트 포함)
+            String encodedUser = java.net.URLEncoder.encode(user, java.nio.charset.StandardCharsets.UTF_8);
+            String encodedPass = java.net.URLEncoder.encode(normalizedPassword, java.nio.charset.StandardCharsets.UTF_8);
+            String url = protocol + "://" + encodedUser + ":" + encodedPass + "@" + host + ":" + resolvedPort + "/" + INBOX_FOLDER;
             mailReceiver = new ImapMailReceiver(url);
 
             Properties javaMailProperties = new Properties();
-            javaMailProperties.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-            javaMailProperties.put("mail.imap.socketFactory.port", "993");
-            javaMailProperties.put("mail.imap.socketFactory.fallback", "false");
-            javaMailProperties.put("mail.store.protocol", PROTOCOL);
-            javaMailProperties.put("mail.debug", DEBUG);
+            javaMailProperties.put("mail.store.protocol", protocol);
+            javaMailProperties.put("mail.debug", String.valueOf(DEBUG));
+            // 사용자/비밀번호를 명시적으로 전달 (URL 내 포함 외에 자카르타 메일 속성에도 지정)
+            if (useImaps) {
+                javaMailProperties.put("mail.imaps.user", user);
+                javaMailProperties.put("mail.imaps.password", normalizedPassword);
+            } else {
+                javaMailProperties.put("mail.imap.user", user);
+                javaMailProperties.put("mail.imap.password", normalizedPassword);
+            }
+
+            if (useImaps) {
+                // 993: SSL IMAPS
+                javaMailProperties.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+                javaMailProperties.put("mail.imap.socketFactory.port", resolvedPort);
+                javaMailProperties.put("mail.imap.socketFactory.fallback", "false");
+            } else {
+                // 일반 IMAP (예: 143)에서는 STARTTLS를 시도하도록 설정 (서버가 지원하지 않으면 무시)
+                javaMailProperties.put("mail.imap.starttls.enable", "true");
+            }
 
             mailReceiver.setJavaMailProperties(javaMailProperties);
             mailReceiver.setShouldDeleteMessages(false);
             mailReceiver.setShouldMarkMessagesAsRead(true);
 
+            // BeanFactory 설정 (스프링 컨텍스트 외부 실행 시 필요)
+            DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+            // IntegrationContextUtils가 요구하는 EvaluationContext 선등록 (ExpressionUtils 호출 시 미존재하면 예외 발생)
+            org.springframework.expression.spel.support.StandardEvaluationContext evalContext =
+                    new org.springframework.expression.spel.support.StandardEvaluationContext();
+            beanFactory.registerSingleton(
+                    org.springframework.integration.context.IntegrationContextUtils.INTEGRATION_EVALUATION_CONTEXT_BEAN_NAME,
+                    evalContext);
+            // ImapMailReceiver 초기화 시 필요로 하는 taskScheduler 등록
+            java.util.concurrent.ScheduledExecutorService scheduledExecutorService =
+                    java.util.concurrent.Executors.newScheduledThreadPool(2);
+            org.springframework.scheduling.concurrent.ConcurrentTaskScheduler concurrentTaskScheduler =
+                    new org.springframework.scheduling.concurrent.ConcurrentTaskScheduler(scheduledExecutorService);
+            beanFactory.registerSingleton(
+                    org.springframework.integration.context.IntegrationContextUtils.TASK_SCHEDULER_BEAN_NAME,
+                    concurrentTaskScheduler);
+            // BeanFactory 주입 및 초기화
+            mailReceiver.setBeanFactory(beanFactory);
+            // 안전장치: 직접 TaskScheduler 주입 (빈 검색 실패 대비)
+            mailReceiver.setTaskScheduler(concurrentTaskScheduler);
             // 연결 초기화
             mailReceiver.afterPropertiesSet();
 
-            log.info("IMAP 서버 연결 성공: {}", host);
+            log.info("IMAP 서버 연결 성공: {}:{} ({})", host, resolvedPort, protocol);
         } catch (Exception e) {
             log.error("IMAP 서버 연결 실패: {}", e.getMessage());
             throw new RuntimeException("IMAP 연결 오류", e);
@@ -127,20 +181,18 @@ public class SpringIntegrationImap {
 
             // 날짜 필터링 (필요한 경우)
             if (chgdate != null) {
-                Date startDate = DateUtil.str2Date(chgdate);
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(startDate);
-                calendar.add(Calendar.DATE, 1);
-                Date endDate = calendar.getTime();
+                Instant startInstant = DateUtil.str2Date(chgdate).toInstant();
+                Instant endInstant = startInstant.plus(1, ChronoUnit.DAYS);
 
                 List<Message> filteredMessages = new ArrayList<>();
                 for (Object obj : receivedMessages) {
                     if (obj instanceof MimeMessage message) {
                         Date sentDate = message.getSentDate();
-                        if (sentDate != null &&
-                            sentDate.compareTo(startDate) >= 0 &&
-                            sentDate.compareTo(endDate) < 0) {
-                            filteredMessages.add(message);
+                        if (sentDate != null) {
+                            Instant sentInstant = sentDate.toInstant();
+                            if (!sentInstant.isBefore(startInstant) && sentInstant.isBefore(endInstant)) {
+                                filteredMessages.add(message);
+                            }
                         }
                     }
                 }
@@ -148,12 +200,10 @@ public class SpringIntegrationImap {
                 msgs = filteredMessages.toArray(new Message[0]);
             } else {
                 // 모든 메시지를 Message 배열로 변환
-                msgs = new Message[receivedMessages.length];
-                for (int i = 0; i < receivedMessages.length; i++) {
-                    if (receivedMessages[i] instanceof MimeMessage) {
-                        msgs[i] = (MimeMessage) receivedMessages[i];
-                    }
-                }
+                msgs = Arrays.stream(receivedMessages)
+                        .filter(MimeMessage.class::isInstance)
+                        .map(MimeMessage.class::cast)
+                        .toArray(Message[]::new);
             }
 
             log.info("검색된 메시지: {}건", msgs.length);
@@ -174,7 +224,7 @@ public class SpringIntegrationImap {
     public List<MailVO> getMail(int startIndex, int maxCount) {
         if (msgs == null || msgs.length == 0) {
             log.warn("가져올 메시지가 없습니다.");
-            return Collections.emptyList(); // 빈 리스트 반환
+            return ImmutableList.of(); // ✅ 항상 불변 리스트 반환
         }
 
         List<MailVO> mailList = new ArrayList<>();
@@ -188,7 +238,7 @@ public class SpringIntegrationImap {
                     }
                 });
 
-        return mailList;
+        return ImmutableList.copyOf(mailList); // ✅ 불변 리스트로 변환 후 반환
     }
 
     /**
@@ -214,6 +264,19 @@ public class SpringIntegrationImap {
         mail.setEmsubject(message.getSubject());
         mail.setRegdate(DateUtil.date2Str(message.getSentDate()));
         extractContent(message, mail);
+
+        // 본문을 파일로 저장하고 파일명을 기록, 미리보기는 4000자 이내로 제한
+        String contents = mail.getEmcontents();
+        if (contents != null) {
+            String contentFileName = FileUtil.getNewName() + ".html";
+            Path contentPath = Paths.get(filePath + contentFileName);
+            Files.writeString(contentPath, contents, java.nio.charset.StandardCharsets.UTF_8);
+            mail.setEmcontentFile(contentFileName);
+
+            // 미리보기(요약) 4000자 제한 저장
+            int previewLimit = Math.min(contents.length(), 4000);
+            mail.setEmcontents(contents.substring(0, previewLimit));
+        }
 
         return mail;
     }

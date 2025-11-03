@@ -9,6 +9,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.lang.reflect.Method;
 import java.time.LocalTime;
+import java.time.ZoneId;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,11 +62,10 @@ public class TradingTimeInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 현재 시간을 가져옵니다.
-        LocalTime currentTime = LocalTime.now();
+        LocalTime currentTime = LocalTime.now(ZoneId.systemDefault());
 
         // 요청을 처리하는 핸들러가 메서드 유형인지 확인 (추가 처리 가능)
-        if (handler instanceof HandlerMethod) {
-            HandlerMethod handlerMethod = (HandlerMethod) handler;
+        if (handler instanceof HandlerMethod handlerMethod) {
 
             // 실행 중인 메서드 및 클래스 정보 가져오기
             Method method = handlerMethod.getMethod();

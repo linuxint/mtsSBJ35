@@ -1,5 +1,7 @@
 package com.devkbil.common.util;
 
+import com.google.common.base.Splitter;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,21 +71,22 @@ public class FileClasspath {
             }
         } else {
             String path = resourceFile.getPath().substring(6).replace('\\', '/');
-            String[] info = path.split("!/");
+            List<String> info = Splitter.on("!/").splitToList(path);
             Optional.ofNullable(info)
-                .filter(i -> i.length > 0)
+                .filter(i -> i.size() > 0)
                 .ifPresent(i -> {
             try {
-                        try (JarFile jar = new JarFile(i[0])) {
+                        try (JarFile jar = new JarFile(i.get(0))) {
             Enumeration<JarEntry> entries = jar.entries();
             while (entries.hasMoreElements()) {
                 String entryName = entries.nextElement().getName();
-                                if (entryName.startsWith(i[1]) && entryName.length() > 16) {
+                                if (entryName.startsWith(i.get(1)) && entryName.length() > 16) {
                     classNames.add(entryName.replace("/", ".").replace(".class", ""));
                 }
             }
                         }
                     } catch (IOException e1) {
+                        // exception
                     }
                 });
         }
@@ -125,9 +128,9 @@ public class FileClasspath {
         String resourcePath = resourceUrl.getFile().replace('\\', '/');
         if (resourcePath.contains("!")) {
             // JAR file path
-            String[] resourceInfo = resourcePath.split("!");
-            String jarPath = resourceInfo[0].replaceFirst("^file:", "");
-            String basePath = resourceInfo[1].substring(1); // Remove leading '/'
+            List<String> resourceInfo = Splitter.on('!').splitToList(resourcePath);
+            String jarPath = resourceInfo.get(0).replaceFirst("^file:", "");
+            String basePath = resourceInfo.get(1).substring(1); // Remove leading '/'
 
             try (JarFile jarFile = new JarFile(jarPath)) {
                 Enumeration<JarEntry> jarEntries = jarFile.entries();
@@ -136,8 +139,8 @@ public class FileClasspath {
                     String entryName = jarEntry.getName();
 
                     if (entryName.startsWith(basePath)) {
-                        String[] fileSplit = entryName.split("\\.");
-                        if (fileSplit.length > 1 && extList.contains(fileSplit[1])) {
+                        List<String> fileSplit = Splitter.on('.').splitToList(entryName);
+                        if (fileSplit.size() > 1 && extList.contains(fileSplit.get(1))) {
                             try {
                                 resultMap.put(entryName, jarFile.getInputStream(jarEntry));
                             } catch (IOException e) {
@@ -210,15 +213,15 @@ public class FileClasspath {
             throw new IOException("Invalid path for resource: " + classpath);
         }
 
-        String[] info = path.split("!/");
-        if (info.length == 0) {
+        List<String> info = Splitter.on("!/").splitToList(path);
+        if (info.isEmpty()) {
             throw new IOException("Invalid JAR path format: " + path);
         }
 
         try {
-            return new JarFile(info[0]);
+            return new JarFile(info.get(0));
         } catch (IOException e) {
-            throw new IOException("Failed to open JAR file: " + info[0], e);
+            throw new IOException("Failed to open JAR file: " + info.get(0), e);
         }
     }
 }

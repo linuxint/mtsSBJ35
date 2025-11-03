@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.context.ApplicationListener;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 /**
@@ -30,7 +33,7 @@ public class ApplicationEnvironmentPreparedEventListener implements ApplicationL
     public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
         logSystem.debug("***********************************************************");
         logSystem.debug("*                                                         *");
-        logSystem.debug("* ApplicationEnvironmentPreparedEvent 발생 시간: {}", new Date(event.getTimestamp()));
+        logSystem.debug("* ApplicationEnvironmentPreparedEvent 발생 시간: {}", LocalDateTime.ofInstant(Instant.ofEpochMilli(event.getTimestamp()), ZoneId.systemDefault()));
         logSystem.debug("*                                                         *");
         logSystem.debug("***********************************************************");
     }

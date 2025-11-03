@@ -1,5 +1,6 @@
 package com.devkbil.mtssbj.common.masking;
 
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -20,6 +21,7 @@ import java.util.List;
 @Aspect
 @EnableAspectJAutoProxy
 @Component
+@Slf4j
 public class MaskingAspect {
     /**
      * 응답 객체에 마스킹을 적용하는 유틸리티 메소드.
@@ -27,20 +29,16 @@ public class MaskingAspect {
      * @param clazz    응답 객체의 클래스 타입
      * @param klass    List 타입인 경우 제네릭 타입
      * @param response 마스킹을 적용할 응답 객체
-     * @param <T>      반환될 객체의 타입
      * @return 마스킹이 적용된 객체
      * @throws InvocationTargetException 리플렉션 호출 중 발생한 예외
      * @throws NoSuchMethodException     메소드를 찾을 수 없는 경우
      * @throws InstantiationException    객체 생성 실패 시
      * @throws IllegalAccessException    접근 권한이 없는 경우
      */
-    private static <T> T applyMaskingUtil(Class<?> clazz, Class<?> klass, Object response)
-        throws InvocationTargetException,
-        NoSuchMethodException,
-        InstantiationException,
-        IllegalAccessException {
+    private static Object applyMaskingUtil(Class<?> clazz, Class<?> klass, Object response)
+            throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         if (response instanceof List) {
-            return applyMaskingUtilForList(klass, response); // 마스킹 적용할 데이터가 List<?> 형태인 경우
+            return applyMaskingUtilForList(klass, response);
         } else {
             return applyMaskingUtilForDto(clazz, response);
         }
@@ -59,31 +57,28 @@ public class MaskingAspect {
      * @throws InstantiationException 객체 생성 실패 시
      * @throws IllegalAccessException 접근 권한이 없는 경우
      */
-    private static <T> T applyMaskingUtilForDto(Class<?> clazz, Object response)
-        throws NoSuchMethodException,
-        InvocationTargetException,
-        InstantiationException,
-        IllegalAccessException {
-        Field[] fields = clazz.getDeclaredFields();
-        Object responseDto = clazz.getDeclaredConstructor().newInstance();
-        Arrays.stream(fields)
-            .forEach(
-                field -> {
-                    field.setAccessible(true);
-                    try {
-                        Object fieldValue = field.get(response);
-                        if (fieldValue instanceof String && field.isAnnotationPresent(Mask.class)) {
-                            Mask mask = field.getAnnotation(Mask.class); // Mask 어노테이션을 가져옴
-                            MaskingType maskingType = mask.type(); // 해당 어노테이션이 보유한 Enum 타입을 가져옴
-                            String maskedValue = MaskingUtil.maskingOf(maskingType, (String)fieldValue); // 마스킹 적용
-                            field.set(responseDto, maskedValue);
-                        } else {
-                            field.set(responseDto, fieldValue);
-                        }
-                    } catch (Exception e) {
-                    }
-                });
-        return (T)responseDto;
+    private static <T> T applyMaskingUtilForDto(Class<T> clazz, Object response)
+            throws NoSuchMethodException,
+            InvocationTargetException,
+            InstantiationException,
+            IllegalAccessException {
+        T responseDto = clazz.getDeclaredConstructor().newInstance();
+        for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                Object fieldValue = field.get(response);
+                if (fieldValue instanceof String && field.isAnnotationPresent(Mask.class)) {
+                    Mask mask = field.getAnnotation(Mask.class);
+                    MaskingType maskingType = mask.type();
+                    field.set(responseDto, MaskingUtil.maskingOf(maskingType, (String) fieldValue));
+                } else {
+                    field.set(responseDto, fieldValue);
+                }
+            } catch (Exception e) {
+                log.warn("마스킹 처리 중 예외 발생: {}", e.getMessage());
+            }
+        }
+        return responseDto;
     }
 
     /**
@@ -92,20 +87,20 @@ public class MaskingAspect {
      *
      * @param klass List 요소의 클래스 타입
      * @param response 마스킹을 적용할 List 객체
-     * @param <T> 반환될 List 타입
      * @return 마스킹이 적용된 List 객체
      * @throws InvocationTargetException 리플렉션 호출 중 발생한 예외
      * @throws NoSuchMethodException 메소드를 찾을 수 없는 경우
      * @throws InstantiationException 객체 생성 실패 시
      * @throws IllegalAccessException 접근 권한이 없는 경우
      */
-    private static <T> T applyMaskingUtilForList(Class<?> klass, Object response)
-        throws InvocationTargetException,
-        NoSuchMethodException,
-        InstantiationException,
-        IllegalAccessException {
+    private static Object applyMaskingUtilForList(Class<?> klass, Object response)
+            throws InvocationTargetException,
+            NoSuchMethodException,
+            InstantiationException,
+            IllegalAccessException {
         List<Object> responseDtoList = new ArrayList<>();
-        List<?> responseList = (List<?>)response;
+        List<?> responseList = (List<?>) response;
+
         for (Object responseDto : responseList) {
             if (responseDto != null && responseDto.getClass().equals(klass)) {
                 Object maskedResponseDto = applyMaskingUtilForDto(klass, responseDto);
@@ -114,7 +109,8 @@ public class MaskingAspect {
                 responseDtoList.add(responseDto);
             }
         }
-        return (T)responseDtoList;
+
+        return responseDtoList;
     }
 
     /**

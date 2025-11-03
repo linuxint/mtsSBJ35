@@ -27,20 +27,20 @@
                         <div class="list-group-item"><label>보낸 사람</label> &nbsp;&nbsp;&nbsp;<c:out value="${mailInfo.emfrom}"/> <c:out value="${mailInfo.regdate}"/></div>
                         <div class="list-group-item"><label>받는 사람</label> &nbsp;&nbsp;&nbsp;
                             <c:forEach var="item" items="${mailInfo.emto}" varStatus="status">
-                                <c:out value="${item.eaaddress}"/><c:if test="${!status.last}">;</c:if>
+                                <c:out value="${item}"/><c:if test="${!status.last}">;</c:if>
                             </c:forEach>
                         </div>
                         <c:if test="${mailInfo.emcc.size() > 0}">
                             <div class="list-group-item"><label>참조</label> &nbsp;&nbsp;&nbsp;
                                 <c:forEach var="item" items="${mailInfo.emcc}" varStatus="status">
-                                    <c:out value="${item.eaaddress}"/><c:if test="${!status.last}">;</c:if>
+                                    <c:out value="${item}"/><c:if test="${!status.last}">;</c:if>
                                 </c:forEach>
                             </div>
                         </c:if>
                         <c:if test="${mailInfo.embcc.size() > 0}">
                             <div class="list-group-item"><label>숨은 참조</label> &nbsp;&nbsp;&nbsp;
                                 <c:forEach var="item" items="${mailInfo.embcc}" varStatus="status">
-                                    <c:out value="${item.eaaddress}"/><c:if test="${!status.last}">;</c:if>
+                                    <c:out value="${item}"/><c:if test="${!status.last}">;</c:if>
                                 </c:forEach>
                             </div>
                         </c:if>

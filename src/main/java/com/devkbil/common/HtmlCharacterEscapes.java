@@ -1,16 +1,13 @@
 package com.devkbil.common;
 
-import com.fasterxml.jackson.core.SerializableString;
-import com.fasterxml.jackson.core.io.CharacterEscapes;
-import com.fasterxml.jackson.core.io.SerializedString;
+import tools.jackson.core.SerializableString;
+import tools.jackson.core.io.CharacterEscapes;
+import tools.jackson.core.io.SerializedString;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.text.translate.AggregateTranslator;
 import org.apache.commons.text.translate.CharSequenceTranslator;
 import org.apache.commons.text.translate.EntityArrays;
 import org.apache.commons.text.translate.LookupTranslator;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -89,12 +86,4 @@ public class HtmlCharacterEscapes extends CharacterEscapes {
         // return new SerializedString(StringEscapeUtils.escapeHtml4(Character.toString((char) ch)));
     }
 
-    @Bean
-    public Jackson2ObjectMapperBuilderCustomizer customJsonEscape() {
-        return builder -> {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.getFactory().setCharacterEscapes(new HtmlCharacterEscapes());
-            builder.configure(objectMapper);
-        };
-    }
 }

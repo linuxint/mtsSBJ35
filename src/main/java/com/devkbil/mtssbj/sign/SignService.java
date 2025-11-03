@@ -11,6 +11,7 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -80,7 +81,7 @@ public class SignService {
 
             // 결재 경로 처리
             String docsignpath = param.getDocsignpath();
-            String[] users = docsignpath.split("\\|\\|");
+            String[] users = StringUtils.delimitedListToStringArray(docsignpath, "||");
             String[] arr;
             SignVO param2 = new SignVO();
             for (int i = 0; i < users.length; i++) {

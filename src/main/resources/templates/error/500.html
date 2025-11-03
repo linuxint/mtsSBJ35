@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{common.pageTitle}"></title>
+
+    <link href="/css/sb-admin/bootstrap.min.css" rel="stylesheet">
+
+    <style type="text/css">
+        .error-template {
+            padding: 40px 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="wrapper">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="error-template">
+                <h1>Internal Server Error</h1>
+                <div class="error-details">
+                    The server encountered an internal error or misconfiguration and was unable to complete your request.<br/>
+                    Please contact the server administrator.
+                </div>
+                <div>
+                    <a th:href="@{/}" class="btn btn-default btn-lg">
+                        <span class="glyphicon glyphicon-home"></span> Take Me Home
+                    </a>
+                </div>
+                <div th:if="${errorResponse}">
+                    <h1>Error Page</h1>
+                    <p>error code : <span th:text="${status}"></span></p>
+                    <p>error : <span th:text="${errorResponse.resultMsg}"></span></p>
+                    <p>message : <span th:text="${errorResponse.reason}"></span></p>
+                    <p>timestamp : <span th:text="${#dates.format(timestamp, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+                    <p>path : <span th:text="${path}"></span></p>
+                    <hr/>
+                    <h3>JSON Error</h3>
+                    <pre th:text="${errorJson}"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>

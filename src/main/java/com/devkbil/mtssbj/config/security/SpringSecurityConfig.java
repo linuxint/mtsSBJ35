@@ -6,7 +6,7 @@ import com.devkbil.mtssbj.config.CorsConfig;
 import com.devkbil.mtssbj.error.ErrorCode;
 import com.devkbil.mtssbj.error.ErrorResponse;
 import com.devkbil.mtssbj.member.MemberService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpSession;
@@ -20,8 +20,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
-import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
@@ -37,10 +35,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 
 import javax.sql.DataSource;
-
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,19 +54,22 @@ public class SpringSecurityConfig {
     private final CustomSessionExpiredStrategy customSessionExpiredStrategy;
     private final UserDetailsService userDetailsService;
     private final AuthenticationFailureHandler userLoginFailHandler;
-    public final JwtRequestFilter jwtRequestFilter;
+    private final JwtRequestFilter jwtRequestFilter;
     private final CorsConfig corsConfig;
+    private final MemberService memberService;
 
     /**
      * 로그인 페이지 URL 경로
      */
     public static final String URL_LOGIN = "/memberLogin";
 
+    // === 1. Password Encoder ===
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // === 2. Session Registry & Event Publisher ===
     @Bean
     public SessionRegistry sessionRegistry() {
         return new SessionRegistryImpl();
@@ -78,62 +80,81 @@ public class SpringSecurityConfig {
         return new ServletListenerRegistrationBean<>(new HttpSessionEventPublisher());
     }
 
+    // === 3. WebSecurityCustomizer: 정적 리소스 무시 ===
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, MemberService memberService) throws Exception {
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico");
+    }
 
+    // === 4. SecurityFilterChain ===
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        // --- 4.1 세션 관리 ---
         http.sessionManagement(session -> session
                 .sessionFixation().changeSessionId()
-                .maximumSessions(1) // 사용자 별로 1개 세션만 허용
+                .maximumSessions(1)
                 .expiredSessionStrategy(customSessionExpiredStrategy)
-                .maxSessionsPreventsLogin(false) // 이미 로그인한 사용자를 새로 로그인 허용
+                .maxSessionsPreventsLogin(false)
                 .sessionRegistry(sessionRegistry())
-                .expiredUrl("/memberLogin?expired")
+                .expiredUrl(URL_LOGIN + "?expired")
         );
-        // JWT 필터 추가: 필요한 경우 주석을 해제하고 실제 구현체를 추가하세요.
+
+        // --- 4.2 JWT 필터 ---
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-        http.csrf(CsrfConfigurer::disable);
+
+        // --- 4.3 CSRF / CORS ---
+        http.csrf(csrf -> csrf.disable());
         http.cors(cors -> cors.configurationSource(request -> {
-            var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
-            corsConfiguration.setAllowedOrigins(java.util.Arrays.asList(corsConfig.corsAllowedOrigins.split(",")));
-            corsConfiguration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-            corsConfiguration.setAllowedHeaders(java.util.Collections.singletonList("*"));
-            corsConfiguration.setAllowCredentials(true);
-            return corsConfiguration;
+            var config = new org.springframework.web.cors.CorsConfiguration();
+            config.setAllowedOrigins(Arrays.asList(corsConfig.corsAllowedOrigins.split(",")));
+            config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+            config.setAllowedHeaders(Arrays.asList("*"));
+            config.setAllowCredentials(true);
+            return config;
         }));
-        http.headers(headerConfig -> headerConfig
+
+        // --- 4.4 Headers / CSP ---
+        http.headers(headers -> headers
                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
                 .contentSecurityPolicy(csp -> csp
-//              .policyDirectives("default-src 'self'; script-src 'self'; object-src 'none';")
                         .policyDirectives(
                                 "default-src 'self'; " +
-                                "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-                                "style-src 'self' 'unsafe-inline'; " +
-                                "img-src 'self' data:; " + // ← 이 줄 추가!
-                                "font-src 'self' data:; " +
-                                "object-src 'none';"
+                                        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+                                        "style-src 'self' 'unsafe-inline'; " +
+                                        "img-src 'self' data:; " +
+                                        "font-src 'self' data:; " +
+                                        "object-src 'none';"
                         )
                 )
         );
+
+        // --- 4.5 URL 권한 설정 ---
         http.authorizeHttpRequests(authorize -> authorize
                 .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                 .requestMatchers(ConfigConstant.allAllowList.toArray(new String[0])).permitAll()
                 .anyRequest().authenticated()
         );
+
+        // --- 4.6 예외 처리 ---
         http.exceptionHandling(exceptionConfig -> exceptionConfig
                 .authenticationEntryPoint(unauthorizedEntryPoint)
                 .accessDeniedHandler(accessDeniedHandler)
         );
+
+        // --- 4.7 Form Login ---
         http.formLogin(login -> login
                 .loginPage(URL_LOGIN)
-                .loginProcessingUrl(ConfigConstant.URL_LOGIN_PROCESS) // 로그인 고정
+                .loginProcessingUrl(ConfigConstant.URL_LOGIN_PROCESS)
                 .usernameParameter(ConfigConstant.PARAMETER_LOGIN_ID)
                 .passwordParameter(ConfigConstant.PARAMETER_LOGIN_PWD)
                 .successHandler(new MyAuthenticationSuccessHandler(memberService))
-                //.defaultSuccessUrl("/memberLoginChk", true)
                 .failureHandler(userLoginFailHandler)
-                //.failureUrl("/memberLoginError")
                 .permitAll()
         );
+
+        // --- 4.8 Remember Me ---
         http.rememberMe(rememberMe -> rememberMe
                 .key(ConfigConstant.REMEMBER_ME_KEY)
                 .rememberMeCookieName(ConfigConstant.REMEMBER_ME_COOKIE_NAME)
@@ -141,89 +162,69 @@ public class SpringSecurityConfig {
                 .userDetailsService(userDetailsService)
                 .tokenRepository(tokenRepository())
         );
+
+        // --- 4.9 Logout ---
         http.logout(logout -> logout
                 .logoutUrl(ConfigConstant.URL_LOGOUT)
                 .invalidateHttpSession(true)
-                .deleteCookies(ConfigConstant.SID_COOKIE_NAME, ConfigConstant.JSESSIONID, ConfigConstant.REMEMBER_ME_COOKIE_NAME)
+                .deleteCookies(
+                        ConfigConstant.SID_COOKIE_NAME,
+                        ConfigConstant.JSESSIONID,
+                        ConfigConstant.REMEMBER_ME_COOKIE_NAME
+                )
                 .permitAll()
         );
+
         return http.build();
     }
 
+    // === 5. Authentication Manager ===
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
+
+    // === 6. Persistent Token Repository ===
+    @Bean
+    public PersistentTokenRepository tokenRepository() {
+        JdbcTokenRepositoryImpl repo = new JdbcTokenRepositoryImpl();
+        repo.setDataSource(dataSource);
+        return repo;
+    }
+
+    // === 7. Unauthorized / AccessDenied Handlers ===
     public final AuthenticationEntryPoint unauthorizedEntryPoint =
             (request, response, authException) -> {
-                if (request.getParameterMap().isEmpty()) { // 입력값이 비어 있는 경우
-                    log.info("요청에 입력값이 없습니다.");
-                    response.sendRedirect(ConfigConstant.URL_LOGIN); // 로그인 페이지로 리다이렉트
+                HttpSession session = request.getSession(false);
+                if (session == null || request.getParameterMap().isEmpty()) {
+                    log.info("미인증 접근: 세션 없음 또는 입력 없음");
+                    response.sendRedirect(URL_LOGIN);
                     return;
                 }
-                // 2. 세션이 없는 경우
-                HttpSession session = request.getSession(false); // 세션 유효성 확인
-                if (session == null) { // 세션이 없는 경우
-                    log.info("세션이 존재하지 않습니다.");
-                    response.sendRedirect(ConfigConstant.URL_LOGIN); // 로그인 페이지로 리다이렉트
-                    return;
+                if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.setStatus(HttpStatus.FORBIDDEN.value());
+                    response.getWriter().write("{\"error\": \"Access Denied\", \"message\": \"권한이 부족합니다.\"}");
+                } else {
+                    response.sendRedirect(ConfigConstant.URL_ACCESS_DENIED);
                 }
-                if (!request.getParameterMap().isEmpty()) {
-                    if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
-                        // REST 요청일 경우 JSON 응답
-                        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                        response.setStatus(HttpStatus.FORBIDDEN.value());
-                        response.getWriter().write(
-                                "{\"error\": \"Access Denied\", \"message\": \"권한이 부족합니다.\"}"
-                        );
-                    } else {
-                        // 브라우저 요청일 경우 권한 부족 페이지로 리다이렉트
-                        response.sendRedirect(ConfigConstant.URL_ACCESS_DENIED); // 권한 부족 페이지로 리다이렉트
-                    }
-                }
-                ErrorResponse fail = ErrorResponse.of(ErrorCode.UNAUTHORIZED_ERROR, "스프링 시큐리티 인증 실패...");
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                String json = new ObjectMapper().writeValueAsString(fail);
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                PrintWriter writer = response.getWriter();
-                writer.write(json);
-                writer.flush();
             };
 
     public final AccessDeniedHandler accessDeniedHandler =
-            (request, response, accessDeniedException) -> {
-                // 1. 입력이 없는 경우
-
+            (request, response, ex) -> {
                 ErrorResponse fail = ErrorResponse.of(ErrorCode.FORBIDDEN_ERROR, "스프링 시큐리티 접근 거부...");
                 response.setStatus(HttpStatus.FORBIDDEN.value());
-                String json = new ObjectMapper().writeValueAsString(fail);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 PrintWriter writer = response.getWriter();
-                writer.write(json);
+                writer.write(new ObjectMapper().writeValueAsString(fail));
                 writer.flush();
             };
 
-    @Bean
-    public PersistentTokenRepository tokenRepository() {
-        JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
-        jdbcTokenRepository.setDataSource(dataSource);
-        return jdbcTokenRepository;
-    }
-
-    /**
-     * Spring Security 설정 파일에서 AuthenticationManager를 빈으로 정의해야 합니다.
-     * Spring Boot 2.x에서는 AuthenticationManager를 직접 정의하는 것이 필요했지만,
-     * Spring Boot 3.x에서는 이를 자동으로 구성하지 않으므로 명시적으로 설정해야 합니다.
-     *
-     * @param authenticationConfiguration Spring Security의 인증 설정을 포함하는 구성 객체
-     * @return AuthenticationManager 인스턴스. 사용자 인증을 처리하고 관리하는 Spring Security의 핵심 인터페이스
-     * @throws Exception 인증 관리자 생성 중 오류 발생 시
-     */
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
-
+    // === 8. SimpleUrlAuthenticationSuccessHandler ===
     @Bean
     public SimpleUrlAuthenticationSuccessHandler simpleUrlAuthenticationSuccessHandler() {
         SimpleUrlAuthenticationSuccessHandler handler = new SimpleUrlAuthenticationSuccessHandler();
-        handler.setDefaultTargetUrl(ConfigConstant.URL_LOGIN);
+        handler.setDefaultTargetUrl(URL_LOGIN);
         handler.setAlwaysUseDefaultTargetUrl(true);
         return handler;
     }

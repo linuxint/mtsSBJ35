@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -143,11 +144,14 @@ public class JwtUtil {
      * @return 생성된 JWT 토큰
      */
     private String createToken(Map<String, Object> claims, String subject, long expiration) {
+        Instant now = Instant.now();
+        Instant expiry = now.plusMillis(expiration);
+
         return Jwts.builder()
-            .setClaims(claims) // 클레임 정보 설정
-            .setSubject(subject) // 서브젝트 설정
-            .setIssuedAt(new java.util.Date(System.currentTimeMillis())) // JWT 라이브러리 요구로 Date 유지
-            .setExpiration(new java.util.Date(System.currentTimeMillis() + expiration)) // JWT 라이브러리 요구로 Date 유지
+            .claims(claims) // 클레임 정보 설정
+            .subject(subject) // 서브젝트 설정
+            .issuedAt(Date.from(now)) // JWT 라이브러리 요구로 Date 유지
+            .expiration(Date.from(expiry)) // JWT 라이브러리 요구로 Date 유지
             .signWith(secretKey) // 비밀 키로 서명
             .compact(); // 직렬화된 토큰 반환
     }

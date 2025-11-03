@@ -12,4 +12,3 @@ public class UserDto {
     private String userid;
 
 }
-

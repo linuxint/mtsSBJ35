@@ -10,6 +10,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 import com.devkbil.common.util.DateUtil;
 import com.devkbil.mtssbj.config.EsConfig;
 
+import com.google.common.base.Splitter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -36,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -203,10 +205,17 @@ public class SearchController {
                 hitMap.put("_id", hit.getId());
                 hitMap.put("_score", hit.getScore());
 
-                // 검색 키워드로 하이라이팅 처리
+// 검색 키워드로 하이라이팅 처리
                 Map<String, Object> source = new HashMap<>(hit.getContent());
-                String[] keywords = searchVO.getSearchKeyword().split("\\s+");
+
+// Guava Splitter 사용
+                Iterable<String> keywords = Splitter.on(Pattern.compile("\\s+"))
+                        .omitEmptyStrings()
+                        .trimResults()
+                        .split(searchVO.getSearchKeyword());
+
                 for (String keyword : keywords) {
+                    // keyword가 빈 문자열이면 건너뜀
                     if (!StringUtils.hasText(keyword)) {
                         continue;
                     }
@@ -214,7 +223,8 @@ public class SearchController {
                     // 제목 하이라이팅
                     if (source.containsKey("brdtitle") && source.get("brdtitle") != null) {
                         String title = source.get("brdtitle").toString();
-                        source.put("brdtitle", title.replaceAll("(?i)" + keyword, "<em>" + keyword + "</em>"));
+                        // (?i) 옵션으로 대소문자 무시
+                        source.put("brdtitle", title.replaceAll("(?i)" + Pattern.quote(keyword), "<em>" + keyword + "</em>"));
                     }
 
                     // 내용 하이라이팅

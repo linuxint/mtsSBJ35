@@ -1,8 +1,9 @@
 package com.devkbil.common.util;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,8 +22,8 @@ public class FileUtil {
      * @return 생성된 파일 이름 문자열 (18자리)
      */
     public static String getNewName() {
-        SimpleDateFormat ft = new SimpleDateFormat("yyyyMMddhhmmssSSS");
-        return ft.format(new Date()) + (int)(Math.random() * 10);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddhhmmssSSS");
+        return LocalDateTime.now(ZoneId.systemDefault()).format(formatter) + (int)(Math.random() * 10);
     }
 
     /**

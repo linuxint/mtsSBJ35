@@ -17,7 +17,7 @@ public class NewStringUtil {
      * @return 문자열이 null이거나 비어있으면 true, 그렇지 않으면 false
      */
     public static boolean isEmpty(String str) {
-        return (str == null || str.length() == 0) || (str.trim().equals(""));
+        return (str == null || str.length() == 0) || str.trim().equals("");
     }
 
     /**
@@ -51,8 +51,8 @@ public class NewStringUtil {
      * @param delim 구분자
      * @return 분할된 문자열을 담은 ArrayList
      */
-    public static ArrayList<String> toArrayList(String srcTxt, String delim) {
-        ArrayList<String> list = new ArrayList<String>();
+    public static List<String> toArrayList(String srcTxt, String delim) {
+        List<String> list = new ArrayList<String>();
         if (isEmpty(srcTxt)) {
             return list;
         }

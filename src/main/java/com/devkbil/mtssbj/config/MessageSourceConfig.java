@@ -49,7 +49,7 @@ public class MessageSourceConfig {
      * @return 세션에서 로케일 및 타임존 관리를 위한 구성된 LocaleResolver 인스턴스
      */
     @Bean
-    public LocaleResolver localeResolver() {
+    public LocaleResolver customLocaleResolver() {
         SessionLocaleResolver slr = new SessionLocaleResolver();
         slr.setDefaultLocale(Locale.KOREA); // 기본 로케일 설정
         slr.setLocaleAttributeName("current.locale"); // 로케일 속성 이름 설정

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.IntStream;
@@ -160,7 +161,7 @@ public class Imap {
 
         try {
             Date startDate = DateUtil.str2Date(chgdate); // 기준 날짜
-            Calendar calendar = Calendar.getInstance();
+            Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
             calendar.setTime(startDate);
             calendar.add(Calendar.DATE, 1); // 다음 날로 설정
 
@@ -182,12 +183,13 @@ public class Imap {
      * @return 메시지 데이터 리스트
      */
     public List<MailVO> getMail(int startIndex, int maxCount) {
+        List<MailVO> mailList = new ArrayList<>();
+
         if (msgs == null || msgs.length == 0) {
             log.warn("가져올 메시지가 없습니다.");
-            return Collections.emptyList(); // 빈 리스트 반환
+            return mailList; // 빈 mutable 리스트 반환
         }
 
-        List<MailVO> mailList = new ArrayList<>();
         IntStream.range(startIndex, Math.min(startIndex + maxCount, msgs.length))
                 .forEach(idx -> {
                     try {
@@ -198,7 +200,7 @@ public class Imap {
                     }
                 });
 
-        return mailList;
+        return mailList; // 항상 mutable
     }
 
     /**

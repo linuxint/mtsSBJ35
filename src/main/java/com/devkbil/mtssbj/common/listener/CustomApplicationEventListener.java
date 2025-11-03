@@ -2,10 +2,16 @@ package com.devkbil.mtssbj.common.listener;
 
 import com.devkbil.mtssbj.common.events.CustomApplicationEvent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * CustomApplicationEventListener는 {@link CustomApplicationEvent}를 수신하는 Spring 컴포넌트입니다.
@@ -30,6 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class CustomApplicationEventListener {
 
+    private final Logger logSystem = LoggerFactory.getLogger("SYSTEM");
+
     /**
      * <p>{@link CustomApplicationEvent} 유형의 사용자 정의 애플리케이션 이벤트를 처리합니다.
      * 이 메서드는 {@link CustomApplicationEvent}가 Spring ApplicationContext에 게시되었을 때 자동으로 실행됩니다.</p>
@@ -38,6 +46,10 @@ public class CustomApplicationEventListener {
      */
     @EventListener
     public void handleCustomEvent(CustomApplicationEvent event) {
-        log.info("CustomApplicationEvent received. Message: {}", event.getMessage());
+        logSystem.debug("***********************************************************");
+        logSystem.debug("*                                                         *");
+        logSystem.debug("* CustomApplicationEvent 발생 시간: {}", LocalDateTime.ofInstant(Instant.ofEpochMilli(event.getTimestamp()), ZoneId.systemDefault()));
+        logSystem.debug("*                                                         *");
+        logSystem.debug("***********************************************************");
     }
 }

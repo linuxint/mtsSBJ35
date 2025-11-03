@@ -1,5 +1,7 @@
 package com.devkbil.common.util;
 
+import com.google.common.base.Splitter;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
@@ -231,8 +233,8 @@ public class FileList {
                     if (subFiles[i].isDirectory()) {
                         fileList.addAll(getAllSubFiles(subFiles[i].getName(), dirName, ext));
                     } else {
-                        String[] fs = subFiles[i].getName().split("\\.");
-                        if (fs.length > 1 && ext.contains(fs[1])) {
+                        List<String> fs = Splitter.on('.').splitToList(subFiles[i].getName());
+                        if (fs.size() > 1 && ext.contains(fs.get(1))) {
                             fileList.add(dirName + "/" + subFiles[i].getName());
                         }
                     }

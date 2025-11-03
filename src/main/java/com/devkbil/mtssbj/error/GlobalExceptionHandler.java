@@ -1,7 +1,5 @@
 package com.devkbil.mtssbj.error;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.springframework.boot.json.JsonParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +17,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import java.io.IOException;
 
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.core.JacksonException;
 
 /**
  * 전역 예외 처리를 담당하는 핸들러 클래스입니다.
@@ -178,10 +177,10 @@ public class GlobalExceptionHandler {
      * @param ex 발생한 예외
      * @return 오류 응답과 HTTP 상태 코드를 포함하는 ResponseEntity
      */
-    @ExceptionHandler(JsonProcessingException.class)
-    protected ResponseEntity<ErrorResponse> handleJsonProcessingException(JsonProcessingException ex) {
+    @ExceptionHandler(JacksonException.class)
+    protected ResponseEntity<ErrorResponse> handleJsonProcessingException(JacksonException ex) {
         log.error("handleJsonProcessingException", ex);
-        final ErrorResponse response = ErrorResponse.of(ErrorCode.REQUEST_BODY_MISSING_ERROR, ex.getMessage());
+        final ErrorResponse response = ErrorResponse.of(ErrorCode.REQUEST_BODY_MISSING_ERROR, String.valueOf(ex));
         return new ResponseEntity<>(response, httpStatusOk);
     }
 

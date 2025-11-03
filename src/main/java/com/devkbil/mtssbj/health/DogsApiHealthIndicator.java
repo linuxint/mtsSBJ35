@@ -1,7 +1,7 @@
 package com.devkbil.mtssbj.health;
 
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -16,17 +16,6 @@ import java.util.Map;
  */
 @Component
 public class DogsApiHealthIndicator implements HealthIndicator {
-
-    /**
-     * 상태 확인을 진행하며, 세부 정보를 포함할지 여부를 설정합니다.
-     *
-     * @param includeDetails 세부 정보를 포함할지 여부
-     * @return Health 상태 객체
-     */
-    @Override
-    public Health getHealth(boolean includeDetails) {
-        return HealthIndicator.super.getHealth(includeDetails);
-    }
 
     /**
      * Dog API의 상태를 확인합니다.

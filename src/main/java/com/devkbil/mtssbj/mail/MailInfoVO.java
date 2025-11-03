@@ -14,7 +14,7 @@ import lombok.Setter;
  */
 @Schema(description = "메일정보 : MailInfoVO")
 @XmlRootElement(name = "MailInfoVO")
-@XmlType(propOrder = {"emino", "emiimap", "emiimapport", "emismtp", "emismtpport", "emiuser", "emipw", "userno", "usernm"})
+@XmlType(propOrder = {"emino", "emiimap", "emiimapport", "emismtp", "emismtpport", "emiuser", "emipw", "emismtpauth", "emistarttl", "userno", "usernm"})
 @Getter
 @Setter
 public class MailInfoVO {
@@ -39,6 +39,12 @@ public class MailInfoVO {
 
     @Schema(description = "메일 계정 비밀번호", example = "password123")
     private String emipw;  // 비밀번호
+
+    @Schema(description = "SMTP 인증 사용 여부", example = "Y")
+    private String emismtpauth;  // Y/N
+
+    @Schema(description = "STARTTLS 사용 여부", example = "Y")
+    private String emistarttl;   // Y/N
 
     @Schema(description = "사용자 번호", example = "USR001")
     private String userno;  // 사용자 번호

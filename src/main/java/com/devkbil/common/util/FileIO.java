@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class FileIO {
      * @throws IOException 파일을 읽는 도중 입출력 오류가 발생할 경우
      */
     public static String readFileForText(String filePath) throws IOException {
-        return new String(readFileForBinary(filePath));
+        return new String(readFileForBinary(filePath), StandardCharsets.UTF_8);
     }
 
     /**
@@ -98,7 +99,7 @@ public class FileIO {
                 is.close();
             }
             if (os != null) {
-                retValue = os.toString();
+                retValue = os.toString(StandardCharsets.UTF_8);
                 os.close();
             }
         }
@@ -121,7 +122,7 @@ public class FileIO {
         BufferedReader in = null;
 
         try {
-            in = new BufferedReader(new FileReader(filePath));
+            in = new BufferedReader(new FileReader(filePath, StandardCharsets.UTF_8));
 
             while ((line = in.readLine()) != null) {
                 if (!line.trim().equals("")) {
@@ -152,19 +153,9 @@ public class FileIO {
      * @throws IOException 파일을 쓰는 도중 입출력 오류가 발생할 경우
      */
     public static void addLineToFile(String filePath, String str) throws IOException {
-        PrintWriter pw = null;
-
-        try {
-            pw = new PrintWriter(new BufferedWriter(new FileWriter(filePath, true)));
+        try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(filePath, StandardCharsets.UTF_8, true)))) {
             pw.println(str);
             pw.flush();
-
-        } catch (IOException ioe) {
-            throw ioe;
-        } finally {
-            if (pw != null) {
-                pw.close();
-            }
         }
     }
 
@@ -177,21 +168,11 @@ public class FileIO {
      * @throws IOException 파일을 쓰는 도중 입출력 오류가 발생할 경우
      */
     public static void updateFile(String filePath, String[] strList) throws IOException {
-        PrintWriter pw = null;
-
-        try {
-            pw = new PrintWriter(new BufferedWriter(new FileWriter(filePath, false)));
+        try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(filePath, StandardCharsets.UTF_8, false)))) {
             for (int i = 0; i < strList.length; i++) {
                 pw.println(strList[i]);
             }
             pw.flush();
-
-        } catch (IOException ioe) {
-            throw ioe;
-        } finally {
-            if (pw != null) {
-                pw.close();
-            }
         }
     }
 }

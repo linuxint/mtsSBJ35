@@ -40,13 +40,13 @@
 </table>
 
 <script type="text/javascript">
-function sendToAD(username, password, displayName, userid) {
-    fetch('/api/ldap/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, displayName, userid })
-    })
-    .then(res => res.text())
-    .then(msg => alert(msg));
-}
+    function sendToAD(username, password, displayName, userid) {
+        fetch('/api/ldap/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, displayName, userid })
+        })
+            .then(res => res.text())
+            .then(msg => alert(msg));
+    }
 </script>

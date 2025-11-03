@@ -26,7 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -84,8 +85,8 @@ public class QrCodeController {
     @ApiResponse(responseCode = "500", description = "PDF 생성 중 오류가 발생했습니다.")
     @GetMapping("/qrpdf")
     public void downQrCodePdf(HttpServletResponse response) {
-        java.time.LocalDateTime nowDate = java.time.LocalDateTime.now();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+        java.time.LocalDateTime nowDate = java.time.LocalDateTime.now(ZoneId.systemDefault());
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
 
         try (PDDocument document = new PDDocument()) {
             PDPage page = new PDPage();
@@ -99,7 +100,7 @@ public class QrCodeController {
             PDType0Font pdType0Font = PDType0Font.load(document, fontStream);
 
             // 안내 메시지
-            String outDate = simpleDateFormat.format(nowDate);
+            String outDate = nowDate.format(dateTimeFormatter);
 
             drawText(QrConstant.TEXT_MSG, Color.BLACK, pdType0Font, QrConstant.TEXT_FONT_SIZE, QrConstant.TEXT_STARTX, QrConstant.TEXT_STARTY, contentStream);
             drawText(outDate, Color.BLACK, pdType0Font, QrConstant.SEQNO_FONT_SIZE, QrConstant.TEXT_STARTX + 370, QrConstant.TEXT_STARTY, contentStream);

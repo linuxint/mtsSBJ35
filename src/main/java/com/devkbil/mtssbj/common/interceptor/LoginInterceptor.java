@@ -32,21 +32,25 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     // 상수로 문자열 및 설정 분리
     private static final String LOG_ID = "logId"; // 세션에서 사용할 로그 ID 키
-    private static final String REDIRECT_LOGIN_PAGE = "memberLogin"; // 로그인 페이지 URL
+    private static final String REDIRECT_LOGIN_PAGE = "/memberLogin"; // 로그인 페이지 URL
 
     private static final List<String> LOGIN_ESSENTIAL = Collections.singletonList("/**"); // 인증 필수 URL
     private static final List<String> LOGIN_INESSENTIAL = Arrays.asList(
             "/api/**", "/memberLogin", "/memberLoginChk", "/js/**", "/css/**", "/images/**"); // 인증 불필요 URL
 
     /**
-     * @return 인증이 필수적인 URL 패턴 목록을 반환합니다.
+     * 인증이 필수적인 URL 패턴 목록을 반환합니다.
+     *
+     * @return LOGIN_ESSENTIAL
      */
     public List<String> getLoginEssential() {
         return LOGIN_ESSENTIAL;
     }
 
     /**
-     * @return 인증이 필요하지 않은 URL 패턴 목록을 반환합니다.
+     * 인증이 필요하지 않은 URL 패턴 목록을 반환합니다.
+     *
+     * @return 인증이 필요하지 않은 URL 패턴 목록
      */
     public List<String> getLoginInessential() {
         return LOGIN_INESSENTIAL;

@@ -83,8 +83,9 @@ public class LoginController {
      * @param userVO  사용자 정보 VO 객체
      */
     private void saveUserSession(HttpSession session, UserVO userVO) {
+        com.devkbil.mtssbj.config.security.Role role = com.devkbil.mtssbj.config.security.Role.of(userVO.getUserrole());
         session.setAttribute("userid", userVO.getUserid());
-        session.setAttribute("userrole", userVO.getUserrole());
+        session.setAttribute("userrole", role.getValue()); // ADMIN / USER / GUEST 로 통일 저장
         session.setAttribute("userno", userVO.getUserno());
         session.setAttribute("usernm", userVO.getUsernm());
     }

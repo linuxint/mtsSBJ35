@@ -75,7 +75,6 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
      * @param key 검색할 쿠키의 이름
      * @return 쿠키가 존재하면 해당 값, 쿠키가 없으면 빈 문자열을 반환
      */
-    @SuppressWarnings("unused")
     private String readCookie(HttpServletRequest request, String key) {
         Cookie[] cookies = request.getCookies();
         if (!ObjectUtils.isEmpty(cookies)) {
@@ -96,8 +95,9 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
      * @param userVO 세션에 저장될 사용자 데이터를 포함하는 {@code UserVO} 객체
      */
     private void saveUserSession(HttpSession session, UserVO userVO) {
+        Role role = Role.of(userVO.getUserrole());
         session.setAttribute("userid", userVO.getUserid());
-        session.setAttribute("userrole", userVO.getUserrole());
+        session.setAttribute("userrole", role.getValue()); // ADMIN / USER / GUEST 로 통일 저장
         session.setAttribute("userno", userVO.getUserno());
         session.setAttribute("usernm", userVO.getUsernm());
     }

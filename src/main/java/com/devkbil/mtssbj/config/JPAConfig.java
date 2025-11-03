@@ -4,7 +4,7 @@ import com.devkbil.mtssbj.MtssbjApplication;
 
 import jakarta.persistence.EntityManagerFactory;
 
-import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
+import org.springframework.boot.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -39,7 +39,7 @@ public class JPAConfig {
      */
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(
-        EntityManagerFactoryBuilder builder, DataSource dataSource) {
+            EntityManagerFactoryBuilder builder, DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean factoryBean = builder
             .dataSource(dataSource)
             .packages(MtssbjApplication.class)

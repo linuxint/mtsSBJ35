@@ -142,12 +142,10 @@ public class CodeCacheService { //extends EgovAbstractServiceImpl
         if (codeGroup.isEmpty()) {
             synchronized (codeGroup) {
                 if (codeGroup.isEmpty()) {
-                    @SuppressWarnings("unchecked")
                     List<Map<String, Object>> mapList = (ArrayList<Map<String, Object>>)codeCacheDAO.selectListCodeGroup();    // codecd,  codenm
                     codeGroup.clear();
                     codeGroup.addAll(mapList);
                     // 상세코드
-                    @SuppressWarnings("unchecked")
                     List<Map<String, Object>> mapList2 = (ArrayList<Map<String, Object>>)codeCacheDAO.selectListCode();    // pcodecd, codecd, codenm
                     code.clear();
                     code.addAll(mapList2);

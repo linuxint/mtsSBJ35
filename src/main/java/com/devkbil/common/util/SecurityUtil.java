@@ -28,17 +28,17 @@ public class SecurityUtil {
     public static String encodeBase64(String input)
         throws NoSuchAlgorithmException,
         UnsupportedEncodingException {
-        return Base64.getEncoder().encodeToString(input.getBytes());
+        return Base64.getEncoder().encodeToString(input.getBytes(StandardCharsets.UTF_8));
     }
 
     public static String decodeBase64(String input)
         throws NoSuchAlgorithmException,
         UnsupportedEncodingException {
-        return new String(Base64.getDecoder().decode(input));
+        return new String(Base64.getDecoder().decode(input), StandardCharsets.UTF_8);
     }
 
     public static String byteArrayToHex(byte[] buf) {
-        StringBuffer strbuf = new StringBuffer();
+        StringBuilder strbuf = new StringBuilder();
         for (int i = 0; i < buf.length; i++) {
             strbuf.append(String.format("%02X", buf[i]));
         }
@@ -61,7 +61,7 @@ public class SecurityUtil {
         char[] charSet = "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
 
         int idx = 0;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < len; i++) {
             idx = (int)(charSet.length * Math.random());

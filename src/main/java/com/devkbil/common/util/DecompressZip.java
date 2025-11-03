@@ -26,60 +26,40 @@ public class DecompressZip {
      * @param zipUnzipPath   압축파일의 내용이 압축해제될 디렉토리
      * @param type          압축파일의 확장자 타입 (예: .zip, .tar)
      * @return 압축해제 프로세스 성공 시 true, 실패 시 false
-     * @throws IOException   압축해제 과정중 입출력 오류 발생시
      */
-    public boolean unZip(String zipPath, String zipFileName, String zipUnzipPath, String type) throws IOException {
-
-        System.out.println(" unZip() - zipPath : " + zipPath);  //압축 파일 위치
-        System.out.println(" unZip() - zipFileName : " + zipFileName);  //압축파일 이름
-        System.out.println(" unZip() - zipUnzipPath : " + zipUnzipPath);  //압축이 해제될 위치
-
-        //파일 압축 해제 성공 여부
+    public boolean unZip(String zipPath, String zipFileName, String zipUnzipPath, String type) {
+        log.debug("unZip() - zipPath : " + zipPath);
+        log.debug("unZip() - zipFileName : " + zipFileName);
+        log.debug("unZip() - zipUnzipPath : " + zipUnzipPath);
         boolean isChk = false;
 
-        //압축 해재할 파일의 type(.zip or .tar) 제거
         zipUnzipPath = zipUnzipPath + zipFileName.replace(type, "");
-
-        //zip 파일
         File zipFile = new File(zipPath + zipFileName);
-        FileInputStream fis = null;
-        ZipInputStream zis = null;
-        ZipEntry zipentry = null;
 
-        try {
+        // try-with-resources 사용
+        try (FileInputStream fis = new FileInputStream(zipFile);
+             ZipInputStream zis = new ZipInputStream(fis, Charset.forName("EUC-KR"))) {
 
-            //zipFileName을 통해서 폴더 생성
             if (makeFolder(zipUnzipPath)) {
-                System.out.println(" --- 폴더를 생성 완료 ");
+                log.debug(" --- 폴더를 생성 완료 ");
             }
 
-            fis = new FileInputStream(zipFile);  //파일 스트림
-            zis = new ZipInputStream(fis, Charset.forName("EUC-KR"));  //Zip 파일 스트림
-
-            //압축되어 있는 ZIP 파일의 목록 조회
+            ZipEntry zipentry;
             while ((zipentry = zis.getNextEntry()) != null) {
                 String filename = zipentry.getName();
-                System.out.println("filename(zipentry.getName()) => " + filename);
+                log.debug("filename(zipentry.getName()) => " + filename);
 
                 File file = new File(zipUnzipPath, filename);
 
-                //entry가 디렉토리인지 파일인지 검색
                 if (zipentry.isDirectory()) {
-
-                    //entry가 디렉토리일 경우 폴더 생성
-                    System.out.println(" --- zipentry가 디렉토리입니다.");
+                    log.debug(" --- zipentry가 디렉토리입니다.");
                     file.mkdirs();
-
                 } else {
-
-                    //entry가 파일일 경우 파일 생성
-                    System.out.println(" --- zipentry가 파일입니다.");
-
+                    log.debug(" --- zipentry가 파일입니다.");
                     try {
                         createFile(file, zis);
-
                     } catch (Throwable e) {
-                        log.error(e.getMessage());
+                        log.error(e.getMessage(), e);
                     }
                 }
             }
@@ -87,27 +67,11 @@ public class DecompressZip {
             isChk = true;
 
         } catch (IOException e) {
+            log.error("압축 해제 중 오류 발생: {}", e.getMessage(), e);
             isChk = false;
-
-        } finally {
-            if (zis != null) {
-                try {
-                    zis.close();
-                } catch (IOException e) {
-                    throw e;
-                }
-            }
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    throw e;
-                }
-            }
         }
 
         return isChk;
-
     }
 
     /**
@@ -117,7 +81,7 @@ public class DecompressZip {
      * @return 폴더가 성공적으로 생성되었거나 이미 존재하는 경우 true, 그렇지 않으면 false
      */
     private boolean makeFolder(String folder) {
-        System.out.println(" makeFolder() - folder : " + folder);
+        log.debug(" makeFolder() - folder : " + folder);
 
         boolean result = false;
 
@@ -148,10 +112,10 @@ public class DecompressZip {
      *
      * @param file 생성되고 기록될 파일
      * @param zis 파일에 기록할 데이터를 제공하는 ZipInputStream
-     * @throws Exception 파일 생성 또는 데이터 쓰기 중 입출력 오류가 발생한 경우
+     * @throws IOException 파일 생성 또는 데이터 쓰기 중 입출력 오류가 발생한 경우
      */
     private void createFile(File file, ZipInputStream zis) throws IOException {
-        System.out.println(" createFile() - file : " + file);
+        log.debug(" createFile() - file : " + file);
         //디렉토리 확인
         File parentDir = new File(file.getParent());
 
@@ -160,11 +124,8 @@ public class DecompressZip {
             parentDir.mkdirs();
         }
 
-        FileOutputStream fos = null;  //출력 스트림
-
         //파일 스트림 선언
-        try {
-            fos = new FileOutputStream(file);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             byte[] buffer = new byte[256];
             int size = 0;
 
@@ -175,15 +136,6 @@ public class DecompressZip {
 
         } catch (IOException e) {
             throw e;
-
-        } finally {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    throw e;
-                }
-            }
         }
     }
 

@@ -59,7 +59,7 @@ public class UUIDUtil {
      */
     private static UUID generateType3UUID() {
         String name = "uuid name key";
-        UUID uuid3 = UUID.nameUUIDFromBytes(name.getBytes());
+        UUID uuid3 = UUID.nameUUIDFromBytes(name.getBytes(java.nio.charset.StandardCharsets.UTF_8));
         return uuid3;
     }
 

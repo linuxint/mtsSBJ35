@@ -51,7 +51,7 @@ public class DbtoolController {
         if (!StringUtils.hasText(tableName)) {
             log.error("Invalid tableName provided.");
             model.addAttribute("errorMessage", "Invalid or empty table name.");
-            return "error";
+            return "error/error";
         }
 
         try {
@@ -82,7 +82,7 @@ public class DbtoolController {
         } catch (Exception e) {
             log.error("Error while retrieving data for table {}: {}", tableName, e.getMessage());
             model.addAttribute("message", e.getMessage());
-            return "error";
+            return "error/error";
         }
     }
 

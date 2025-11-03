@@ -1,7 +1,5 @@
 package com.devkbil.mtssbj.schedule;
 
-import com.devkbil.common.util.DateUtil;
-import com.devkbil.mtssbj.schedule.DateVO;
 import com.devkbil.mtssbj.common.ExtFieldVO;
 import com.devkbil.mtssbj.search.SearchVO;
 import com.devkbil.mtssbj.calendar.LunarCalendarService;
@@ -65,7 +63,6 @@ public class SchService {
      * @param param 검색 조건
      * @return 일정 개수
      */
-    @SuppressWarnings("unused") // 사용되지 않는 경고를 억제
     public int selectSchCount(SearchVO param) {
         return sqlSession.selectOne("selectSchCount", param);
     }
@@ -76,7 +73,6 @@ public class SchService {
      * @param param 검색 조건
      * @return 일정 리스트
      */
-    @SuppressWarnings("unused") // 사용되지 않는 경고를 억제
     public List<?> selectSchList(SearchVO param) {
         return sqlSession.selectList("selectSchList", param);
     }

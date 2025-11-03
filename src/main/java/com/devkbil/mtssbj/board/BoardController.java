@@ -10,7 +10,7 @@ import com.devkbil.mtssbj.common.TreeMaker;
 import com.devkbil.mtssbj.config.security.Role;
 import com.devkbil.mtssbj.member.auth.AuthService;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -161,7 +161,7 @@ public class BoardController {
         String userno = authService.getAuthUserNo();
         String userrole = authService.getAuthUserrole();
 
-        boolean isAdmin = Role.ROLE_ADMIN == Role.getRoleByValue(userrole);
+        boolean isAdmin = Role.ROLE_ADMIN == Role.of(userrole);
         boardInfo.setUserno(userno);
 
         if (StringUtils.hasText(boardInfo.getBrdno())) {    // 업데이트 권한 확인

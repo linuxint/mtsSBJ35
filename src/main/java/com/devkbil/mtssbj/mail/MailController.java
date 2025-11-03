@@ -220,6 +220,16 @@ public class MailController {
     }
 
     /**
+     * 단일 수신 메일 삭제 (GET 버튼 호환)
+     */
+    @Operation(summary = "수신 메일 삭제", description = "단일 수신 메일을 삭제합니다. (GET 요청 호환)")
+    @GetMapping("/receiveMailDelete")
+    public String receiveMailDeleteGet(@ModelAttribute @Valid MailVO mailVO) {
+        mailService.deleteMail(mailVO);
+        return "redirect:/receiveMails";
+    }
+
+    /**
      * 다중 수신 메일 삭제
      *
      * @param checkRow 삭제할 메일 ID 배열
@@ -232,6 +242,31 @@ public class MailController {
         mailService.deleteMails(checkRow);
 
         return "redirect:/receiveMails";
+    }
+
+    /**
+     * 다중 발신 메일 삭제
+     *
+     * @param checkRow 삭제할 메일 ID 배열
+     * @return 발신 메일 리스트 화면으로 리다이렉트
+     */
+    @Operation(summary = "다중 발신 메일 삭제", description = "여러 발신 메일을 동시에 삭제합니다.")
+    @PostMapping("/sendMailsDelete")
+    public String sendMailsDelete(@RequestParam(value = "checkRow") String[] checkRow) {
+
+        mailService.deleteMails(checkRow);
+
+        return "redirect:/sendMails";
+    }
+
+    /**
+     * 단일 발신 메일 삭제 (GET 버튼 호환)
+     */
+    @Operation(summary = "발신 메일 삭제", description = "단일 발신 메일을 삭제합니다. (GET 요청 호환)")
+    @GetMapping("/sendMailDelete")
+    public String sendMailDelete(@ModelAttribute @Valid MailVO mailVO) {
+        mailService.deleteMail(mailVO);
+        return "redirect:/sendMails";
     }
 
     /**

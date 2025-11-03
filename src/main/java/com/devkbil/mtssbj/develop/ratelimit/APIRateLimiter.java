@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -87,7 +88,7 @@ public class APIRateLimiter {
     public boolean tryConsume(String apiKey) {
         BucketProxy bucket = getOrCreateBucket(apiKey);
         boolean consumed = bucket.tryConsume(1);
-        log.info("API Key: {}, Consumed: {}, Time: {}", apiKey, consumed, LocalDateTime.now());
+        log.info("API Key: {}, Consumed: {}, Time: {}", apiKey, consumed, LocalDateTime.now(ZoneId.systemDefault()));
         return consumed;
     }
 }

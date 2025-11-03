@@ -17,5 +17,5 @@ public class FileCore {
     public static int nSuccess = 1;
     public static int nException = 0;
     public static int nFailer = -1;
-    static int bufferSize = 1024; /** 파일 복사 BUFFER_SIZE **/
+    static int bufferSize = 1024; /* 파일 복사 BUFFER_SIZE */
 }

@@ -22,19 +22,19 @@ public class RoleMappingsJson {
     public static final String ROLE_MAPPINGS_JSON = """
             {
                 "/adBoardGroupList": {
-                    "ADMIN": {
-                        "successUrl": "thymeleaf/admin/board/BoardGroupList",
+                    "A": {
+                        "successUrl": "admin/board/BoardGroupList",
                         "errorUrl": "adminErrorPage"
                     },
-                    "USER": {
+                    "U": {
                         "successUrl": null,
                         "errorUrl": null
                     },
-                    "GUEST": {
+                    "G": {
                         "successUrl": null,
                         "errorUrl": null
                     },
-                    "ANONYMOUS": {
+                    "O": {
                         "successUrl": null,
                         "errorUrl": "member/memberLogin"
                     }

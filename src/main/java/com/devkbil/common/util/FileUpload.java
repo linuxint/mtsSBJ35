@@ -108,24 +108,28 @@ public class FileUpload {
      */
     public List<FileVO> saveAllFiles(List<MultipartFile> upfiles) {
         List<FileVO> fileVOList = new ArrayList<>();
-        // 파일 리스트가 null인 경우 빈 리스트 반환
         if (upfiles == null) {
             return fileVOList;
         }
-
+        List<java.util.concurrent.Future<?>> futures = new ArrayList<>();
         for (MultipartFile file : upfiles) {
-            // 스레드 풀을 사용하여 비동기적으로 파일 처리
-            executorService.submit(() -> {
+            futures.add(executorService.submit(() -> {
                 FileVO savedFile = saveFile(file);
-                // 파일 저장 성공 시 리스트에 추가
                 if (savedFile != null) {
                     synchronized (fileVOList) {
                         fileVOList.add(savedFile);
                     }
                 }
-            });
+            }));
         }
-        // 스레드 풀 종료
+        // 모든 작업이 끝날 때까지 대기
+        for (java.util.concurrent.Future<?> future : futures) {
+            try {
+                future.get();
+            } catch (Exception e) {
+                log.error("File upload task interrupted: " + e.getMessage(), e);
+            }
+        }
         executorService.shutdown();
         return fileVOList;
     }

@@ -94,8 +94,10 @@ public class UserVO implements UserDetails {
     @Override
     @Schema(hidden = true) // Swagger 문서에서는 숨김
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 역할 기반 권한을 GrantedAuthority 형태로 변환
-        return Collections.singletonList(() -> "ROLE_" + userrole);
+        // DB 값(A/U/G) 또는 텍스트(ADMIN/USER/GUEST)를 표준 권한으로 정규화
+        com.devkbil.mtssbj.config.security.Role role = com.devkbil.mtssbj.config.security.Role.of(this.userrole);
+        // Spring Security는 ROLE_ 접두가 붙은 권한명을 기대합니다. enum.name()이 정확히 그 문자열을 반환합니다.
+        return Collections.singletonList(() -> role.name());
     }
 
     @Override

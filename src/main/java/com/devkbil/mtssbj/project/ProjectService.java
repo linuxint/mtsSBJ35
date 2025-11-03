@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -75,7 +76,7 @@ public class ProjectService {
             projectVO = sqlSession.selectOne("selectProjectOne", param);
         } else {
             log.warn("프로젝트 번호 [{}]에 대한 조회 결과가 없습니다. 기본값을 초기화합니다.", param);
-            String today = LocalDate.now().toString(); // 현재 날짜
+            String today = LocalDate.now(ZoneId.systemDefault()).toString();
             projectVO = new ProjectVO();
             projectVO.setPrstartdate(today);
             projectVO.setPrenddate(today);

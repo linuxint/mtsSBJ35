@@ -18,8 +18,9 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -46,8 +47,8 @@ public class MakeExcel {
      * @return 생성된 파일 이름 문자열
      */
     public String get_Filename() {
-        SimpleDateFormat ft = new SimpleDateFormat("yyyyMMddHHmm");
-        return ft.format(new Date());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+        return LocalDateTime.now(ZoneId.systemDefault()).format(formatter);
     }
 
     /**
