@@ -5,7 +5,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.coyote.ajp.AbstractAjpProtocol;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.servlet.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,28 +31,6 @@ public class TomcatConfiguration {
     int httpPort;
     @Value("${server.port}")
     int serverPort;
-
-    @Bean
-    public ServletWebServerFactory servletContainer() {
-
-        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory() {
-            @Override
-            protected void postProcessContext(Context context) {
-                SecurityConstraint securityConstraint = new SecurityConstraint();
-                securityConstraint.setUserConstraint("CONFIDENTIAL");
-                //SecurityCollection collection = new SecurityCollection();
-                //collection.addPattern("/*");
-                //securityConstraint.addCollection(collection);
-                //scontext.addConstraint(securityConstraint);
-            }
-        };
-
-        tomcat.addAdditionalConnectors(createAjpConnector()); // ajp 포트
-        //tomcat.addAdditionalTomcatConnectors(redirectConnector()); // 서비스 기본포트
-        //createStandardConnector(8081); // http 추가포트
-
-        return tomcat;
-    }
 
     /**
      * tomcat Multi Port

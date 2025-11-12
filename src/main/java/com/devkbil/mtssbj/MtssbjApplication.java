@@ -18,7 +18,6 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup;
-import org.springframework.boot.data.jdbc.autoconfigure.DataJdbcRepositoriesAutoConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -30,9 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 @CrossOrigin(origins = "${app.cors.allowed-origins}") // 'Access-Control-Allow-Origin' header 추가
 @Slf4j
 @EnableCaching
-@EnableAutoConfiguration(exclude = {
-        DataJdbcRepositoriesAutoConfiguration.class
-})
 public class MtssbjApplication implements CommandLineRunner {
 
     private final ApplicationEventPublisher applicationEventPublisher;
