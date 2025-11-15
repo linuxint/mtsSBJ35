@@ -132,6 +132,7 @@ dependencies {
 
     // 모니터링 및 관리
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-actuator-autoconfigure'
 
     // 개발 도구 및 유틸리티
     implementation 'org.springframework.boot:spring-boot-starter-aop'
