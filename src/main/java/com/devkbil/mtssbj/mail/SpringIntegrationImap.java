@@ -11,7 +11,7 @@ import jakarta.mail.Part;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeUtility;
 
-import org.springframework.integration.mail.inbound.ImapMailReceiver;
+import org.springframework.integration.mail.ImapMailReceiver;
 import org.springframework.messaging.MessagingException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 

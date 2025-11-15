@@ -11,7 +11,7 @@ plugins {
     id 'org.springdoc.openapi-gradle-plugin' version '1.9.0'
     id 'checkstyle'
     id 'com.diffplug.spotless' version '8.0.0'
-    id 'org.cyclonedx.bom' version '3.0.1'
+    id 'org.cyclonedx.bom' version '3.0.2'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'net.ltgt.errorprone' version '4.3.0'
 }
@@ -41,6 +41,8 @@ repositories {
         url = 'https://repo.clojars.org'
         name = 'Clojars'
     }
+    maven { url = uri('https://jitpack.io') } // WireMock JRE8 최신 버전 필요시
+
 }
 
 springBoot {
@@ -118,8 +120,8 @@ dependencies {
     // ======================
 
     // Jackson 3.0 (tools.jackson) dependencies
-    implementation 'tools.jackson:jackson-base:3.0.1'
-    implementation 'tools.jackson.core:jackson-databind:3.0.1'
+    implementation 'tools.jackson:jackson-base:3.0.2'
+    implementation 'tools.jackson.core:jackson-databind:3.0.2'
 
     // ======================
     // 2. Spring Boot 핵심 Starter
@@ -130,7 +132,6 @@ dependencies {
 
     // 모니터링 및 관리
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-actuator-autoconfigure'
 
     // 개발 도구 및 유틸리티
     implementation 'org.springframework.boot:spring-boot-starter-aop'
@@ -140,10 +141,10 @@ dependencies {
     // 캐시 관련
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine:3.2.3'
-//    implementation 'org.ehcache:ehcache' //:3.10.8
+//    implementation 'org.ehcache:ehcache:3.11.1' //:3.10.8
 
     // 코드 품질
-    checkstyle 'com.puppycrawl.tools:checkstyle:12.1.1'
+    checkstyle 'com.puppycrawl.tools:checkstyle:12.1.2'
 
     // ======================
     // 3. Spring Data & Integration
@@ -152,6 +153,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.session:spring-session-jdbc'
+    // Removed invalid artifact 'org.springframework.boot:spring-boot-transaction'
+    // Transaction management is provided transitively by Spring Boot starters (e.g., spring-boot-starter-data-jpa)
 
     // Integration
     implementation 'org.springframework.boot:spring-boot-starter-integration'
@@ -192,15 +195,14 @@ dependencies {
     implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.6'
     implementation 'org.thymeleaf:thymeleaf-spring6:3.1.3.RELEASE'
 
-    // Embedded Tomcat (managed by Spring Boot)
-    runtimeOnly 'org.springframework.boot:spring-boot-starter-tomcat' // managed version from Spring Boot
-    // Removed explicit Tomcat 11 overrides to maintain compatibility with Spring Boot 3.5.x
+    // Embedded Tomcat (use Spring Boot managed version)
+    runtimeOnly 'org.springframework.boot:spring-boot-starter-tomcat'
 
     // ======================
     // 5. 데이터베이스 및 퍼시스턴스
     // ======================
     // JDBC Drivers
-    implementation 'org.xerial:sqlite-jdbc:3.50.3.0'
+    implementation 'org.xerial:sqlite-jdbc:3.51.0.0'
     implementation 'com.oracle.database.jdbc:ojdbc11:23.26.0.0.0'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.5.6'
     runtimeOnly 'com.h2database:h2:2.4.240'
@@ -218,18 +220,18 @@ dependencies {
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.6-alpha1'
 
     // Elasticsearch Low-level Client and Java API Client
-    implementation 'org.elasticsearch.client:elasticsearch-rest-client:9.2.0'
-    implementation 'co.elastic.clients:elasticsearch-java:9.2.0'
+    implementation 'org.elasticsearch.client:elasticsearch-rest-client:9.2.1'
+    implementation 'co.elastic.clients:elasticsearch-java:9.2.1'
 
     // ======================
     // 8. Logging & Monitoring
     // ======================
     // Micrometer & Metrics
-    implementation 'io.micrometer:micrometer-core:1.16.0-RC1'
-    implementation 'io.micrometer:micrometer-registry-prometheus:1.16.0-RC1'
-    implementation 'io.micrometer:micrometer-observation:1.16.0-RC1'
-    implementation 'io.micrometer:micrometer-commons:1.16.0-RC1'
-    implementation 'io.micrometer:micrometer-tracing:1.6.0-RC1'
+    implementation 'io.micrometer:micrometer-core:1.16.0'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.16.0'
+    implementation 'io.micrometer:micrometer-observation:1.16.0'
+    implementation 'io.micrometer:micrometer-commons:1.16.0'
+    implementation 'io.micrometer:micrometer-tracing:1.6.0'
 
     // Database Monitoring
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.12.0'
@@ -238,7 +240,7 @@ dependencies {
     implementation 'net.ttddyy:datasource-proxy:1.11.0'
 
     // Application Monitoring
-    implementation 'de.codecentric:spring-boot-admin-starter-client:3.5.5'
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.5.6'
 
     // Distributed Tracing
     implementation 'org.springframework.cloud:spring-cloud-starter-sleuth:3.1.11'
@@ -261,6 +263,7 @@ dependencies {
     implementation 'org.apache.tika:tika-parsers-standard-package:3.2.3'
     annotationProcessor 'org.apache.tika:tika-core:3.2.3'
     implementation 'org.apache.tika:tika-parsers:3.2.3'
+    implementation 'kr.dogfoot:hwplib:1.1.10'
 
     // Office Documents
     implementation 'org.apache.poi:poi-ooxml:5.4.1'
@@ -279,48 +282,55 @@ dependencies {
     implementation 'org.imgscalr:imgscalr-lib:4.2'
 
     // Other Formats
-    implementation 'com.google.zxing:javase:3.5.3'
-    implementation 'org.mnode.ical4j:ical4j:4.2.0'
+    implementation 'com.google.zxing:javase:3.5.4'
+    implementation 'org.mnode.ical4j:ical4j:4.2.1'
     implementation 'com.ibm.icu:icu4j:78.1'
 
     // ======================
     // 11. API Documentation
     // ======================
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0-M1'
+    // SpringDoc for Spring Boot 3.x (compatible with Spring Framework 6.x)
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 
     // ======================
     // 12. Testing
     // ======================
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.mockito:mockito-core:5.18.0'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.testcontainers:oracle-xe:1.21.3'
+    testImplementation 'io.projectreactor:reactor-test:3.8.0'
+    testImplementation 'org.mockito:mockito-core:5.20.0'
+
+    testImplementation 'org.testcontainers:junit-jupiter:1.21.3'
+    testImplementation 'org.wiremock:wiremock:4.0.0-beta.17'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.20.0'
 
     // ======================
     // 13. Utilities
     // ======================
     // Common Utils
     implementation 'com.google.guava:guava:33.5.0-jre'
-    implementation 'org.modelmapper:modelmapper:3.2.5'
+    implementation 'org.modelmapper:modelmapper:3.2.6'
     implementation 'org.jodd:jodd-util:6.3.0'
     implementation 'org.apache.commons:commons-lang3:3.19.0'
     implementation 'org.apache.commons:commons-text:1.14.0'
-    implementation 'io.projectreactor:reactor-core:3.8.0-RC1'  // Reactor Core 추가
-
+    implementation 'io.projectreactor:reactor-core:3.8.0'  // Reactor Core 추가
 
     // Code Quality
     implementation 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.47'
     checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:0.0.47'
     runtimeOnly 'io.spring.javaformat:spring-javaformat-config:0.0.47'
     runtimeOnly 'io.spring.javaformat:spring-javaformat-intellij-idea-plugin:0.0.47'
-    annotationProcessor 'com.google.errorprone:error_prone_core:2.36.0'
-    errorprone 'com.google.errorprone:error_prone_core:2.36.0'
+    annotationProcessor 'com.google.errorprone:error_prone_core:2.44.0'
+    errorprone 'com.google.errorprone:error_prone_core:2.44.0'
 
     // ======================
     // 14. Persistence & Validation
     // ======================
     // Hibernate
-    implementation 'org.hibernate.validator:hibernate-validator:9.1.0.CR1'
-    implementation 'org.hibernate.orm:hibernate-core:7.2.0.CR1'
-    implementation 'org.hibernate.orm:hibernate-jcache:7.2.0.CR1'
+    implementation 'org.hibernate.validator:hibernate-validator:9.1.0.Final'
+    implementation 'org.hibernate.orm:hibernate-core:7.2.0.CR2'
+    implementation 'org.hibernate.orm:hibernate-jcache:7.2.0.CR2'
 
     // Jakarta Persistence
     implementation 'jakarta.validation:jakarta.validation-api:3.1.1'
@@ -346,8 +356,8 @@ dependencies {
     // ======================
     // JOOQ
     implementation 'org.springframework.boot:spring-boot-starter-jooq'
-    implementation 'org.jooq:jooq:3.20.8'
-    implementation 'org.jooq:jooq-codegen:3.20.8'
+    implementation 'org.jooq:jooq:3.20.9'
+    implementation 'org.jooq:jooq-codegen:3.20.9'
     // jood.sql-dialect: ORACLE // application.properties || application.yml
     // 세선 DB
 
@@ -550,7 +560,7 @@ spotless {
 
 // Checkstyle
 checkstyle {
-    toolVersion = '12.1.1'
+    toolVersion = '12.1.2'
     // Using a local Checkstyle configuration file
     config = resources.text.fromFile('codestyle/naver-checkstyle-rules.xml')
 }
@@ -677,27 +687,30 @@ tasks.register('dockerRemove', Exec) {
 bootRun {
     // bootRun 시 테스트 실행 제외
     dependsOn 'compileJava', 'processResources'
-    //systemProperty 'spring.profiles.active', 'local'
+//    systemProperty 'spring.profiles.active', 'local'
 }
+def testsEnabled = project.hasProperty('enableTests') && project.property('enableTests') == 'true'
 
 test {
-    // 테스트 실행 비활성화
-    enabled = false
+    enabled = testsEnabled
     useJUnitPlatform()
     testLogging {
-        events "passed", "skipped", "failed"
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+        showStandardStreams = true
     }
 }
 
 tasks.register("generateMsgEnum") {
-    // 소스 디렉터리 하위에 생성
-    def generatedSrcDir = file("$projectDir/src/main/java")
+    // 소스 디렉터리 하위에 생성 (configuration phase 계산, configuration cache 호환)
+    def generatedSrcDir = layout.projectDirectory.dir("src/main/java").asFile
 
-    def propFile = file("$projectDir/src/main/resources/messages/message.properties")
+    def propFile = layout.projectDirectory.file("src/main/resources/messages/message.properties").asFile
+    def genPropsFile = layout.projectDirectory.file("src/main/resources/message-gen.properties").asFile
 
     dependsOn(tasks.named("copySplitSboms"))
 
     inputs.file(propFile)
+    inputs.file(genPropsFile)
     outputs.dir(generatedSrcDir)
 
     doLast {
@@ -709,7 +722,7 @@ tasks.register("generateMsgEnum") {
         propFile.withInputStream { props.load(it) }
 
         def genProps = new Properties()
-        file("$projectDir/src/main/resources/message-gen.properties").withInputStream { genProps.load(it) }
+        genPropsFile.withInputStream { genProps.load(it) }
 
         def packageName = genProps.getProperty("java.package")
         def enumName = genProps.getProperty("java.class")

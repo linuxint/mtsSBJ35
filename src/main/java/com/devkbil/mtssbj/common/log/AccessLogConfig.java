@@ -1,7 +1,7 @@
 package com.devkbil.mtssbj.common.log;
 
 import org.apache.catalina.valves.AccessLogValve;
-import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Configuration;
@@ -25,10 +25,10 @@ public class AccessLogConfig implements WebServerFactoryCustomizer {
         final TomcatServletWebServerFactory containerFactory = (TomcatServletWebServerFactory) factory;
 
         final AccessLogValve accessLogValve = new AccessLogValve();
-        //accessLogValve.setDirectory();
+//        accessLogValve.setDirectory();
         accessLogValve.setPattern("%{yyyy-MM-dd HH:mm:ss}t\t%s\t%r\t%{User-Agent}i\t%{Referer}i\t%a\t%b");
-        //accessLogValve.setDirectory(".");
-        //accessLogValve.setSuffix(".log");
+        accessLogValve.setDirectory(".");
+        accessLogValve.setSuffix(".log");
         accessLogValve.setCondition("ignoreLogging");
         containerFactory.addContextValves(accessLogValve);
     }
