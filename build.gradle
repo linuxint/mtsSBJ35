@@ -4,7 +4,7 @@
 import org.apache.maven.artifact.versioning.ComparableVersion
 
 plugins {
-    id 'org.springframework.boot' version '3.5.7'
+    id 'org.springframework.boot' version '3.5.8'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'maven-publish'
     id 'java'
