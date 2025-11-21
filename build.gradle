@@ -10,7 +10,7 @@ plugins {
     id 'java'
     id 'org.springdoc.openapi-gradle-plugin' version '1.9.0'
     id 'checkstyle'
-    id 'com.diffplug.spotless' version '8.0.0'
+    id 'com.diffplug.spotless' version '8.1.0'
     id 'org.cyclonedx.bom' version '3.0.2'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'net.ltgt.errorprone' version '4.3.0'
@@ -235,9 +235,9 @@ dependencies {
     implementation 'io.micrometer:micrometer-tracing:1.6.0'
 
     // Database Monitoring
-    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.12.0'
-    implementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:1.12.0'
-    implementation 'com.github.gavlyukovskiy:flexy-pool-spring-boot-starter:1.12.0'
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:2.0.0'
+    implementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:2.0.0'
+    implementation 'com.github.gavlyukovskiy:flexy-pool-spring-boot-starter:2.0.0'
     implementation 'net.ttddyy:datasource-proxy:1.11.0'
 
     // Application Monitoring
