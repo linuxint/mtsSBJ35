@@ -269,7 +269,7 @@ dependencies {
     // Office Documents
     implementation 'org.apache.poi:poi-ooxml:5.5.0'
     implementation 'org.jxls:jxls-poi:3.0.0'
-    implementation 'net.sf.mpxj:mpxj:14.5.2'
+    implementation 'net.sf.mpxj:mpxj:15.0.0'
     implementation 'net.freeutils:jtnef:2.1.0'
 
     // PDF Processing
@@ -330,8 +330,8 @@ dependencies {
     // ======================
     // Hibernate
     implementation 'org.hibernate.validator:hibernate-validator:9.1.0.Final'
-    implementation 'org.hibernate.orm:hibernate-core:7.2.0.CR2'
-    implementation 'org.hibernate.orm:hibernate-jcache:7.2.0.CR2'
+    implementation 'org.hibernate.orm:hibernate-core:7.2.0.CR3'
+    implementation 'org.hibernate.orm:hibernate-jcache:7.2.0.CR3'
 
     // Jakarta Persistence
     implementation 'jakarta.validation:jakarta.validation-api:3.1.1'
