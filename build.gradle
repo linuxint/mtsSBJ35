@@ -251,10 +251,10 @@ dependencies {
     // 9. Encryption & Security Utils
     // ======================
     // Bouncy Castle Security Provider
-    implementation 'org.bouncycastle:bcjmail-jdk18on:1.82'
-    implementation 'org.bouncycastle:bcpkix-jdk18on:1.82'
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.82'
-    implementation 'org.bouncycastle:bcutil-jdk18on:1.82'
+    implementation 'org.bouncycastle:bcjmail-jdk18on:1.83'
+    implementation 'org.bouncycastle:bcpkix-jdk18on:1.83'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.83'
+    implementation 'org.bouncycastle:bcutil-jdk18on:1.83'
 
     // ======================
     // 10. File & Document Processing
