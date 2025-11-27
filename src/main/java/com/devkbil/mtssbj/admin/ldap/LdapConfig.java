@@ -7,6 +7,7 @@ import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 
 @Configuration
+@ConditionalOnProperty(prefix = "spring.ldap", name = "enabled", havingValue = "true")
 public class LdapConfig {
     @Bean
     @ConditionalOnProperty(name = "spring.ldap.urls")

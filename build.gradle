@@ -198,6 +198,8 @@ dependencies {
 
     // Embedded Tomcat (use Spring Boot managed version)
     runtimeOnly 'org.springframework.boot:spring-boot-starter-tomcat'
+    // JSP rendering support for embedded Tomcat (Jasper)
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
 
     // ======================
     // 5. 데이터베이스 및 퍼시스턴스
