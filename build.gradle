@@ -4,16 +4,16 @@
 import org.apache.maven.artifact.versioning.ComparableVersion
 
 plugins {
-    id 'org.springframework.boot' version '3.5.9'
+    id 'org.springframework.boot' version '3.5.15'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'maven-publish'
     id 'java'
     id 'org.springdoc.openapi-gradle-plugin' version '1.9.0'
     id 'checkstyle'
-    id 'com.diffplug.spotless' version '8.1.0'
-    id 'org.cyclonedx.bom' version '3.1.0'
+    id 'com.diffplug.spotless' version '8.7.0'
+    id 'org.cyclonedx.bom' version '3.2.4'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
-    id 'net.ltgt.errorprone' version '4.3.0'
+    id 'net.ltgt.errorprone' version '5.1.0'
 }
 
 // Project Information
@@ -50,10 +50,10 @@ springBoot {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_24
-    targetCompatibility = JavaVersion.VERSION_24
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
     toolchain {
-        languageVersion = JavaLanguageVersion.of(24)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -112,16 +112,16 @@ dependencyManagement {
 
 dependencies {
 
-    implementation 'com.google.guava:guava:33.5.0-jre' // For Splitter
-    implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1'
+    implementation 'com.google.guava:guava:33.6.0-jre' // For Splitter
+    implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260313.1'
 
     // ======================
     // 1. Platform & BOM
     // ======================
 
     // Jackson 3.0 (tools.jackson) dependencies
-    implementation 'tools.jackson:jackson-base:3.0.3'
-    implementation 'tools.jackson.core:jackson-databind:3.0.3'
+    implementation 'tools.jackson:jackson-base:3.2.0'
+    implementation 'tools.jackson.core:jackson-databind:3.2.0'
 
     // ======================
     // 2. Spring Boot 핵심 Starter
@@ -141,11 +141,11 @@ dependencies {
 
     // 캐시 관련
     implementation 'org.springframework.boot:spring-boot-starter-cache'
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.2.3'
-//    implementation 'org.ehcache:ehcache:3.11.1' //:3.10.8
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.2.4'
+//    implementation 'org.ehcache:ehcache:3.12.0' //:3.10.8
 
     // 코드 품질
-    checkstyle 'com.puppycrawl.tools:checkstyle:12.3.0'
+    checkstyle 'com.puppycrawl.tools:checkstyle:13.7.0'
 
     // ======================
     // 3. Spring Data & Integration
@@ -174,7 +174,7 @@ dependencies {
     // ======================
     // Core Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.3.RELEASE'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.5.RELEASE'
 
     // Authentication
     implementation 'io.jsonwebtoken:jjwt:0.13.0'
@@ -193,8 +193,8 @@ dependencies {
 
     // Implementation Libraries
     implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1'
-    implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.6'
-    implementation 'org.thymeleaf:thymeleaf-spring6:3.1.3.RELEASE'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.9'
+    implementation 'org.thymeleaf:thymeleaf-spring6:3.1.5.RELEASE'
 
     // Embedded Tomcat (use Spring Boot managed version)
     runtimeOnly 'org.springframework.boot:spring-boot-starter-tomcat'
@@ -205,9 +205,9 @@ dependencies {
     // 5. 데이터베이스 및 퍼시스턴스
     // ======================
     // JDBC Drivers
-    implementation 'org.xerial:sqlite-jdbc:3.51.1.0'
-    implementation 'com.oracle.database.jdbc:ojdbc11:23.26.0.0.0'
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.5.7'
+    implementation 'org.xerial:sqlite-jdbc:3.53.2.0'
+    implementation 'com.oracle.database.jdbc:ojdbc11:23.26.2.0.0'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.5.9'
     runtimeOnly 'com.h2database:h2:2.4.240'
 
     // ORM & SQL Mappers
@@ -220,7 +220,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
     // HTTP Client for Elasticsearch
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.6-alpha1'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.6.1'
 
     // Elasticsearch Low-level Client and Java API Client
     implementation 'org.elasticsearch.client:elasticsearch-rest-client:9.2.2'
@@ -230,20 +230,20 @@ dependencies {
     // 8. Logging & Monitoring
     // ======================
     // Micrometer & Metrics
-    implementation 'io.micrometer:micrometer-core:1.16.1'
-    implementation 'io.micrometer:micrometer-registry-prometheus:1.16.1'
-    implementation 'io.micrometer:micrometer-observation:1.16.1'
-    implementation 'io.micrometer:micrometer-commons:1.16.1'
-    implementation 'io.micrometer:micrometer-tracing:1.6.1'
+    implementation 'io.micrometer:micrometer-core:1.17.0'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.17.0'
+    implementation 'io.micrometer:micrometer-observation:1.17.0'
+    implementation 'io.micrometer:micrometer-commons:1.17.0'
+    implementation 'io.micrometer:micrometer-tracing:1.7.0'
 
     // Database Monitoring
-    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:2.0.0'
-    implementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:2.0.0'
-    implementation 'com.github.gavlyukovskiy:flexy-pool-spring-boot-starter:2.0.0'
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:2.0.1'
+    implementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:2.0.1'
+    implementation 'com.github.gavlyukovskiy:flexy-pool-spring-boot-starter:2.0.1'
     implementation 'net.ttddyy:datasource-proxy:1.11.0'
 
     // Application Monitoring
-    implementation 'de.codecentric:spring-boot-admin-starter-client:3.5.6'
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.5.9'
 
     // Distributed Tracing
     implementation 'org.springframework.cloud:spring-cloud-starter-sleuth:3.1.11'
@@ -253,41 +253,41 @@ dependencies {
     // 9. Encryption & Security Utils
     // ======================
     // Bouncy Castle Security Provider
-    implementation 'org.bouncycastle:bcjmail-jdk18on:1.83'
-    implementation 'org.bouncycastle:bcpkix-jdk18on:1.83'
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.83'
-    implementation 'org.bouncycastle:bcutil-jdk18on:1.83'
+    implementation 'org.bouncycastle:bcjmail-jdk18on:1.84'
+    implementation 'org.bouncycastle:bcpkix-jdk18on:1.84'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.84'
+    implementation 'org.bouncycastle:bcutil-jdk18on:1.84'
 
     // ======================
     // 10. File & Document Processing
     // ======================
     // Document Parsing
-    implementation 'org.apache.tika:tika-core:3.2.3'
-    implementation 'org.apache.tika:tika-parsers-standard-package:3.2.3'
-    annotationProcessor 'org.apache.tika:tika-core:3.2.3'
-    implementation 'org.apache.tika:tika-parsers:3.2.3'
+    implementation 'org.apache.tika:tika-core:3.3.1'
+    implementation 'org.apache.tika:tika-parsers-standard-package:3.3.1'
+    annotationProcessor 'org.apache.tika:tika-core:3.3.1'
+    implementation 'org.apache.tika:tika-parsers:3.3.1'
     implementation 'kr.dogfoot:hwplib:1.1.10'
 
     // Office Documents
     implementation 'org.apache.poi:poi-ooxml:5.5.1'
-    implementation 'org.jxls:jxls-poi:3.0.0'
-    implementation 'net.sf.mpxj:mpxj:15.1.0'
+    implementation 'org.jxls:jxls-poi:3.1.0'
+    implementation 'net.sf.mpxj:mpxj:16.4.1'
     implementation 'net.freeutils:jtnef:2.1.0'
 
     // PDF Processing
-    implementation 'org.apache.pdfbox:pdfbox:3.0.6'
-    implementation 'org.apache.pdfbox:jbig2-imageio:3.0.4'
+    implementation 'org.apache.pdfbox:pdfbox:3.0.7'
+    implementation 'org.apache.pdfbox:jbig2-imageio:3.0.5'
 
     // Image Processing
     implementation 'com.github.jai-imageio:jai-imageio-core:1.4.0'
     implementation 'com.github.jai-imageio:jai-imageio-jpeg2000:1.4.0'
-    implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.12.0'
+    implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.13.1'
     implementation 'org.imgscalr:imgscalr-lib:4.2'
 
     // Other Formats
     implementation 'com.google.zxing:javase:3.5.4'
-    implementation 'org.mnode.ical4j:ical4j:4.2.2'
-    implementation 'com.ibm.icu:icu4j:78.1'
+    implementation 'org.mnode.ical4j:ical4j:4.3.0'
+    implementation 'com.ibm.icu:icu4j:78.3'
 
     // ======================
     // 11. API Documentation
@@ -312,12 +312,12 @@ dependencies {
     // 13. Utilities
     // ======================
     // Common Utils
-    implementation 'com.google.guava:guava:33.5.0-jre'
+    implementation 'com.google.guava:guava:33.6.0-jre'
     implementation 'org.modelmapper:modelmapper:3.2.6'
     implementation 'org.jodd:jodd-util:6.3.0'
     implementation 'org.apache.commons:commons-lang3:3.20.0'
     implementation 'org.apache.commons:commons-text:1.15.0'
-    implementation 'io.projectreactor:reactor-core:3.8.1'  // Reactor Core 추가
+    implementation 'io.projectreactor:reactor-core:3.8.6'  // Reactor Core 추가
 
     // Code Quality
     implementation 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.47'
@@ -332,23 +332,23 @@ dependencies {
     // ======================
     // Hibernate
     implementation 'org.hibernate.validator:hibernate-validator:9.1.0.Final'
-    implementation 'org.hibernate.orm:hibernate-core:7.2.0.Final'
-    implementation 'org.hibernate.orm:hibernate-jcache:7.2.0.Final'
+    implementation 'org.hibernate.orm:hibernate-core:7.2.20.Final'
+    implementation 'org.hibernate.orm:hibernate-jcache:7.2.20.Final'
 
     // Jakarta Persistence
     implementation 'jakarta.validation:jakarta.validation-api:3.1.1'
     implementation 'jakarta.persistence:jakarta.persistence-api:3.2.0'
 
     // Lombok
-    implementation 'org.projectlombok:lombok:1.18.42'
-    annotationProcessor 'org.projectlombok:lombok:1.18.42'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.42'
+    implementation 'org.projectlombok:lombok:1.18.46'
+    annotationProcessor 'org.projectlombok:lombok:1.18.46'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.46'
 
     // ======================
     // 15. Communication & Messaging
     // ======================
     // Rate Limiting
-    implementation 'com.bucket4j:bucket4j_jdk17-oracle:8.15.0'
+    implementation 'com.bucket4j:bucket4j_jdk17-oracle:8.19.0'
 
     // Web Communication
     implementation 'org.springframework.boot:spring-boot-starter-json'
@@ -359,8 +359,8 @@ dependencies {
     // ======================
     // JOOQ
     implementation 'org.springframework.boot:spring-boot-starter-jooq'
-    implementation 'org.jooq:jooq:3.20.10'
-    implementation 'org.jooq:jooq-codegen:3.20.10'
+    implementation 'org.jooq:jooq:3.21.6'
+    implementation 'org.jooq:jooq-codegen:3.21.6'
     // jood.sql-dialect: ORACLE // application.properties || application.yml
     // 세선 DB
 
@@ -371,10 +371,10 @@ dependencies {
     // 17. Miscellaneous
     // ======================
     // Network
-    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.9.Final'
+    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.2.15.Final'
 
     // Version Control
-    implementation 'org.eclipse.jgit:org.eclipse.jgit:7.5.0.202512021534-r'
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:7.7.0.202606012155-r'
 
     // External Libraries
     implementation fileTree(dir: 'lib', include: ['*.jar'])
